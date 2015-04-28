@@ -10,16 +10,22 @@
 
     inspired by ElementSOAP.py
 """
+import logging
+from coherence.upnp.core.xml_constants import ELEMENT_TYPE
 from twisted.python.util import OrderedDict
 
-from coherence.extern.et import ET
+from lxml import etree
 
-NS_SOAP_ENV = "{http://schemas.xmlsoap.org/soap/envelope/}"
-NS_SOAP_ENC = "{http://schemas.xmlsoap.org/soap/encoding/}"
-NS_XSI = "{http://www.w3.org/1999/XMLSchema-instance}"
-NS_XSD = "{http://www.w3.org/1999/XMLSchema}"
+NS_SOAP_ENV = "http://schemas.xmlsoap.org/soap/envelope/"
+NS_SOAP_ENC = "http://schemas.xmlsoap.org/soap/encoding/"
+NS_XSD = "http://www.w3.org/1999/XMLSchema"
+NS_UPNP_ORG_CONTROL_1_0 = 'urn:schemas-upnp-org:control-1-0'
 
-SOAP_ENCODING = "http://schemas.xmlsoap.org/soap/encoding/"
+TYPE_MAP = {str: 'string',
+            unicode: 'string',
+            int: 'int',
+            float: 'float',
+            bool: 'boolean'}
 
 UPNPERRORS = {401: 'Invalid Action',
               402: 'Invalid Args',
@@ -38,82 +44,69 @@ UPNPERRORS = {401: 'Invalid Action',
               611: 'Invalid Control URL',
               612: 'No Such Session', }
 
-
-def build_soap_error(status, description='without words'):
-    """ builds an UPnP SOAP error msg
-    """
-    root = ET.Element('s:Fault')
-    ET.SubElement(root, 'faultcode').text = 's:Client'
-    ET.SubElement(root, 'faultstring').text = 'UPnPError'
-    e = ET.SubElement(root, 'detail')
-    e = ET.SubElement(e, 'UPnPError')
-    e.attrib['xmlns'] = 'urn:schemas-upnp-org:control-1-0'
-    ET.SubElement(e, 'errorCode').text = str(status)
-    ET.SubElement(e, 'errorDescription').text = UPNPERRORS.get(status, description)
-    return build_soap_call(None, root, encoding=None)
+logger = logging.getLogger('soap_lite')
 
 
-def build_soap_call(method, arguments, is_response=False,
-                                       encoding=SOAP_ENCODING,
-                                       envelope_attrib=None,
-                                       typed=None):
-    """ create a shell for a SOAP request or response element
-        - set method to none to omitt the method element and
-          add the arguments directly to the body (for an error msg)
-        - arguments can be a dict or an ET.Element
-    """
-    envelope = ET.Element("s:Envelope")
-    if envelope_attrib:
-        # :fixme: ensure there is no xmlns defined here
-        for n in envelope_attrib:
-            envelope.attrib.update({n[0]: n[1]})
+def build_soap_error(status,
+                     description='without words',
+                     pretty_print=True):
+  """ builds an UPnP SOAP error msg
+  """
+  root = etree.Element(etree.QName(NS_SOAP_ENV, 'Fault'))
+  etree.SubElement(root, 'faultcode').text = 's:Client'
+  etree.SubElement(root, 'faultstring').text = 'UPnPError'
+  e = etree.SubElement(root, 'detail')
+  e = etree.SubElement(e, etree.QName(NS_UPNP_ORG_CONTROL_1_0, 'UPnPError'), nsmap={None: NS_UPNP_ORG_CONTROL_1_0})
+  etree.SubElement(e, 'errorCode').text = str(status)
+  etree.SubElement(e, 'errorDescription').text = UPNPERRORS.get(status, description)
+
+  return build_soap_call(None, root, pretty_print=pretty_print)
+
+
+def build_soap_call(method, arguments, ns=None,
+                    is_response=False,
+                    pretty_print=True):
+  """ create a shell for a SOAP request or response element
+      - set method to none to omitt the method element and
+        add the arguments directly to the body (for an error msg)
+      - arguments can be a dict or an etree.Element
+  """
+  envelope = etree.Element(etree.QName(NS_SOAP_ENV, 'Envelope'),
+                           attrib={etree.QName(NS_SOAP_ENV, 'encodingStyle'): NS_SOAP_ENC},
+                           nsmap={'s': NS_SOAP_ENV})
+  body = etree.SubElement(envelope, etree.QName(NS_SOAP_ENV, 'Body'))
+
+  if method:
+    if is_response is True:
+      method += "Response"
+
+    if ns:
+      tag = etree.QName(ns, method)
+      nsmap = {'u': ns}
     else:
-        envelope.attrib.update({'s:encodingStyle': "http://schemas.xmlsoap.org/soap/encoding/"})
-        # :fixme: remove explict xmlns attribute
-        envelope.attrib.update({'xmlns:s': "http://schemas.xmlsoap.org/soap/envelope/"})
+      tag = method
+      nsmap = None
 
-    body = ET.SubElement(envelope, "s:Body")
+    re = etree.SubElement(body, tag, nsmap=nsmap)
+  else:
+    re = body
 
-    if method:
-        # append the method call
-        if is_response is True:
-            method += "Response"
-        re = ET.SubElement(body, method)
-        if encoding:
-            re.set(NS_SOAP_ENV + "encodingStyle", encoding)
-    else:
-        re = body
+  # append the arguments
+  if isinstance(arguments, (dict, OrderedDict)):
+    for arg_name, arg_val in arguments.iteritems():
+      if type(arg_val) in TYPE_MAP:
+        arg_type = TYPE_MAP[type(arg_val)]
+        if arg_type == 'int' or arg_type == 'float':
+          arg_val = str(arg_val)
+        if arg_type == 'boolean':
+          arg_val = '1' if arg_val else '0'
+        e = etree.SubElement(re, arg_name)
+        e.text = arg_val
+      # elif isinstance(arg_val, ELEMENT_TYPE):
+      #   e.append(arg_val)
+  elif isinstance(arguments, ELEMENT_TYPE):
+    re.append(arguments)
 
-    # append the arguments
-    if isinstance(arguments, (dict, OrderedDict)):
-        type_map = {str: 'xsd:string',
-                    unicode: 'xsd:string',
-                    int: 'xsd:int',
-                    float: 'xsd:float',
-                    bool: 'xsd:boolean'}
-
-        for arg_name, arg_val in arguments.iteritems():
-            arg_type = type_map[type(arg_val)]
-            if arg_type == 'xsd:string' and type(arg_val) == unicode:
-                arg_val = arg_val.encode('utf-8')
-            if arg_type == 'xsd:int' or arg_type == 'xsd:float':
-                arg_val = str(arg_val)
-            if arg_type == 'xsd:boolean':
-                if arg_val == True:
-                    arg_val = '1'
-                else:
-                    arg_val = '0'
-
-            e = ET.SubElement(re, arg_name)
-            if typed and arg_type:
-                if not isinstance(type, ET.QName):
-                    arg_type = ET.QName("http://www.w3.org/1999/XMLSchema", arg_type)
-                e.set(NS_XSI + "type", arg_type)
-            e.text = arg_val
-    else:
-        if arguments == None:
-            arguments = {}
-        re.append(arguments)
-
-    preamble = """<?xml version="1.0" encoding="utf-8"?>"""
-    return preamble + ET.tostring(envelope, 'utf-8')
+  xml = etree.tostring(envelope, encoding='utf-8', xml_declaration=True, pretty_print=pretty_print)
+  logger.debug("xml dump:\n%s", xml)
+  return xml

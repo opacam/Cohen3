@@ -15,7 +15,6 @@ import coherence.extern.louie as louie
 from coherence.upnp.core.utils import getPage
 from coherence.extern.et import parse_xml
 from coherence.upnp.core import DIDLLite
-from twisted.internet import defer, reactor
 
 
 class Backend(log.Loggable, Plugin):
@@ -360,25 +359,25 @@ class Container(BackendItem):
             self.children_by_external_id[external_id] = child
 
     def add_child(self, child, external_id=None, update=True):
-        id = self.register_child(child, external_id)
+        self.register_child(child, external_id)
         if self.children is None:
             self.children = []
         self.children.append(child)
         self.sorted = False
-        if update == True:
+        if update:
             self.update_id += 1
 
     def remove_child(self, child, external_id=None, update=True):
         self.children.remove(child)
         self.store.remove_item(child)
-        if update == True:
+        if update:
             self.update_id += 1
         if external_id is not None:
             child.external_id = None
             del self.children_by_external_id[external_id]
 
     def get_children(self, start=0, end=0):
-        if self.sorted == False:
+        if not self.sorted:
             self.children.sort(cmp=self.sorting_method)
             self.sorted = True
         if end != 0:
@@ -433,7 +432,7 @@ class LazyContainer(Container):
 
     def replace_by(self, item):
         if self.external_id is not None and item.external_id is not None:
-            return (self.external_id == item.external_id)
+            return self.external_id == item.external_id
         return True
 
     def add_child(self, child, external_id=None, update=True):
@@ -473,8 +472,7 @@ class LazyContainer(Container):
             old_item = item
             new_item = new_children[id]
             replaced = False
-            if self.replace_by:
-                #print "Replacement method available: Try"
+            if hasattr(old_item, 'replace_by'):
                 replaced = old_item.replace_by(new_item)
             if replaced is False:
                 #print "No replacement possible: we remove and add the item again"

@@ -773,8 +773,6 @@ class GStreamerPlayer(log.Loggable, Plugin):
         """
         from urllib import unquote
         from cgi import parse_qs
-        from coherence.extern.et import ET
-        from coherence.upnp.core.utils import parse_xml
 
         def handle_reply(r, uri, action, kw):
             try:

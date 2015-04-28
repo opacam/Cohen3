@@ -146,13 +146,13 @@ class RhythmboxPlayer(log.Loggable):
             elt.addItem(item)
             self.metadata = elt.toString()
             self.entry = entry
-            if self.server != None:
+            if self.server is not None:
                 self.server.av_transport_server.set_variable(connection_id, 'CurrentTrackURI', uri)
                 self.server.av_transport_server.set_variable(connection_id, 'AVTransportURI', uri)
                 self.server.av_transport_server.set_variable(connection_id, 'AVTransportURIMetaData', self.metadata)
                 self.server.av_transport_server.set_variable(connection_id, 'CurrentTrackMetaData', self.metadata)
             self.info("playing_song_changed %r", self.metadata)
-        if self.server != None:
+        if self.server is not None:
             self.server.av_transport_server.set_variable(connection_id, 'CurrentTransportActions', 'PLAY,STOP,PAUSE,SEEK,NEXT,PREVIOUS')
             self.server.av_transport_server.set_variable(connection_id, 'RelativeTimePosition', '00:00:00')
             self.server.av_transport_server.set_variable(connection_id, 'AbsoluteTimePosition', '00:00:00')

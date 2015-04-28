@@ -9,8 +9,6 @@ from twisted.internet import defer
 
 from coherence import log, SERVER_ID
 
-from coherence.extern.et import ET, namespace_map_update
-
 from coherence.upnp.core.utils import parse_xml
 
 from coherence.upnp.core import soap_lite
@@ -62,10 +60,7 @@ class UPnPPublisher(resource.Resource, log.Loggable):
     def _gotResult(self, result, request, methodName, ns):
         self.debug('_gotResult %s %s %s %s', result, request, methodName, ns)
 
-        response = soap_lite.build_soap_call("{%s}%s" % (ns, methodName), result,
-                                                is_response=True,
-                                                encoding=None)
-        #print "SOAP-lite response", response
+        response = soap_lite.build_soap_call(methodName, result, ns=ns, is_response=True)
         self._sendResponse(request, response)
 
     def _gotError(self, failure, request, methodName, ns):

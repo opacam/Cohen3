@@ -6,11 +6,7 @@
 from twisted.python import failure
 
 from coherence import log
-
-from coherence.extern.et import ET, namespace_map_update
-
 from coherence.upnp.core.utils import getPage, parse_xml
-
 from coherence.upnp.core import soap_lite
 
 
@@ -47,13 +43,12 @@ class SOAPProxy(log.Loggable):
         self.info("callRemote %r %r %r %r", self.soapaction, soapmethod, self.namespace, self.action)
 
         headers = {'content-type': 'text/xml ;charset="utf-8"',
-                    'SOAPACTION': '"%s"' % soapaction, }
+                   'SOAPACTION': '"%s"' % soapaction, }
         if arguments.has_key('headers'):
             headers.update(arguments['headers'])
             del arguments['headers']
 
-        payload = soap_lite.build_soap_call("{%s}%s" % (self.namespace[1], self.action), arguments,
-                                            encoding=None)
+        payload = soap_lite.build_soap_call(self.action, arguments, ns=self.namespace[1])
 
         self.info("callRemote soapaction:  %s %s", self.action, self.url)
         self.debug("callRemote payload:  %s", payload)
@@ -102,7 +97,7 @@ class SOAPProxy(log.Loggable):
             response = body.find('%sResponse' % self.action)
         self.debug("callRemote response  %s", response)
         result = {}
-        if response != None:
+        if response is not None:
             for elem in response:
                 result[elem.tag] = self.decode_result(elem)
         #print "_cbGotResult 3", result

@@ -46,7 +46,6 @@ class Device(log.Loggable):
     #    pass
 
     def as_dict(self):
-        import copy
         d = {'device_type': self.get_device_type(),
              'friendly_name': self.get_friendly_name(),
              'udn': self.get_id(),
@@ -67,24 +66,24 @@ class Device(log.Loggable):
             service = self.services.pop()
             self.debug("try to remove %r", service)
             service.remove()
-        if self.client != None:
+        if self.client is not None:
             louie.send('Coherence.UPnP.Device.remove_client', None, self.udn, self.client)
             self.client = None
         #del self
 
     def receiver(self, *args, **kwargs):
-        if self.detection_completed == True:
+        if self.detection_completed:
             return
         for s in self.services:
-            if s.detection_completed == False:
+            if not s.detection_completed:
                 return
-        if self.udn == None:
+        if self.udn is None:
             return
         self.detection_completed = True
-        if self.parent != None:
+        if self.parent is not None:
             self.info("embedded device %r %r initialized, parent %r", self.friendly_name, self.device_type, self.parent)
         louie.send('Coherence.UPnP.Device.detection_completed', None, device=self)
-        if self.parent != None:
+        if self.parent is not None:
             louie.send('Coherence.UPnP.Device.detection_completed', self.parent, device=self)
         else:
             louie.send('Coherence.UPnP.Device.detection_completed', self, device=self)

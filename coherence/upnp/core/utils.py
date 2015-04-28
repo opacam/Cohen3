@@ -4,21 +4,16 @@
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
 
-from os.path import abspath
 import urlparse
 from urlparse import urlsplit
 
 from coherence.extern.et import parse_xml as et_parse_xml
-
 from coherence import SERVER_ID
-
-from twisted.web import server, http, static
+from twisted.web import http, static
 from twisted.web import client, error
 from twisted.web import proxy, resource, server
-from twisted.internet import reactor, protocol, defer, abstract
+from twisted.internet import reactor, defer, abstract
 from twisted.python import failure
-
-from twisted.python.util import InsensitiveDict
 
 
 try:
@@ -141,9 +136,9 @@ def get_host_address():
         try:
             route_file = '/proc/net/route'
             route = open(route_file)
-            if(route):
+            if route:
                 tmp = route.readline()  # skip first line
-                while (tmp != ''):
+                while tmp != '':
                     tmp = route.readline()
                     l = tmp.split('\t')
                     if (len(l) > 2):

@@ -7,21 +7,13 @@
 
 import os.path
 
-from twisted.internet import task
-from twisted.internet import reactor
-from twisted.web import resource, static
-
-from coherence import __version__
-
-from coherence.extern.et import ET, indent
-
 from coherence.upnp.core.utils import StaticFile
 
 from coherence.upnp.services.servers.connection_manager_server import ConnectionManagerServer
 from coherence.upnp.services.servers.rendering_control_server import RenderingControlServer
 from coherence.upnp.services.servers.av_transport_server import AVTransportServer
 
-from coherence.upnp.devices.basics import RootDeviceXML, DeviceHttpRoot, BasicDeviceMixin
+from coherence.upnp.devices.basics import DeviceHttpRoot, BasicDeviceMixin
 
 from coherence import log
 

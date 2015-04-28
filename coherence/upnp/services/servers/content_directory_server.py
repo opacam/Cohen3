@@ -17,8 +17,6 @@ from coherence.upnp.core.DIDLLite import DIDLElement
 
 from coherence.upnp.core import service
 
-from coherence import log
-
 
 class ContentDirectoryControl(service.ServiceControl, UPnPPublisher):
 
@@ -36,7 +34,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
     def __init__(self, device, backend=None, transcoding=False):
         self.device = device
         self.transcoding = transcoding
-        if backend == None:
+        if backend is None:
             backend = self.device.backend
         resource.Resource.__init__(self)
         service.ServiceServer.__init__(self, 'ContentDirectory', self.device.version, backend)
@@ -99,10 +97,10 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             l = []
 
             def process_items(result, tm):
-                if result == None:
+                if result is None:
                     result = []
                 for i in result:
-                    if i[0] == True:
+                    if i[0]:
                         didl.addItem(i[1])
 
                 return build_response(tm)
@@ -111,7 +109,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                 d = defer.maybeDeferred(i.get_item)
                 l.append(d)
 
-            if found_item != None:
+            if found_item is not None:
                 def got_child_count(count):
                     dl = defer.DeferredList(l)
                     dl.addCallback(process_items, count)
@@ -121,7 +119,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                 d.addCallback(got_child_count)
 
                 return d
-            elif total == None:
+            elif total is None:
                 total = item.get_child_count()
 
             dl = defer.DeferredList(l)
@@ -145,14 +143,14 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
         wmc_mapping = getattr(self.backend, "wmc_mapping", None)
         if kwargs.get('X_UPnPClient', '') == 'XBox':
-            if(wmc_mapping != None and
+            if(wmc_mapping is not None and
                wmc_mapping.has_key(ContainerID)):
                 """ fake a Windows Media Connect Server
                 """
                 root_id = wmc_mapping[ContainerID]
                 if callable(root_id):
                     item = root_id()
-                    if item  is not None:
+                    if item is not None:
                         if isinstance(item, list):
                             total = len(item)
                             if int(RequestedCount) == 0:
@@ -168,7 +166,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                                 return proceed(item)
 
                 item = self.backend.get_by_id(root_id)
-                if item == None:
+                if item is None:
                     return process_result([], total=0)
 
                 if isinstance(item, defer.Deferred):
@@ -178,7 +176,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                     return proceed(item)
 
         item = self.backend.get_by_id(root_id)
-        if item == None:
+        if item is None:
             return failure.Failure(errorCode(701))
 
         if isinstance(item, defer.Deferred):
@@ -266,17 +264,18 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             return build_response(total)
 
         def build_response(tm):
-            r = {'Result': didl.toString(), 'TotalMatches': tm,
-                 'NumberReturned': didl.numItems()}
+          r = {'Result': didl.toString(),
+               'TotalMatches': tm,
+               'NumberReturned': didl.numItems()}
 
-            if hasattr(item, 'update_id'):
-                r['UpdateID'] = item.update_id
-            elif hasattr(self.backend, 'update_id'):
-                r['UpdateID'] = self.backend.update_id  # FIXME
-            else:
-                r['UpdateID'] = 0
+          if hasattr(item, 'update_id'):
+            r['UpdateID'] = item.update_id
+          elif hasattr(self.backend, 'update_id'):
+            r['UpdateID'] = self.backend.update_id  # FIXME
+          else:
+            r['UpdateID'] = 0
 
-            return r
+          return r
 
         def proceed(result):
             if BrowseFlag == 'BrowseDirectChildren':
@@ -291,15 +290,14 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         root_id = ObjectID
 
         wmc_mapping = getattr(self.backend, "wmc_mapping", None)
-        if(kwargs.get('X_UPnPClient', '') == 'XBox' and
-            wmc_mapping != None and
-            wmc_mapping.has_key(ObjectID)):
+        if kwargs.get('X_UPnPClient', '') == 'XBox' and \
+                wmc_mapping is not None and wmc_mapping.has_key(ObjectID):
             """ fake a Windows Media Connect Server
             """
             root_id = wmc_mapping[ObjectID]
             if callable(root_id):
                 item = root_id()
-                if item  is not None:
+                if item is not None:
                     if isinstance(item, list):
                         total = len(item)
                         if int(RequestedCount) == 0:
@@ -315,7 +313,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                             return proceed(item)
 
             item = self.backend.get_by_id(root_id)
-            if item == None:
+            if item is None:
                 return process_result([], total=0)
 
             if isinstance(item, defer.Deferred):
@@ -325,7 +323,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                 return proceed(item)
 
         item = self.backend.get_by_id(root_id)
-        if item == None:
+        if item is None:
             return failure.Failure(errorCode(701))
 
         if isinstance(item, defer.Deferred):
