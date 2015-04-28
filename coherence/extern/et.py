@@ -38,7 +38,7 @@ escape = re.compile(eval(r'u"[&<>\"\u0080-\uffff]+"'))
 
 
 def new_encode_entity(text, pattern=utf8_escape):
-    
+
     def escape_entities(m, map=elementtree.ElementTree._escape_map):
         """
         map reserved and non-ascii characters to numerical entities
@@ -85,7 +85,8 @@ def namespace_map_update(namespaces):
         elementtree.ElementTree.register_namespace(prefix, uri)
 
 
-class ElementInterface(elementtree.ElementTree._ElementInterface): pass
+class ElementInterface(elementtree.ElementTree._ElementInterface):
+  pass
 
 
 def indent(elem, level=0):

@@ -84,7 +84,7 @@ class MovieItem(BackendItem):
         self.item = None
 
     def get_item(self):
-        if self.item == None:
+        if self.item is None:
             upnp_id = self.get_id()
             upnp_parent_id = self.parent.get_id()
             self.item = DIDLLite.Movie(upnp_id, upnp_parent_id, self.upnp_title)

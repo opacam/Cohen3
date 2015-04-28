@@ -2,7 +2,7 @@
 
 import sys
 import os
-__version__ =  "0.6.7"
+__version__ = "0.7.0"
 
 try:
     import setuptools
@@ -28,6 +28,7 @@ except:
 
 from distutils.core import Command
 from distutils import log
+
 
 class build_docs(Command):
     description = "build documentation from rst-files"
@@ -77,10 +78,10 @@ DOCPAGES = (
     )
 
 setup_args = {
-    'name':"Coherence",
-    'version':__version__,
-    'description':"""Coherence - DLNA/UPnP framework for the digital living""",
-    'long_description':"""
+    'name': "Coherence",
+    'version': __version__,
+    'description': """Coherence - DLNA/UPnP framework for the digital living""",
+    'long_description': """
 Coherence is a framework written in Python, providing a variety of
 UPnP MediaServer and UPnP MediaRenderer implementations for instant
 use.
@@ -160,8 +161,9 @@ if setuptools:
         'Twisted >= 8.2',
         'zope.interface',
         'louie',
-        ]
-    if sys.platform in ('win32','sunos5'):
+        'livestreamer'
+    ]
+    if sys.platform in ('win32', 'sunos5'):
         setup_args['install_requires'].append('Netifaces >= 0.4')
 
     setup_args['entry_points'] = """
@@ -194,6 +196,7 @@ if setuptools:
         FeedStore = coherence.backends.feed_storage:FeedStore
         RadiotimeStore = coherence.backends.radiotime_storage:RadiotimeStore
         AudioCDStore = coherence.backends.audiocd_storage:AudioCDStore
+        TwitchStore = coherence.backends.twitch_storage:TwitchStore
         
         [coherence.plugins.backend.media_renderer]
         ElisaPlayer = coherence.backends.elisa_renderer:ElisaPlayer

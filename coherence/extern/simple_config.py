@@ -23,9 +23,9 @@ class Config(ConfigItem):
         self.db = parse_xml(open(self.filename).read())
         self.config = self.db = ConvertXmlToDict(self.db.getroot())
         self.preamble = ''
-        if preamble == True:
+        if preamble:
             self.preamble = """<?xml version="1.0" encoding="utf-8"?>\n"""
-        if root != None:
+        if root is not None:
             try:
                 self.config = self.config[root]
             except KeyError:

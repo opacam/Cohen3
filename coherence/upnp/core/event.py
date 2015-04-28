@@ -8,15 +8,13 @@ import time
 from urlparse import urlsplit
 
 from twisted.internet import reactor, defer
-from twisted.web import resource, server
+from twisted.web import resource
 from twisted.web.http import datetimeToString
 from twisted.internet.protocol import Protocol, ClientCreator, _InstanceFactory
-from twisted.python import failure
-
 from coherence import log, SERVER_ID
 from coherence.upnp.core import utils
-
 import coherence.extern.louie as louie
+
 
 global hostname, web_server_port
 hostname = None
@@ -120,9 +118,7 @@ class EventSubscriptionServer(resource.Resource, log.Loggable):
         else:
             headers = request.getAllHeaders()
             try:
-                #print self.subscribers
-                #print headers['sid']
-                if self.subscribers.has_key(headers['sid']):
+                if headers['sid'] in self.subscribers:
                     s = self.subscribers[headers['sid']]
                     s['timeout'] = headers['timeout']
                     s['created'] = time.time()
@@ -150,9 +146,10 @@ class EventSubscriptionServer(resource.Resource, log.Loggable):
 
     def render_UNSUBSCRIBE(self, request):
         self.info("EventSubscriptionServer %s (%s) received unsubscribe request from %s, code: %d",
-                            self.service.id,
-                            self.backend_name,
-                            request.client, request.code)
+                  self.service.id,
+                  self.backend_name,
+                  request.client,
+                  request.code)
         data = request.content.getvalue()
         request.setResponseCode(200)
 
@@ -164,11 +161,7 @@ class EventSubscriptionServer(resource.Resource, log.Loggable):
             self.debug("data: %s", data)
         else:
             headers = request.getAllHeaders()
-            try:
-                del self.subscribers[headers['sid']]
-            except:
-                """ XXX if not found set right error code """
-                pass
+            self.subscribers.pop(headers['sid'], None)
             #print self.subscribers
         return ""
 
@@ -418,23 +411,18 @@ def send_notification(s, xml):
                     xml]
 
         request = '\r\n'.join(request)
-        logger.info("send_notification.send_request to %r %r",
-                 s['sid'], s['callback'])
+        logger.info("send_notification.send_request to %r %r", s['sid'], s['callback'])
         logger.debug("request: %r", request)
         s['seq'] += 1
         if s['seq'] > 0xffffffff:
             s['seq'] = 1
         p.transport.write(request)
         port_item.disconnect()
-        #return p.transport.write(request)
 
     def got_error(failure, port_item):
         port_item.disconnect()
-        logger.info("error sending notification to %r %r",
-                 s['sid'], s['callback'])
+        logger.info("error sending notification to %r %r", s['sid'], s['callback'])
         logger.debug(failure)
-    #c = ClientCreator(reactor, NotificationProtocol)
-    #d = c.connectTCP(host, port)
 
     d = defer.Deferred()
     f = _InstanceFactory(reactor, NotificationProtocol(), d)

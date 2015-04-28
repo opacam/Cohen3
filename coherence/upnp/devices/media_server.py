@@ -84,7 +84,7 @@ class MSRoot(resource.Resource, log.Loggable):
                 try:
                     location = ch.get_path()
                     caption = ch.caption
-                    if caption == None:
+                    if caption is None:
                         raise KeyError
                     request.setResponseCode(200)
                     request.setHeader('CaptionInfo.sec', caption)

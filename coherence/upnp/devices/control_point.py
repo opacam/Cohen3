@@ -167,7 +167,7 @@ class ControlPoint(log.Loggable):
 
     def propagate(self, event):
         self.info('propagate: %r', event)
-        if event.get_sid() in service.subscribers.keys():
+        if event.get_sid() in service.subscribers:
             try:
                 service.subscribers[event.get_sid()].process_event(event)
             except Exception, msg:

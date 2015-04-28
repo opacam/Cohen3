@@ -32,6 +32,9 @@
 /.project
 /.pydevproject
 
+# PyCharm
+/.idea
+
 # OS generated files
 *.DS_[sS]Store*
 ehthumbs.db

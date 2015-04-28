@@ -160,8 +160,7 @@ class CoherencePlugin(rb.Plugin, log.Loggable):
                     name = name.replace('{host}', self.coherence.hostname)
                     kwargs['name'] = name
 
-                self.renderer = MediaRenderer(self.coherence,
-                        RhythmboxPlayer, **kwargs)
+                self.renderer = MediaRenderer(self.coherence, RhythmboxPlayer, **kwargs)
 
                 if dmr_uuid is None:
                     self.config.set_string(gconf_keys['dmr_uuid'], str(self.renderer.uuid))

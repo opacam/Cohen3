@@ -13,7 +13,7 @@ from twisted.internet import reactor
 
 from coherence import __version__
 
-from coherence.extern.et import ET, indent
+from coherence.extern.et import ET
 
 import coherence.extern.louie as louie
 
@@ -61,7 +61,6 @@ class DeviceHttpRoot(resource.Resource, log.Loggable):
 
 
 class RootDeviceXML(static.Data):
-
     def __init__(self, hostname, uuid, urlbase,
                         xmlns='urn:schemas-upnp-org:device-1-0',
                         device_uri_base='urn:schemas-upnp-org:device',
