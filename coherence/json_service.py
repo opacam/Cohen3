@@ -3,7 +3,7 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
-import simplejson as json
+import json
 from twisted.web import resource, static
 from twisted.internet import defer
 
@@ -12,14 +12,12 @@ from coherence import log
 
 class JsonInterface(resource.Resource, log.Loggable):
     logCategory = 'json'
-    #isLeaf = False
 
     def __init__(self, controlpoint):
         resource.Resource.__init__(self)
         log.Loggable.__init__(self)
         self.controlpoint = controlpoint
-        self.controlpoint.coherence.add_web_resource('json',
-                                        self)
+        self.controlpoint.coherence.add_web_resource('json', self)
         self.children = {}
 
     def render_GET(self, request):
@@ -49,11 +47,11 @@ class JsonInterface(resource.Resource, log.Loggable):
                     return self.list_devices(request)
                 else:
                     device = self.controlpoint.get_device_with_id(path[0])
-                    if device != None:
+                    if device is not None:
                         service = device.get_service_by_type(path[1])
-                        if service != None:
+                        if service is not None:
                             action = service.get_action(path[2])
-                            if action != None:
+                            if action is not None:
                                 return self.call_action(action, request)
                             else:
                                 msg = "action %r on service type %r for device %r not found" % (path[2], path[1], path[0])
