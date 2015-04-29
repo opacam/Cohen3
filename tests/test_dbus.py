@@ -20,7 +20,7 @@ from coherence.base import Coherence
 from coherence.upnp.core import uuid
 import coherence.extern.louie as louie
 
-from coherence.test import wrapped
+from tests import wrapped
 
 try:
     import dbus
