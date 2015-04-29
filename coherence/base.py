@@ -217,7 +217,6 @@ class Coherence(log.Loggable):
     self.ctrl = None
     self.dbus = None
     self.json = None
-    self.mirabeau = None
     self.msearch = None
     self.ssdp_server = None
     self.transcoder_manager = None
@@ -372,7 +371,7 @@ class Coherence(log.Loggable):
     """ Json Interface Initialization
     """
     if self.config.get('json', 'no') == 'yes':
-      from coherence.json import JsonInterface
+      from coherence.json_service import JsonInterface
       self.json = JsonInterface(self.ctrl)
 
     """ Transcoder Initialization
@@ -393,16 +392,6 @@ class Coherence(log.Loggable):
       except Exception, msg:
         self.warning("Unable to activate dbus sub-system: %r", msg)
         self.debug(traceback.format_exc())
-      else:
-        if self.config.get('enable_mirabeau', 'no') == 'yes':
-          from coherence import mirabeau
-          from coherence.tube_service import MirabeauProxy
-
-          mirabeau_cfg = self.config.get('mirabeau', {})
-
-          self.mirabeau = mirabeau.Mirabeau(mirabeau_cfg, self)
-          self.add_web_resource('mirabeau', MirabeauProxy())
-          self.mirabeau.start()
 
   def add_plugin(self, plugin, **kwargs):
     self.info("adding plugin %r", plugin)
@@ -496,64 +485,55 @@ class Coherence(log.Loggable):
       self.__incarnations -= 1
       return
 
-    def _shutdown():
-      self.mirabeau = None
-      if self.dbus:
-        self.dbus.shutdown()
-        self.dbus = None
+    if self.dbus:
+      self.dbus.shutdown()
+      self.dbus = None
 
-      for backend in self.active_backends.itervalues():
-        backend.unregister()
-      self.active_backends = {}
+    for backend in self.active_backends.itervalues():
+      backend.unregister()
+    self.active_backends = {}
 
-      """ send service unsubscribe messages """
-      try:
-        if self.web_server.port is not None:
-          self.web_server.port.stopListening()
-          self.web_server.port = None
-        if hasattr(self.msearch, 'double_discover_loop'):
-          self.msearch.double_discover_loop.stop()
-        if hasattr(self.msearch, 'port'):
-          self.msearch.port.stopListening()
-        if hasattr(self.ssdp_server, 'resend_notify_loop'):
-          self.ssdp_server.resend_notify_loop.stop()
-        if hasattr(self.ssdp_server, 'port'):
-          self.ssdp_server.port.stopListening()
-        #self.renew_service_subscription_loop.stop()
-      except:
-        pass
+    """ send service unsubscribe messages """
+    try:
+      if self.web_server.port is not None:
+        self.web_server.port.stopListening()
+        self.web_server.port = None
+      if hasattr(self.msearch, 'double_discover_loop'):
+        self.msearch.double_discover_loop.stop()
+      if hasattr(self.msearch, 'port'):
+        self.msearch.port.stopListening()
+      if hasattr(self.ssdp_server, 'resend_notify_loop'):
+        self.ssdp_server.resend_notify_loop.stop()
+      if hasattr(self.ssdp_server, 'port'):
+        self.ssdp_server.port.stopListening()
+      #self.renew_service_subscription_loop.stop()
+    except:
+      pass
 
-      l = []
-      for root_device in self.get_devices():
-        for device in root_device.get_devices():
-          dd = device.unsubscribe_service_subscriptions()
-          dd.addCallback(device.remove)
-          l.append(dd)
-        rd = root_device.unsubscribe_service_subscriptions()
-        rd.addCallback(root_device.remove)
-        l.append(rd)
+    l = []
+    for root_device in self.get_devices():
+      for device in root_device.get_devices():
+        dd = device.unsubscribe_service_subscriptions()
+        dd.addCallback(device.remove)
+        l.append(dd)
+      rd = root_device.unsubscribe_service_subscriptions()
+      rd.addCallback(root_device.remove)
+      l.append(rd)
 
-      def homecleanup(result):
-        """anything left over"""
-        louie.disconnect(self.create_device, 'Coherence.UPnP.SSDP.new_device', louie.Any)
-        louie.disconnect(self.remove_device, 'Coherence.UPnP.SSDP.removed_device', louie.Any)
-        louie.disconnect(self.add_device, 'Coherence.UPnP.RootDevice.detection_completed', louie.Any)
-        self.ssdp_server.shutdown()
-        if self.ctrl:
-          self.ctrl.shutdown()
-        self.warning('Coherence UPnP framework shutdown')
-        return result
+    def homecleanup(result):
+      """anything left over"""
+      louie.disconnect(self.create_device, 'Coherence.UPnP.SSDP.new_device', louie.Any)
+      louie.disconnect(self.remove_device, 'Coherence.UPnP.SSDP.removed_device', louie.Any)
+      louie.disconnect(self.add_device, 'Coherence.UPnP.RootDevice.detection_completed', louie.Any)
+      self.ssdp_server.shutdown()
+      if self.ctrl:
+        self.ctrl.shutdown()
+      self.warning('Coherence UPnP framework shutdown')
+      return result
 
-      dl = defer.DeferredList(l)
-      dl.addCallback(homecleanup)
-      return dl
-
-    if self.mirabeau is not None:
-      d = defer.maybeDeferred(self.mirabeau.stop)
-      d.addBoth(lambda x: _shutdown())
-      return d
-    else:
-      return _shutdown()
+    dl = defer.DeferredList(l)
+    dl.addCallback(homecleanup)
+    return dl
 
   def check_devices(self):
     """ iterate over devices and their embedded ones and renew subscriptions """
