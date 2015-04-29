@@ -19,7 +19,7 @@ from coherence.upnp.core import uuid
 from coherence.upnp.devices.control_point import DeviceQuery
 import coherence.extern.louie as louie
 
-from coherence.test import wrapped
+from tests import wrapped
 
 
 class TestSwitchPowerClient(unittest.TestCase):

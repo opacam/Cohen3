@@ -9,19 +9,16 @@
 Test cases for L{upnp.core.action}
 """
 
-import time
-
 from twisted.trial import unittest
-from twisted.internet import protocol
-from twisted.internet.defer import Deferred, DeferredList
-from twisted.test import proto_helpers
+from twisted.internet.defer import Deferred
 
 from coherence.upnp.core import action
 
-from coherence.test import wrapped
 
-class NoImplementation: pass
+class NoImplementation:
+  pass
 NoImplementation = NoImplementation()
+
 
 class DummyClient:
     def __init__(self, result):
