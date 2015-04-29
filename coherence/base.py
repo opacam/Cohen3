@@ -62,30 +62,30 @@ class SimpleRoot(resource.Resource, log.Loggable):
       return static.Data('<html><p>No device for requested UUID: %s</p></html>' % name, 'text/html')
 
   def listchilds(self, uri):
-      self.info('listchilds %s', uri)
-      if uri[-1] != '/':
-          uri += '/'
-      cl = []
-      for child in self.coherence.children:
-          device = self.coherence.get_device_with_id(child)
-          if device is not None:
-              cl.append('<li><a href=%s%s>%s:%s %s</a></li>' % (
-                      uri, child, device.get_friendly_device_type(),
-                      device.get_device_type_version(),
-                      device.get_friendly_name()))
+    self.info('listchilds %s', uri)
+    if uri[-1] != '/':
+      uri += '/'
+    cl = []
+    for child in self.coherence.children:
+      device = self.coherence.get_device_with_id(child)
+      if device is not None:
+        cl.append('<li><a href=%s%s>%s:%s %s</a></li>' % (
+          uri, child, device.get_friendly_device_type(),
+          device.get_device_type_version(),
+          device.get_friendly_name()))
 
-      for child in self.children:
-          cl.append('<li><a href=%s%s>%s</a></li>' % (uri, child, child))
-      return "".join(cl)
+    for child in self.children:
+      cl.append('<li><a href=%s%s>%s</a></li>' % (uri, child, child))
+    return "".join(cl)
 
   def render(self, request):
-      result = """<html>
-      <head><title>Coherence</title></head>
-      <body><a href="http://coherence.beebits.net">Coherence</a> - a Python DLNA/UPnP framework for the Digital Living
-      <p>Hosting:<ul>%s</ul></p>
-      </body>
-      </html>""" % self.listchilds(request.uri)
-      return result.encode('utf-8')
+    result = """<html>
+    <head><title>Coherence</title></head>
+    <body><a href="http://coherence.beebits.net">Coherence</a> - a Python DLNA/UPnP framework for the Digital Living
+    <p>Hosting:<ul>%s</ul></p>
+    </body>
+    </html>""" % self.listchilds(request.uri)
+    return result.encode('utf-8')
 
 
 class WebServer(log.Loggable):
@@ -102,82 +102,81 @@ class WebServer(log.Loggable):
 
 
 class Plugins(log.Loggable):
-    logCategory = 'plugins'
-    _instance_ = None  # Singleton
+  logCategory = 'plugins'
+  __instance = None  # Singleton
 
-    _valids = ("coherence.plugins.backend.media_server",
-               "coherence.plugins.backend.media_renderer",
-               "coherence.plugins.backend.binary_light",
-               "coherence.plugins.backend.dimmable_light")
+  _valids = ("coherence.plugins.backend.media_server",
+             "coherence.plugins.backend.media_renderer",
+             "coherence.plugins.backend.binary_light",
+             "coherence.plugins.backend.dimmable_light")
 
-    _plugins = {}
+  _plugins = {}
 
-    def __new__(cls, *args, **kwargs):
-        obj = getattr(cls, '_instance_', None)
-        if obj is not None:
-            return obj
-        else:
-            obj = super(Plugins, cls).__new__(cls, *args, **kwargs)
-            cls._instance_ = obj
-            obj._collect(*args, **kwargs)
-            return obj
+  def __new__(cls, *args, **kwargs):
+    if cls.__instance is None:
+      cls.__instance = super(Plugins, cls).__new__(cls)
+      cls.__instance.__initialized = False
+      cls.__instance.__cls = cls
+    return cls.__instance
 
-    def __repr__(self):
-        return str(self._plugins)
+  def __init__(self, ids=_valids):
+    # initialize only once
+    if self.__initialized:
+      return
+    self.__initialized = True
 
-    def __init__(self, *args, **kwargs):
-        log.Loggable.__init__(self)
-        pass
+    log.Loggable.__init__(self)
+    if not isinstance(ids, (list, tuple)):
+      ids = (ids, )
+    if pkg_resources:
+      for group in ids:
+        for entrypoint in pkg_resources.iter_entry_points(group):
+          # set a placeholder for lazy loading
+          self._plugins[entrypoint.name] = entrypoint
+    else:
+      self.info("no pkg_resources, fallback to simple plugin handling")
 
-    def __getitem__(self, key):
-        plugin = self._plugins.__getitem__(key)
-        if pkg_resources and isinstance(plugin, pkg_resources.EntryPoint):
-            try:
-                plugin = plugin.load(require=False)
-            except (ImportError, AttributeError, pkg_resources.ResolutionError), msg:
-                self.warning("Can't load plugin %s (%s), maybe missing dependencies...", plugin.name, msg)
-                self.info(traceback.format_exc())
-                del self._plugins[key]
-                raise KeyError
-            else:
-                self._plugins[key] = plugin
-        return plugin
+    if len(self._plugins) == 0:
+      self._collect_from_module()
 
-    def get(self, key, default=None):
-        try:
-            return self.__getitem__(key)
-        except KeyError:
-            return default
+  def __repr__(self):
+    return str(self._plugins)
 
-    def __setitem__(self, key, value):
-        self._plugins.__setitem__(key, value)
+  def __getitem__(self, key):
+    plugin = self._plugins.__getitem__(key)
+    if pkg_resources and isinstance(plugin, pkg_resources.EntryPoint):
+      try:
+        plugin = plugin.load(require=False)
+      except (ImportError, AttributeError, pkg_resources.ResolutionError), msg:
+        self.warning("Can't load plugin %s (%s), maybe missing dependencies...", plugin.name, msg)
+        self.info(traceback.format_exc())
+        del self._plugins[key]
+        raise KeyError
+      else:
+        self._plugins[key] = plugin
+    return plugin
 
-    def set(self, key, value):
-        return self.__setitem__(key, value)
+  def get(self, key, default=None):
+    try:
+      return self.__getitem__(key)
+    except KeyError:
+      return default
 
-    def keys(self):
-        return self._plugins.keys()
+  def __setitem__(self, key, value):
+    self._plugins.__setitem__(key, value)
 
-    def _collect(self, ids=_valids):
-        if not isinstance(ids, (list, tuple)):
-            ids = (ids, )
-        if pkg_resources:
-            for group in ids:
-                for entrypoint in pkg_resources.iter_entry_points(group):
-                    # set a placeholder for lazy loading
-                    self._plugins[entrypoint.name] = entrypoint
-        else:
-            self.info("no pkg_resources, fallback to simple plugin handling")
+  def set(self, key, value):
+    return self.__setitem__(key, value)
 
-        if len(self._plugins) == 0:
-            self._collect_from_module()
+  def keys(self):
+    return self._plugins.keys()
 
-    def _collect_from_module(self):
-        from coherence.extern.simple_plugin import Reception
-        reception = Reception(os.path.join(os.path.dirname(__file__), 'backends'), log=self.warning)
-        self.info(reception.guestlist())
-        for cls in reception.guestlist():
-            self._plugins[cls.__name__.split('.')[-1]] = cls
+  def _collect_from_module(self):
+    from coherence.extern.simple_plugin import Reception
+    reception = Reception(os.path.join(os.path.dirname(__file__), 'backends'), log=self.warning)
+    self.info(reception.guestlist())
+    for cls in reception.guestlist():
+      self._plugins[cls.__name__.split('.')[-1]] = cls
 
 
 class Coherence(log.Loggable):
@@ -202,9 +201,7 @@ class Coherence(log.Loggable):
     # supers
     log.Loggable.__init__(self)
 
-    if not config:
-      config = {}
-    self.config = config
+    self.config = config or {}
 
     self.devices = []
     self.children = {}
