@@ -4,27 +4,22 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2006,2007 Frank Scholz <coherence@beebits.net>
-
-import os
-import re
 import traceback
 from StringIO import StringIO
 import urllib
 
-from twisted.internet import task
+from lxml import etree
+import os
+import re
 from twisted.internet import defer
 from twisted.web import static
-from twisted.web import resource, server
-#from twisted.web import proxy
+from twisted.web import resource
 from twisted.python import util
-from twisted.python.filepath import FilePath
 
-from coherence.extern.et import ET, indent
+from coherence.extern.et import ET
 
 from coherence import __version__
 
-from coherence.upnp.core.service import ServiceServer
-from coherence.upnp.core import utils
 from coherence.upnp.core.utils import StaticFile
 from coherence.upnp.core.utils import ReverseProxyResource
 
@@ -244,19 +239,19 @@ class MSRoot(resource.Resource, log.Loggable):
 
                 new_config = None
                 try:
-                    element_tree = utils.parse_xml(request.content.getvalue(), encoding='utf-8')
-                    new_config = convert_elementtree_to_dict(element_tree.getroot())
+                    element_tree = etree.fromstring(request.content.getvalue())
+                    new_config = convert_elementtree_to_dict(element_tree)
                     self.server.coherence.remove_plugin(self.server)
                     self.warning("%s %s (%s) with id %s desactivated", backend.name, self.server.device_type, backend, str(self.server.uuid)[5:])
                     if new_config is None:
                         msg = "<plugin active=\"no\"/>"
                     else:
                         new_backend = self.server.coherence.add_plugin(backend_type, **new_config)
-                        if (self.server.coherence.writeable_config()):
-                            self.server.coherence.store_plugin_config(new_backend.uuid, new_config)
-                            msg = "<html><p>Device restarted. Config file has been modified with posted data.</p></html>"  # constructConfigData(new_backend)
+                        if self.server.coherence.writeable_config():
+                          self.server.coherence.store_plugin_config(new_backend.uuid, new_config)
+                          msg = "<html><p>Device restarted. Config file has been modified with posted data.</p></html>"  # constructConfigData(new_backend)
                         else:
-                            msg = "<html><p>Device restarted. Config file not modified</p></html>"  # constructConfigData(new_backend)
+                          msg = "<html><p>Device restarted. Config file not modified</p></html>"  # constructConfigData(new_backend)
                     request.setResponseCode(202)
                     return static.Data(msg, 'text/html')  # 'text/xml')
                 except SyntaxError, e:

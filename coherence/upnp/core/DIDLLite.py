@@ -14,7 +14,6 @@ import string
 import urllib
 from datetime import datetime
 
-# from coherence.extern.et import ET, namespace_map_update, ElementInterface
 from lxml import etree
 from coherence.upnp.core import utils
 from coherence import log
@@ -202,9 +201,9 @@ def build_dlna_additional_info(content_format, does_playcontainer=False):
 class Resource(object):
     """An object representing a resource."""
 
-    def __init__(self, data=None, protocolInfo=None):
+    def __init__(self, data=None, protocol_info=None):
         self.data = data
-        self.protocolInfo = protocolInfo
+        self.protocolInfo = protocol_info
         self.bitrate = None
         self.size = None
         self.duration = None
@@ -298,10 +297,10 @@ class Resource(object):
         return etree.tostring(self.toElement(**kwargs), encoding='utf-8')
 
     @classmethod
-    def fromString(cls, aString):
+    def fromString(cls, _string):
         instance = cls()
-        elt = utils.parse_xml(aString)
-        instance.fromElement(elt.getroot())
+        elt = etree.fromstring(_string)
+        instance.fromElement(elt)
         return instance
 
     def transcoded(self, format):
@@ -340,14 +339,14 @@ class PlayContainerResource(Resource):
 
     def __init__(self, udn,
                  sid='urn:upnp-org:serviceId:ContentDirectory',
-                 cid=None, fid=None, fii=0, sc='', md=0, protocolInfo=None):
+                 cid=None, fid=None, fii=0, sc='', md=0, protocol_info=None):
 
         Resource.__init__(self)
         if cid is None:
             raise AttributeError('missing Container Id')
         if fid is None:
             raise AttributeError('missing first Child Id')
-        self.protocolInfo = protocolInfo
+        self.protocolInfo = protocol_info
 
         args = ['sid=' + urllib.quote(sid),
                 'cid=' + urllib.quote(str(cid)),
@@ -557,8 +556,8 @@ class Object(log.Loggable):
     @classmethod
     def fromString(cls, data):
         instance = cls()
-        elt = utils.parse_xml(data)
-        instance.fromElement(elt.getroot())
+        elt = etree.fromstring(data)
+        instance.fromElement(elt)
         return instance
 
 
@@ -814,9 +813,9 @@ class Container(Object):
     createClass = None
     searchable = None
 
-    def __init__(self, id=None, parentID=None, title=None,
+    def __init__(self, id=None, parent_id=None, title=None,
                  restricted=False, creator=None):
-        Object.__init__(self, id, parentID, title, restricted, creator)
+        Object.__init__(self, id, parent_id, title, restricted, creator)
         self.searchClass = []
 
     def toElement(self, **kwargs):
@@ -977,10 +976,9 @@ class DIDLElement(log.Loggable):
         return None
 
     @classmethod
-    def fromString(cls, aString):
+    def fromString(cls, data):
         instance = cls()
-        elt = utils.parse_xml(aString, 'utf-8')
-        elt = elt.getroot()
+        elt = etree.fromstring(data)
         for node in elt.getchildren():
             upnp_class_name = node.findtext('{%s}class' % 'urn:schemas-upnp-org:metadata-1-0/upnp/')
             upnp_class = instance.get_upnp_class(upnp_class_name.strip())

@@ -105,7 +105,7 @@ class ControlPoint(log.Loggable):
     def add_query(self, query):
         for device in self.get_devices():
             query.check(device)
-        if query.fired == False and query.timeout == 0:
+        if not query.fired and query.timeout == 0:
             query.callback(None)
         else:
             self.queries.append(query)

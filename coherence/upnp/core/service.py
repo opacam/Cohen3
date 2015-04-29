@@ -3,6 +3,7 @@
 
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
+from coherence.upnp.core.xml_constants import UPNP_SERVICE_NS
 
 import os
 
@@ -271,7 +272,7 @@ class Service(log.Loggable):
         if var_name == 'LastChange':
             self.info("we have a LastChange event")
             self.get_state_variable(var_name, 0).update(var_value)
-            tree = utils.parse_xml(var_value, 'utf-8').getroot()
+            tree = etree.fromstring(var_value)
             namespace_uri, tag = tree.tag[1:].split("}", 1)
             for instance in tree.findall('{%s}InstanceID' % namespace_uri):
                 instance_id = instance.attrib['val']
@@ -318,17 +319,13 @@ class Service(log.Loggable):
     def parse_actions(self):
 
         def gotPage(x):
-            #print "gotPage"
-            #print x
             self.scpdXML, headers = x
             try:
-                xml_doc = utils.parse_xml(self.scpdXML, 'utf-8')
+              tree = etree.fromstring(self.scpdXML)
             except Exception as e:
-                self.warning("Invalid service description received from %r: e",
-                             self.get_scpd_url(), e)
-                return
-            tree = xml_doc.getroot()
-            ns = "urn:schemas-upnp-org:service-1-0"
+              self.warning("Invalid service description received from %r: %r", self.get_scpd_url(), e)
+              return
+            ns = UPNP_SERVICE_NS
 
             for action_node in tree.findall('.//{%s}action' % ns):
                 name = action_node.findtext('{%s}name' % ns)
@@ -538,11 +535,9 @@ class ServiceServer(log.Loggable):
 
         def process_value(result):
             variable.update(result)
-            if default == True:
+            if default:
                 variable.default_value = variable.value
-            if(variable.send_events == True and
-                variable.moderated == False and
-                len(self._subscribers) > 0):
+            if variable.send_events and not variable.moderated and len(self._subscribers) > 0:
                 xml = self.build_single_notification(instance, variable_name, variable.value)
                 for s in self._subscribers.values():
                     d, p = event.send_notification(s, xml)
@@ -756,7 +751,7 @@ class ServiceServer(log.Loggable):
 
         new_action = action.Action(self, name, implementation, arguments_list)
         self._actions[name] = new_action
-        if callback != None:
+        if callback is not None:
             new_action.set_callback(callback)
             self.info('Add callback %s for %s/%s', callback, self.id, name)
         return new_action

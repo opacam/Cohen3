@@ -67,6 +67,7 @@ In the config file the definition of this backend could look like this:
         </plugin>
 
 """
+from lxml import etree
 
 import os
 
@@ -83,7 +84,6 @@ except ImportError:
     pass
 
 from coherence.upnp.core import DIDLLite
-from coherence.upnp.core.utils import parse_xml
 
 from coherence import log
 
@@ -339,10 +339,9 @@ class TestStore(BackendStore):
 
         for item in items:
             if isinstance(item, basestring):
-                xml = parse_xml(item)
-                print xml.getroot()
+                xml = etree.fromstring(item)
                 item = {}
-                for child in xml.getroot():
+                for child in xml:
                     item[child.tag] = child.text
             type = item.get('type', 'file')
             try:

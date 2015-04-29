@@ -3,6 +3,7 @@
 
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006,2007,2008,2009 Frank Scholz <coherence@beebits.net>
+from lxml import etree
 
 import time
 from urlparse import urlsplit
@@ -52,7 +53,7 @@ class EventServer(resource.Resource, log.Loggable):
             headers = request.getAllHeaders()
             sid = headers['sid']
             try:
-                tree = utils.parse_xml(data).getroot()
+                tree = etree.fromstring(data)
             except (SyntaxError, AttributeError):
                 self.warning("malformed event notification from %r", request.client)
                 self.debug("data: %r", data)

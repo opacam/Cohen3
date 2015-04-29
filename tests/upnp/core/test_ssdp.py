@@ -12,7 +12,6 @@ Test cases for L{upnp.core.sspd}
 import time
 
 from twisted.trial import unittest
-from twisted.internet import protocol
 from twisted.test import proto_helpers
 
 from coherence.upnp.core import ssdp

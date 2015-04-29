@@ -8,30 +8,26 @@
 """
 Test cases for L{upnp.core.service.ServiceServer}
 """
+from lxml import etree
 
-import time
 try:
     import unittest.mock as mock
 except ImportError:
     import mock
 
 from twisted.trial import unittest
-from twisted.internet.defer import Deferred
 from twisted.internet import task
-
-from coherence.upnp.core import service, device
-from coherence.extern.et import ET
+from coherence.upnp.core import service
 
 
 # :todo: put this into a central module
 def fakeXMLparse(content):
-    et_parse = ET.parse
     def parse(filename):
         """
         Used for mocking coherence.upnp.core.utils.getPage, behaves as if
         the file contains `content`.
         """
-        return ET.fromstring(content)
+        return etree.fromstring(content)
     return parse
 
 
@@ -53,8 +49,7 @@ class DescriptionNotFound(unittest.TestCase):
         # description XML for can not be found. As ServiceServer is
         # used for services Coherence is implementing, the XML file
         # ought to exist.
-        self.assertRaises(IOError,
-                          service.ServiceServer, 'UnknownService', 1, None)
+        self.assertRaises(IOError, service.ServiceServer, 'UnknownService', 1, None)
 
 
 class EmptyDescription(unittest.TestCase):
@@ -63,34 +58,38 @@ class EmptyDescription(unittest.TestCase):
         # In thie case, the description XML is empty. As ServiceServer
         # is used for services Coherence is implementing, the XML file
         # ought to be valid.
-        with mock.patch(ET.__name__ + '.parse', fakeXMLparse('')):
-            self.assertRaises(ET.ParseError,
-                              service.ServiceServer, 'UnknownService', 1, None)
+        with mock.patch(etree.__name__ + '.parse', fakeXMLparse('')):
+            self.assertRaises(etree.ParseError, service.ServiceServer, 'UnknownService', 1, None)
 
 
 class InvalidDescriptionXML(unittest.TestCase):
 
     def test_init(self):
-        # In thie case, the description XML is empty. As ServiceServer
-        # is used for services Coherence is implementing, the XML file
-        # ought to be valid.
-        with mock.patch(ET.__name__ + '.parse', fakeXMLparse('<x>')):
-            self.assertRaises(ET.ParseError,
-                              service.ServiceServer, 'UnknownService', 1, None)
+      # In thie case, the description XML is empty. As ServiceServer
+      # is used for services Coherence is implementing, the XML file
+      # ought to be valid.
+      with mock.patch(etree.__name__ + '.parse', fakeXMLparse('<x>')):
+        self.assertRaises(etree.ParseError, service.ServiceServer, 'UnknownService', 1, None)
 
+
+def kwargs_patching_wrapper(func, kwargs_patch):
+  def inner(*args, **kwargs):
+      kwargs.update(kwargs_patch)
+      return func(*args, **kwargs)
+  return inner
 
 
 class ValidButEmptyDescriptionXML(unittest.TestCase):
 
     def setUp(self):
-        with mock.patch(ET.__name__ + '.parse', fakeXMLparse('<x></x>')):
-            self.setUp_main()
+
+      with mock.patch(etree.__name__ + '.parse', fakeXMLparse('<x></x>')):
+        self.setUp_main()
 
     def setUp_main(self):
         # :todo: use service.ServiceServer, see comment at
         # ServiceServer4Test
-        self.service_server = ServiceServer4Test(
-            'UnknownService', version=1, backend=None)
+        self.service_server = ServiceServer4Test('UnknownService', version=1, backend=None)
 
     def tearDown(self):
         try:
@@ -110,8 +109,7 @@ class ValidButEmptyDescriptionXML(unittest.TestCase):
         self.assertEqual(srv.backend, None)
         self.assertEqual(srv.namespace, 'schemas-upnp-org')
         self.assertEqual(srv.id_namespace, 'upnp-org')
-        self.assertEqual(srv.service_type,
-                         'urn:schemas-upnp-org:service:UnknownService:1')
+        self.assertEqual(srv.service_type, 'urn:schemas-upnp-org:service:UnknownService:1')
         self.assertEqual(srv.scpd_url, 'scpd.xml')
         self.assertEqual(srv.control_url, 'control')
         self.assertEqual(srv.subscription_url, 'subscribe')
@@ -139,21 +137,20 @@ class ValidButEmptyDescriptionXML(unittest.TestCase):
         self.assertEqual(srv.get_subscribers(), {})
 
         self.assertEqual(srv.get_id(), 'UnknownService')
-        self.assertEqual(srv.get_type(),
-                         'urn:schemas-upnp-org:service:UnknownService:1')
+        self.assertEqual(srv.get_type(), 'urn:schemas-upnp-org:service:UnknownService:1')
 
     def test_build_single_notification(self):
         srv = self.service_server
         # note: parameter `instance` is ignored.:fixme: remove it?
-        self.assertEqual(
-            srv.build_single_notification(0, 'DummyVariable', 987),
-            # :todo: this tested result heavily depends on how ElementTree
-            # handles the namespace.
-            ('<ns0:propertyset xmlns:ns0="urn:schemas-upnp-org:event-1-0">'
-             '<ns0:property><DummyVariable>987</DummyVariable></ns0:property>'
-             '</ns0:propertyset>'))
-        self.assertRaisesRegexp(TypeError, '^cannot serialize',
-                                srv.build_single_notification, 0, 321, 987)
+        with mock.patch(etree.__name__ + '.tostring',
+                        kwargs_patching_wrapper(etree.tostring, {'pretty_print': False})):
+          self.assertSequenceEqual(
+              srv.build_single_notification(0, 'DummyVariable', 987),
+              # :todo: this tested result heavily depends on how ElementTree handles the namespace.
+              ('<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0">'
+               '<e:property><DummyVariable>987</DummyVariable></e:property>'
+               '</e:propertyset>'))
+          self.assertRaises(TypeError, srv.build_single_notification, 0, 321, 987)
 
     def test_build_last_change_event(self):
         srv = self.service_server
@@ -163,7 +160,7 @@ class ValidButEmptyDescriptionXML(unittest.TestCase):
         self.assertIs(srv.build_last_change_event(force=False), None)
         self.assertIs(srv.build_last_change_event(1, force=False), None)
 
-    def test_build_last_change_event(self):
+    def test_build_last_change_event_2(self):
         srv = self.service_server
         # This returns None if no variables are found or no
         # subscribers and notifiers are registered. In this test-cse

@@ -6,12 +6,12 @@
 """ DBUS service class
 
 """
+from lxml import etree
 
 import time
 import urllib
 import urlparse
 
-#import gtk
 import dbus
 
 if dbus.__version__ < '0.82.2':
@@ -21,21 +21,13 @@ from dbus.mainloop.glib import DBusGMainLoop
 DBusGMainLoop(set_as_default=True)
 
 import dbus.service
-#import dbus.gobject_service
-
-#import dbus.glib
 
 from coherence import __version__
 from coherence.upnp.core import DIDLLite
 from coherence.dbus_constants import *
-from coherence.upnp.core.utils import parse_xml
-
 import coherence.extern.louie as louie
-
 from coherence import log
-
-from twisted.internet import reactor
-from twisted.internet import defer, task
+from twisted.internet import reactor, task
 
 namespaces = {'{http://purl.org/dc/elements/1.1/}': 'dc:',
               '{urn:schemas-upnp-org:metadata-1-0/upnp/}': 'upnp:',
@@ -217,8 +209,7 @@ class DBusCDSService(dbus.service.Object, log.Loggable):
             return r
 
         def convert_reply(data):
-            et = parse_xml(data['Result'], 'utf-8')
-            et = et.getroot()
+            et = etree.fromstring(data['Result'])
             items = dbus.Array([], signature='v')
 
             def append(item):
@@ -262,8 +253,7 @@ class DBusCDSService(dbus.service.Object, log.Loggable):
             return r
 
         def convert_reply(data):
-            et = parse_xml(data['Result'], 'utf-8')
-            et = et.getroot()
+            et = etree.fromstring(data['Result'])
             items = dbus.Array([], signature='v')
 
             def append(item):

@@ -2,11 +2,12 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2007 - Frank Scholz <coherence@beebits.net>
+from lxml import etree
 
 from twisted.python import failure
 
 from coherence import log
-from coherence.upnp.core.utils import getPage, parse_xml
+from coherence.upnp.core.utils import getPage
 from coherence.upnp.core import soap_lite
 
 
@@ -44,7 +45,7 @@ class SOAPProxy(log.Loggable):
 
         headers = {'content-type': 'text/xml ;charset="utf-8"',
                    'SOAPACTION': '"%s"' % soapaction, }
-        if arguments.has_key('headers'):
+        if 'headers' in arguments:
             headers.update(arguments['headers'])
             del arguments['headers']
 
@@ -57,24 +58,22 @@ class SOAPProxy(log.Loggable):
             self.warning("error requesting url %r", url)
             self.debug(error)
             try:
-                tree = parse_xml(error.value.response)
+                tree = etree.fromstring(error.value.response)
                 body = tree.find('{http://schemas.xmlsoap.org/soap/envelope/}Body')
-                return failure.Failure(Exception("%s - %s" % (body.find('.//{urn:schemas-upnp-org:control-1-0}errorCode').text,
-                                                    body.find('.//{urn:schemas-upnp-org:control-1-0}errorDescription').text)))
+                return failure.Failure(Exception("%s - %s" % (
+                  body.find('.//{urn:schemas-upnp-org:control-1-0}errorCode').text,
+                  body.find('.//{urn:schemas-upnp-org:control-1-0}errorDescription').text)))
             except:
                 import traceback
                 self.debug(traceback.format_exc())
             return error
 
-        return getPage(self.url, postdata=payload, method="POST",
-                        headers=headers
-                      ).addCallbacks(self._cbGotResult, gotError, None, None, [self.url], None)
+        return getPage(self.url, postdata=payload, method="POST", headers=headers).addCallbacks(self._cbGotResult,
+                                                                                                gotError, None, None,
+                                                                                                [self.url], None)
 
     def _cbGotResult(self, result):
-        #print "_cbGotResult 1", result
         page, headers = result
-        #result = SOAPpy.parseSOAPRPC(page)
-        #print "_cbGotResult 2", result
 
         def print_c(e):
             for c in e.getchildren():
@@ -83,16 +82,10 @@ class SOAPProxy(log.Loggable):
 
         self.debug("result: %r", page)
 
-        tree = parse_xml(page)
-        #print tree, "find %s" % self.action
-
-        #root = tree.getroot()
-        #print_c(root)
-
+        tree = etree.fromstring(page)
         body = tree.find('{http://schemas.xmlsoap.org/soap/envelope/}Body')
-        #print "body", body
         response = body.find('{%s}%sResponse' % (self.namespace[1], self.action))
-        if response == None:
+        if response is None:
             """ fallback for improper SOAP action responses """
             response = body.find('%sResponse' % self.action)
         self.debug("callRemote response  %s", response)
@@ -100,7 +93,6 @@ class SOAPProxy(log.Loggable):
         if response is not None:
             for elem in response:
                 result[elem.tag] = self.decode_result(elem)
-        #print "_cbGotResult 3", result
 
         return result
 

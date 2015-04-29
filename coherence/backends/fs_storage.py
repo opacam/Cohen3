@@ -41,6 +41,7 @@ from coherence.upnp.core.soap_service import errorCode
 
 from coherence.upnp.core import utils
 
+#FIXME: doesn't work, migrate to twisted.inotify
 try:
     from coherence.extern.inotify import (
         INotify, IN_CREATE, IN_DELETE, IN_MOVED_FROM, IN_MOVED_TO,

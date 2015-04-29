@@ -4,18 +4,17 @@
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
 
-import urllib2
 import time
 
+from lxml import etree
+import xml_constants
 from twisted.internet import defer
-
 from coherence.upnp.core.service import Service
 from coherence.upnp.core import utils
 from coherence import log
-
 import coherence.extern.louie as louie
 
-ns = "urn:schemas-upnp-org:device-1-0"
+ns = xml_constants.UPNP_DEVICE_NS
 
 
 class Device(log.Loggable):
@@ -276,7 +275,7 @@ class Device(log.Loggable):
                     self.warning("device %r seems to have an invalid icon description, ignoring that icon", self.friendly_name)
 
         serviceList = d.find('./{%s}serviceList' % ns)
-        if serviceList:
+        if serviceList is not None:
             for service in serviceList.findall('./{%s}service' % ns):
                 serviceType = service.findtext('{%s}serviceType' % ns)
                 serviceId = service.findtext('{%s}serviceId' % ns)
@@ -535,14 +534,14 @@ class RootDevice(Device):
             data, headers = x
             xml_data = None
             try:
-                xml_data = utils.parse_xml(data, 'utf-8')
+                xml_data = etree.fromstring(data)
             except:
                 self.warning("Invalid device description received from %r", self.location)
                 import traceback
                 self.debug(traceback.format_exc())
 
             if xml_data is not None:
-                tree = xml_data.getroot()
+                tree = xml_data
                 major = tree.findtext('./{%s}specVersion/{%s}major' % (ns, ns))
                 minor = tree.findtext('./{%s}specVersion/{%s}minor' % (ns, ns))
                 try:
