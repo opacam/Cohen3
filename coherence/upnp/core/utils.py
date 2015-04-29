@@ -3,11 +3,11 @@
 
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
-
 import urlparse
+from io import StringIO
 from urlparse import urlsplit
 
-from coherence.extern.et import parse_xml as et_parse_xml
+from lxml import etree
 from coherence import SERVER_ID
 from twisted.web import http, static
 from twisted.web import client, error
@@ -45,10 +45,6 @@ def generalise_boolean(value):
     return '0'
 
 generalize_boolean = generalise_boolean
-
-
-def parse_xml(data, encoding="utf-8"):
-    return et_parse_xml(data, encoding)
 
 
 def parse_http_response(data):

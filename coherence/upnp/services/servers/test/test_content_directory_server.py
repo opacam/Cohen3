@@ -11,20 +11,16 @@ Test cases for L{upnp.services.servers.content_directory_server}
 """
 
 import os
-
 from twisted.trial import unittest
 from twisted.internet.defer import Deferred
-
 from twisted.python.filepath import FilePath
-
-from coherence import __version__
 from coherence.base import Coherence
 from coherence.upnp.core.uuid import UUID
 from coherence.upnp.devices.control_point import DeviceQuery
 from coherence.upnp.core import DIDLLite
-import coherence.extern.louie as louie
-
+from coherence.extern import louie
 from coherence.test import wrapped
+
 
 class TestContentDirectoryServer(unittest.TestCase):
 
@@ -44,18 +40,18 @@ class TestContentDirectoryServer(unittest.TestCase):
         album.child('track-2.ogg').touch()
         louie.reset()
         self.coherence = Coherence(
-            {'unittest': 'yes',
-             'logmode': 'critical',
-             'no-subsystem_log': {'controlpoint': 'error',
-                               'action': 'info',
-                               'soap': 'error'},
-             'controlpoint': 'yes'})
+          {'unittest': 'yes',
+           'logmode': 'critical',
+           'no-subsystem_log': {'controlpoint': 'error',
+                                'action': 'info',
+                                'soap': 'error'},
+           'controlpoint': 'yes'})
         self.uuid = str(UUID())
-        p = self.coherence.add_plugin('FSStore',
-                                      name='MediaServer-%d' % os.getpid(),
-                                      content=self.tmp_content.path,
-                                      uuid=self.uuid,
-                                      enable_inotify=False)
+        self.coherence.add_plugin('FSStore',
+                                  name='MediaServer-%d' % os.getpid(),
+                                  content=self.tmp_content.path,
+                                  uuid=self.uuid,
+                                  enable_inotify=False)
 
     def tearDown(self):
         self.tmp_content.remove()
@@ -67,7 +63,6 @@ class TestContentDirectoryServer(unittest.TestCase):
         dl = self.coherence.shutdown()
         dl.addBoth(cleaner)
         return dl
-
 
     def test_Browse(self):
         """ tries to find the activated FSStore backend
@@ -101,7 +96,6 @@ class TestContentDirectoryServer(unittest.TestCase):
                         the_result, timeout=10, oneshot=True))
         return d
 
-
     def test_Browse_Non_Existing_Object(self):
 
         d = Deferred()
@@ -122,7 +116,6 @@ class TestContentDirectoryServer(unittest.TestCase):
             DeviceQuery('uuid', self.uuid, the_result,
                         timeout=10, oneshot=True))
         return d
-
 
     def test_Browse_Metadata(self):
         """ tries to find the activated FSStore backend
@@ -151,7 +144,6 @@ class TestContentDirectoryServer(unittest.TestCase):
                         the_result, timeout=10, oneshot=True))
         return d
 
-
     def test_XBOX_Browse(self):
         """ tries to find the activated FSStore backend
             and browses all audio files.
@@ -160,17 +152,7 @@ class TestContentDirectoryServer(unittest.TestCase):
 
         @wrapped(d)
         def the_result(mediaserver):
-
-            def my_browse(*args, **kwargs):
-                kwargs['ContainerID'] = kwargs['ObjectID']
-                del kwargs['ObjectID']
-                del kwargs['BrowseFlag']
-                kwargs['SearchCriteria'] = ''
-                return 'Search', kwargs
-
-            #mediaserver.client.overlay_actions = {'Browse': my_browse}
-            mediaserver.client.overlay_headers = {
-                'user-agent': 'Xbox/Coherence emulation'}
+            mediaserver.client.overlay_headers = {'user-agent': 'Xbox/Coherence emulation'}
             cdc = mediaserver.client.content_directory
             self.assertEqual(self.uuid, mediaserver.udn)
             call = cdc.browse(object_id='4', process_result=False)
@@ -187,7 +169,6 @@ class TestContentDirectoryServer(unittest.TestCase):
             DeviceQuery('uuid', self.uuid, the_result,
                         timeout=10, oneshot=True))
         return d
-
 
     def test_XBOX_Browse_Metadata(self):
         """ tries to find the activated FSStore backend
@@ -218,7 +199,6 @@ class TestContentDirectoryServer(unittest.TestCase):
             DeviceQuery('uuid', self.uuid, the_result,
                         timeout=10, oneshot=True))
         return d
-
 
     def test_XBOX_Search(self):
         """ tries to find the activated FSStore backend

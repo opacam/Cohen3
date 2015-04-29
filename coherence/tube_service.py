@@ -6,17 +6,17 @@
 """ TUBE service classes
 
 """
+from lxml import etree
 
 import urllib
 import urlparse
+from upnp.core import xml_constants
 
 import dbus
 
 from twisted.web import resource
 from twisted.internet import defer
 from twisted.python.util import OrderedDict
-
-from coherence.upnp.core.utils import parse_xml
 
 from coherence.upnp.devices.basics import RootDeviceXML, DeviceHttpRoot
 from coherence.upnp.core import service
@@ -179,8 +179,8 @@ class TubeServiceProxy(service.ServiceServer, resource.Resource):
             classes for our (proxy) server
         """
         xml = self.service.get_scpd_xml()
-        tree = parse_xml(xml, 'utf-8').getroot()
-        ns = "urn:schemas-upnp-org:service-1-0"
+        tree = etree.fromstring(xml)
+        ns = xml_constants.UPNP_SERVICE_NS
 
         for action_node in tree.findall('.//{%s}action' % ns):
             name = action_node.findtext('{%s}name' % ns)

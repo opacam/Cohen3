@@ -40,7 +40,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         self.known = {}
         self._callbacks = {}
         self.test = test
-        if self.test == False:
+        if not self.test:
             try:
                 self.port = reactor.listenMulticast(SSDP_PORT, self, listenMultiple=True)
                 #self.port.setLoopbackMode(1)

@@ -2,14 +2,13 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2007 - Frank Scholz <coherence@beebits.net>
+from lxml import etree
 
 from twisted.web import server, resource
 from twisted.python import failure
 from twisted.internet import defer
 
 from coherence import log, SERVER_ID
-
-from coherence.upnp.core.utils import parse_xml
 
 from coherence.upnp.core import soap_lite
 
@@ -99,9 +98,7 @@ class UPnPPublisher(resource.Resource, log.Loggable):
                 print c, c.tag
                 print_c(c)
 
-        tree = parse_xml(data)
-        #root = tree.getroot()
-        #print_c(root)
+        tree = etree.fromstring(data)
 
         body = tree.find('{http://schemas.xmlsoap.org/soap/envelope/}Body')
         method = body.getchildren()[0]

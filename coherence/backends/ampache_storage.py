@@ -2,6 +2,7 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2008, Frank Scholz <coherence@beebits.net>
+from lxml import etree
 
 import time
 import mimetypes
@@ -493,7 +494,7 @@ class Track(BackendItem):
         return self.title
 
     def get_url(self):
-        if self.store.proxy == True:
+        if self.store.proxy:
             return self.store.urlbase + str(self.id)
         else:
             return self.url
@@ -647,7 +648,7 @@ class AmpacheStore(BackendStore):
     def got_auth_response(self, response, renegotiate=False):
         self.info("got_auth_response %r", response)
         try:
-            response = utils.parse_xml(response, encoding='utf-8')
+            response = etree.fromstring(response)
         except SyntaxError, msg:
             self.warning('error parsing ampache answer %r', msg)
             raise SyntaxError('error parsing ampache answer %r' % msg)
@@ -700,7 +701,7 @@ class AmpacheStore(BackendStore):
 
     def got_auth_error(self, e, renegotiate=False):
         self.warning('error calling ampache %r', e)
-        if renegotiate == False:
+        if not renegotiate:
             louie.send('Coherence.UPnP.Backend.init_failed', None, backend=self, msg=e)
 
     def get_token(self, renegotiate=False):
@@ -728,7 +729,7 @@ class AmpacheStore(BackendStore):
     def got_response(self, response, query_item, request):
         self.info("got a response for %r", query_item)
         self.debug(response)
-        response = utils.parse_xml(response, encoding='utf-8')
+        response = etree.fromstring(response)
         items = []
         try:
             error = response.find('error')
@@ -754,7 +755,7 @@ class AmpacheStore(BackendStore):
         except AttributeError:
             if query_item in ('song', 'artist', 'album', 'playlist', 'genre', 'tag', 'video'):
                 q = response.find(query_item)
-                if q == None:
+                if q is None:
                     return None
                 else:
                     if q.tag in ['song']:
@@ -970,14 +971,14 @@ class AmpacheStore(BackendStore):
         root_id = ObjectID
 
         item = self.get_by_id(root_id)
-        if item == None:
+        if item is None:
             return failure.Failure(errorCode(701))
 
         def got_error(r):
             return r
 
         def process_result(result, found_item):
-            if result == None:
+            if result is None:
                 result = []
             if BrowseFlag == 'BrowseDirectChildren':
                 l = []
