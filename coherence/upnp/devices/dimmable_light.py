@@ -5,21 +5,13 @@
 
 # Copyright 2008, Frank Scholz <coherence@beebits.net>
 
-from twisted.internet import task
-from twisted.internet import reactor
-from twisted.web import resource, static
+import os
 
-from coherence import __version__
-
-from coherence.extern.et import ET, indent
+from twisted.web import static
 
 from coherence.upnp.services.servers.switch_power_server import SwitchPowerServer
 from coherence.upnp.services.servers.dimming_server import DimmingServer
-
 from coherence.upnp.devices.basics import RootDeviceXML, DeviceHttpRoot, BasicDeviceMixin
-
-import coherence.extern.louie as louie
-
 from coherence import log
 
 
@@ -33,19 +25,24 @@ class DimmableLight(log.Loggable, BasicDeviceMixin):
     version = 1
 
     def __init__(self, coherence, backend, **kwargs):
-        BasicDeviceMixin.__init__(self, coherence, backend, **kwargs)
-        log.Loggable.__init__(self)
+      BasicDeviceMixin.__init__(self, coherence, backend, **kwargs)
+      log.Loggable.__init__(self)
+      self._devices = []
+      self._services = []
+      self.switch_power_server = None
+      self.dimming_server = None
+      self.web_resource = None
 
     def fire(self, backend, **kwargs):
-        if kwargs.get('no_thread_needed', False) == False:
+        if not kwargs.get('no_thread_needed', False):
             """ this could take some time, put it in a  thread to be sure it doesn't block
                 as we can't tell for sure that every backend is implemented properly """
 
             from twisted.internet import threads
             d = threads.deferToThread(backend, self, **kwargs)
 
-            def backend_ready(backend):
-                self.backend = backend
+            def backend_ready(_backend):
+                self.backend = _backend
 
             def backend_failure(x):
                 self.warning('backend not installed, %s activation aborted', self.device_type)

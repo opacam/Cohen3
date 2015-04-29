@@ -60,25 +60,24 @@ class DeviceQuery(object):
 class ControlPoint(log.Loggable):
     logCategory = 'controlpoint'
 
-    def __init__(self, coherence, auto_client=['MediaServer', 'MediaRenderer', 'BinaryLight', 'DimmableLight']):
+    def __init__(self, coherence, auto_client=None):
         log.Loggable.__init__(self)
+
+        if not auto_client:
+          auto_client = ['MediaServer', 'MediaRenderer', 'BinaryLight', 'DimmableLight']
         self.coherence = coherence
+        self.auto_client = auto_client
+        self.queries = []
 
         self.info("Coherence UPnP ControlPoint starting...")
         self.event_server = EventServer(self)
-
-        self.coherence.add_web_resource('RPC2',
-                                        XMLRPC(self))
-
-        self.auto_client = auto_client
-        self.queries = []
+        self.coherence.add_web_resource('RPC2', XMLRPC(self))
 
         for device in self.get_devices():
             self.check_device(device)
 
         louie.connect(self.check_device, 'Coherence.UPnP.Device.detection_completed', louie.Any)
         louie.connect(self.remove_client, 'Coherence.UPnP.Device.remove_client', louie.Any)
-
         louie.connect(self.completed, 'Coherence.UPnP.DeviceClient.detection_completed', louie.Any)
 
     def shutdown(self):
