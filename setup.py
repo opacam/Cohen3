@@ -34,8 +34,10 @@ class build_docs(Command):
     description = "build documentation from rst-files"
     user_options=[]
 
-    def initialize_options (self): pass
-    def finalize_options (self):
+    def initialize_options(self):
+      pass
+
+    def finalize_options(self):
         self.docpages = DOCPAGES
 
     def run(self):
@@ -161,7 +163,8 @@ if setuptools:
         'Twisted >= 8.2',
         'zope.interface',
         'louie',
-        'livestreamer'
+        'livestreamer',
+        'lxml'
     ]
     if sys.platform in ('win32', 'sunos5'):
         setup_args['install_requires'].append('Netifaces >= 0.4')
