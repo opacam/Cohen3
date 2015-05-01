@@ -81,12 +81,13 @@ class LiveStreamerProxyResource(Resource, Loggable):
 class TwitchLazyContainer(LazyContainer):
   logCategory = 'twitch_store'
 
-  def __init__(self, parent, title, **kwargs):
+  def __init__(self, parent, title, limit=None, **kwargs):
     super(TwitchLazyContainer, self).__init__(parent, title, **kwargs)
 
     self.childrenRetriever = self._retrieve_children
     self.refresh = 60
     self.children_url = None
+    self.limit = limit
 
   def result_handler(self, result, **kwargs):
     return True
@@ -94,6 +95,9 @@ class TwitchLazyContainer(LazyContainer):
   def _retrieve_children(self, parent=None, **kwargs):
     if self.children_url is None:
       return
+
+    kwargs.update({'limit': self.limit})
+    kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
     url = "%s?%s" % (self.children_url, urllib.urlencode(kwargs)) if kwargs else self.children_url
 
@@ -114,12 +118,13 @@ class TwitchLazyContainer(LazyContainer):
 
 
 class GamesContainer(TwitchLazyContainer):
-  def __init__(self, parent, title='Top Games', description=None, **kwargs):
-    super(GamesContainer, self).__init__(parent, title, **kwargs)
+  def __init__(self, parent, title='Games', description=None, limit=None, children_limit=None, **kwargs):
+    super(GamesContainer, self).__init__(parent, title, limit=limit, **kwargs)
     self.description = description
 
     self.children_url = '%s/games/top' % TWITCH_API_URL
     self.sorting_method = sort_by_viewers
+    self.children_limit = children_limit
 
   def result_handler(self, result, **kwargs):
     for game_info in result['top']:
@@ -129,7 +134,7 @@ class GamesContainer(TwitchLazyContainer):
                               channels=game_info['channels'],
                               cover_url=game_info['game']['box']['large'],
                               game=game_name,
-                              limit=3)
+                              limit=self.children_limit)
       # item.description = "%d viewers" % game_info['viewers']
       self.add_child(item, external_id=game_info['game']['_id'])
     return True
@@ -262,20 +267,32 @@ class TwitchStore(AbstractBackendStore):
     root_item = Container(None, self.name)
     self.set_root_item(root_item)
 
-    # 'Followed Streams' directory
-    if self.access_token:
-      games_dir = StreamsContainer(root_item, 'Following',
+    # 'Following' directory
+    settings = self.config.get('Following', {})
+    if self.access_token and settings.get('active') != 'no':
+      games_dir = StreamsContainer(root_item,
+                                   title=settings.get('name') or 'Following',
                                    streams_url='%s/streams/followed',
+                                   limit=settings.get('limit', 25),
                                    oauth_token=self.access_token)
       root_item.add_child(games_dir)
 
     # 'Games' directory
-    games_dir = GamesContainer(root_item, limit=5)
-    root_item.add_child(games_dir)
+    settings = self.config.get('TopGames', {})
+    if settings.get('active') != 'no':
+      games_dir = GamesContainer(root_item,
+                                 title=settings.get('name', 'Top Games'),
+                                 limit=settings.get('limit', 10),
+                                 children_limit=settings.get('children_limit', 25))
+      root_item.add_child(games_dir)
 
     # 'Top Streams' directory
-    games_dir = StreamsContainer(root_item, 'Top Streams')
-    root_item.add_child(games_dir)
+    settings = self.config.get('TopStreams', {})
+    if settings.get('active') != 'no':
+      games_dir = StreamsContainer(root_item,
+                                   title=settings.get('name', 'Top Streams'),
+                                   limit=settings.get('limit', 25))
+      root_item.add_child(games_dir)
 
 
 def sort_by_viewers(x, y):
