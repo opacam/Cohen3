@@ -18,7 +18,7 @@ except:
         for f in os.listdir(path):
             if f[0] == '.':
                 continue
-            if os.path.isdir(os.path.join(path,f)) == True:
+            if os.path.isdir(os.path.join(path, f)):
                 next_path = os.path.join(path,f)
                 if '__init__.py' in os.listdir(next_path):
                     packages.append(next_path.replace(os.sep,'.'))
@@ -164,7 +164,9 @@ if setuptools:
         'zope.interface',
         'louie',
         'livestreamer',
-        'lxml'
+        'lxml',
+        'python-dateutil',
+        'pyopenssl'
     ]
     if sys.platform in ('win32', 'sunos5'):
         setup_args['install_requires'].append('Netifaces >= 0.4')
