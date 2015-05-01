@@ -6,18 +6,7 @@ logmode = warning                         # none, error, warning, info, debug, l
 #logfile = coherence.log
 #interface = eth0
 serverport = 30020                       # if not specified or set to 0
-                                          # coherence will let the OS choose the port
-
-controlpoint = yes                        # if set to yes coherence will activate its
-                                          # internal ControlPoint
-
-web-ui = no                               # set this to yes to enable some interactive
-                                          # Web-UI
-
-#use_dbus = yes                            # set this to yes to let Coherence signal
-                                          # devices and services via dbus and provide
-                                          # access to them
-                                          # only useful when controlpoint is enabled too
+                                         # coherence will let the OS choose the port
 
 [subsystem_log]
 #coherence = info
@@ -38,20 +27,38 @@ web-ui = no                               # set this to yes to enable some inter
 #MS_Client = info
 #flickr_storage = info
 #Buzztard=info
+#twitch_store=debug
 
 
 [plugins]
-    [[FSStore]]
+    #[[FSStore]]
     #    content = tests/content/audio,tests/content/video           # append more directories separated by commas
     #    version = 1
     #    #content = /data/audio/music
-        name = Coherence Test Content
+    #    name = Coherence Test Content
     #    [[[icon]]]
     #        mimetype = image/png
     #        width = 120
     #        height = 106
     #        depth = 24
     #        url = file:///home/dev/Projects/Coherence/tests/coherence-icon.png
+
+    #[[TwitchStore]]
+    #    uuid = twitch_tv
+    #    access_token = YOUR_TOKEN (TODO check guide at http:///)
+    #    [[[Following]]]
+    #      name = Following
+    #      limit = 25
+    #      active = no
+    #    [[[TopGames]]]
+    #      name = Top Games
+    #      limit = 10              # number of top games to show
+    #      children_limit = 20     # number of streams per game
+    #      active = no
+    #    [[[TopStreams]]]
+    #      name = Top Streams
+    #      limit = 25
+    #      active = no
 
     #[[GStreamerPlayer]]
     #    name = GStreamer Audio Player
