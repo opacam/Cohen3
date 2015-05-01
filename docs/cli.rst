@@ -1,39 +1,19 @@
-.. -*- mode: rst ; ispell-local-dictionary: "american" -*-
+.. _cli:
 
-=====
-cohen
-=====
--------------------------------------------
-Python UPnP/DLNA Media Server and Framework
--------------------------------------------
-:Authors:   Cohen is based on Coherence by Frank Scholz <cohen@beebits.net>.
-This man page was created by Charlie Smotherman <cjsmo@cableone.net> for Frank Scholz and the Debian Project.
-:Version:   Version |VERSION|
-:Licence:   GNU Public Licence v3 (GPLv3)
-:Date:      Thu, Mar 19 2009
-:Manual section: 1
-
-.. raw:: manpage
-
-   .\" disable justification (adjust text to left margin only)
-   .ad l
+Command-Line Interface
+======================
 
 SYNOPSIS
-========
+--------
 
 ``cohen`` <options> [--plugin=<BACKEND> [ , <PARAM_NAME> : <PARAM_VALUE> ] ...]
 
 DESCRIPTION
-===========
+-----------
 
-Coherence is a Python UPnP framework which enabling your application to
-participate in digital living networks, at the moment primarily the
-UPnP universe.
+Cohen is a Python DLNA/UPnP Media Server made to broadcast digital media content over your network.
 
-Its goal is to relieve your application from all the membership and UPnP
-related tasks as much as possible.
-
-The core of Coherence provides a (hopefully complete) implementation
+The core of Cohen provides a (hopefully complete) implementation
 of:
 
   * a SSDP server,
@@ -42,7 +22,7 @@ of:
   * server and client for Event Subscription and Notification (GENA).
 
 OPTIONS
-=======
+-------
 
 -v, --version  Show program's version number and exit
 
@@ -60,18 +40,18 @@ OPTIONS
 
 
 EXAMPLES
-========
+--------
 
 :cohen --plugin=backend\:FSStore,name\:MyCoherence:
-        Start cohen activating the `FSStore` backend.
+    Start cohen activating the `FSStore` backend.
 
 :cohen --plugin=backend\:MediaStore,medialocation\:$HOME/Music/,mediadb\:/tmp/media.db:
-        Start cohen activating the `MediaStore` backend with media
+    Start cohen activating the `MediaStore` backend with media
     located in `$HOME/Music` and the media metadata store in
     `/tmp/media.db`.
 
 AVAILABLE STORES
-================
+----------------
 
 BetterLight, AmpacheStore, FlickrStore, MiroStore, ElisaPlayer,
 ElisaMediaStore, Gallery2Store, DVBDStore, FSStore, BuzztardPlayer,
@@ -80,18 +60,18 @@ TrackerStore, LolcatsStore, BBCStore, MediaStore, AppleTrailerStore,
 LastFMStore, AxisCamStore, YouTubeStore, TEDStore, IRadioStore, TwitchStore
 
 FILES
-=====
+-----
 
 :$HOME/.coherence: default config file
 
 ENVIRONMENT VARIABLES
-=====================
+---------------------
 
 :COHERENCE_DEBUG=<STORE>:
-          Supplies debug information pertaining to the named store.
+    Supplies debug information pertaining to the named store.
 
 
 SEE ALSO
-========
+--------
 
 Project Homepage https://github.com/unintended/Cohen
