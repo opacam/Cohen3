@@ -294,7 +294,8 @@ class Coherence(log.Loggable):
     """ SSDP Server Initialization
     """
     try:
-      self.ssdp_server = SSDPServer(test=unittest, interface=self.hostname)
+      # TODO: add ip/interface bind
+      self.ssdp_server = SSDPServer(test=unittest)
     except CannotListenError, err:
       self.error("Error starting the SSDP-server: %s", err)
       self.debug("Error starting the SSDP-server", exc_info=True)
@@ -316,6 +317,7 @@ class Coherence(log.Loggable):
     """ Web Server Initialization
     """
     try:
+      # TODO: add ip/interface bind
       self.web_server = WebServer(self.config.get('web-ui', None), self.web_server_port, self)
     except CannotListenError:
       self.warning('port %r already in use, aborting!', self.web_server_port)
