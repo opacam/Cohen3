@@ -300,7 +300,7 @@ class Device(log.Loggable):
 
             # now look for all sub devices
             embedded_devices = d.find('./{%s}deviceList' % ns)
-            if embedded_devices:
+            if embedded_devices is not None:
                 for d in embedded_devices.findall('./{%s}device' % ns):
                     embedded_device = Device(self)
                     self.add_device(embedded_device)

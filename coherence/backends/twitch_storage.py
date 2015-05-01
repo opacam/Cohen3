@@ -43,11 +43,14 @@ class LiveStreamerProxyResource(Resource, Loggable):
 
   def __init__(self, url, stream_id, content_type=MPEG_MIME):
     Resource.__init__(self)
+    Loggable.__init__(self)
     self.url = url
     self.stream_id = stream_id
     self.content_type = content_type
 
   def render_GET(self, request):
+    self.debug("serving %s request from %s for %s", request.method, request.getClientIP(), request.uri)
+
     def stream_opened(fd):
       producer = NoRangeStaticProducer(request, fd)
       producer.start()
@@ -180,7 +183,7 @@ class TwitchStreamItem(BackendItem):
       self.item.date = self.created_at
       self.item.albumArtURI = self.preview_url
 
-      res = DIDLLite.Resource(self.url, 'http-get:*:%s:*' % self.mimetype)
+      res = DIDLLite.Resource(self.url, 'http-get:*:%s:#' % MPEG_MIME)
       self.item.res.append(res)
     return self.item
 
@@ -253,7 +256,7 @@ class TwitchStore(AbstractBackendStore):
   def upnp_init(self):
     if self.server:
       self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo',
-                                                         ['http-get:*:video/mpeg:*'],
+                                                         ['http-get:*:%s:*' % MPEG_MIME],
                                                          default=True)
     # root item
     root_item = Container(None, self.name)
