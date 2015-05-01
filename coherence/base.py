@@ -293,7 +293,14 @@ class Coherence(log.Loggable):
 
     """ SSDP Server Initialization
     """
-    self.ssdp_server = SSDPServer(test=unittest, interface=self.hostname)
+    try:
+      self.ssdp_server = SSDPServer(test=unittest, interface=self.hostname)
+    except CannotListenError, err:
+      self.error("Error starting the SSDP-server: %s", err)
+      self.debug("Error starting the SSDP-server", exc_info=True)
+      reactor.stop()
+      return
+
     louie.connect(self.create_device, 'Coherence.UPnP.SSDP.new_device', louie.Any)
     louie.connect(self.remove_device, 'Coherence.UPnP.SSDP.removed_device', louie.Any)
     louie.connect(self.add_device, 'Coherence.UPnP.RootDevice.detection_completed', louie.Any)

@@ -11,7 +11,6 @@
 
 import random
 import string
-import sys
 import time
 import socket
 
@@ -19,10 +18,9 @@ from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor, error
 from twisted.internet import task
 from twisted.web.http import datetimeToString
-
 from coherence import log, SERVER_ID
-
 import coherence.extern.louie as louie
+
 
 SSDP_PORT = 1900
 SSDP_ADDR = '239.255.255.250'
@@ -41,21 +39,15 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         self._callbacks = {}
         self.test = test
         if not self.test:
-            try:
-                self.port = reactor.listenMulticast(SSDP_PORT, self, listenMultiple=True)
-                #self.port.setLoopbackMode(1)
+          self.port = reactor.listenMulticast(SSDP_PORT, self, listenMultiple=True, interface=interface)
 
-                self.port.joinGroup(SSDP_ADDR, interface=interface)
+          self.port.joinGroup(SSDP_ADDR, interface=interface)
 
-                self.resend_notify_loop = task.LoopingCall(self.resendNotify)
-                self.resend_notify_loop.start(777.0, now=False)
+          self.resend_notify_loop = task.LoopingCall(self.resendNotify)
+          self.resend_notify_loop.start(777.0, now=False)
 
-                self.check_valid_loop = task.LoopingCall(self.check_valid)
-                self.check_valid_loop.start(333.0, now=False)
-
-            except error.CannotListenError, err:
-                self.error("Error starting the SSDP-server: %s", err)
-                self.error("There seems to be already a SSDP server running on this host, no need starting a second one.")
+          self.check_valid_loop = task.LoopingCall(self.check_valid)
+          self.check_valid_loop.start(333.0, now=False)
 
         self.active_calls = []
 
@@ -63,7 +55,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         for call in reactor.getDelayedCalls():
             if call.func == self.send_it:
                 call.cancel()
-        if self.test == False:
+        if not self.test:
             if self.resend_notify_loop.running:
                 self.resend_notify_loop.stop()
             if self.check_valid_loop.running:
