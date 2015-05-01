@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=org.Coherence
-Exec=/usr/bin/coherence -o use_dbus:yes -o controlpoint:yes
