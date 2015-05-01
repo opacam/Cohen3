@@ -12,7 +12,8 @@
 
 NAME=cohen
 DAEMON=/usr/local/bin/$NAME
-CONFIG=/usr/loca/etc/coherence.conf
+CONFIG=/usr/local/etc/coherence.conf
+LOGFILE=/var/log/cohen.log
 USER=nobody
 DAEMON_OPTS=""
 PIDFILE=/var/run/$NAME.pid
@@ -26,7 +27,7 @@ STOP_TIMEOUT=30
 
 do_start () {
     log_daemon_msg "Starting $NAME daemon"
-    start-stop-daemon --start --background --pidfile $PIDFILE --make-pidfile --user $USER --chuid $USER --startas $DAEMON -- -c $CONFIG $DAEMON_OPTS
+    start-stop-daemon --start --background --pidfile $PIDFILE --make-pidfile --user $USER --chuid $USER --startas $DAEMON -- -c $CONFIG -l $LOGFILE $DAEMON_OPTS
     log_end_msg $?
 }
 
