@@ -6,12 +6,7 @@ include README
 recursive-include docs *
 recursive-include tests *
 recursive-include coherence/upnp/core/xml-service-descriptions *
-include misc/coherence-initscript.sh
-include misc/media_server_observer.py
-include misc/org.Coherence.service
-include misc/upnp-tester.py
 recursive-include misc/device-icons *
-recursive-include misc/EOG-Plugin *
-recursive-include misc/Nautilus *
-recursive-include misc/Rhythmbox-Plugin *
-recursive-include misc/Totem-Plugin *
+include misc/cohen-initscript.sh
+include misc/media_server_observer.py
+include misc/upnp-tester.py

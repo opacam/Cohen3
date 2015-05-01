@@ -138,7 +138,7 @@ Kudos go to:
   'author_email': 'dev@coherence-project.org',
   'license': "MIT",
   'packages': packages,
-  'scripts': ['bin/coherence'],
+  'scripts': ['bin/cohen'],
   'url': "http://coherence-project.org",
   'download_url': 'http://coherence-project.org/download/Coherence-%s.tar.gz' % __version__,
   'keywords': ['UPnP', 'DLNA', 'multimedia', 'gstreamer'],
