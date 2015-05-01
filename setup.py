@@ -160,7 +160,7 @@ Kudos go to:
 if setuptools:
     setup_args['install_requires'] = [
         'ConfigObj >= 4.3',
-        'Twisted >= 8.2',
+        'Twisted >= 14.0',
         'zope.interface',
         'louie',
         'livestreamer',
