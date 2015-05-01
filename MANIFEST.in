@@ -3,10 +3,7 @@ include LICENCE
 include MANIFEST.in
 include NEWS
 include README
-recursive-include docs *
-recursive-include tests *
 recursive-include coherence/upnp/core/xml-service-descriptions *
-recursive-include misc/device-icons *
-include misc/cohen-initscript.sh
-include misc/media_server_observer.py
-include misc/upnp-tester.py
+recursive-include docs *
+recursive-include misc *
+recursive-include tests *
