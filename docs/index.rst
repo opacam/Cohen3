@@ -4,7 +4,9 @@ Overview
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :glob:
 
     install
     cli
+    backends
+    backend/*

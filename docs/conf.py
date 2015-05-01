@@ -226,7 +226,7 @@ htmlhelp_basename = 'Cohendoc'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-  (master_doc, 'cohen', u'Cohen Documentation', [author, "Frank Scholz"], 1)
+  ('cli', 'Cohen', u'DLNA/UPnP Media Server', [author, "Frank Scholz"], 1)
 ]
 
 # If true, show URL addresses after external links.
