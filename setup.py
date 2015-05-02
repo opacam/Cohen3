@@ -167,4 +167,6 @@ if setuptools:
     BetterLight = coherence.backends.light:BetterLight
   """
 
-  setup(cmdclass=cmdclass, requires=requires, entry_points=entry_points)
+  setup(cmdclass=cmdclass, install_requires=requires, entry_points=entry_points)
+else:
+  setup(cmdclass=cmdclass)
