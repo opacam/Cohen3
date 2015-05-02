@@ -19,3 +19,6 @@ manager, :command:`easy_install` the older package manager included with
 Dependencies
 ------------
 
+
+Starting as Service
+-------------------
