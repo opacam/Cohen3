@@ -13,7 +13,7 @@ LOG_FORMAT = ('%(asctime)s %(levelname)s '
               '%(name)s: %(message)s '
               '(%(filename)s:%(lineno)s)')
 
-ENV_VAR_NAME = 'COHERENCE_DEBUG'
+ENV_VAR_NAME = 'COHEN_DEBUG'
 
 # This is taken from std.-module logging, see Logger.findCaller below.
 # _srcfile is used when walking the stack to check when we've got the first

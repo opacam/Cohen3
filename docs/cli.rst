@@ -62,12 +62,12 @@ LastFMStore, AxisCamStore, YouTubeStore, TEDStore, IRadioStore, TwitchStore
 FILES
 -----
 
-:$HOME/.coherence: default config file
+:$HOME/.cohen: default config file
 
 ENVIRONMENT VARIABLES
 ---------------------
 
-:COHERENCE_DEBUG=<STORE>:
+:COHEN_DEBUG=<STORE>:
     Supplies debug information pertaining to the named store.
 
 

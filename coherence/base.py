@@ -221,7 +221,7 @@ class Coherence(log.Loggable):
     self.web_server = None
 
     """ initializes logsystem
-        a COHERENCE_DEBUG environment variable overwrites
+        a COHEN_DEBUG environment variable overwrites
         all level settings here
     """
     try:
