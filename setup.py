@@ -6,94 +6,53 @@ import os
 __version__ = "0.7.0"
 
 try:
-    import setuptools
-    from setuptools import setup, find_packages
-    packages = find_packages()
+  import setuptools
+  from setuptools import setup, find_packages
+
+  packages = find_packages()
 except ImportError:
-    setuptools = None
-    from distutils.core import setup
+  setuptools = None
+  from distutils.core import setup
 
-    packages = ['coherence', ]
+  packages = ['coherence', ]
 
-    def find_packages(path):
-        for f in os.listdir(path):
-            if f[0] == '.':
-                continue
-            if os.path.isdir(os.path.join(path, f)):
-                next_path = os.path.join(path,f)
-                if '__init__.py' in os.listdir(next_path):
-                    packages.append(next_path.replace(os.sep,'.'))
-                find_packages(next_path)
+  def find_packages(path):
+    for f in os.listdir(path):
+      if f[0] == '.':
+        continue
+      if os.path.isdir(os.path.join(path, f)):
+        next_path = os.path.join(path, f)
+        if '__init__.py' in os.listdir(next_path):
+          packages.append(next_path.replace(os.sep, '.'))
+        find_packages(next_path)
 
-    find_packages('coherence')
+  find_packages('coherence')
 
 cmdclass = {}
 
 
 DOCPAGES = (
-  ('manpage', 'docs/man/coherence.rst', 'docs/man/coherence.1'),
+  ('manpage', 'docs/man/cohen.rst', 'docs/man/cohen.1'),
 )
 
 setup_args = {
   'name': "Cohen",
   'version': __version__,
-  'description': """Coherence - DLNA/UPnP framework for the digital living""",
+  'description': """Cohen - DLNA/UPnP Media Server""",
   'long_description': """
-Coherence is a framework written in Python, providing a variety of
-UPnP MediaServer and UPnP MediaRenderer implementations for instant
-use.
+Cohen is a DLNA/UPnP Media Server written in Python,
+providing several UPnP MediaServers and MediaRenderers
+to make simple publishing and streaming different types of media content to your network.
 
-It includes an UPnP ControlPoint, which is accessible via D-Bus too.
-
-Furthermore it enables your application to participate in
-digital living networks, at the moment primarily the DLNA/UPnP universe.
-Its objective and demand is to relieve your application from all the
-membership/the UPnP related tasks as much as possible.
-
-New in this %s - the Red-Nosed Reindeer - release
-
- * new MediaServer backends that allow access to
-   * Banshee - exports audio and video files from Banshees media db
-     (http://banshee-project.org/)
-   * FeedStore - a MediaServer serving generic RSS feeds
-   * Playlist - exposes the list of video/audio streams from a m3u
-     playlist (e.g. web TV listings published by french ISPs such as
-     Free, SFR...)
-   * YAMJ - serves the movie/TV series data files and metadata from a
-     given YAMJ (Yet Another Movie Jukebox) library
-     (http://code.google.com/p/moviejukebox/)
- * updates on Mirabeau - our "UPnP over XMPP" bridge
- * simplifications in the D-Bus API
- * a first implementation of an JSON/REST API
- * advancements of the GStreamer MediaRenderer, supporting now GStreamers
-   playbin2
- * upgrade of the DVB-Daemon MediaServer
- * refinements in the transcoding section, having now the choice to use
-   GStreamer pipelines or external processes like mencoder
- * more 'compatibility' improvements for different devices (e.g.
-   Samsung TVs or Apache Felix)
- * and - as every time - the usual bugfixes and enhancements
-
-Kudos go to:
-
- * Benjamin (lightyear) Kampmann,
- * Charlie (porthose) Smotherman
- * Dominik (schrei5) Ruf,
- * Frank (dev) Scholz,
- * Friedrich (frinring) Kossebau,
- * Jean-Michel (jmsizun) Sizun,
- * Philippe (philn) Normand,
- * Sebastian (sebp) Poelsterl,
- * Zaheer (zaheerm) Merali
-
-
-""" % __version__,
-  'author': "Frank Scholz",
-  'author_email': 'dev@coherence-project.org',
+Cohen is actually a highly simplified and refreshed version of Coherence Framework project
+(http://coherence-project.org) by Frank Scholz (dev@coherence-project.org).
+""",
+  'author': "unintended",
+  'author_email': 'unintended.github@gmail.com',
   'license': "MIT",
   'packages': packages,
   'scripts': ['bin/cohen'],
-  'url': "http://coherence-project.org",
+  'url': "https://github.com/unintended/Cohen",
   'download_url': 'http://coherence-project.org/download/Coherence-%s.tar.gz' % __version__,
   'keywords': ['UPnP', 'DLNA', 'multimedia', 'gstreamer'],
   'classifiers': ['Development Status :: 5 - Production/Stable',
