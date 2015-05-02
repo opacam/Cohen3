@@ -74,8 +74,6 @@ setup(name='Cohen',
       packages=packages,
       scripts=['bin/cohen'],
       url='https://github.com/unintended/Cohen',
-      download_url='https://github.com/chrippa/livestreamer/releases/download/%s/Cohen-%s.tar.bz2' %
-                   (__version__, __version__),
       keywords=['UPnP', 'DLNA', 'multimedia', 'gstreamer'],
       classifiers=['Development Status :: 5 - Production/Stable',
                    'Environment :: Console',
