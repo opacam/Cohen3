@@ -9,15 +9,14 @@ Simple DLNA/UPnP Media Server
 Overview
 --------
 Cohen is a DLNA/UPnP Media Server written in Python,
-providing several UPnP MediaServers and MediaRenderers,
-and enabling your application to participate in digital living networks.
+providing several UPnP MediaServers and MediaRenderers
+to make simple publishing and streaming different types of media content to your network.
 
 Cohen is actually a highly simplified and refreshed version of
 `Coherence Framework <https://github.com/coherence-project/Coherence>`_ project by `Frank Scholz <mailto:dev@coherence-project.org>`_
 which looks like no longer supported.
 
 Software Information
-    - Latest release: |version| (:ref:`CHANGELOG`)
     - GitHub: https://github.com/unintended/Cohen
     - Issue tracker: https://github.com/unintended/Cohen/issues
     - PyPI: https://pypi.python.org/pypi/cohen
