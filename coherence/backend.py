@@ -4,6 +4,7 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2007,, Frank Scholz <coherence@beebits.net>
+from lxml import etree
 
 import time
 from coherence.extern.simple_plugin import Plugin
@@ -13,7 +14,6 @@ from coherence import log
 import coherence.extern.louie as louie
 
 from coherence.upnp.core.utils import getPage
-from coherence.extern.et import parse_xml
 from coherence.upnp.core import DIDLLite
 
 
@@ -29,8 +29,7 @@ class Backend(log.Loggable, Plugin):
         Like maybe upnp_Browse for the CDS Browse action.
     """
 
-    implements = []  # list the device classes here
-                     # like [BinaryLight'] or ['MediaServer','MediaRenderer']
+    implements = []  # list the device classes here, like ['MediaServer','MediaRenderer']
 
     logCategory = 'backend'
 
@@ -291,18 +290,22 @@ class BackendItem(log.Loggable):
 
 class BackendRssMixin:
 
-    def update_data(self, rss_url, container=None, encoding="utf-8"):
+    def __init__(self):
+      pass
+
+    def update_data(self, rss_url, container=None):
         """ creates a deferred chain to retrieve the rdf file,
             parse and extract the metadata and reschedule itself
         """
 
         def fail(f):
-            self.info("fail %r", f)
-            self.debug(f.getTraceback())
-            return f
+          # TODO fix loggable thing
+          self.info("fail %r", f)
+          self.debug(f.getTraceback())
+          return f
 
         dfr = getPage(rss_url)
-        dfr.addCallback(parse_xml, encoding=encoding)
+        dfr.addCallback(etree.fromstring)
         dfr.addErrback(fail)
         dfr.addCallback(self.parse_data, container)
         dfr.addErrback(fail)

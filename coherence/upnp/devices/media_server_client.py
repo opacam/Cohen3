@@ -40,9 +40,7 @@ class MediaServerClient(log.Loggable):
             if service.get_type() in ["urn:schemas-upnp-org:service:AVTransport:1",
                                       "urn:schemas-upnp-org:service:AVTransport:2"]:
                 self.av_transport = AVTransportClient(service)
-            #if service.get_type()  in ["urn:schemas-upnp-org:service:ScheduledRecording:1",
-            #                           "urn:schemas-upnp-org:service:ScheduledRecording:2"]:
-            #    self.scheduled_recording = ScheduledRecordingClient( service)
+
         self.info("MediaServer %s", self.device.get_friendly_name())
         if self.content_directory:
             self.info("ContentDirectory available")
@@ -58,57 +56,48 @@ class MediaServerClient(log.Loggable):
             self.info("AVTransport (optional) available")
         if self.scheduled_recording:
             self.info("ScheduledRecording (optional) available")
-        #d = self.content_directory.browse(0) # browse top level
-        #d.addCallback( self.process_meta)
-
-    #def __del__(self):
-    #    #print "MediaServerClient deleted"
-    #    pass
 
     def remove(self):
         self.info("removal of MediaServerClient started")
-        if self.content_directory != None:
+        if self.content_directory is not None:
             self.content_directory.remove()
-        if self.connection_manager != None:
+        if self.connection_manager is not None:
             self.connection_manager.remove()
-        if self.av_transport != None:
+        if self.av_transport is not None:
             self.av_transport.remove()
-        if self.scheduled_recording != None:
+        if self.scheduled_recording is not None:
             self.scheduled_recording.remove()
-        #del self
 
     def service_notified(self, service):
         self.info('notified about %r', service)
-        if self.detection_completed == True:
+        if self.detection_completed:
             return
-        if self.content_directory != None:
+        if self.content_directory is not None:
             if not hasattr(self.content_directory.service, 'last_time_updated'):
                 return
-            if self.content_directory.service.last_time_updated == None:
+            if self.content_directory.service.last_time_updated is None:
                 return
-        if self.connection_manager != None:
+        if self.connection_manager is not None:
             if not hasattr(self.connection_manager.service, 'last_time_updated'):
                 return
-            if self.connection_manager.service.last_time_updated == None:
+            if self.connection_manager.service.last_time_updated is None:
                 return
-        if self.av_transport != None:
+        if self.av_transport is not None:
             if not hasattr(self.av_transport.service, 'last_time_updated'):
                 return
-            if self.av_transport.service.last_time_updated == None:
+            if self.av_transport.service.last_time_updated is None:
                 return
-        if self.scheduled_recording != None:
+        if self.scheduled_recording is not None:
             if not hasattr(self.scheduled_recording.service, 'last_time_updated'):
                 return
-            if self.scheduled_recording.service.last_time_updated == None:
+            if self.scheduled_recording.service.last_time_updated is None:
                 return
         self.detection_completed = True
-        louie.send('Coherence.UPnP.DeviceClient.detection_completed', None,
-                               client=self, udn=self.device.udn)
+        louie.send('Coherence.UPnP.DeviceClient.detection_completed', None, client=self, udn=self.device.udn)
         self.info('detection_completed for %r', self)
 
     def state_variable_change(self, variable, usn):
-        self.info('%(name)r changed from %(old_value)r to %(value)r',
-                  vars(variable))
+        self.info('%(name)r changed from %(old_value)r to %(value)r', vars(variable))
 
     def print_results(self, results):
         self.info("results= %s", results)

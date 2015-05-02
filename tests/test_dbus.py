@@ -84,9 +84,7 @@ class TestDBUS(unittest.TestCase):
         @wrapped(d)
         def add_it(uuid):
             self.coherence_service.add_plugin(
-                'SimpleLight', {'name': 'dbus-test-light-%d' % os.getpid(),
-                                'uuid': uuid,
-                                },
+                'SimpleLight', {'name': 'dbus-test-light-%d' % os.getpid(), 'uuid': uuid},
                 dbus_interface=BUS_NAME,
                 reply_handler=handle_add_plugin_reply,
                 error_handler=d.errback)

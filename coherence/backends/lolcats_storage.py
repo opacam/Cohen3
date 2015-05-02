@@ -56,8 +56,8 @@ from coherence.upnp.core.utils import getPage
 # later
 from twisted.internet import reactor
 
-# And to parse the RSS-Data (which is XML), we use the coherence helper
-from coherence.extern.et import parse_xml
+# And to parse the RSS-Data (which is XML), we use lxml.etree.fromstring
+from lxml.etree import fromstring
 
 ########## The models
 # After the download and parsing of the data is done, we want to save it. In
@@ -239,12 +239,12 @@ class LolcatsStore(BackendStore):
         # here we define what kind of media content we do provide
         # mostly needed to make some naughty DLNA devices behave
         # will probably move into Coherence internals one day
-        self.server.connection_manager_server.set_variable( \
-            0, 'SourceProtocolInfo', ['http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-                                      'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-                                      'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-                                      'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-                                      'http-get:*:image/jpeg:*'])
+        self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo', [
+          'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+          'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+          'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+          'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+          'http-get:*:image/jpeg:*'])
 
         # and as it was done after we fetched the data the first time
         # we want to take care about the server wide updates as well
@@ -278,20 +278,14 @@ class LolcatsStore(BackendStore):
         dfr = getPage(self.rss_url)
 
         # push it through our xml parser
-        dfr.addCallback(parse_xml)
+        dfr.addCallback(fromstring)
 
         # then parse the data into our models
         dfr.addCallback(self.parse_data)
 
         return dfr
 
-    def parse_data(self, xml_data):
-        # So. xml_data is a cElementTree Element now. We can read our data from
-        # it now.
-
-        # each xml has a root element
-        root = xml_data.getroot()
-
+    def parse_data(self, root):
         # from there, we look for the newest update and compare it with the one
         # we have saved. If they are the same, we don't need to go on:
         pub_date = root.find('./channel/lastBuildDate').text

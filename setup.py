@@ -9,7 +9,7 @@ try:
     import setuptools
     from setuptools import setup, find_packages
     packages = find_packages()
-except:
+except ImportError:
     setuptools = None
     from distutils.core import setup
 
@@ -27,61 +27,15 @@ except:
 
     find_packages('coherence')
 
-from distutils.core import Command
-from distutils import log
-
-
-class build_docs(Command):
-    description = "build documentation from rst-files"
-    user_options = []
-
-    def initialize_options(self):
-      pass
-
-    def finalize_options(self):
-      self.docpages = DOCPAGES
-
-    def run(self):
-        substitutions = ('.. |VERSION| replace:: '
-                         + self.distribution.get_version())
-        for writer, rstfilename, outfilename in self.docpages:
-            distutils.dir_util.mkpath(os.path.dirname(outfilename))
-            log.info("creating %s page %s", writer, outfilename)
-            if not self.dry_run:
-                try:
-                    rsttext = open(rstfilename).read()
-                except IOError, e:
-                    raise SystemExit(e)
-                rsttext = '\n'.join((substitutions, rsttext))
-                # docutils.core does not offer easy reading from a
-                # string into a file, so we need to do it ourself :-(
-                doc = docutils.core.publish_string(source=rsttext,
-                                                   source_path=rstfilename,
-                                                   writer_name=writer)
-                try:
-                    rsttext = open(outfilename, 'w').write(doc)
-                except IOError, e:
-                    raise SystemExit(e)
-
 cmdclass = {}
 
-try:
-    import docutils.core
-    import docutils.io
-    import docutils.writers.manpage
-    import distutils.command.build
-    distutils.command.build.build.sub_commands.append(('build_docs', None))
-    cmdclass['build_docs'] = build_docs
-except ImportError:
-    log.warn("docutils not installed, can not build man pages. "
-             "Using pre-build ones.")
 
 DOCPAGES = (
   ('manpage', 'docs/man/coherence.rst', 'docs/man/coherence.1'),
 )
 
 setup_args = {
-  'name': "Coherence",
+  'name': "Cohen",
   'version': __version__,
   'description': """Coherence - DLNA/UPnP framework for the digital living""",
   'long_description': """
@@ -156,7 +110,7 @@ Kudos go to:
 }
 
 if setuptools:
-  setup_args['install_requires'] = [
+  requires = [
     'ConfigObj >= 4.3',
     'Twisted >= 14.0',
     'zope.interface',
@@ -167,9 +121,9 @@ if setuptools:
     'pyopenssl'
   ]
   if sys.platform in ('win32', 'sunos5'):
-    setup_args['install_requires'].append('Netifaces >= 0.4')
+    requires.append('Netifaces >= 0.4')
 
-  setup_args['entry_points'] = """
+  entry_points = """
     [coherence.plugins.backend.media_server]
     FSStore = coherence.backends.fs_storage:FSStore
     MediaStore = coherence.backends.mediadb_storage:MediaStore
@@ -213,5 +167,4 @@ if setuptools:
     BetterLight = coherence.backends.light:BetterLight
   """
 
-
-setup(cmdclass=cmdclass, **setup_args)
+  setup(cmdclass=cmdclass, requires=requires, entry_points=entry_points)

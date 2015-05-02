@@ -24,10 +24,8 @@ from coherence.upnp.core.utils import Site
 from coherence.upnp.devices.control_point import ControlPoint
 from coherence.upnp.devices.media_server import MediaServer
 from coherence.upnp.devices.media_renderer import MediaRenderer
-from coherence.upnp.devices.binary_light import BinaryLight
-from coherence.upnp.devices.dimmable_light import DimmableLight
 
-__import_devices__ = ControlPoint, MediaServer, MediaRenderer, BinaryLight, DimmableLight
+__import_devices__ = ControlPoint, MediaServer, MediaRenderer
 
 try:
     import pkg_resources
@@ -454,11 +452,9 @@ class Coherence(log.Loggable):
       self.warning("no backend with the uuid %r found", plugin.uuid)
       return ""
 
-  def writeable_config(self):
+  @staticmethod
+  def writeable_config():
     """ do we have a new-style config file """
-    from coherence.extern.simple_config import ConfigItem
-    if isinstance(self.config, ConfigItem):
-      return True
     return False
 
   def store_plugin_config(self, uuid, items):

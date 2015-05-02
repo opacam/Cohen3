@@ -11,10 +11,6 @@ from twisted.python import util
 from twisted.web import resource, static
 from twisted.internet import reactor
 
-from coherence import __version__
-
-from coherence.extern.et import ET
-
 import coherence.extern.louie as louie
 
 from coherence import log
@@ -60,127 +56,127 @@ class DeviceHttpRoot(resource.Resource, log.Loggable):
                                                                            self.listchilds(request.uri))
 
 
-class RootDeviceXML(static.Data):
-    def __init__(self, hostname, uuid, urlbase,
-                        xmlns='urn:schemas-upnp-org:device-1-0',
-                        device_uri_base='urn:schemas-upnp-org:device',
-                        device_type='BasicDevice',
-                        version=2,
-                        friendly_name='Coherence UPnP BasicDevice',
-                        manufacturer='beebits.net',
-                        manufacturer_url='http://coherence.beebits.net',
-                        model_description='Coherence UPnP BasicDevice',
-                        model_name='Coherence UPnP BasicDevice',
-                        model_number=__version__,
-                        model_url='http://coherence.beebits.net',
-                        serial_number='0000001',
-                        presentation_url='',
-                        services=[],
-                        devices=[],
-                        icons=[],
-                        dlna_caps=[]):
-        uuid = str(uuid)
-        root = ET.Element('root')
-        root.attrib['xmlns'] = xmlns
-        device_type_uri = ':'.join((device_uri_base, device_type, str(version)))
-        e = ET.SubElement(root, 'specVersion')
-        ET.SubElement(e, 'major').text = '1'
-        ET.SubElement(e, 'minor').text = '0'
-        #ET.SubElement(root, 'URLBase').text = urlbase + uuid[5:] + '/'
-
-        d = ET.SubElement(root, 'device')
-
-        if device_type == 'MediaServer':
-            x = ET.SubElement(d, 'dev:X_DLNADOC')
-            x.text = 'DMS-1.50'
-            x = ET.SubElement(d, 'dev:X_DLNADOC')
-            x.text = 'M-DMS-1.50'
-        elif device_type == 'MediaRenderer':
-            x = ET.SubElement(d, 'dev:X_DLNADOC')
-            x.text = 'DMR-1.50'
-            x = ET.SubElement(d, 'dev:X_DLNADOC')
-            x.text = 'M-DMR-1.50'
-
-        if len(dlna_caps) > 0:
-            if isinstance(dlna_caps, basestring):
-                dlna_caps = [dlna_caps]
-            for cap in dlna_caps:
-                x = ET.SubElement(d, 'dev:X_DLNACAP')
-                x.text = cap
-
-        ET.SubElement(d, 'deviceType').text = device_type_uri
-        ET.SubElement(d, 'friendlyName').text = friendly_name
-        ET.SubElement(d, 'manufacturer').text = manufacturer
-        ET.SubElement(d, 'manufacturerURL').text = manufacturer_url
-        ET.SubElement(d, 'modelDescription').text = model_description
-        ET.SubElement(d, 'modelName').text = model_name
-        ET.SubElement(d, 'modelNumber').text = model_number
-        ET.SubElement(d, 'modelURL').text = model_url
-        ET.SubElement(d, 'serialNumber').text = serial_number
-        ET.SubElement(d, 'UDN').text = uuid
-        ET.SubElement(d, 'UPC').text = ''
-        ET.SubElement(d, 'presentationURL').text = presentation_url
-
-        if len(services):
-            e = ET.SubElement(d, 'serviceList')
-            for service in services:
-                id = service.get_id()
-                s = ET.SubElement(e, 'service')
-                try:
-                    namespace = service.namespace
-                except:
-                    namespace = 'schemas-upnp-org'
-                if(hasattr(service, 'version') and
-                    service.version < version):
-                    v = service.version
-                else:
-                    v = version
-                ET.SubElement(s, 'serviceType').text = 'urn:%s:service:%s:%d' % (namespace, id, int(v))
-                try:
-                    namespace = service.id_namespace
-                except:
-                    namespace = 'upnp-org'
-                ET.SubElement(s, 'serviceId').text = 'urn:%s:serviceId:%s' % (namespace, id)
-                ET.SubElement(s, 'SCPDURL').text = '/' + uuid[5:] + '/' + id + '/' + service.scpd_url
-                ET.SubElement(s, 'controlURL').text = '/' + uuid[5:] + '/' + id + '/' + service.control_url
-                ET.SubElement(s, 'eventSubURL').text = '/' + uuid[5:] + '/' + id + '/' + service.subscription_url
-
-        if len(devices):
-            e = ET.SubElement(d, 'deviceList')
-
-        if len(icons):
-            e = ET.SubElement(d, 'iconList')
-            for icon in icons:
-
-                icon_path = ''
-                if icon.has_key('url'):
-                    if icon['url'].startswith('file://'):
-                        icon_path = icon['url'][7:]
-                    elif icon['url'] == '.face':
-                        icon_path = os.path.join(os.path.expanduser('~'), ".face")
-                    else:
-                        from pkg_resources import resource_filename
-                        icon_path = os.path.abspath(resource_filename(__name__, os.path.join('..', '..', '..', 'misc', 'device-icons', icon['url'])))
-
-                if os.path.exists(icon_path) == True:
-                    i = ET.SubElement(e, 'icon')
-                    for k, v in icon.items():
-                        if k == 'url':
-                            if v.startswith('file://'):
-                                ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + os.path.basename(v)
-                                continue
-                            elif v == '.face':
-                                ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + 'face-icon.png'
-                                continue
-                            else:
-                                ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + os.path.basename(v)
-                                continue
-                        ET.SubElement(i, k).text = str(v)
-        #if self.has_level(LOG_DEBUG):
-        #    indent( root)
-
-        self.xml = """<?xml version="1.0" encoding="utf-8"?>""" + ET.tostring(root, encoding='utf-8')
-        static.Data.__init__(self, self.xml, 'text/xml')
+# class RootDeviceXML(static.Data):
+#   def __init__(self, hostname, uuid, urlbase,
+#                xmlns='urn:schemas-upnp-org:device-1-0',
+#                device_uri_base='urn:schemas-upnp-org:device',
+#                device_type='BasicDevice',
+#                version=2,
+#                friendly_name='Coherence UPnP BasicDevice',
+#                manufacturer='beebits.net',
+#                manufacturer_url='http://coherence.beebits.net',
+#                model_description='Coherence UPnP BasicDevice',
+#                model_name='Coherence UPnP BasicDevice',
+#                model_number=__version__,
+#                model_url='http://coherence.beebits.net',
+#                serial_number='0000001',
+#                presentation_url='',
+#                services=None,
+#                devices=None,
+#                icons=None,
+#                dlna_caps=None):
+#         uuid = str(uuid)
+#         root = ET.Element('root')
+#         root.attrib['xmlns'] = xmlns
+#         device_type_uri = ':'.join((device_uri_base, device_type, str(version)))
+#         e = ET.SubElement(root, 'specVersion')
+#         ET.SubElement(e, 'major').text = '1'
+#         ET.SubElement(e, 'minor').text = '0'
+#         #ET.SubElement(root, 'URLBase').text = urlbase + uuid[5:] + '/'
+#
+#         d = ET.SubElement(root, 'device')
+#
+#         if device_type == 'MediaServer':
+#             x = ET.SubElement(d, 'dev:X_DLNADOC')
+#             x.text = 'DMS-1.50'
+#             x = ET.SubElement(d, 'dev:X_DLNADOC')
+#             x.text = 'M-DMS-1.50'
+#         elif device_type == 'MediaRenderer':
+#             x = ET.SubElement(d, 'dev:X_DLNADOC')
+#             x.text = 'DMR-1.50'
+#             x = ET.SubElement(d, 'dev:X_DLNADOC')
+#             x.text = 'M-DMR-1.50'
+#
+#         if len(dlna_caps) > 0:
+#             if isinstance(dlna_caps, basestring):
+#                 dlna_caps = [dlna_caps]
+#             for cap in dlna_caps:
+#                 x = ET.SubElement(d, 'dev:X_DLNACAP')
+#                 x.text = cap
+#
+#         ET.SubElement(d, 'deviceType').text = device_type_uri
+#         ET.SubElement(d, 'friendlyName').text = friendly_name
+#         ET.SubElement(d, 'manufacturer').text = manufacturer
+#         ET.SubElement(d, 'manufacturerURL').text = manufacturer_url
+#         ET.SubElement(d, 'modelDescription').text = model_description
+#         ET.SubElement(d, 'modelName').text = model_name
+#         ET.SubElement(d, 'modelNumber').text = model_number
+#         ET.SubElement(d, 'modelURL').text = model_url
+#         ET.SubElement(d, 'serialNumber').text = serial_number
+#         ET.SubElement(d, 'UDN').text = uuid
+#         ET.SubElement(d, 'UPC').text = ''
+#         ET.SubElement(d, 'presentationURL').text = presentation_url
+#
+#         if len(services):
+#             e = ET.SubElement(d, 'serviceList')
+#             for service in services:
+#                 id = service.get_id()
+#                 s = ET.SubElement(e, 'service')
+#                 try:
+#                     namespace = service.namespace
+#                 except:
+#                     namespace = 'schemas-upnp-org'
+#                 if(hasattr(service, 'version') and
+#                     service.version < version):
+#                     v = service.version
+#                 else:
+#                     v = version
+#                 ET.SubElement(s, 'serviceType').text = 'urn:%s:service:%s:%d' % (namespace, id, int(v))
+#                 try:
+#                     namespace = service.id_namespace
+#                 except:
+#                     namespace = 'upnp-org'
+#                 ET.SubElement(s, 'serviceId').text = 'urn:%s:serviceId:%s' % (namespace, id)
+#                 ET.SubElement(s, 'SCPDURL').text = '/' + uuid[5:] + '/' + id + '/' + service.scpd_url
+#                 ET.SubElement(s, 'controlURL').text = '/' + uuid[5:] + '/' + id + '/' + service.control_url
+#                 ET.SubElement(s, 'eventSubURL').text = '/' + uuid[5:] + '/' + id + '/' + service.subscription_url
+#
+#         if len(devices):
+#             e = ET.SubElement(d, 'deviceList')
+#
+#         if len(icons):
+#             e = ET.SubElement(d, 'iconList')
+#             for icon in icons:
+#
+#                 icon_path = ''
+#                 if icon.has_key('url'):
+#                     if icon['url'].startswith('file://'):
+#                         icon_path = icon['url'][7:]
+#                     elif icon['url'] == '.face':
+#                         icon_path = os.path.join(os.path.expanduser('~'), ".face")
+#                     else:
+#                         from pkg_resources import resource_filename
+#                         icon_path = os.path.abspath(resource_filename(__name__, os.path.join('..', '..', '..', 'misc', 'device-icons', icon['url'])))
+#
+#                 if os.path.exists(icon_path) == True:
+#                     i = ET.SubElement(e, 'icon')
+#                     for k, v in icon.items():
+#                         if k == 'url':
+#                             if v.startswith('file://'):
+#                                 ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + os.path.basename(v)
+#                                 continue
+#                             elif v == '.face':
+#                                 ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + 'face-icon.png'
+#                                 continue
+#                             else:
+#                                 ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + os.path.basename(v)
+#                                 continue
+#                         ET.SubElement(i, k).text = str(v)
+#         #if self.has_level(LOG_DEBUG):
+#         #    indent( root)
+#
+#         self.xml = """<?xml version="1.0" encoding="utf-8"?>""" + ET.tostring(root, encoding='utf-8')
+#         static.Data.__init__(self, self.xml, 'text/xml')
 
 
 class BasicDeviceMixin(object):

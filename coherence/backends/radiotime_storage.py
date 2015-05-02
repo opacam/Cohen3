@@ -6,21 +6,14 @@
 
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
 # Copyright 2009-2010, Jean-Michel Sizun <jmDOTsizunATfreeDOTfr>
+from lxml import etree
 
-from twisted.internet import defer, reactor
 from twisted.python.failure import Failure
-from twisted.web import server
 
 from coherence.upnp.core import utils
-
 from coherence.upnp.core import DIDLLite
-from coherence.upnp.core.DIDLLite import classChooser, Resource, DIDLElement
-
-from coherence import log
-from coherence.backend import BackendItem, BackendStore, Container, LazyContainer, AbstractBackendStore
-#from coherence.backends.iradio_storage import PlaylistStreamProxy
-from urlparse import urlsplit
-from coherence.extern.et import parse_xml
+from coherence.upnp.core.DIDLLite import Resource
+from coherence.backend import BackendItem, Container, LazyContainer, AbstractBackendStore
 
 OPML_BROWSE_URL = 'http://opml.radiotime.com/Browse.ashx'
 
@@ -109,14 +102,14 @@ class RadiotimeStore(AbstractBackendStore):
         self.wmc_mapping = {'4': self.get_root_id()}
 
         if self.server:
-            self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo',
-                                                                    ['http-get:*:audio/mpeg:*',
-                                                                     'http-get:*:audio/x-scpls:*'],
-                                                                     default=True)
+          self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo',
+                                                             ['http-get:*:audio/mpeg:*',
+                                                              'http-get:*:audio/x-scpls:*'],
+                                                             default=True)
 
     def retrieveItemsForOPML (self, parent, url):
 
-        def append_outline (parent, outline):
+        def append_outline(parent, outline):
             type = outline.get('type')
             if type is None:
                 # This outline is just a classification item containing other outline elements
@@ -136,7 +129,7 @@ class RadiotimeStore(AbstractBackendStore):
                 for sub_outline in sub_outlines:
                     append_outline(item, sub_outline)
 
-            elif type in ('link'):
+            elif type == 'link':
                 # the corresponding item will a self-populating Container
                 text = outline.get('text')
                 outline_url = outline.get('URL')
@@ -150,7 +143,7 @@ class RadiotimeStore(AbstractBackendStore):
                 item = LazyContainer(parent, text, external_id, self.refresh, self.retrieveItemsForOPML, url=outline_url)
                 parent.add_child(item, external_id=external_id)
 
-            elif type in ('audio'):
+            elif type == 'audio':
                 item = RadiotimeAudioItem(outline)
                 parent.add_child(item, external_id=item.preset_id)
 
@@ -177,7 +170,7 @@ class RadiotimeStore(AbstractBackendStore):
             return Failure("Unable to retrieve items for url %s" % url)
 
         d = utils.getPage(url, )
-        d.addCallback(parse_xml)
+        d.addCallback(etree.fromstring)
         d.addErrback(got_error)
         d.addCallback(got_page)
         d.addErrback(got_xml_error)

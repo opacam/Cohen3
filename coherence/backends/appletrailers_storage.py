@@ -8,14 +8,13 @@
 """
 This is a Media Backend that allows you to access the Trailers from Apple.com
 """
+from lxml import etree
 
 from coherence.backend import BackendItem, BackendStore
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.utils import ReverseProxyUriResource
 from twisted.web import client
 from twisted.internet import task, reactor
-
-from coherence.extern.et import parse_xml
 
 XML_URL = "http://www.apple.com/trailers/home/xml/current.xml"
 
@@ -116,19 +115,18 @@ class AppleTrailersStore(BackendStore):
 
     def update_data(self):
         dfr = client.getPage(XML_URL)
-        dfr.addCallback(parse_xml)
+        dfr.addCallback(etree.fromstring)
         dfr.addCallback(self.parse_data)
         dfr.addCallback(self.queue_update)
         return dfr
 
-    def parse_data(self, xml_data):
+    def parse_data(self, root):
 
         def iterate(root):
             for item in root.findall('./movieinfo'):
                 trailer = self._parse_into_trailer(item)
                 yield trailer
 
-        root = xml_data.getroot()
         return task.coiterate(iterate(root))
 
     def _parse_into_trailer(self, item):
