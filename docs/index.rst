@@ -1,7 +1,7 @@
-Overview
-========
+.. include:: ../README.rst
 
-Contents:
+Table of Contents
+-----------------
 
 .. toctree::
     :glob:
