@@ -3,7 +3,7 @@ Cohen
 Simple DLNA/UPnP Media Server
 
 .. image:: http://img.shields.io/travis/unintended/Cohen.svg?style=flat-square
-    :target: http://travis-ci.org/unintended/cohen
+    :target: http://travis-ci.org/unintended/Cohen
 
 
 Overview
@@ -16,11 +16,11 @@ Cohen is actually a highly simplified and refreshed version of
 `Coherence Framework <https://github.com/coherence-project/Coherence>`_ project by `Frank Scholz <mailto:dev@coherence-project.org>`_
 which looks like no longer supported.
 
-Software Information
-    - GitHub: https://github.com/unintended/Cohen
-    - Issue tracker: https://github.com/unintended/Cohen/issues
-    - PyPI: https://pypi.python.org/pypi/cohen
-    - Free software: MIT licence
+- Documentation: https://cohen.readthedocs.org/
+- GitHub: https://github.com/unintended/Cohen
+- Issue tracker: https://github.com/unintended/Cohen/issues
+- PyPI: https://pypi.python.org/pypi/cohen
+- Free software: MIT licence
 
 
 Features
