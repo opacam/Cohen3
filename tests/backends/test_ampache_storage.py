@@ -8,10 +8,10 @@
 """
 Test cases for L{backends.ampache_storage}
 """
+from lxml import etree
 
 from twisted.trial import unittest
 
-from coherence.extern import et
 from coherence.backends import ampache_storage
 
 SONG = '''
@@ -65,7 +65,11 @@ SONG_370 = '''
 </root>
 '''
 
+
 class DummyStore:
+    def __init__(self):
+      pass
+
     proxy = False
 
 
@@ -76,7 +80,7 @@ class TestAmpache(unittest.TestCase):
 
     def test_song(self):
         """Test songs with XML from Ampache 3.7.0"""
-        doc = et.parse_xml(SONG)
+        doc = etree.fromstring(SONG)
         song = doc.find('song')
         store = DummyStore()
         track = ampache_storage.Track(store, song)
@@ -100,15 +104,14 @@ class TestAmpache(unittest.TestCase):
 
     def test_song_370(self):
         """Test songs with XML from Ampache 3.7.0"""
-        doc = et.parse_xml(SONG_370)
+        doc = etree.fromstring(SONG_370)
         song = doc.find('song')
         store = DummyStore()
         track = ampache_storage.Track(store, song)
         self.assertEqual(track.get_id(), 'song.3440')
         self.assertEqual(track.parent_id, 'album.359')
         self.assertEqual(track.duration, '0:10:25')
-        self.assertEqual(track.get_url(),
-                         'http://songserver/ampache/play/index.php?ssid=1e11a4&type=song&oid=3440&uid=4&name=Led%20Zeppelin%20-%20Achilles%20Last%20Stand.mp3')
+        self.assertEqual(track.get_url(), 'http://songserver/ampache/play/index.php?ssid=1e11a4&type=song&oid=3440&uid=4&name=Led%20Zeppelin%20-%20Achilles%20Last%20Stand.mp3')
         self.assertEqual(track.get_name(), 'Achilles Last Stand')
         self.assertEqual(track.title, 'Achilles Last Stand')
         self.assertEqual(track.artist, 'Led Zeppelin')

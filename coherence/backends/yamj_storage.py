@@ -7,19 +7,16 @@
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
 # Copyright 2009, Jean-Michel Sizun <jm.sizun AT free.fr>
 #
-# TODO: add comments
+from lxml import etree
 
 import urllib
+import mimetypes
 
 from coherence.upnp.core import DIDLLite
-from coherence.backend import BackendStore, BackendItem, Container, \
-     LazyContainer, AbstractBackendStore
-from coherence import log
-
+from coherence.backend import BackendItem, Container, LazyContainer, AbstractBackendStore
 from coherence.upnp.core.utils import getPage
-from coherence.extern.et import parse_xml
 
-import mimetypes
+
 mimetypes.init()
 mimetypes.add_type('audio/x-m4a', '.m4a')
 mimetypes.add_type('video/mp4', '.mp4')
@@ -74,7 +71,7 @@ class MovieItem(BackendItem):
             self.str_actors.append(actor.text)
 
         url_mimetype, _ = mimetypes.guess_type(self.movie_url, strict=False)
-        if url_mimetype == None:
+        if url_mimetype is None:
             url_mimetype = "video"
 
         self.name = self.title
@@ -177,8 +174,6 @@ class YamjStore(AbstractBackendStore):
         dfr = getPage(filepath)
 
         def read_categories(data, parent_item, jukebox_url):
-            #nbMoviesPerFile = 1 #int(data.find('preferences/mjb.nbThumbnailsPerPage').text)
-            #self.debug("YMAJ: Nb Movies per file =  %s" % nbMoviesPerFile)
             for category in data.findall('category'):
                 type = category.get('name')
                 category_title = type
@@ -202,7 +197,7 @@ class YamjStore(AbstractBackendStore):
             self.warning("failure reading yamj categories (%s): %r", filepath, f.getErrorMessage())
             return f
 
-        dfr.addCallback(parse_xml)
+        dfr.addCallback(etree.fromstring)
         dfr.addErrback(fail_categories_read)
         dfr.addCallback(read_categories, parent_item=parent, jukebox_url=self.jukebox_url)
         dfr.addErrback(fail_categories_read)
@@ -286,7 +281,7 @@ class YamjStore(AbstractBackendStore):
 
         self.debug("Reading index file %s", fileUrl)
         d = getPage(fileUrl)
-        d.addCallback(parse_xml)
+        d.addCallback(etree.fromstring)
         d.addErrback(fail_readPage)
         d.addCallback(readIndex)
         d.addErrback(fail_parseIndex)

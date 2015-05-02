@@ -4,18 +4,13 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2008,2009 Frank Scholz <coherence@beebits.net>
-
-from datetime import datetime
-from email.Utils import parsedate_tz
+from lxml import etree
 
 from coherence.backend import BackendStore, BackendRssMixin
 from coherence.backend import BackendItem
 from coherence.upnp.core import DIDLLite
 
-from twisted.python.util import OrderedDict
-
 from coherence.upnp.core.utils import getPage
-from coherence.extern.et import parse_xml
 
 ROOT_CONTAINER_ID = 0
 
@@ -37,7 +32,7 @@ class Item(BackendItem):
         self.item = None
 
     def get_item(self):
-        if self.item == None:
+        if self.item is None:
             self.item = DIDLLite.AudioItem(self.id, self.parent.id, self.name)
             self.item.description = self.description
             self.item.date = self.date
@@ -78,7 +73,7 @@ class Container(BackendItem):
         self.sorted = False
 
     def get_children(self, start=0, end=0):
-        if self.sorted == False:
+        if not self.sorted:
             def childs_sort(x, y):
                 r = cmp(x.name, y.name)
                 return r
@@ -120,33 +115,29 @@ class SWR3Store(BackendStore, BackendRssMixin):
         self.next_id = 1000
         self.update_id = 0
         self.last_updated = None
-        self.store = {}
-
-        self.store[ROOT_CONTAINER_ID] = \
-                        Container(ROOT_CONTAINER_ID, self, -1, self.name)
+        self.store = {ROOT_CONTAINER_ID: Container(ROOT_CONTAINER_ID, self, -1, self.name)}
 
         self.parse_opml()
         self.init_completed()
 
     def parse_opml(self):
-        def fail(f):
-            self.info("fail %r", f)
-            return f
+      def fail(f):
+        self.info("fail %r", f)
+        return f
 
-        def create_containers(data):
-            feeds = []
-            for feed in data.findall('body/outline'):
-                #print feed.attrib['type'],feed.attrib['url']
-                if(feed.attrib['type'] == 'link' and
-                   feed.attrib['url'] not in feeds):
-                    feeds.append(feed.attrib['url'])
-                    self.update_data(feed.attrib['url'], self.get_next_id(), encoding=self.encoding)
+      def create_containers(data):
+        feeds = []
+        for feed in data.findall('body/outline'):
+          if (feed.attrib['type'] == 'link' and
+                  feed.attrib['url'] not in feeds):
+            feeds.append(feed.attrib['url'])
+            self.update_data(feed.attrib['url'], self.get_next_id())
 
-        dfr = getPage(self.opml)
-        dfr.addCallback(parse_xml, encoding=self.encoding)
-        dfr.addErrback(fail)
-        dfr.addCallback(create_containers)
-        dfr.addErrback(fail)
+      dfr = getPage(self.opml)
+      dfr.addCallback(etree.fromstring)
+      dfr.addErrback(fail)
+      dfr.addCallback(create_containers)
+      dfr.addErrback(fail)
 
     def get_next_id(self):
         self.next_id += 1
@@ -163,17 +154,15 @@ class SWR3Store(BackendStore, BackendRssMixin):
         return None
 
     def upnp_init(self):
-        if self.server:
-            self.server.connection_manager_server.set_variable( \
-                0, 'SourceProtocolInfo', ['http-get:*:audio/mpeg:*'])
+      if self.server:
+        self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo', ['http-get:*:audio/mpeg:*'])
 
     def parse_data(self, xml_data, container):
         root = xml_data.getroot()
 
         title = root.find("./channel/title").text
         title = title.encode(self.encoding).decode('utf-8')
-        self.store[container] = \
-                        Container(container, self, ROOT_CONTAINER_ID, title)
+        self.store[container] = Container(container, self, ROOT_CONTAINER_ID, title)
         description = root.find("./channel/description").text
         description = description.encode(self.encoding).decode('utf-8')
         self.store[container].description = description
@@ -189,15 +178,8 @@ class SWR3Store(BackendStore, BackendRssMixin):
             item.mimetype = enclosure.attrib['type']
             self.store[container].add_child(item)
             description = podcast.find("./description")
-            if description != None:
+            if description is not None:
                 description = description.text
                 item.description = description.encode(self.encoding).decode('utf-8')
-            #item.date = datetime(*parsedate_tz(podcast.find("./pubDate").text)[0:6])
-
-            #item.date = podcast.find("./pubDate")
 
         self.update_id += 1
-        #if self.server:
-        #    self.server.content_directory_server.set_variable(0, 'SystemUpdateID', self.update_id)
-        #    value = (ROOT_CONTAINER_ID,self.container.update_id)
-        #    self.server.content_directory_server.set_variable(0, 'ContainerUpdateIDs', value)

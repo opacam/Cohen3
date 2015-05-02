@@ -4,16 +4,15 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2008 Frank Scholz <coherence@beebits.net>
+from lxml import etree
+
+from twisted.internet import reactor
 
 from coherence.backend import BackendStore
 from coherence.backend import BackendItem
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.utils import getPage
 
-from twisted.internet import reactor
-from twisted.python.util import OrderedDict
-
-from coherence.extern.et import parse_xml
 
 ROOT_CONTAINER_ID = 0
 SERIES_CONTAINER_ID = 100
@@ -145,24 +144,20 @@ class BBCStore(BackendStore):
             return f
 
         dfr = getPage(self.rss_url)
-        dfr.addCallback(parse_xml)
+        dfr.addCallback(etree.fromstring)
         dfr.addErrback(fail)
         dfr.addCallback(self.parse_data)
         dfr.addErrback(fail)
         dfr.addBoth(self.queue_update)
         return dfr
 
-    def parse_data(self, xml_data):
-        root = xml_data.getroot()
+    def parse_data(self, root):
+        self.store = {
+          ROOT_CONTAINER_ID: Container(ROOT_CONTAINER_ID, self, -1, self.name),
+          SERIES_CONTAINER_ID: Container(SERIES_CONTAINER_ID, self, ROOT_CONTAINER_ID, 'Series')
+        }
 
-        self.store = {}
-
-        self.store[ROOT_CONTAINER_ID] = \
-                        Container(ROOT_CONTAINER_ID, self, -1, self.name)
-        self.store[SERIES_CONTAINER_ID] = \
-                        Container(SERIES_CONTAINER_ID, self, ROOT_CONTAINER_ID, 'Series')
         self.store[ROOT_CONTAINER_ID].add_child(self.store[SERIES_CONTAINER_ID])
-
 
         for brand in root.findall('./{http://purl.org/ontology/po/}Brand'):
             first = None

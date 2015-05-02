@@ -7,36 +7,29 @@
 import traceback
 from StringIO import StringIO
 import urllib
-
-from lxml import etree
 import os
 import re
+
+from lxml import etree
 from twisted.internet import defer
 from twisted.web import static
 from twisted.web import resource
 from twisted.python import util
 
-from coherence.extern.et import ET
-
-from coherence import __version__
-
+from coherence import log, __version__, __url__, __service_name__
+from coherence.upnp.core import xml_constants
 from coherence.upnp.core.utils import StaticFile
 from coherence.upnp.core.utils import ReverseProxyResource
-
 from coherence.upnp.services.servers.connection_manager_server import ConnectionManagerServer
 from coherence.upnp.services.servers.content_directory_server import ContentDirectoryServer
 from coherence.upnp.services.servers.scheduled_recording_server import ScheduledRecordingServer
 from coherence.upnp.services.servers.media_receiver_registrar_server import MediaReceiverRegistrarServer
 from coherence.upnp.services.servers.media_receiver_registrar_server import FakeMediaReceiverRegistrarBackend
-
 from coherence.upnp.devices.basics import BasicDeviceMixin
 
-from coherence import log
 
 COVER_REQUEST_INDICATOR = re.compile(".*?cover\.[A-Z|a-z]{3,4}$")
-
 ATTACHMENT_REQUEST_INDICATOR = re.compile(".*?attachment=.*$")
-
 TRANSCODED_REQUEST_INDICATOR = re.compile(".*/transcoded/.*$")
 
 
@@ -44,24 +37,14 @@ class MSRoot(resource.Resource, log.Loggable):
     logCategory = 'mediaserver'
 
     def __init__(self, server, store):
-        resource.Resource.__init__(self)
-        log.Loggable.__init__(self)
-        self.server = server
-        self.store = store
-    #def delayed_response(self, resrc, request):
-    #    print "delayed_response", resrc, request
-    #    body = resrc.render(request)
-    #    print "delayed_response", body
-    #    if body == 1:
-    #        print "delayed_response not yet done"
-    #        return
-    #    request.setHeader("Content-length", str(len(body)))
-    #    request.write(response)
-    #    request.finish()
+      resource.Resource.__init__(self)
+      log.Loggable.__init__(self)
+      self.server = server
+      self.store = store
 
     def getChildWithDefault(self, path, request):
-        self.info('%s getChildWithDefault, %s, %s, %s %s', self.server.device_type,
-                                request.method, path, request.uri, request.client)
+        self.info('%s getChildWithDefault, %s, %s, %s %s', self.server.device_type, request.method,
+                  path, request.uri, request.client)
         headers = request.getAllHeaders()
         self.msg(request.getAllHeaders())
 
@@ -143,17 +126,8 @@ class MSRoot(resource.Resource, log.Loggable):
                 dfr.addCallback(got_attachment)
                 dfr.isLeaf = True
                 return dfr
-        #if(request.method in ('GET','HEAD') and
-        #   XBOX_TRANSCODED_REQUEST_INDICATOR.match(request.uri)):
-        #    if self.server.coherence.config.get('transcoding', 'no') == 'yes':
-        #        id = path[:-15].split('/')[-1]
-        #        self.info("request transcoding to %r for id %s" % (request.args,id))
-        #        ch = self.store.get_by_id(id)
-        #        uri = ch.get_path()
-        #        return MP3Transcoder(uri)
 
-        if(request.method in ('GET', 'HEAD') and
-           TRANSCODED_REQUEST_INDICATOR.match(request.uri)):
+        if request.method in ('GET', 'HEAD') and TRANSCODED_REQUEST_INDICATOR.match(request.uri):
             self.info("request transcoding to %s for id %s", request.uri.split('/')[-1], path)
             if self.server.coherence.config.get('transcoding', 'no') == 'yes':
                 def got_stuff_to_transcode(ch):
@@ -176,8 +150,7 @@ class MSRoot(resource.Resource, log.Loggable):
             request.setResponseCode(404)
             return static.Data("<html><p>This MediaServer doesn't support transcoding</p></html>", 'text/html')
 
-        if(request.method == 'POST' and
-           request.uri.endswith('?import')):
+        if request.method == 'POST' and request.uri.endswith('?import'):
             d = self.import_file(path, request)
             if isinstance(d, defer.Deferred):
                 d.addBoth(self.import_response, path)
@@ -233,7 +206,7 @@ class MSRoot(resource.Resource, log.Loggable):
                     for element in root.getchildren():
                         key = element.tag
                         text = element.text
-                        if (key not in ('backend')):
+                        if key != 'backend':
                             dict[key] = text
                     return dict
 
@@ -291,12 +264,10 @@ class MSRoot(resource.Resource, log.Loggable):
                 request.setResponseCode(404)
         dfr = defer.maybeDeferred(self.store.get_by_id, name)
         dfr.addCallback(got_file)
+        return dfr
 
     def prepare_connection(self, request):
-        new_id, _, _ = self.server.connection_manager_server.add_connection('',
-                                                                    'Output',
-                                                                    -1,
-                                                                    '')
+        new_id, _, _ = self.server.connection_manager_server.add_connection('', 'Output', -1, '')
         self.info("startup, add %d to connection table", new_id)
         d = request.notifyFinish()
         d.addBoth(self.requestFinished, new_id, request)
@@ -312,7 +283,7 @@ class MSRoot(resource.Resource, log.Loggable):
                     request.setHeader('contentFeatures.dlna.org', "DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000")
 
     def process_child(self, ch, name, request):
-        if ch != None:
+        if ch is not None:
             self.info('Child found %s', ch)
             if(request.method == 'GET' or
                request.method == 'HEAD'):
@@ -429,7 +400,7 @@ class MSRoot(resource.Resource, log.Loggable):
 
             return build_page(children, page)
 
-        elif(hasattr(item, 'mimetype') and item.mimetype.find('image/') == 0):
+        elif hasattr(item, 'mimetype') and item.mimetype.find('image/') == 0:
             #path = item.get_path().encode('utf-8').encode('string_escape')
             path = urllib.quote(item.get_path().encode('utf-8'))
             title = item.get_name().decode('utf-8').encode('ascii', 'xmlcharrefreplace')
@@ -451,132 +422,130 @@ class MSRoot(resource.Resource, log.Loggable):
         return cl
 
     def import_response(self, result, id):
-        return static.Data('<html><p>import of %s finished</p></html>' % id, 'text/html')
+      return static.Data('<html><p>import of %s finished</p></html>' % id, 'text/html')
 
     def render(self, request):
-        #print "render", request
-        return '<html><p>root of the %s MediaServer</p><p><ul>%s</ul></p></html>' % \
-                                        (self.server.backend,
-                                         self.listchilds(request.uri))
+      return '<html><p>root of the %s MediaServer</p><p><ul>%s</ul></p></html>' % (
+        self.server.backend, self.listchilds(request.uri))
 
 
 class RootDeviceXML(static.Data):
+  def __init__(self, hostname, uuid, urlbase,
+               device_type='MediaServer',
+               version=2,
+               friendly_name='Coherence UPnP A/V MediaServer',
+               xbox_hack=False,
+               services=None,
+               devices=None,
+               icons=None,
+               presentation_url=None):
+    uuid = str(uuid)
+    root = etree.Element('root', nsmap={None: xml_constants.UPNP_DEVICE_NS})
+    device_type = 'urn:schemas-upnp-org:device:%s:%d' % (device_type, int(version))
+    e = etree.SubElement(root, 'specVersion')
+    etree.SubElement(e, 'major').text = '1'
+    etree.SubElement(e, 'minor').text = '0'
 
-    def __init__(self, hostname, uuid, urlbase,
-                        device_type='MediaServer',
-                        version=2,
-                        friendly_name='Coherence UPnP A/V MediaServer',
-                        xbox_hack=False,
-                        services=[],
-                        devices=[],
-                        icons=[],
-                        presentationURL=None):
-        uuid = str(uuid)
-        root = ET.Element('root')
-        root.attrib['xmlns'] = 'urn:schemas-upnp-org:device-1-0'
-        device_type = 'urn:schemas-upnp-org:device:%s:%d' % (device_type, int(version))
-        e = ET.SubElement(root, 'specVersion')
-        ET.SubElement(e, 'major').text = '1'
-        ET.SubElement(e, 'minor').text = '0'
-        #if version == 1:
-        #    ET.SubElement(root, 'URLBase').text = urlbase + uuid[5:] + '/'
+    d = etree.SubElement(root, 'device')
+    etree.SubElement(d, 'deviceType').text = device_type
 
-        d = ET.SubElement(root, 'device')
-        ET.SubElement(d, 'deviceType').text = device_type
-        if xbox_hack == False:
-            ET.SubElement(d, 'friendlyName').text = friendly_name
+    if xbox_hack:
+      etree.SubElement(d, 'friendlyName').text = friendly_name + ' : 1 : Windows Media Connect'
+    else:
+      etree.SubElement(d, 'friendlyName').text = friendly_name
+
+    etree.SubElement(d, 'manufacturer').text = 'beebits.net'
+    etree.SubElement(d, 'manufacturerURL').text = __url__
+    etree.SubElement(d, 'modelDescription').text = __service_name__
+
+    if not xbox_hack:
+      etree.SubElement(d, 'modelName').text = 'Windows Media Connect'
+    else:
+      etree.SubElement(d, 'modelName').text = __service_name__
+
+    etree.SubElement(d, 'modelNumber').text = __version__
+    etree.SubElement(d, 'modelURL').text = __url__
+    etree.SubElement(d, 'serialNumber').text = '0000001'
+    etree.SubElement(d, 'UDN').text = uuid
+    etree.SubElement(d, 'UPC').text = ''
+
+    if icons:
+      e = etree.SubElement(d, 'iconList')
+      for icon in icons:
+
+        icon_path = ''
+        if 'url' in icon:
+          if icon['url'].startswith('file://'):
+            icon_path = icon['url'][7:]
+          elif icon['url'] == '.face':
+            icon_path = os.path.join(os.path.expanduser('~'), ".face")
+          else:
+            from pkg_resources import resource_filename
+
+            icon_path = os.path.abspath(resource_filename(
+              __name__, os.path.join('..', '..', '..', 'misc', 'device-icons', icon['url'])))
+
+        if os.path.exists(icon_path):
+          i = etree.SubElement(e, 'icon')
+          for k, v in icon.items():
+            if k == 'url':
+              if v.startswith('file://'):
+                etree.SubElement(i, k).text = '/' + uuid[5:] + '/' + os.path.basename(v)
+                continue
+              elif v == '.face':
+                etree.SubElement(i, k).text = '/' + uuid[5:] + '/' + 'face-icon.png'
+                continue
+              else:
+                etree.SubElement(i, k).text = '/' + uuid[5:] + '/' + os.path.basename(v)
+                continue
+            etree.SubElement(i, k).text = str(v)
+
+    if services:
+      e = etree.SubElement(d, 'serviceList')
+      for service in services:
+        id = service.get_id()
+
+        if not xbox_hack and id == 'X_MS_MediaReceiverRegistrar':
+          continue
+
+        s = etree.SubElement(e, 'service')
+        try:
+          namespace = service.namespace
+        except:
+          namespace = 'schemas-upnp-org'
+
+        if hasattr(service, 'version') and service.version < version:
+          v = service.version
         else:
-            ET.SubElement(d, 'friendlyName').text = friendly_name + ' : 1 : Windows Media Connect'
-        ET.SubElement(d, 'manufacturer').text = 'beebits.net'
-        ET.SubElement(d, 'manufacturerURL').text = 'http://coherence.beebits.net'
-        ET.SubElement(d, 'modelDescription').text = 'Coherence UPnP A/V MediaServer'
-        if xbox_hack == False:
-            ET.SubElement(d, 'modelName').text = 'Coherence UPnP A/V MediaServer'
-        else:
-            ET.SubElement(d, 'modelName').text = 'Windows Media Connect'
-        ET.SubElement(d, 'modelNumber').text = __version__
-        ET.SubElement(d, 'modelURL').text = 'http://coherence.beebits.net'
-        ET.SubElement(d, 'serialNumber').text = '0000001'
-        ET.SubElement(d, 'UDN').text = uuid
-        ET.SubElement(d, 'UPC').text = ''
+          v = version
 
-        if len(icons):
-            e = ET.SubElement(d, 'iconList')
-            for icon in icons:
+        etree.SubElement(s, 'serviceType').text = 'urn:%s:service:%s:%d' % (namespace, id, int(v))
+        try:
+          namespace = service.id_namespace
+        except:
+          namespace = 'upnp-org'
 
-                icon_path = ''
-                if icon.has_key('url'):
-                    if icon['url'].startswith('file://'):
-                        icon_path = icon['url'][7:]
-                    elif icon['url'] == '.face':
-                        icon_path = os.path.join(os.path.expanduser('~'), ".face")
-                    else:
-                        from pkg_resources import resource_filename
-                        icon_path = os.path.abspath(resource_filename(__name__, os.path.join('..', '..', '..', 'misc', 'device-icons', icon['url'])))
+        etree.SubElement(s, 'serviceId').text = 'urn:%s:serviceId:%s' % (namespace, id)
+        etree.SubElement(s, 'SCPDURL').text = '/' + uuid[5:] + '/' + id + '/' + service.scpd_url
+        etree.SubElement(s, 'controlURL').text = '/' + uuid[5:] + '/' + id + '/' + service.control_url
+        etree.SubElement(s, 'eventSubURL').text = '/' + uuid[5:] + '/' + id + '/' + service.subscription_url
 
-                if os.path.exists(icon_path) == True:
-                    i = ET.SubElement(e, 'icon')
-                    for k, v in icon.items():
-                        if k == 'url':
-                            if v.startswith('file://'):
-                                ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + os.path.basename(v)
-                                continue
-                            elif v == '.face':
-                                ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + 'face-icon.png'
-                                continue
-                            else:
-                                ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + os.path.basename(v)
-                                continue
-                        ET.SubElement(i, k).text = str(v)
+    if devices:
+      etree.SubElement(d, 'deviceList')
 
-        if len(services):
-            e = ET.SubElement(d, 'serviceList')
-            for service in services:
-                id = service.get_id()
-                if xbox_hack == False and id == 'X_MS_MediaReceiverRegistrar':
-                    continue
-                s = ET.SubElement(e, 'service')
-                try:
-                    namespace = service.namespace
-                except:
-                    namespace = 'schemas-upnp-org'
-                if(hasattr(service, 'version') and
-                    service.version < version):
-                    v = service.version
-                else:
-                    v = version
-                ET.SubElement(s, 'serviceType').text = 'urn:%s:service:%s:%d' % (namespace, id, int(v))
-                try:
-                    namespace = service.id_namespace
-                except:
-                    namespace = 'upnp-org'
-                ET.SubElement(s, 'serviceId').text = 'urn:%s:serviceId:%s' % (namespace, id)
-                ET.SubElement(s, 'SCPDURL').text = '/' + uuid[5:] + '/' + id + '/' + service.scpd_url
-                ET.SubElement(s, 'controlURL').text = '/' + uuid[5:] + '/' + id + '/' + service.control_url
-                ET.SubElement(s, 'eventSubURL').text = '/' + uuid[5:] + '/' + id + '/' + service.subscription_url
+    if presentation_url is None:
+      presentation_url = '/' + uuid[5:]
+    etree.SubElement(d, 'presentationURL').text = presentation_url
 
-                #ET.SubElement(s, 'SCPDURL').text = id + '/' + service.scpd_url
-                #ET.SubElement(s, 'controlURL').text = id + '/' + service.control_url
-                #ET.SubElement(s, 'eventSubURL').text = id + '/' + service.subscription_url
+    x = etree.SubElement(d, 'X_DLNADOC')
+    x.text = 'DMS-1.50'
+    x = etree.SubElement(d, 'X_DLNADOC')
+    x.text = 'M-DMS-1.50'
+    x = etree.SubElement(d, 'X_DLNACAP')
+    x.text = 'av-upload,image-upload,audio-upload'
 
-        if len(devices):
-            e = ET.SubElement(d, 'deviceList')
-
-        if presentationURL is None:
-            presentationURL = '/' + uuid[5:]
-        ET.SubElement(d, 'presentationURL').text = presentationURL
-
-        x = ET.SubElement(d, 'X_DLNADOC')
-        x.text = 'DMS-1.50'
-        x = ET.SubElement(d, 'X_DLNADOC')
-        x.text = 'M-DMS-1.50'
-        x = ET.SubElement(d, 'X_DLNACAP')
-        x.text = 'av-upload,image-upload,audio-upload'
-
-        #if self.has_level(LOG_DEBUG):
-        #    indent( root)
-        self.xml = """<?xml version="1.0" encoding="utf-8"?>""" + ET.tostring(root, encoding='utf-8')
-        static.Data.__init__(self, self.xml, 'text/xml')
+    self.xml = etree.tostring(root, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    static.Data.__init__(self, self.xml, 'text/xml')
 
 
 class MediaServer(log.Loggable, BasicDeviceMixin):
@@ -668,7 +637,7 @@ class MediaServer(log.Loggable, BasicDeviceMixin):
                                     services=self._services,
                                     devices=self._devices,
                                     icons=self.icons,
-                                    presentationURL=self.presentationURL))
+                                    presentation_url=self.presentationURL))
             self.web_resource.putChild('xbox-description-%d.xml' % version,
                                     RootDeviceXML(self.coherence.hostname,
                                     str(self.uuid),
@@ -679,7 +648,7 @@ class MediaServer(log.Loggable, BasicDeviceMixin):
                                     services=self._services,
                                     devices=self._devices,
                                     icons=self.icons,
-                                    presentationURL=self.presentationURL))
+                                    presentation_url=self.presentationURL))
             version -= 1
 
         self.web_resource.putChild('ConnectionManager', self.connection_manager_server)

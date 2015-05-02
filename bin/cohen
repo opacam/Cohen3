@@ -13,11 +13,13 @@
 """
 import errno
 import sys
-
 import os
+import traceback
 import warnings
+
+from configobj import ConfigObj
+
 from coherence import __version__
-from coherence.extern.simple_config import Config, ConfigItem
 
 
 warnings.filterwarnings('ignore', "extern.louie will soon be deprecated")
@@ -43,15 +45,12 @@ def daemonize():
   os.close(null)
 
 
-def setConfigFile():
-    def findConfigDir():
-        try:
-            configDir = os.path.expanduser('~')
-        except:
-            configDir = os.getcwd()
-        return configDir
+def get_config_file():
+  config_dir = os.path.expanduser('~')
+  if config_dir == '~':
+    config_dir = os.getcwd()
 
-    return os.path.join(findConfigDir(), '.coherence')
+  return os.path.join(config_dir, '.cohen')
 
 
 def __opt_option(option, opt, value, parser):
@@ -90,7 +89,7 @@ if __name__ == '__main__':
                     help='daemonize')
   parser.add_option('--noconfig', action='store_false', dest='configfile',
                     help='ignore any configfile found')
-  parser.add_option('-c', '--configfile', default=setConfigFile(),
+  parser.add_option('-c', '--configfile', default=get_config_file(),
                     help='configfile to use, default: %default')
   parser.add_option('-l', '--logfile', help='logfile to use')
   parser.add_option('-o', '--option', action='callback',
@@ -112,31 +111,20 @@ if __name__ == '__main__':
     except:
       print traceback.format_exc()
 
-  config = {'logging': {}}
+  config = {}
 
   if options.configfile:
     try:
-      config = Config(options.configfile, root='config',
-                      element2attr_mappings={'active': 'active'}).config
-    except SyntaxError:
-      import traceback
-      try:
-        from configobj import ConfigObj
-        config = ConfigObj(options.configfile)
-      except:
-        print "hmm, seems we are in trouble reading in any sort of config file"
-        print traceback.format_exc()
+      config = ConfigObj(options.configfile)
     except IOError:
       print "Config file %r not found, ignoring" % options.configfile
       pass
 
+  if 'logging' not in config:
+    config['logging'] = {}
+
   if options.logfile:
-    if isinstance(config, (ConfigItem, dict)):
-      if 'logging' not in config:
-        config['logging'] = {}
-      config['logging']['logfile'] = options.logfile
-    else:
-      config['logfile'] = options.logfile
+    config['logging']['logfile'] = options.logfile
 
   # copy options passed by -o/--option into config
   for k, v in options.options.items():
@@ -145,35 +133,17 @@ if __name__ == '__main__':
     config[k] = v
 
   if options.daemon:
-    if isinstance(config, (ConfigItem, dict)):
-      if not config.get('logging', None):
-        config['logging'] = {}
-      if not config['logging'].get('logfile', None):
-        config['logging']['level'] = 'none'
-        try:
-          del config['logging']['logfile']
-        except KeyError:
-          pass
-    else:
-      if not config.get('logfile', None):
-        config.set('logmode', 'none')
-        try:
-          del config['logfile']
-        except KeyError:
-          pass
+    if config['logging'].get('logfile') is None:
+      config['logging']['level'] = 'none'
+      config['logging'].pop('logfile', None)
 
-  use_qt = config.get('qt', 'no') == 'yes'
   if config.get('use_dbus', 'no') == 'yes' or config.get('glib', 'no') == 'yes' \
-     or use_qt or config.get('transcoding', 'no') == 'yes':
-    if use_qt:
-      from coherence.extern import qt4reactor
-      qt4reactor.install()
-    else:
-      try:
-        from twisted.internet import glib2reactor
-        glib2reactor.install()
-      except AssertionError:
-        print "error installing glib2reactor"
+     or config.get('transcoding', 'no') == 'yes':
+    try:
+      from twisted.internet import glib2reactor
+      glib2reactor.install()
+    except AssertionError:
+      print "error installing glib2reactor"
 
   if options.plugins:
     plugins = config.get('plugin')

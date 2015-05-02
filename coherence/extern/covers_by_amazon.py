@@ -39,6 +39,7 @@ a maximum of one month and requested then from Amazon
 again.
 
 """
+from lxml import etree
 
 import os
 import urllib
@@ -48,13 +49,11 @@ from twisted.internet import reactor
 from twisted.internet import defer
 from twisted.web import client
 
-from et import parse_xml
-
 aws_server = {'de': 'de',
-               'jp': 'jp',
-               'ca': 'ca',
-               'uk': 'co.uk',
-               'fr': 'fr'}
+              'jp': 'jp',
+              'ca': 'ca',
+              'uk': 'co.uk',
+              'fr': 'fr'}
 
 aws_artist_query = '&Operation=ItemSearch' \
                    '&SearchIndex=Music'
@@ -240,11 +239,11 @@ class CoverGetter(object):
 
     def got_response(self, result):
         convert_from = convert_to = ''
-        result = parse_xml(result, encoding='utf-8')
+        result = etree.fromstring(result)
         image_tag = result.find('.//{%s}%s' % (aws_ns, aws_image_size.get(self.image_size, 'large')))
-        if image_tag != None:
+        if image_tag is not None:
             image_url = image_tag.findtext('{%s}URL' % aws_ns)
-            if self.filename == None:
+            if self.filename is None:
                 d = client.getPage(image_url)
             else:
                 _, file_ext = os.path.splitext(self.filename)
@@ -293,7 +292,6 @@ if __name__ == '__main__':
 
     from twisted.python import usage
 
-
     class Options(usage.Options):
         optParameters = [['artist', 'a', '', 'artist name'],
                          ['title', 't', '', 'title'],
@@ -309,7 +307,6 @@ if __name__ == '__main__':
         print '%s: %s' % (sys.argv[0], errortext)
         print '%s: Try --help for usage details.' % (sys.argv[0])
         sys.exit(1)
-
 
     def got_it(filename, *args, **kwargs):
         print "Mylady, it is an image and its name is", filename, args, kwargs

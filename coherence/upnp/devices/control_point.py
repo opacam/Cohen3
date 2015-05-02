@@ -3,10 +3,8 @@
 
 # Copyright 2006-2010 Frank Scholz <dev@coherence-project.org>
 
-import string
 import traceback
 
-from twisted.internet import task
 from twisted.internet import reactor
 from twisted.web import xmlrpc, client
 
@@ -15,12 +13,8 @@ from coherence.upnp.core.event import EventServer
 
 from coherence.upnp.devices.media_server_client import MediaServerClient
 from coherence.upnp.devices.media_renderer_client import MediaRendererClient
-from coherence.upnp.devices.binary_light_client import BinaryLightClient
-from coherence.upnp.devices.dimmable_light_client import DimmableLightClient
 from coherence.upnp.devices.internet_gateway_device_client import InternetGatewayDeviceClient
-
 import coherence.extern.louie as louie
-
 from coherence import log
 
 
@@ -64,7 +58,7 @@ class ControlPoint(log.Loggable):
         log.Loggable.__init__(self)
 
         if not auto_client:
-          auto_client = ['MediaServer', 'MediaRenderer', 'BinaryLight', 'DimmableLight']
+          auto_client = ['MediaServer', 'MediaRenderer']
         self.coherence = coherence
         self.auto_client = auto_client
         self.queries = []
@@ -130,22 +124,17 @@ class ControlPoint(log.Loggable):
         return self.coherence.get_device_by_host(host)
 
     def check_device(self, device):
-        if device.client == None:
+        if device.client is None:
             self.info("found device %s of type %s - %r", device.get_friendly_name(),
                                                 device.get_device_type(), device.client)
             short_type = device.get_friendly_device_type()
             if short_type in self.auto_client and short_type is not None:
-                self.info("identified %s %r",
-                        short_type, device.get_friendly_name())
+                self.info("identified %s %r", short_type, device.get_friendly_name())
 
                 if short_type == 'MediaServer':
                     client = MediaServerClient(device)
                 if short_type == 'MediaRenderer':
                     client = MediaRendererClient(device)
-                if short_type == 'BinaryLight':
-                    client = BinaryLightClient(device)
-                if short_type == 'DimmableLight':
-                    client = DimmableLightClient(device)
                 if short_type == 'InternetGatewayDevice':
                     client = InternetGatewayDeviceClient(device)
 
@@ -335,10 +324,6 @@ def startXMLRPC(control_point, port):
 
 
 if __name__ == '__main__':
-
-    from coherence.base import Coherence
-    from coherence.upnp.devices.media_server_client import MediaServerClient
-    from coherence.upnp.devices.media_renderer_client import MediaRendererClient
 
     config = {}
     config['logmode'] = 'warning'
