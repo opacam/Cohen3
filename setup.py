@@ -2,8 +2,7 @@
 
 import sys
 from setuptools import setup, find_packages
-
-__version__ = "0.7.1"
+from coherence import __version__
 
 packages = find_packages()
 

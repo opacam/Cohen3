@@ -5,10 +5,10 @@
 # Copyright 2006,2007,2008 Frank Scholz <coherence@beebits.net>
 # Copyright 2011, Hartmut Goebel <h.goebel@goebel-consult.de>
 
-""" Coherence is a framework to host DLNA/UPnP devices
+""" Cohen is a framework to host DLNA/UPnP devices
 
     For more information about it and its available backends
-    point your browser to: http://coherence-project.org
+    point your browser to: https://cohen.readthedocs.org/
 """
 import errno
 import sys
@@ -83,7 +83,7 @@ if __name__ == '__main__':
           self.epilog = 'Available backends are: %s' % ', '.join(p)
           optparse.OptionParser.print_help(self, file)
 
-  parser = OptionParser('%prog [options]', version="Coherence version: %s" % __version__)
+  parser = OptionParser('%prog [options]', version="Version: %s" % __version__)
   parser.add_option('-d', '--daemon', action='store_true',
                     help='daemonize')
   parser.add_option('--noconfig', action='store_false', dest='configfile',
@@ -98,7 +98,7 @@ if __name__ == '__main__':
                          "colon (`:`), may be given multiple times)")
   parser.add_option('-p', '--plugins', action='append',
                     help='activate plugins (may be given multiple times) '
-                         'Example: --plugin=backend:FSStore,name:MyCoherence')
+                         'Example: --plugin=backend:FSStore,name:MyCohen')
 
   options, args = parser.parse_args()
   if args:
