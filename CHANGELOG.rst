@@ -1,3 +1,10 @@
+0.7.1 - Minor bugfixes
+----------------------
+
+Fixes:
+    - Fix issue when Cohen fails to be discovered by xbox 360 dlna client
+    - Fix issue when using Lazy Container on Samsung AllShare on 2012 Samsung TV fails
+
 0.7.0 - Cohen project started
 -----------------------------
 
