@@ -1,4 +1,9 @@
-0.7.1 - Minor bugfixes
+0.7.3 - Fixes and improvements
+------------------------------
+
+
+
+0.7.2 - Minor bugfixes
 ----------------------
 
 Fixes:
