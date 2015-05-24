@@ -488,13 +488,11 @@ class LazyContainer(Container):
         self.update_id += 1
 
     def start_children_retrieval_campaign(self):
-        #print "start_update_campaign"
         self.last_updated = time.time()
         self.retrieved_children = {}
         self.children_retrieval_campaign_in_progress = True
 
     def end_children_retrieval_campaign(self, success=True):
-        #print "end_update_campaign"
         self.children_retrieval_campaign_in_progress = False
         if success is True:
             self.update_children(self.retrieved_children, self.children_by_external_id)
@@ -520,19 +518,13 @@ class LazyContainer(Container):
 
     def retrieve_all_children(self, start=0, request_count=0):
 
-        def all_items_retrieved (result):
-            #print "All children retrieved!"
+        def all_items_retrieved(result):
             self.end_children_retrieval_campaign(True)
-            return Container.get_children(self, start, request_count)
+            return super(LazyContainer, self).get_children(start, request_count)
 
-        def error_while_retrieving_items (error):
-            #print "Error while retrieving all children!"
+        def error_while_retrieving_items(error):
             self.end_children_retrieval_campaign(False)
-            return Container.get_children(self, start, request_count)
-        # if first retrieval and refresh required
-        # we start a looping call to periodically update the children
-        #if ((self.last_updated == 0) and (self.refresh > 0)):
-        #    task.LoopingCall(self.retrieve_children,0,0).start(self.refresh, now=False)
+            return super(LazyContainer, self).get_children(start, request_count)
 
         self.start_children_retrieval_campaign()
         if self.childrenRetriever is not None:
@@ -555,9 +547,8 @@ class LazyContainer(Container):
             self.childrenRetrievingNeeded = True
 
         if self.childrenRetrievingNeeded is True:
-            #print "children Retrieving IS Needed (offset is %d)" % start
-            self.retrieve_all_children()
-        Container.get_children(self, start, request_count)
+            return self.retrieve_all_children(start, request_count)
+        return Container.get_children(self, start, request_count)
 
 ROOT_CONTAINER_ID = 0
 SEED_ITEM_ID = 1000
