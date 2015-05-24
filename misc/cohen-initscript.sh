@@ -12,7 +12,7 @@
 
 NAME=cohen
 DAEMON=/usr/local/bin/$NAME
-CONFIG=/usr/local/etc/coherence.conf
+CONFIG=/usr/local/etc/cohen.conf
 LOGFILE=/var/log/cohen.log
 USER=nobody
 DAEMON_OPTS=""

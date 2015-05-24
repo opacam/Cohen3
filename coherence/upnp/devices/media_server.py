@@ -451,17 +451,14 @@ class RootDeviceXML(static.Data):
 
     if xbox_hack:
       etree.SubElement(d, 'friendlyName').text = friendly_name + ' : 1 : Windows Media Connect'
+      etree.SubElement(d, 'modelName').text = 'Windows Media Connect'
     else:
       etree.SubElement(d, 'friendlyName').text = friendly_name
+      etree.SubElement(d, 'modelName').text = __service_name__
 
     etree.SubElement(d, 'manufacturer').text = 'beebits.net'
     etree.SubElement(d, 'manufacturerURL').text = __url__
     etree.SubElement(d, 'modelDescription').text = __service_name__
-
-    if not xbox_hack:
-      etree.SubElement(d, 'modelName').text = 'Windows Media Connect'
-    else:
-      etree.SubElement(d, 'modelName').text = __service_name__
 
     etree.SubElement(d, 'modelNumber').text = __version__
     etree.SubElement(d, 'modelURL').text = __url__

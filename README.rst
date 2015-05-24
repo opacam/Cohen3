@@ -2,6 +2,12 @@ Cohen
 =====
 Simple DLNA/UPnP Media Server
 
+.. image:: http://img.shields.io/pypi/v/Cohen.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/Cohen
+
+.. image:: http://img.shields.io/pypi/dm/Cohen.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/Cohen
+
 .. image:: http://img.shields.io/travis/unintended/Cohen.svg?style=flat-square
     :target: http://travis-ci.org/unintended/Cohen
 
