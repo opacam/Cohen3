@@ -14,7 +14,7 @@ Simple DLNA/UPnP Media Server
 
 Overview
 --------
-Cohen is a DLNA/UPnP Media Server written in Python,
+Cohen is a DLNA/UPnP Media Server written in Python (v2),
 providing several UPnP MediaServers and MediaRenderers
 to make simple publishing and streaming different types of media content to your network.
 
