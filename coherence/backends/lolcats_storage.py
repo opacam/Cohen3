@@ -219,9 +219,9 @@ class LolcatsStore(BackendStore):
         dfr.addCallback(self.queue_update)
 
     def get_by_id(self, id):
-        print "asked for", id, type(id)
+        print("asked for", id, type(id))
         # what ever we are asked for, we want to return the container only
-        if isinstance(id, basestring):
+        if isinstance(id, str):
             id = id.split('@', 1)
             id = id[0]
         if int(id) == self.ROOT_ID:
@@ -332,5 +332,5 @@ class LolcatsStore(BackendStore):
 
     def queue_update(self, error_or_failure):
         # We use the reactor to queue another updating of our data
-        print error_or_failure
+        print(error_or_failure)
         reactor.callLater(self.refresh, self.update_loop)

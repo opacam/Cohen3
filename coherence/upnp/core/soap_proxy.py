@@ -37,14 +37,15 @@ class SOAPProxy(log.Loggable):
 
     def callRemote(self, soapmethod, arguments):
         soapaction = soapmethod or self.soapaction
+        url_bytes = bytes(self.url, encoding='utf-8')
         if '#' not in soapaction:
             soapaction = '#'.join((self.namespace[1], soapaction))
         self.action = soapaction.split('#')[1]
 
         self.info("callRemote %r %r %r %r", self.soapaction, soapmethod, self.namespace, self.action)
 
-        headers = {'content-type': 'text/xml ;charset="utf-8"',
-                   'SOAPACTION': '"%s"' % soapaction, }
+        headers = {b'content-type': b'text/xml ;charset="utf-8"',
+                   b'SOAPACTION': bytes('"%s"' % soapaction, encoding='utf-8'), }
         if 'headers' in arguments:
             headers.update(arguments['headers'])
             del arguments['headers']
@@ -58,7 +59,12 @@ class SOAPProxy(log.Loggable):
             self.warning("error requesting url %r", url)
             self.debug(error)
             try:
-                tree = etree.fromstring(error.value.response)
+                # TODO: Must deal with error handling
+                self.error('\t-> callRemote [type: {}]: {} => {}'.format(
+                    type(error.value.__traceback__),
+                    'error.value.__traceback__',
+                    error.value.__traceback__))
+                tree = etree.fromstring(error.value.__traceback__)
                 body = tree.find('{http://schemas.xmlsoap.org/soap/envelope/}Body')
                 return failure.Failure(Exception("%s - %s" % (
                   body.find('.//{urn:schemas-upnp-org:control-1-0}errorCode').text,
@@ -68,16 +74,19 @@ class SOAPProxy(log.Loggable):
                 self.debug(traceback.format_exc())
             return error
 
-        return getPage(self.url, postdata=payload, method="POST", headers=headers).addCallbacks(self._cbGotResult,
-                                                                                                gotError, None, None,
-                                                                                                [self.url], None)
+        return getPage(
+            url_bytes,
+            postdata=payload,
+            method=b"POST",
+            headers=headers).addCallbacks(
+            self._cbGotResult, gotError, None, None, [url_bytes], None)
 
     def _cbGotResult(self, result):
         page, headers = result
 
         def print_c(e):
             for c in e.getchildren():
-                print c, c.tag
+                print(c, c.tag)
                 print_c(c)
 
         self.debug("result: %r", page)

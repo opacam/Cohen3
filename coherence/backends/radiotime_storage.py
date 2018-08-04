@@ -165,7 +165,7 @@ class RadiotimeStore(AbstractBackendStore):
         def got_xml_error(error):
             self.warning("Data received from Radiotime service is invalid: %s", url)
             #self.debug("%r", error.getTraceback())
-            print error.getTraceback()
+            print(error.getTraceback())
             parent.childrenRetrievingNeeded = True  # we retry
             return Failure("Unable to retrieve items for url %s" % url)
 

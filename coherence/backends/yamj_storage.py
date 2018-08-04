@@ -9,7 +9,7 @@
 #
 from lxml import etree
 
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import mimetypes
 
 from coherence.upnp.core import DIDLLite
@@ -209,7 +209,7 @@ class YamjStore(AbstractBackendStore):
             counter = 1
         else:
             counter = abs(offset / self.nbMoviesPerFile) + 1
-        fileUrl = "%s/%s_%d.xml" % (self.jukebox_url, urllib.quote(root_name), counter)
+        fileUrl = "%s/%s_%d.xml" % (self.jukebox_url, urllib.parse.quote(root_name), counter)
 
         def fail_readPage(f):
             self.warning("failure reading yamj index (%s): %r", fileUrl, f.getErrorMessage())

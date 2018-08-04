@@ -140,7 +140,7 @@ class TestClient(unittest.TestCase):
     def setUp(self):
         name = self.mktemp()
         os.mkdir(name)
-        FilePath(name).child("file").setContent("0123456789")
+        FilePath(name).child("file").setContent(b"0123456789")
         r = static.File(name)
         self.site = server.Site(r, timeout=None)
         self.wrapper = policies.WrappingFactory(self.site)
@@ -162,10 +162,10 @@ class TestClient(unittest.TestCase):
             self.assertEqual(originalHeaders[header], headers[header])
 
     def test_getPage(self):
-        content = '0123456789'
-        headers = {'accept-ranges': ['bytes'],
-                   'content-length': ['10'],
-                   'content-type': ['text/html']}
+        content = b'0123456789'
+        headers = {b'accept-ranges': [b'bytes'],
+                   b'content-length': [b'10'],
+                   b'content-type': [b'text/html']}
         d = utils.getPage(self.getURL("file"))
         d.addCallback(self.assertResponse, content, headers)
         return d

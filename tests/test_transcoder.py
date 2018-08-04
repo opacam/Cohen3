@@ -30,7 +30,7 @@ class TestTranscoderManagerSingletony(TranscoderTestMixin, TestCase):
     # FIXME: singleton tests should be outsourced some when
     old_id = id(self.manager)
     new_manager = tc.TranscoderManager()
-    self.assertEquals(old_id, id(new_manager))
+    self.assertEqual(old_id, id(new_manager))
 
 
 class TestTranscoderAutoloading(TranscoderTestMixin, TestCase):
@@ -47,7 +47,7 @@ class TestTranscoderAutoloading(TranscoderTestMixin, TestCase):
   process_config = {'name': 'megaprocess', 'pipeline': 'uiui%suiui',
                     'type': 'process', 'target': 'yay'}
 
-  bad_name_config = {'name': u'so bäd', 'pipeline': 'fake %s',
+  bad_name_config = {'name': 'so bäd', 'pipeline': 'fake %s',
                      'type': 'process', 'target': 'norway'}
 
   def setUp(self):
@@ -60,7 +60,7 @@ class TestTranscoderAutoloading(TranscoderTestMixin, TestCase):
   def _check_for_transcoders(self, transcoders):
     for klass in transcoders:
       loaded_transcoder = self.manager.transcoders[tc.get_transcoder_name(klass)]
-      self.assertEquals(loaded_transcoder, klass)
+      self.assertEqual(loaded_transcoder, klass)
 
   def test_is_loading_no_config(self):
     coherence = self.CoherenceStump()
@@ -78,8 +78,8 @@ class TestTranscoderAutoloading(TranscoderTestMixin, TestCase):
 
   def _check_transcoder_attrs(self, transcoder, pipeline=None, uri=None):
     # bahh... relying on implementation details of the basetranscoder here
-    self.assertEquals(transcoder.pipeline_description, pipeline)
-    self.assertEquals(transcoder.uri, uri)
+    self.assertEqual(transcoder.pipeline_description, pipeline)
+    self.assertEqual(transcoder.uri, uri)
 
   def test_is_loading_one_process_from_config(self):
     coherence = self.CoherenceStump(transcoder=self.process_config)
@@ -108,7 +108,7 @@ class TestTranscoderAutoloading(TranscoderTestMixin, TestCase):
     coherence = self.CoherenceStump(transcoder=self.bad_name_config)
     self.manager = tc.TranscoderManager(coherence)
     self._check_for_transcoders(known_transcoders)
-    self.assertRaises(KeyError, self.manager.select, u'so bäd',
+    self.assertRaises(KeyError, self.manager.select, 'so bäd',
                       'http://another/uri')
 
   def test_is_loading_multiple_from_config(self):
@@ -141,5 +141,5 @@ class TestTranscoderAutoloading(TranscoderTestMixin, TestCase):
     self.assertTrue(isinstance(transcoder_b, tc.GStreamerTranscoder))
     self._check_transcoder_attrs(transcoder_b, pipeline='pp%spppl', uri="http://another/uri")
 
-    self.assertNotEquals(transcoder_a, transcoder_b)
-    self.assertNotEquals(id(transcoder_a), id(transcoder_b))
+    self.assertNotEqual(transcoder_a, transcoder_b)
+    self.assertNotEqual(id(transcoder_a), id(transcoder_b))

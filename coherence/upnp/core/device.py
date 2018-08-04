@@ -7,7 +7,7 @@
 import time
 
 from lxml import etree
-import xml_constants
+from . import xml_constants
 from twisted.internet import defer
 from coherence.upnp.core.service import Service
 from coherence.upnp.core import utils
@@ -56,17 +56,20 @@ class Device(log.Loggable):
         return d
 
     def remove(self, *args):
-        self.info("removal of  %s %s", self.friendly_name, self.udn)
+        self.info('removal of  {} {}'.format(
+            self.friendly_name, self.udn))
         while len(self.devices) > 0:
             device = self.devices.pop()
-            self.debug("try to remove %r", device)
+            self.debug('try to remove {}'.format(device))
             device.remove()
         while len(self.services) > 0:
             service = self.services.pop()
             self.debug("try to remove %r", service)
             service.remove()
         if self.client is not None:
-            louie.send('Coherence.UPnP.Device.remove_client', None, self.udn, self.client)
+            louie.send(
+                'Coherence.UPnP.Device.remove_client',
+                None, self.udn, self.client)
             self.client = None
         #del self
 
@@ -80,12 +83,20 @@ class Device(log.Loggable):
             return
         self.detection_completed = True
         if self.parent is not None:
-            self.info("embedded device %r %r initialized, parent %r", self.friendly_name, self.device_type, self.parent)
-        louie.send('Coherence.UPnP.Device.detection_completed', None, device=self)
+            self.info(
+                'embedded device {} {} initialized, parent {}'.format(
+                    self.friendly_name, self.device_type, self.parent))
+        louie.send(
+            'Coherence.UPnP.Device.detection_completed',
+            None, device=self)
         if self.parent is not None:
-            louie.send('Coherence.UPnP.Device.detection_completed', self.parent, device=self)
+            louie.send(
+                'Coherence.UPnP.Device.detection_completed',
+                self.parent, device=self)
         else:
-            louie.send('Coherence.UPnP.Device.detection_completed', self, device=self)
+            louie.send(
+                'Coherence.UPnP.Device.detection_completed',
+                self, device=self)
 
     def service_detection_failed(self, device):
         self.remove()
@@ -118,7 +129,7 @@ class Device(log.Loggable):
                 return service
 
     def add_service(self, service):
-        self.debug("add_service %r", service)
+        self.debug('add_service {}'.format(service))
         self.services.append(service)
 
     # :fixme: This fails as Service.get_usn() is not implemented.
@@ -146,8 +157,10 @@ class Device(log.Loggable):
         try:
             return self._markup_name
         except AttributeError:
-            self._markup_name = u"%s:%s %s" % (self.friendly_device_type,
-                    self.device_type_version, self.friendly_name)
+            self._markup_name = "%s:%s %s" % \
+                                (self.friendly_device_type,
+                                 self.device_type_version,
+                                 self.friendly_name)
             return self._markup_name
 
     def get_device_type_version(self):
@@ -161,17 +174,17 @@ class Device(log.Loggable):
 
     def renew_service_subscriptions(self):
         """ iterate over device's services and renew subscriptions """
-        self.info("renew service subscriptions for %s", self.friendly_name)
+        self.info('renew service subscriptions for {}'.format(self.friendly_name))
         now = time.time()
         for service in self.services:
-            self.info("check service %r %r %s %s", service.id, service.get_sid(),
-                      service.get_timeout(), now)
+            self.info('check service {} {} {} {}'.format(service.id, service.get_sid(),
+                      service.get_timeout(), now))
             if service.get_sid() is not None:
                 if service.get_timeout() < now:
-                    self.debug("wow, we lost an event subscription for %s %s, "
-                               "maybe we need to rethink the loop time and "
-                               "timeout calculation?",
-                               self.friendly_name, service.get_id())
+                    self.debug('wow, we lost an event subscription for {} {}, '
+                               'maybe we need to rethink the loop time and '
+                               'timeout calculation?'.format(
+                                   self.friendly_name, service.get_id()))
                 if service.get_timeout() < now + 30:
                     service.renew_subscription()
 
@@ -188,11 +201,11 @@ class Device(log.Loggable):
         return dl
 
     def parse_device(self, d):
-        self.info("parse_device %r", d)
-        self.device_type = unicode(d.findtext('./{%s}deviceType' % ns))
+        self.info('parse_device {}'.format(d))
+        self.device_type = d.findtext('./{%s}deviceType' % ns)
         self.friendly_device_type, self.device_type_version = \
                 self.device_type.split(':')[-2:]
-        self.friendly_name = unicode(d.findtext('./{%s}friendlyName' % ns))
+        self.friendly_name = d.findtext('./{%s}friendlyName' % ns)
         self.udn = d.findtext('./{%s}UDN' % ns)
         self.info("found udn %r %r", self.udn, self.friendly_name)
 
@@ -256,8 +269,8 @@ class Device(log.Loggable):
 
         icon_list = d.find('./{%s}iconList' % ns)
         if icon_list is not None:
-            import urllib2
-            url_base = "%s://%s" % urllib2.urlparse.urlparse(self.get_location())[:2]
+            from urllib.parse import urlparse
+            url_base = "%s://%s" % urlparse(self.get_location())[:2]
             for icon in icon_list.findall('./{%s}icon' % ns):
                 try:
                     i = {}
@@ -268,11 +281,14 @@ class Device(log.Loggable):
                     i['realurl'] = icon.find('./{%s}url' % ns).text
                     i['url'] = self.make_fullyqualified(i['realurl'])
                     self.icons.append(i)
-                    self.debug("adding icon %r for %r", i, self.friendly_name)
+                    self.debug('adding icon {} for {}'.format(
+                        i, self.friendly_name))
                 except:
                     import traceback
                     self.debug(traceback.format_exc())
-                    self.warning("device %r seems to have an invalid icon description, ignoring that icon", self.friendly_name)
+                    self.warning(
+                        'device {} seems to have an invalid icon description, '
+                        'ignoring that icon'.format(self.friendly_name))
 
         serviceList = d.find('./{%s}serviceList' % ns)
         if serviceList is not None:
@@ -286,17 +302,22 @@ class Device(log.Loggable):
                 """ check if values are somehow reasonable
                 """
                 if len(scpdUrl) == 0:
-                    self.warning("service has no uri for its description")
+                    self.warning('service has no uri for its description')
                     continue
                 if len(eventSubUrl) == 0:
-                    self.warning("service has no uri for eventing")
+                    self.warning('service has no uri for eventing')
                     continue
                 if len(controlUrl) == 0:
-                    self.warning("service has no uri for controling")
+                    self.warning('service has no uri for controling')
                     continue
-                self.add_service(Service(serviceType, serviceId, self.get_location(),
+                try:
+                    self.add_service(Service(serviceType, serviceId, self.get_location(),
                                          controlUrl,
                                          eventSubUrl, presentationUrl, scpdUrl, self))
+                except Exception as e:
+                    self.error(
+                        'Error on adding service: {} [ERROR: {}]'.format(
+                            service, e))
 
             # now look for all sub devices
             embedded_devices = d.find('./{%s}deviceList' % ns)
@@ -366,7 +387,8 @@ class Device(log.Loggable):
                 self.debug(traceback.format_exc())
 
         try:
-            r.append(('Location', (self.get_location(), self.get_location())))
+            r.append(('Location', (str(self.get_location()),
+                                   str(self.get_location()))))
         except:
             pass
         try:
@@ -456,13 +478,19 @@ class RootDevice(Device):
         self.host = infos['HOST']
         self.root_detection_completed = False
         Device.__init__(self, None)
-        louie.connect(self.device_detect, 'Coherence.UPnP.Device.detection_completed', self)
+        louie.connect(
+            self.device_detect,
+            'Coherence.UPnP.Device.detection_completed',
+            self)
         # we need to handle root device completion
         # these events could be ourself or our children.
         self.parse_description()
+        self.debug('RootDevice initialized'.format(self.location))
 
     def __repr__(self):
-        return "rootdevice %r %r %r %r, manifestation %r" % (self.friendly_name, self.udn, self.st, self.host, self.manifestation)
+        return "rootdevice %r %r %r %r, manifestation %r" % \
+               (self.friendly_name, self.udn, self.st,
+                self.host, self.manifestation)
 
     def remove(self, *args):
         result = Device.remove(self, *args)
@@ -557,22 +585,27 @@ class RootDevice(Device):
                 d = tree.find('./{%s}device' % ns)
                 if d is not None:
                     self.parse_device(d)  # root device
+            self.debug("device parsed succesfully %r", self.location)
 
         def gotError(failure, url):
             self.warning("error getting device description from %r", url)
             self.info(failure)
-
-        utils.getPage(self.location).addCallbacks(gotPage, gotError, None, None, [self.location], None)
+        try:
+            utils.getPage(
+                self.location).addCallbacks(
+                gotPage, gotError, None, None, [self.location], None)
+        except Exception as e:
+            self.error('Error on parsing device description: {}'.format(e))
 
     def make_fullyqualified(self, url):
         if url.startswith('http://'):
             return url
-        import urlparse
+        from urllib.parse import urljoin
         base = self.get_urlbase()
         if base != None:
             if base[-1] != '/':
                 base += '/'
-            r = urlparse.urljoin(base, url)
+            r = urljoin(base, url)
         else:
-            r = urlparse.urljoin(self.get_location(), url)
+            r = urljoin(self.get_location(), url)
         return r

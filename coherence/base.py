@@ -48,8 +48,12 @@ class SimpleRoot(resource.Resource, log.Loggable):
       """ we have an out-of-band request """
       return static.File(self.coherence.dbus.pinboard[request.args['key'][0]])
 
-    if name == '':
+    if name in ['', None, '\'']:
       return self
+    if name.endswith('\''):
+      self.warning('\t modified wrong name from {} to {}'.format(
+        name, name[:-1]))
+      name = name[:-1]
 
     # at this stage, name should be a device UUID
     try:
@@ -145,7 +149,7 @@ class Plugins(log.Loggable):
     if pkg_resources and isinstance(plugin, pkg_resources.EntryPoint):
       try:
         plugin = plugin.load(require=False)
-      except (ImportError, AttributeError, pkg_resources.ResolutionError), msg:
+      except (ImportError, AttributeError, pkg_resources.ResolutionError) as msg:
         self.warning("Can't load plugin %s (%s), maybe missing dependencies...", plugin.name, msg)
         self.info(traceback.format_exc())
         del self._plugins[key]
@@ -167,7 +171,7 @@ class Plugins(log.Loggable):
     return self.__setitem__(key, value)
 
   def keys(self):
-    return self._plugins.keys()
+    return list(self._plugins.keys())
 
   def _collect_from_module(self):
     from coherence.extern.simple_plugin import Reception
@@ -243,12 +247,12 @@ class Coherence(log.Loggable):
         logging.getLogger(subsystem['name'].lower()).setLevel(subsystem['level'].upper())
     except (KeyError, TypeError):
       subsystem_log = config.get('subsystem_log', {})
-      for subsystem, level in subsystem_log.items():
+      for subsystem, level in list(subsystem_log.items()):
         logging.getLogger(subsystem.lower()).setLevel(level.upper())
     try:
       logfile = config.get('logging').get('logfile', None)
       if logfile is not None:
-        logfile = unicode(logfile)
+        logfile = str(logfile)
     except (KeyError, AttributeError, TypeError):
       logfile = config.get('logfile', None)
     log.init(logfile, logmode.upper())
@@ -294,7 +298,7 @@ class Coherence(log.Loggable):
     try:
       # TODO: add ip/interface bind
       self.ssdp_server = SSDPServer(test=unittest)
-    except CannotListenError, err:
+    except CannotListenError as err:
       self.error("Error starting the SSDP-server: %s", err)
       self.debug("Error starting the SSDP-server", exc_info=True)
       reactor.stop()
@@ -340,12 +344,12 @@ class Coherence(log.Loggable):
       self.info("No plugin defined!")
     else:
       if isinstance(plugins, dict):
-        for plugin, arguments in plugins.items():
+        for plugin, arguments in list(plugins.items()):
           try:
             if not isinstance(arguments, dict):
               arguments = {}
             self.add_plugin(plugin, **arguments)
-          except Exception, msg:
+          except Exception as msg:
             self.warning("Can't enable plugin, %s: %s!", plugin, msg)
             self.info(traceback.format_exc())
       else:
@@ -364,7 +368,7 @@ class Coherence(log.Loggable):
               if 'uuid' not in plugin:
                 plugin['uuid'] = str(backend.uuid)[5:]
                 self.config.save()
-          except Exception, msg:
+          except Exception as msg:
             self.warning("Can't enable plugin, %s: %s!", plugin, msg)
             self.info(traceback.format_exc())
 
@@ -396,7 +400,7 @@ class Coherence(log.Loggable):
           self.ctrl = ControlPoint(self)
         self.ctrl.auto_client_append('InternetGatewayDevice')
         self.dbus = dbus_service.DBusPontoon(self.ctrl)
-      except Exception, msg:
+      except Exception as msg:
         self.warning("Unable to activate dbus sub-system: %r", msg)
         self.debug(traceback.format_exc())
 
@@ -426,7 +430,7 @@ class Coherence(log.Loggable):
           self.debug(traceback.format_exc())
     except KeyError:
       self.warning("Can't enable %s plugin, not found!", plugin)
-    except Exception, msg:
+    except Exception as msg:
       self.warning("Can't enable %s plugin, %s!", plugin, msg)
       self.debug(traceback.format_exc())
 
@@ -436,7 +440,7 @@ class Coherence(log.Loggable):
 
     @:param plugin: is the object return by add_plugin or an UUID string
     """
-    if isinstance(plugin, basestring):
+    if isinstance(plugin, str):
       try:
         plugin = self.active_backends[plugin]
       except KeyError:
@@ -474,7 +478,7 @@ class Coherence(log.Loggable):
     for plugin in plugins:
       try:
         if plugin['uuid'] == uuid:
-          for k, v in items.items():
+          for k, v in list(items.items()):
             plugin[k] = v
           self.config.save()
       except:
@@ -494,7 +498,7 @@ class Coherence(log.Loggable):
       self.dbus.shutdown()
       self.dbus = None
 
-    for backend in self.active_backends.itervalues():
+    for backend in self.active_backends.values():
       backend.unregister()
     self.active_backends = {}
 
@@ -576,6 +580,7 @@ class Coherence(log.Loggable):
     return found
 
   def get_device_with_id(self, device_id):
+    # print('get_device_with_id [{}]: {}'.format(type(device_id), device_id))
     found = None
     for device in self.devices:
       id = device.get_id()
@@ -587,32 +592,36 @@ class Coherence(log.Loggable):
     return found
 
   def get_devices(self):
+    # print('get_devices: {}'.format(self.devices))
     return self.devices
 
   def get_local_devices(self):
+    # print('get_local_devices: {}'.format([d for d in self.devices if d.manifestation == 'local']))
     return [d for d in self.devices if d.manifestation == 'local']
 
   def get_nonlocal_devices(self):
+    # print('get_nonlocal_devices: {}'.format([d for d in self.devices if d.manifestation == 'remote']))
     return [d for d in self.devices if d.manifestation == 'remote']
 
   def create_device(self, device_type, infos):
     self.info("creating %s %s", infos['ST'], infos['USN'])
     if infos['ST'] == 'upnp:rootdevice':
-      self.info("creating upnp:rootdevice  %s", infos['USN'])
+      self.info('creating upnp:rootdevice  {}'.format(infos['USN']))
       root = RootDevice(infos)
     else:
-      self.info("creating device/service  %s", infos['USN'])
+      self.info('creating device/service  {}'.format(infos['USN']))
       root_id = infos['USN'][:-len(infos['ST']) - 2]
       root = self.get_device_with_id(root_id)
       # FIXME doesn't look like doing right thing
       device = Device(infos, root)
 
   def add_device(self, device):
-    self.info("adding device %s %s %s", device.get_id(), device.get_usn(), device.friendly_device_type)
+    self.info('adding device {} {} {}'.format(
+        device.get_id(), device.get_usn(), device.friendly_device_type))
     self.devices.append(device)
 
   def remove_device(self, device_type, infos):
-    self.info("removed device %s %s", infos['ST'], infos['USN'])
+    self.info('removed device {} %s{}'.format(infos['ST'], infos['USN']))
     device = self.get_device_with_usn(infos['USN'])
     if device:
       louie.send('Coherence.UPnP.Device.removed', None, usn=infos['USN'])

@@ -6,6 +6,8 @@
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
 # Copyright 2008,2009 Jean-Michel Sizun <jmDOTsizunATfreeDOTfr>
 
+from functools import cmp_to_key
+
 from twisted.internet import defer, reactor
 from twisted.web import server
 
@@ -78,7 +80,7 @@ class ProxyStream(utils.ReverseProxyUriResource, log.Loggable):
         if request.clientproto == 'HTTP/1.1':
             self.connection = request.getHeader('connection')
             if self.connection:
-                tokens = map(str.lower, self.connection.split(' '))
+                tokens = list(map(str.lower, self.connection.split(' ')))
                 if 'close' in tokens:
                     d = request.notifyFinish()
                     d.addBoth(self.requestFinished)
@@ -108,7 +110,7 @@ class Container(BackendItem):
 
     def add_child(self, child):
         id = child.id
-        if isinstance(child.id, basestring):
+        if isinstance(child.id, str):
             _, id = child.id.split('.')
         if self.children is None:
             self.children = []
@@ -119,10 +121,11 @@ class Container(BackendItem):
     def get_children(self, start=0, end=0):
         if self.sorted == False:
             def childs_sort(x, y):
-                r = cmp(x.name, y.name)
+                r = cmp_to_key(x.name, y.name)
                 return r
 
-            self.children.sort(cmp=childs_sort)
+            self.children = sorted(
+                self.children.sort, key=childs_sort)
             self.sorted = True
         if end != 0:
             return self.children[start:end]
@@ -231,7 +234,7 @@ class ITVStore(BackendStore):
         return len(self.store)
 
     def get_by_id(self, id):
-        if isinstance(id, basestring):
+        if isinstance(id, str):
             id = id.split('@', 1)
             id = id[0]
         try:
@@ -300,7 +303,7 @@ class ITVStore(BackendStore):
                 genreItem = self.appendGenre(genre, parent)
                 genreItems[genre] = genreItem
 
-            for station in stations.values():
+            for station in list(stations.values()):
                 genre = station.get('genre')
                 parentItem = genreItems[genre]
                 self.appendFeed({'name': station.get('name'),

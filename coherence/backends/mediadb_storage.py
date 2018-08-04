@@ -44,9 +44,9 @@ depends on:
 import os
 import shutil
 import string
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
-from urlparse import urlsplit
+from urllib.parse import urlsplit
 
 from axiom import store, item, attributes
 from epsilon.extime import Time
@@ -77,14 +77,14 @@ def _dict_from_tags(tag):
     tags['title'] = tag.title.strip()
     if type(tag.track) == int:
         tags['track'] = tag.track
-    elif type(tag.track) in (str, unicode):
+    elif type(tag.track) in (str, str):
         tags['track'] = int(tag.track.strip())
     else:
         tags['track'] = tag.track[0]
 
     for key in ('artist', 'album', 'title'):
-        value = tags.get(key, u'')
-        if isinstance(value, unicode):
+        value = tags.get(key, '')
+        if isinstance(value, str):
             tags[key] = value.encode('utf-8')
 
     return tags
@@ -136,9 +136,9 @@ AUDIO_ALBUM_CONTAINER_ID = 103
 
 def sanitize(filename):
     badchars = ''.join(set(string.punctuation) - set('-_+.~'))
-    f = unicode(filename.lower())
-    for old, new in ((u'ä', 'ae'), (u'ö', 'oe'), (u'ü', 'ue'), (u'ß', 'ss')):
-        f = f.replace(unicode(old), unicode(new))
+    f = str(filename.lower())
+    for old, new in (('ä', 'ae'), ('ö', 'oe'), ('ü', 'ue'), ('ß', 'ss')):
+        f = f.replace(str(old), str(new))
     f = f.replace(badchars, '_')
     return f
 
@@ -262,7 +262,7 @@ class Album(item.Item, BackendItem):
     musicbrainz_id = attributes.text()
     artist = attributes.reference(allowNone=False, indexed=True)
     cd_count = attributes.integer(default=1)
-    cover = attributes.text(default=u'')
+    cover = attributes.text(default='')
 
     get_path = None
 
@@ -497,13 +497,13 @@ class MediaStore(BackendStore):
             """
             jpgs = [i for i in os.listdir(path) if os.path.splitext(i)[1] in ('.jpg', '.JPG')]
             try:
-                return unicode(jpgs[0])
+                return str(jpgs[0])
             except IndexError:
                 pngs = [i for i in os.listdir(path) if os.path.splitext(i)[1] in ('.png', '.PNG')]
                 try:
-                    return unicode(pngs[0])
+                    return str(pngs[0])
                 except IndexError:
-                    return u''
+                    return ''
 
         def got_tags(tags, file):
             #print "got_tags", tags
@@ -515,34 +515,34 @@ class MediaStore(BackendStore):
 
             if len(artist) == 0:
                 return
-                artist = u'UNKNOWN_ARTIST'
+                artist = 'UNKNOWN_ARTIST'
             if len(album) == 0:
                 return
-                album = u'UNKNOWN_ALBUM'
+                album = 'UNKNOWN_ALBUM'
             if len(title) == 0:
                 return
-                title = u'UNKNOWN_TITLE'
+                title = 'UNKNOWN_TITLE'
             #print "Tags:", file, album, artist, title, track
 
-            artist_ds = self.db.findOrCreate(Artist, name=unicode(artist, 'utf8'))
+            artist_ds = self.db.findOrCreate(Artist, name=str(artist, 'utf8'))
             album_ds = self.db.findOrCreate(Album,
-                                            title=unicode(album, 'utf8'),
+                                            title=str(album, 'utf8'),
                                             artist=artist_ds)
             if len(album_ds.cover) == 0:
-                dirname = unicode(os.path.dirname(file), 'utf-8')
+                dirname = str(os.path.dirname(file), 'utf-8')
                 album_ds.cover = check_for_cover_art(dirname)
                 if len(album_ds.cover) > 0:
-                    filename = u"%s - %s" % (album_ds.artist.name, album_ds.title)
+                    filename = "%s - %s" % (album_ds.artist.name, album_ds.title)
                     filename = sanitize(filename + os.path.splitext(album_ds.cover)[1])
                     filename = os.path.join(dirname, filename)
                     shutil.move(os.path.join(dirname, album_ds.cover), filename)
                     album_ds.cover = filename
             #print album_ds.cover
             track_ds = self.db.findOrCreate(Track,
-                                            title=unicode(title, 'utf8'),
+                                            title=str(title, 'utf8'),
                                             track_nr=int(track),
                                             album=album_ds,
-                                            location=unicode(file, 'utf8'))
+                                            location=str(file, 'utf8'))
 
         for file in self.filelist:
             d = defer.maybeDeferred(get_tags, file)
@@ -550,17 +550,17 @@ class MediaStore(BackendStore):
 
     def show_db(self):
         for album in list(self.db.query(Album, sort=Album.title.ascending)):
-            print album
+            print(album)
             for track in list(self.db.query(Track, Track.album == album, sort=Track.track_nr.ascending)):
-                print track
+                print(track)
 
     def show_albums(self):
         for album in list(self.db.query(Album, sort=Album.title.ascending)):
-            print album
+            print(album)
 
     def show_artists(self):
         for artist in list(self.db.query(Artist, sort=Artist.name.ascending)):
-            print artist
+            print(artist)
 
     def show_tracks_by_artist(self, artist_name):
         """
@@ -576,35 +576,35 @@ class MediaStore(BackendStore):
                                            Track.album == Album.storeID),
                             sort=(Track.title.ascending)
                             ))]:
-            print track
+            print(track)
 
     def show_tracks_by_title(self, title_or_part):
-        for track in list(self.db.query(Track, Track.title.like(u'%', title_or_part, u'%'), sort=Track.title.ascending)):
-            print track
+        for track in list(self.db.query(Track, Track.title.like('%', title_or_part, '%'), sort=Track.title.ascending)):
+            print(track)
 
     def show_tracks_to_filename(self, title_or_part):
-        for track in list(self.db.query(Track, Track.title.like(u'%', title_or_part, u'%'), sort=Track.title.ascending)):
-            print track.title, track.album.artist.name, track.track_nr
+        for track in list(self.db.query(Track, Track.title.like('%', title_or_part, '%'), sort=Track.title.ascending)):
+            print(track.title, track.album.artist.name, track.track_nr)
             _, ext = os.path.splitext(track.path)
             f = "%02d - %s - %s%s" % (track.track_nr, track.album.artist.name,
                                        track.title, ext)
             f = sanitize(f)
-            print f
+            print(f)
 
     def get_album_covers(self):
-        for album in list(self.db.query(Album, Album.cover == u'')):
-            print "missing cover for:", album.artist.name, album.title
+        for album in list(self.db.query(Album, Album.cover == '')):
+            print("missing cover for:", album.artist.name, album.title)
             filename = "%s - %s" % (album.artist.name, album.title)
             filename = sanitize(filename)
 
             if self.coverlocation is not None:
                 cover_path = os.path.join(self.coverlocation, filename + '.jpg')
                 if os.path.exists(cover_path) is True:
-                    print "cover found:", cover_path
+                    print("cover found:", cover_path)
                     album.cover = cover_path
                 else:
                     def got_it(f, a):
-                        print "cover saved:", f, a.title
+                        print("cover saved:", f, a.title)
                         a.cover = f
 
                     aws_key = '1XHSE4FQJ0RK0X3S9WR2'
@@ -615,10 +615,10 @@ class MediaStore(BackendStore):
 
     def get_by_id(self, id):
         self.info("get_by_id %s", id)
-        if isinstance(id, basestring):
+        if isinstance(id, str):
             id = id.split('@', 1)
             id = id[0].split('.')[0]
-        if isinstance(id, basestring) and id.startswith('artist_all_tracks_'):
+        if isinstance(id, str) and id.startswith('artist_all_tracks_'):
             try:
                 return self.containers[id]
             except:

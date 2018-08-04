@@ -36,4 +36,4 @@ def xdg_content():
 
 
 if __name__ == '__main__':
-  print xdg_content()
+  print(xdg_content())

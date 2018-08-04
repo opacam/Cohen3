@@ -19,7 +19,8 @@ To enable personalized features (e.g. 'Following' streams), add 'access_token' k
 """
 
 import json
-import urllib
+from functools import cmp_to_key
+import urllib.request, urllib.parse, urllib.error
 
 from coherence.log import Loggable
 from dateutil import parser as dateutil_parser
@@ -97,9 +98,9 @@ class TwitchLazyContainer(LazyContainer):
       return
 
     kwargs.update({'limit': self.limit})
-    kwargs = {k: v for k, v in kwargs.items() if v is not None}
+    kwargs = {k: v for k, v in list(kwargs.items()) if v is not None}
 
-    url = "%s?%s" % (self.children_url, urllib.urlencode(kwargs)) if kwargs else self.children_url
+    url = "%s?%s" % (self.children_url, urllib.parse.urlencode(kwargs)) if kwargs else self.children_url
 
     d = utils.getPage(url)
     d.addCallbacks(self._got_page, self._got_error)
@@ -296,7 +297,7 @@ class TwitchStore(AbstractBackendStore):
 
 
 def sort_by_viewers(x, y):
-  return cmp(y.viewers, x.viewers)
+  return cmp_to_key(y.viewers, x.viewers)
 
 
 def json_loads(data):

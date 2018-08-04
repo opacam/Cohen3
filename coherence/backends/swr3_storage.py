@@ -66,7 +66,7 @@ class Container(BackendItem):
 
     def add_child(self, child):
         id = child.id
-        if isinstance(child.id, basestring):
+        if isinstance(child.id, str):
             _, id = child.id.split('.')
         self.children.append(child)
         self.item.childCount += 1
@@ -74,11 +74,10 @@ class Container(BackendItem):
 
     def get_children(self, start=0, end=0):
         if not self.sorted:
-            def childs_sort(x, y):
-                r = cmp(x.name, y.name)
-                return r
+            def childs_key_sort(x):
+                return x.name
 
-            self.children.sort(cmp=childs_sort)
+            sorted(self.children, key=childs_key_sort)
             self.sorted = True
         if end != 0:
             return self.children[start:end]
@@ -144,7 +143,7 @@ class SWR3Store(BackendStore, BackendRssMixin):
         return self.next_id
 
     def get_by_id(self, id):
-        if isinstance(id, basestring):
+        if isinstance(id, str):
             id = id.split('@', 1)
             id = id[0]
         try:

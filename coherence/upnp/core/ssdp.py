@@ -65,26 +65,30 @@ class SSDPServer(DatagramProtocol, log.Loggable):
                 if self.known[st]['MANIFESTATION'] == 'local':
                     self.doByebye(st)
 
-    def datagramReceived(self, data, (host, port)):
+    def datagramReceived(self, data, xxx_todo_changeme):
         """Handle a received multicast datagram."""
-
+        (host, port) = xxx_todo_changeme
+        if isinstance(data, bytes):
+            data = data.decode('utf-8')
         try:
             header, payload = data.split('\r\n\r\n')[:2]
-        except ValueError, err:
-            print err
-            print 'Arggg,', data
-            import pdb; pdb.set_trace()
+        except ValueError as err:
+            print(err)
+            print('Arggg,', data)
+            import pdb
+            pdb.set_trace()
 
         lines = header.split('\r\n')
-        cmd = string.split(lines[0], ' ')
-        lines = map(lambda x: x.replace(': ', ':', 1), lines[1:])
-        lines = filter(lambda x: len(x) > 0, lines)
+        cmd = lines[0].split(' ')
+        lines = [x.replace(': ', ':', 1) for x in lines[1:]]
+        lines = [x for x in lines if len(x) > 0]
 
-        headers = [string.split(x, ':', 1) for x in lines]
-        headers = dict(map(lambda x: (x[0].lower(), x[1]), headers))
+        headers = [x.split(':', 1) for x in lines]
+        headers = dict([(x[0].lower(), x[1]) for x in headers])
 
-        self.msg('SSDP command %s %s - from %s:%d', cmd[0], cmd[1], host, port)
-        self.debug('with headers: %s', headers)
+        self.msg('SSDP command {} {} - from {}:{}'.format(
+            cmd[0], cmd[1], host, port))
+        self.debug('with headers: {}'.format(headers))
         if cmd[0] == 'M-SEARCH' and cmd[1] == '*':
             # SSDP discovery
             self.discoveryRequest(headers, (host, port))
@@ -92,7 +96,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
             # SSDP presence
             self.notifyReceived(headers, (host, port))
         else:
-            self.warning('Unknown SSDP command %s %s', cmd[0], cmd[1])
+            self.warning('Unknown SSDP command {} {}'.format(cmd[0], cmd[1]))
 
         # make raw data available
         # send out the signal after we had a chance to register the device
@@ -106,53 +110,62 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         """Register a service or device that this SSDP server will
         respond to."""
 
-        self.info('Registering %s (%s)', st, location)
+        self.info('Registering {} ({})'.format(st, location))
 
-        self.known[usn] = {}
-        self.known[usn]['USN'] = usn
-        self.known[usn]['LOCATION'] = location
-        self.known[usn]['ST'] = st
-        self.known[usn]['EXT'] = ''
-        self.known[usn]['SERVER'] = server
-        self.known[usn]['CACHE-CONTROL'] = cache_control
+        try:
+            self.known[usn] = {}
+            self.known[usn]['USN'] = usn
+            self.known[usn]['LOCATION'] = location
+            self.known[usn]['ST'] = st
+            self.known[usn]['EXT'] = ''
+            self.known[usn]['SERVER'] = server
+            self.known[usn]['CACHE-CONTROL'] = cache_control
 
-        self.known[usn]['MANIFESTATION'] = manifestation
-        self.known[usn]['SILENT'] = silent
-        self.known[usn]['HOST'] = host
-        self.known[usn]['last-seen'] = time.time()
+            self.known[usn]['MANIFESTATION'] = manifestation
+            self.known[usn]['SILENT'] = silent
+            self.known[usn]['HOST'] = host
+            self.known[usn]['last-seen'] = time.time()
 
-        self.msg(self.known[usn])
+            self.msg(self.known[usn])
 
-        if manifestation == 'local':
-            self.doNotify(usn)
+            if manifestation == 'local':
+                self.doNotify(usn)
 
-        if st == 'upnp:rootdevice':
-            louie.send('Coherence.UPnP.SSDP.new_device', None, device_type=st, infos=self.known[usn])
-            #self.callback("new_device", st, self.known[usn])
+            if st == 'upnp:rootdevice':
+                louie.send(
+                    'Coherence.UPnP.SSDP.new_device',
+                    None, device_type=st, infos=self.known[usn])
+                #self.callback("new_device", st, self.known[usn])
+            print('\t - ok all')
+        except Exception as e:
+            print(('\t -> Error on registering service: {}'.format(manifestation, e)))
 
     def unRegister(self, usn):
-        self.msg("Un-registering %s", usn)
+        self.msg("Un-registering {}".format(usn))
         st = self.known[usn]['ST']
         if st == 'upnp:rootdevice':
-            louie.send('Coherence.UPnP.SSDP.removed_device', None, device_type=st, infos=self.known[usn])
+            louie.send(
+                'Coherence.UPnP.SSDP.removed_device',
+                None, device_type=st, infos=self.known[usn])
             #self.callback("removed_device", st, self.known[usn])
 
         del self.known[usn]
 
     def isKnown(self, usn):
-        return self.known.has_key(usn)
+        return usn in self.known
 
-    def notifyReceived(self, headers, (host, port)):
+    def notifyReceived(self, headers, xxx_todo_changeme1):
         """Process a presence announcement.  We just remember the
         details of the SSDP service announced."""
-
-        self.info('Notification from (%s,%d) for %s', host, port, headers['nt'])
-        self.debug('Notification headers: %s', headers)
+        (host, port) = xxx_todo_changeme1
+        self.info('Notification from ({},{}) for {}'.format(
+            host, port, headers['nt']))
+        self.debug('Notification headers: {}'.format(headers))
 
         if headers['nts'] == 'ssdp:alive':
             try:
                 self.known[headers['usn']]['last-seen'] = time.time()
-                self.debug('updating last-seen for %r', headers['usn'])
+                self.debug('updating last-seen for {}'.format(headers['usn']))
             except KeyError:
                 self.register('remote', headers['usn'], headers['nt'], headers['location'],
                               headers['server'], headers['cache-control'], host=host)
@@ -160,39 +173,45 @@ class SSDPServer(DatagramProtocol, log.Loggable):
             if self.isKnown(headers['usn']):
                 self.unRegister(headers['usn'])
         else:
-            self.warning('Unknown subtype %s for notification type %s',
-                    headers['nts'], headers['nt'])
+            self.warning('Unknown subtype {} for notification type {}'.format(
+                headers['nts'], headers['nt']))
         louie.send('Coherence.UPnP.Log', None, 'SSDP', host, 'Notify %s for %s' % (headers['nts'], headers['usn']))
 
     def send_it(self, response, destination, delay, usn):
-        self.info('send discovery response delayed by %ds for %s to %r', delay, usn, destination)
+        self.info('send discovery response delayed by '
+                  '{} for {} to {}'.format(delay, usn, destination))
         try:
-            self.transport.write(response, destination)
-        except (AttributeError, socket.error), msg:
-            self.info("failure sending out byebye notification: %r", msg)
+            self.transport.write(
+                bytes(str(response), encoding='utf-8'),
+                bytes(str(destination), encoding='utf-8'))
+        except (AttributeError, socket.error) as msg:
+            self.info('failure sending out byebye notification: {}'.format(msg))
 
-    def discoveryRequest(self, headers, (host, port)):
+    def discoveryRequest(self, headers, xxx_todo_changeme2):
         """Process a discovery request.  The response must be sent to
         the address specified by (host, port)."""
+        (host, port) = xxx_todo_changeme2
+        self.info('Discovery request from ({},{}) for {}'.format(
+            host, port, headers['st']))
+        self.info('Discovery request for {}'.format(headers['st']))
 
-        self.info('Discovery request from (%s,%d) for %s', host, port, headers['st'])
-        self.info('Discovery request for %s', headers['st'])
-
-        louie.send('Coherence.UPnP.Log', None, 'SSDP', host, 'M-Search for %s' % headers['st'])
+        louie.send(
+            'Coherence.UPnP.Log',
+            None, 'SSDP', host, 'M-Search for %s' % headers['st'])
 
         # Do we know about this service?
-        for i in self.known.values():
+        for i in list(self.known.values()):
             if i['MANIFESTATION'] == 'remote':
                 continue
             if(headers['st'] == 'ssdp:all' and
-               i['SILENT'] == True):
+               i['SILENT'] is True):
                 continue
             if(i['ST'] == headers['st'] or
                 headers['st'] == 'ssdp:all'):
                 response = []
                 response.append('HTTP/1.1 200 OK')
 
-                for k, v in i.items():
+                for k, v in list(i.items()):
                     if k == 'USN':
                         usn = v
                     if k not in ('MANIFESTATION', 'SILENT', 'HOST'):
@@ -202,21 +221,22 @@ class SSDPServer(DatagramProtocol, log.Loggable):
                 response.extend(('', ''))
                 delay = random.randint(0, int(headers['mx']))
 
-                reactor.callLater(delay, self.send_it,
-                                '\r\n'.join(response), (host, port), delay, usn)
+                reactor.callLater(
+                    delay, self.send_it, b'\r\n'.join(response),
+                    (host, port), delay, usn)
 
     def doNotify(self, usn):
         """Do notification"""
 
-        if self.known[usn]['SILENT'] == True:
+        if self.known[usn]['SILENT'] is True:
             return
-        self.info('Sending alive notification for %s', usn)
+        self.info('Sending alive notification for {}'.format(usn))
 
-        resp = ['NOTIFY * HTTP/1.1',
-            'HOST: %s:%d' % (SSDP_ADDR, SSDP_PORT),
-            'NTS: ssdp:alive',
+        resp = [b'NOTIFY * HTTP/1.1',
+                b'HOST: %s:%s' % (SSDP_ADDR, SSDP_PORT),
+                b'NTS: ssdp:alive',
             ]
-        stcpy = dict(self.known[usn].iteritems())
+        stcpy = dict(iter(self.known[usn].items()))
         stcpy['NT'] = stcpy['ST']
         del stcpy['ST']
         del stcpy['MANIFESTATION']
@@ -224,41 +244,45 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         del stcpy['HOST']
         del stcpy['last-seen']
 
-        resp.extend(map(lambda x: ': '.join(x), stcpy.iteritems()))
-        resp.extend(('', ''))
-        self.debug('doNotify content %s', resp)
+        resp.extend([bytes(
+            ': '.join(x), encoding='utf-8') for x in iter(stcpy.items())])
+        resp.extend((b'', b''))
+        self.debug('doNotify content {}'.format(resp))
         try:
-            self.transport.write('\r\n'.join(resp), (SSDP_ADDR, SSDP_PORT))
-            self.transport.write('\r\n'.join(resp), (SSDP_ADDR, SSDP_PORT))
-        except (AttributeError, socket.error), msg:
-            self.info("failure sending out alive notification: %r", msg)
+            self.transport.write(b'\r\n'.join(resp), (SSDP_ADDR, SSDP_PORT))
+            self.transport.write(b'\r\n'.join(resp), (SSDP_ADDR, SSDP_PORT))
+        except (AttributeError, socket.error) as msg:
+            self.info('failure sending out alive notification: {}'.format(msg))
 
     def doByebye(self, usn):
         """Do byebye"""
 
         self.info('Sending byebye notification for %s', usn)
 
-        resp = ['NOTIFY * HTTP/1.1',
-                'HOST: %s:%d' % (SSDP_ADDR, SSDP_PORT),
-                'NTS: ssdp:byebye',
+        resp = [b'NOTIFY * HTTP/1.1',
+                b'HOST: %s:%s' % (SSDP_ADDR, SSDP_PORT),
+                b'NTS: ssdp:byebye',
                 ]
         try:
-            stcpy = dict(self.known[usn].iteritems())
+            stcpy = dict(iter(self.known[usn].items()))
             stcpy['NT'] = stcpy['ST']
             del stcpy['ST']
             del stcpy['MANIFESTATION']
             del stcpy['SILENT']
             del stcpy['HOST']
             del stcpy['last-seen']
-            resp.extend(map(lambda x: ': '.join(x), stcpy.iteritems()))
-            resp.extend(('', ''))
+            resp.extend([bytes(
+                ': '.join(x), encoding='utf-8') for x in iter(stcpy.items())])
+            resp.extend((b'', b''))
             self.debug('doByebye content %s', resp)
             if self.transport:
                 try:
-                    self.transport.write('\r\n'.join(resp), (SSDP_ADDR, SSDP_PORT))
-                except (AttributeError, socket.error), msg:
-                    self.info("failure sending out byebye notification: %r", msg)
-        except KeyError, msg:
+                    self.transport.write(
+                        b'\r\n'.join(resp), (SSDP_ADDR, SSDP_PORT))
+                except (AttributeError, socket.error) as msg:
+                    self.info(
+                        "failure sending out byebye notification: %r", msg)
+        except KeyError as msg:
             self.debug("error building byebye notification: %r", msg)
 
     def resendNotify(self):
@@ -278,11 +302,16 @@ class SSDPServer(DatagramProtocol, log.Loggable):
                 expiry = int(expiry)
                 now = time.time()
                 last_seen = self.known[usn]['last-seen']
-                self.debug("Checking if %r is still valid - last seen %d (+%d), now %d", self.known[usn]['USN'], last_seen, expiry, now)
+                self.debug('Checking if {} is still valid - last seen '
+                           '{} (+{}), now {}'.format(
+                    self.known[usn]['USN'], last_seen, expiry, now))
                 if last_seen + expiry + 30 < now:
-                    self.debug("Expiring: %r", self.known[usn])
+                    self.debug('Expiring: {}'.format(self.known[usn]))
                     if self.known[usn]['ST'] == 'upnp:rootdevice':
-                        louie.send('Coherence.UPnP.SSDP.removed_device', None, device_type=self.known[usn]['ST'], infos=self.known[usn])
+                        louie.send(
+                            'Coherence.UPnP.SSDP.removed_device',
+                            None, device_type=self.known[usn]['ST'],
+                            infos=self.known[usn])
                     removable.append(usn)
         while len(removable) > 0:
             usn = removable.pop(0)

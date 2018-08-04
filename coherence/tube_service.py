@@ -8,9 +8,9 @@
 """
 from lxml import etree
 
-import urllib
-import urlparse
-from upnp.core import xml_constants
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
+from .upnp.core import xml_constants
 
 import dbus
 
@@ -41,7 +41,7 @@ class MirabeauProxy(resource.Resource, log.Loggable):
 
     def getChildWithDefault(self, path, request):
         self.info('MiraBeau getChildWithDefault %s, %s, %s %s', request.method, path, request.uri, request.client)
-        uri = urllib.unquote_plus(path)
+        uri = urllib.parse.unquote_plus(path)
         self.info('MiraBeau  uri %r', uri)
         return ReverseProxyUriResource(uri)
 
@@ -90,10 +90,10 @@ class TubeServiceControl(UPnPPublisher):
                     for res in item.res:
                         remote_protocol, remote_network, remote_content_format, _ = res.protocolInfo.split(':')
                         if remote_protocol == 'http-get' and remote_network == '*':
-                            quoted_url = urllib.quote_plus(res.data)
-                            print "modifying", res.data
-                            res.data = urlparse.urlunsplit(('http', self.service.device.external_address, 'mirabeau', quoted_url, ""))
-                            print "--->", res.data
+                            quoted_url = urllib.parse.quote_plus(res.data)
+                            print("modifying", res.data)
+                            res.data = urllib.parse.urlunsplit(('http', self.service.device.external_address, 'mirabeau', quoted_url, ""))
+                            print("--->", res.data)
                             new_res.append(res)
                             changed = True
                     item.res = new_res
@@ -126,7 +126,7 @@ class TubeServiceControl(UPnPPublisher):
         del kwargs['soap_methodName']
 
         in_arguments = action.get_in_arguments()
-        for arg_name, arg in kwargs.iteritems():
+        for arg_name, arg in kwargs.items():
             if arg_name.find('X_') == 0:
                 continue
             l = [a for a in in_arguments if arg_name == a.get_name()]

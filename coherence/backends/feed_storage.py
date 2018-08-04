@@ -9,9 +9,9 @@ from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.utils import ReverseProxyUriResource
 
 from xml.etree.ElementTree import ElementTree
-import urllib
-import httplib
-from urlparse import urlsplit
+import urllib.request, urllib.parse, urllib.error
+import http.client
+from urllib.parse import urlsplit
 try:
     import feedparser
 except:
@@ -36,7 +36,7 @@ class RedirectingReverseProxyUriResource(ReverseProxyUriResource):
 
     def follow_redirect(self, uri):
         netloc, path, query, fragment = urlsplit(uri)[1:]
-        conn = httplib.HTTPConnection(netloc)
+        conn = http.client.HTTPConnection(netloc)
         conn.request('HEAD', '%s?%s#%s' % (path, query, fragment))
         res = conn.getresponse()
         if(res.status == 301 or res.status == 302):
@@ -135,13 +135,13 @@ class FeedStore(BackendStore):
 
         try:
             self._update_data()
-        except Exception, e:
+        except Exception as e:
             self.error('error while updateing the feed contant for %s: %s', self.name, str(e))
         self.init_completed()
 
     def get_by_id(self, id):
         """returns the item according to the DIDLite id"""
-        if isinstance(id, basestring):
+        if isinstance(id, str):
             id = id.split('@', 1)
             id = id[0]
         try:
@@ -154,7 +154,7 @@ class FeedStore(BackendStore):
         """get the feed xml, parse it, etc."""
         feed_urls = []
         if(self.opml_url):
-            tree = ElementTree(file=urllib.urlopen(self.opml_url))
+            tree = ElementTree(file=urllib.request.urlopen(self.opml_url))
             body = tree.find('body')
             for outline in body.findall('outline'):
                 feed_urls.append(outline.attrib['url'])
@@ -165,7 +165,7 @@ class FeedStore(BackendStore):
         item_id = 1001
         for feed_url in feed_urls:
             netloc, path, query, fragment = urlsplit(feed_url)[1:]
-            conn = httplib.HTTPConnection(netloc)
+            conn = http.client.HTTPConnection(netloc)
             conn.request('HEAD', '%s?%s#%s' % (path, query, fragment))
             res = conn.getresponse()
             if res.status >= 400:

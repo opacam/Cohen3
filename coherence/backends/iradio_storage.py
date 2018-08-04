@@ -23,7 +23,7 @@ from coherence.extern.simple_plugin import Plugin
 from coherence import log
 from coherence.backend import BackendItem, BackendStore, Container, LazyContainer, AbstractBackendStore
 
-from urlparse import urlsplit
+from urllib.parse import urlsplit
 
 SHOUTCAST_WS_URL = 'http://www.shoutcast.com/sbin/newxml.phtml'
 
@@ -130,7 +130,7 @@ class PlaylistStreamProxy(utils.ReverseProxyUriResource, log.Loggable):
         if request.clientproto == 'HTTP/1.1':
             self.connection = request.getHeader('connection')
             if self.connection:
-                tokens = map(str.lower, self.connection.split(' '))
+                tokens = list(map(str.lower, self.connection.split(' ')))
                 if 'close' in tokens:
                     d = request.notifyFinish()
                     d.addBoth(self.requestFinished)
@@ -202,7 +202,7 @@ class IRadioStore(AbstractBackendStore):
 
         # set root-level genre family containers
         # and populate the genre_parent_items dict from the family hierarchy information
-        for family, genres in genre_families.items():
+        for family, genres in list(genre_families.items()):
             family_item = self.append_genre(root_item, family)
             if family_item is not None:
                 self.genre_parent_items[family] = root_item
@@ -218,7 +218,7 @@ class IRadioStore(AbstractBackendStore):
     def append_genre(self, parent, genre):
         if genre in useless_genres:
             return None
-        if synonym_genres.has_key(genre):
+        if genre in synonym_genres:
             same_genres = synonym_genres[genre]
         else:
             same_genres = [genre]
@@ -266,7 +266,7 @@ class IRadioStore(AbstractBackendStore):
             parent.childrenRetrievingNeeded = True
         url = '%s?genre=%s' % (self.shoutcast_ws_url, genre)
 
-        if genre_families.has_key(genre):
+        if genre in genre_families:
             family_genres = genre_families[genre]
             for family_genre in family_genres:
                 self.append_genre(parent, family_genre)
@@ -302,7 +302,7 @@ class IRadioStore(AbstractBackendStore):
                                'bitrate': bitrate}
                     stations[lower_name] = station
 
-            for station in stations.values():
+            for station in list(stations.values()):
                 station_id = station.get('station_id')
                 name = station.get('name')
                 url = station.get('url')
@@ -337,7 +337,7 @@ class IRadioStore(AbstractBackendStore):
 
             genres = {}
             main_synonym_genre = {}
-            for main_genre, sub_genres in synonym_genres.items():
+            for main_genre, sub_genres in list(synonym_genres.items()):
                 genres[main_genre] = sub_genres
                 for genre in sub_genres:
                     main_synonym_genre[genre] = main_genre
@@ -348,8 +348,8 @@ class IRadioStore(AbstractBackendStore):
                     genres[name] = [name]
                     main_synonym_genre[name] = name
 
-            for main_genre, sub_genres in genres.items():
-                if not self.genre_parent_items.has_key(main_genre):
+            for main_genre, sub_genres in list(genres.items()):
+                if main_genre not in self.genre_parent_items:
                     genre_families["Misc"].append(main_genre)
 
             self.init_completed()

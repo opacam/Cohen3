@@ -5,6 +5,7 @@
 
 # Copyright 2008 Frank Scholz <coherence@beebits.net>
 from lxml import etree
+from functools import cmp_to_key
 
 from twisted.internet import reactor
 
@@ -64,7 +65,7 @@ class Container(BackendItem):
 
     def add_child(self, child):
         id = child.id
-        if isinstance(child.id, basestring):
+        if isinstance(child.id, str):
             _, id = child.id.split('.')
         self.children.append(child)
         self.item.childCount += 1
@@ -73,10 +74,11 @@ class Container(BackendItem):
     def get_children(self, start=0, end=0):
         if self.sorted == False:
             def childs_sort(x, y):
-                r = cmp(x.name, y.name)
+                r = cmp_to_key(x.name, y.name)
                 return r
 
-            self.children.sort(cmp=childs_sort)
+            self.children = sorted(
+                self.children.sort, key=childs_sort)
             self.sorted = True
         if end != 0:
             return self.children[start:end]
@@ -122,7 +124,7 @@ class BBCStore(BackendStore):
 
     def get_by_id(self, id):
         #print "looking for id %r" % id
-        if isinstance(id, basestring):
+        if isinstance(id, str):
             id = id.split('@', 1)
             id = id[0]
         try:
@@ -140,7 +142,7 @@ class BBCStore(BackendStore):
     def update_data(self):
 
         def fail(f):
-            print "fail", f
+            print("fail", f)
             return f
 
         dfr = getPage(self.rss_url)

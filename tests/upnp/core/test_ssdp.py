@@ -80,7 +80,7 @@ class TestSSDP(unittest.TestCase):
         data = '\r\n'.join(SSDP_NOTIFY_1) + '\r\n\r\n'
         self.proto.datagramReceived(data, ('10.20.30.40', 1234))
         self.assertEqual(self.tr.written, [])
-        self.proto.doNotify('uuid:e711a4bf::upnp:rootdevice')
+        self.proto.doNotify(b'uuid:e711a4bf::upnp:rootdevice')
         expected = [(l + '\r\n') for l in [
             'NOTIFY * HTTP/1.1',
             'HOST: 239.255.255.250:1900',
@@ -97,15 +97,19 @@ class TestSSDP(unittest.TestCase):
         self.assertEqual(len(self.tr.written), 2)
         self.assertEqual(self.tr.written[0], self.tr.written[1])
         data, (host, port) = self.tr.written[0]
-        self.assertEqual((host, port), (SSDP_ADDR, SSDP_PORT))
+        self.assertEqual(
+            (host, port),
+            (bytes(SSDP_ADDR, encoding='utf-8'), bytes(str(SSDP_PORT), encoding='utf-8')))
         recieved = data.splitlines(True)
-        self.assertEqual(sorted(recieved), sorted(expected))
+        self.assertEqual(
+            sorted(recieved),
+            sorted([bytes(str(i), encoding='utf-8') for i in expected]))
 
     def test_doByebye(self):
         data = '\r\n'.join(SSDP_NOTIFY_1) + '\r\n\r\n'
         self.proto.datagramReceived(data, ('10.20.30.40', 1234))
         self.assertEqual(self.tr.written, [])
-        self.proto.doByebye('uuid:e711a4bf::upnp:rootdevice')
+        self.proto.doByebye(b'uuid:e711a4bf::upnp:rootdevice')
         expected = [(l + '\r\n') for l in [
             'NOTIFY * HTTP/1.1',
             'HOST: 239.255.255.250:1900',
@@ -120,6 +124,10 @@ class TestSSDP(unittest.TestCase):
             ]]
         self.assertEqual(len(self.tr.written), 1)
         data, (host, port) = self.tr.written[0]
-        self.assertEqual((host, port), (SSDP_ADDR, SSDP_PORT))
+        self.assertEqual(
+            (host, port),
+            (bytes(SSDP_ADDR, encoding='utf-8'), bytes(str(SSDP_PORT), encoding='utf-8')))
         recieved = data.splitlines(True)
-        self.assertEqual(sorted(recieved), sorted(expected))
+        self.assertEqual(
+            sorted(recieved),
+            sorted([bytes(str(i), encoding='utf-8') for i in expected]))

@@ -87,7 +87,7 @@ class Action(log.Loggable):
         in_arguments = self.get_in_arguments()
         self.info("in arguments %s", [a.get_name() for a in in_arguments])
         instance_id = 0
-        for arg_name, arg in kwargs.iteritems():
+        for arg_name, arg in kwargs.items():
             l = [a for a in in_arguments if arg_name == a.get_name()]
             if len(l) > 0:
                 in_arguments.remove(l[0])
@@ -103,7 +103,7 @@ class Action(log.Loggable):
         action_name = self.name
 
         if(hasattr(self.service.device.client, 'overlay_actions') and
-           self.service.device.client.overlay_actions.has_key(self.name)):
+           self.name in self.service.device.client.overlay_actions):
             self.info("we have an overlay method %r for action %r", self.service.device.client.overlay_actions[self.name], self.name)
             action_name, kwargs = self.service.device.client.overlay_actions[self.name](**kwargs)
             self.info("changing action to %r %r", action_name, kwargs)
@@ -116,8 +116,8 @@ class Action(log.Loggable):
             return failure
 
         if hasattr(self.service.device.client, 'overlay_headers'):
-            self.info("action call has headers %r", kwargs.has_key('headers'))
-            if kwargs.has_key('headers'):
+            self.info("action call has headers %r", 'headers' in kwargs)
+            if 'headers' in kwargs:
                 kwargs['headers'].update(self.service.device.client.overlay_headers)
             else:
                 kwargs['headers'] = self.service.device.client.overlay_headers
@@ -128,7 +128,7 @@ class Action(log.Loggable):
         ordered_arguments = OrderedDict()
         for argument in self.get_in_arguments():
             ordered_arguments[argument.name] = kwargs[argument.name]
-        if kwargs.has_key('headers'):
+        if 'headers' in kwargs:
             ordered_arguments['headers'] = kwargs['headers']
 
         d = client.callRemote(action_name, ordered_arguments)
@@ -150,15 +150,19 @@ class Action(log.Loggable):
         #elif len(out_arguments) > 1:
 
         if len(out_arguments) > 0:
-            for arg_name, value in results.items():
-                state_variable_name = [a.get_state_variable() for a in out_arguments if a.get_name() == arg_name]
-                self.service.get_state_variable(state_variable_name[0], instance_id).update(value)
+            for arg_name, value in list(results.items()):
+                state_variable_name = \
+                    [a.get_state_variable() for a in out_arguments if
+                     a.get_name() == arg_name]
+                self.service.get_state_variable(
+                    state_variable_name[0], instance_id).update(value)
 
         return results
 
     def __repr__(self):
-        return "Action: %s [%s], (%s args)" % (self.get_name(), self.get_implementation(),
-                                         len(self.get_arguments_list()))
+        return "Action: %s [%s], (%s args)" % \
+               (self.get_name(), self.get_implementation(),
+                len(self.get_arguments_list()))
 
     def as_tuples(self):
         r = []

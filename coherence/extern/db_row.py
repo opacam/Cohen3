@@ -108,7 +108,7 @@ class DBRow(object):
 
     def keys(self):
         """Return the field names"""
-        return self.fields.keys()
+        return list(self.fields.keys())
 
     def keymappings(self):
         """Return a dictionary of the keys and their indices in the row"""
@@ -116,13 +116,13 @@ class DBRow(object):
 
     def has_key(self, key):
         """Return whether the given key is valid"""
-        return self.fields.has_key(key)
+        return key in self.fields
 
     def as_dict(self):
         d = {}
-        for field_name, pos in self.fields.iteritems():
+        for field_name, pos in self.fields.items():
             d[field_name] = self.row[pos]
-        for field_name, field in self._extra_fields.iteritems():
+        for field_name, field in self._extra_fields.items():
             d[field_name] = field
         return d
 
@@ -130,7 +130,7 @@ class DBRow(object):
         """Return how many columns are in this row"""
         return len(self.row)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return len(self.row) != 0
 
     def __eq__(self, other):

@@ -14,7 +14,7 @@ from coherence.upnp.core.DIDLLite import classChooser, Container, Resource, DIDL
 from coherence.backend import BackendStore
 from coherence.backend import BackendItem
 
-from urlparse import urlsplit
+from urllib.parse import urlsplit
 
 from coherence.extern.galleryremote import Gallery
 
@@ -202,7 +202,7 @@ class Gallery2Store(BackendStore):
         return self.__class__.__name__
 
     def append(self, obj, parent):
-        if isinstance(obj, basestring):
+        if isinstance(obj, str):
             mimetype = 'directory'
         else:
             mimetype = obj['mimetype']
@@ -235,7 +235,7 @@ class Gallery2Store(BackendStore):
         return len(self.store)
 
     def get_by_id(self, id):
-        if isinstance(id, basestring):
+        if isinstance(id, str):
             id = id.split('@', 1)
             id = id[0]
         try:
@@ -276,7 +276,9 @@ class Gallery2Store(BackendStore):
 
         def gotAlbums (albums):
             if albums:
-                albums = [album for album in albums.values() if album.get('parent') == album_gallery2_id]
+                albums = [
+                    album for album in list(albums.values()) if
+                    album.get('parent') == album_gallery2_id]
                 if album_gallery2_id == '0' and len(albums) == 1:
                     album = albums[0]
                     self.store[1000].gallery2_id = album.get('name')
@@ -343,7 +345,7 @@ def main():
     f = Gallery2Store(None)
 
     def got_upnp_result(result):
-        print "upnp", result
+        print("upnp", result)
 
     f.upnp_init()
 

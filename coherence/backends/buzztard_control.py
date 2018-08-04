@@ -3,7 +3,7 @@
 
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
 
-from urlparse import urlsplit
+from urllib.parse import urlsplit
 
 from twisted.internet import reactor, protocol
 from twisted.internet import reactor
@@ -540,11 +540,11 @@ class BuzztardPlayer(log.Loggable):
             return {}
         else:
             elt = DIDLLite.DIDLElement.fromString(CurrentURIMetaData)
-            print elt.numItems()
+            print(elt.numItems())
             if elt.numItems() == 1:
                 item = elt.getItems()[0]
                 for res in item.res:
-                    print res.protocolInfo, local_protocol_info
+                    print(res.protocolInfo, local_protocol_info)
                     if res.protocolInfo in local_protocol_info:
                         self.load(CurrentURI, CurrentURIMetaData)
                         return {}
@@ -570,7 +570,7 @@ class BuzztardPlayer(log.Loggable):
 
 def test_init_complete(backend):
 
-    print "Houston, we have a touchdown!"
+    print("Houston, we have a touchdown!")
     backend.buzztard.sendMessage('browse')
 
 
@@ -581,14 +581,14 @@ def main():
     f = BuzztardStore(None)
 
     f.parent = f.append('Buzztard', 'directory', None)
-    print f.parent
-    print f.store
+    print(f.parent)
+    print(f.store)
     f.add_content('playlist|test label|start|stop')
-    print f.store
+    print(f.store)
     f.clear()
-    print f.store
+    print(f.store)
     f.add_content('playlist|after flush label|flush-start|flush-stop')
-    print f.store
+    print(f.store)
 
     #def got_upnp_result(result):
     #    print "upnp", result

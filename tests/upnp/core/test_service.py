@@ -365,7 +365,7 @@ class CompleteDescription(unittest.TestCase):
         svc = self.service
         # there is one instance
         self.assertEqual(len(svc._variables), 1)
-        self.assertEqual(svc._variables.keys(), [0])
+        self.assertEqual(list(svc._variables.keys()), [0])
         compare_variables(svc._variables[0])
         #self.assertEqual(svc._var_subscribers, {})
         #compare_variables(svc.get_state_variables(0))
