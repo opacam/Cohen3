@@ -134,7 +134,7 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
 
         now = time.time()
 
-        for id, connection in self.connections.items():
+        for id, connection in list(self.connections.items()):
             avt_id = connection['AVTransportID']
             rcs_id = connection['RcsID']
             avt_active = True
@@ -145,7 +145,7 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
                 avt_variables = self.device.av_transport_server.get_variables().get(avt_id)
                 if avt_variables:
                     avt_active = False
-                    for variable in avt_variables.values():
+                    for variable in list(avt_variables.values()):
                         if variable.last_time_touched + 300 >= now:
                             avt_active = True
                             break
@@ -153,7 +153,7 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
                 rcs_variables = self.device.rendering_control_server.get_variables().get(rcs_id)
                 if rcs_variables:
                     rcs_active = False
-                    for variable in rcs_variables.values():
+                    for variable in list(rcs_variables.values()):
                         if variable.last_time_touched + 300 >= now:
                             rcs_active = True
                             break
@@ -187,7 +187,7 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
     def set_variable(self, instance, variable_name, value, default=False):
         if(variable_name == 'SourceProtocolInfo' or
            variable_name == 'SinkProtocolInfo'):
-            if isinstance(value, basestring) and len(value) > 0:
+            if isinstance(value, str) and len(value) > 0:
                 value = [v.strip() for v in value.split(',')]
             without_dlna_tags = []
             for v in value:

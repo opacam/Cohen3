@@ -60,9 +60,9 @@ class Reception(object):
             if plugin != '__init__.py' and os.path.isfile(p) and os.path.splitext(p)[1] == '.py':
                 try:
                     __import__(os.path.splitext(plugin)[0], None, None, [''])
-                except Exception, msg:
+                except Exception as msg:
                     if self.log is None:
-                        print "can't import %r - %s" % (os.path.splitext(plugin)[0], msg)
+                        print("can't import %r - %s" % (os.path.splitext(plugin)[0], msg))
                     else:
                         self.log("can't import %r - %r" % (os.path.splitext(plugin)[0], msg))
 

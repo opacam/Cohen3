@@ -155,7 +155,7 @@ class ContentDirectoryClient:
                           parentID=elements.get('parentID', None),
                           title=elements.get('title', None),
                           restricted=elements.get('restricted', None))
-        for k, v in elements.items():
+        for k, v in list(elements.items()):
             attribute = getattr(item, k, None)
             if attribute is None:
                 continue

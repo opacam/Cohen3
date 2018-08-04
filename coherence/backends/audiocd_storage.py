@@ -134,7 +134,7 @@ class AudioCDStore(AbstractBackendStore):
         self.disc_title = query_info['title'].encode('utf-8')
         tracks = {}
         for i in range(track_count):
-            tracks[i + 1] = read_info['TTITLE' + `i`].decode('ISO-8859-1').encode('utf-8')
+            tracks[i + 1] = read_info['TTITLE' + repr(i)].decode('ISO-8859-1').encode('utf-8')
 
         self.name = self.disc_title
 
@@ -147,7 +147,7 @@ class AudioCDStore(AbstractBackendStore):
 
         self.set_root_item(root_item)
 
-        for number, title in tracks.items():
+        for number, title in list(tracks.items()):
             item = TrackItem(self.device_name, number, "Unknown", title)
             external_id = "%s_%d" % (disc_id, number)
             root_item.add_child(item, external_id=external_id)

@@ -14,7 +14,7 @@ Test cases for L{upnp.core.device}
 # :todo: test-cases with embedded devices
 
 import os
-import urlparse
+import urllib.parse
 import posixpath
 try:
     import unittest.mock as mock
@@ -73,10 +73,10 @@ def fakeGetPageURL(url):
     Example:
       http://1.2.3.4/a/b/c/some.xml -> <module-dir>/some.xml
     """
-    path = urlparse.urlparse(url).path
+    path = urllib.parse.urlparse(url).path
     path = posixpath.normpath(path)
     words = path.split('/')
-    words = filter(None, words)[-1:]
+    words = [_f for _f in words if _f][-1:]
     file = FilePath(os.path.join(FILE_BASE, *words))
     d = Deferred()
     d.callback((file.open().read(), {}))

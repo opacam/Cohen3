@@ -95,4 +95,6 @@ class TestMSearch(unittest.TestCase):
         data, (host, port) = self.tr.written[0]
         self.assertEqual((host, port), (SSDP_ADDR, SSDP_PORT))
         recieved = data.splitlines(True)
-        self.assertEqual(sorted(recieved), sorted(expected))
+        self.assertEqual(
+            sorted(recieved),
+            sorted([bytes(str(i), encoding='utf-8') for i in expected]))

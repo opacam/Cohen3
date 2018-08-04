@@ -50,7 +50,7 @@ from coherence.extern.simple_plugin import Plugin
 
 from coherence import log
 
-from urlparse import urlsplit
+from urllib.parse import urlsplit
 
 ROOT_CONTAINER_ID = 0
 INTERESTINGNESS_CONTAINER_ID = 100
@@ -121,7 +121,7 @@ class FlickrItem(log.Loggable):
 
         if isinstance(obj, str):
             self.name = obj
-            if isinstance(self.id, basestring) and self.id.startswith('upload.'):
+            if isinstance(self.id, str) and self.id.startswith('upload.'):
                 self.mimetype = mimetype
             else:
                 self.mimetype = 'directory'
@@ -148,7 +148,7 @@ class FlickrItem(log.Loggable):
             self.mimetype = 'image/jpeg'
 
         self.parent = parent
-        if not (isinstance(self.id, basestring) and self.id.startswith('upload.')):
+        if not (isinstance(self.id, str) and self.id.startswith('upload.')):
             if parent:
                 parent.add_child(self, update=update)
 
@@ -161,7 +161,7 @@ class FlickrItem(log.Loggable):
             except:
                 self.flickr_id = None
             self.url = urlbase + str(self.id)
-        elif isinstance(self.id, basestring) and self.id.startswith('upload.'):
+        elif isinstance(self.id, str) and self.id.startswith('upload.'):
             self.url = urlbase + str(self.id)
             self.location = None
         else:
@@ -187,7 +187,7 @@ class FlickrItem(log.Loggable):
                 self.url = urlbase + str(self.id)
                 self.location = ProxyImage(self.real_url)
             else:
-                self.url = u"http://farm%s.static.flickr.com/%s/%s_%s.jpg" % (
+                self.url = "http://farm%s.static.flickr.com/%s/%s_%s.jpg" % (
                         obj.get('farm').encode('utf-8'),
                         obj.get('server').encode('utf-8'),
                         obj.get('id').encode('utf-8'),
@@ -260,7 +260,7 @@ class FlickrItem(log.Loggable):
             return None
 
     def get_path(self):
-        if isinstance(self.id, basestring) and self.id.startswith('upload.'):
+        if isinstance(self.id, str) and self.id.startswith('upload.'):
             return '/tmp/' + self.id  # FIXME
         return self.url
 
@@ -626,7 +626,7 @@ class FlickrStore(BackendStore):
         return len(self.store)
 
     def get_by_id(self, id):
-        if isinstance(id, basestring) and id.startswith('upload.'):
+        if isinstance(id, str) and id.startswith('upload.'):
             self.info("get_by_id looking for %s", id)
             try:
                 item = self.uploads[id]
@@ -635,7 +635,7 @@ class FlickrStore(BackendStore):
             except:
                 return None
 
-        if isinstance(id, basestring):
+        if isinstance(id, str):
             id = id.split('@', 1)
             id = id[0]
         try:
@@ -670,8 +670,8 @@ class FlickrStore(BackendStore):
             old_ones[child.get_flickr_id()] = child
         for photo in result.findall(element):
             new_ones[photo.get('id')] = photo
-        for id, child in old_ones.items():
-            if new_ones.has_key(id):
+        for id, child in list(old_ones.items()):
+            if id in new_ones:
                 self.debug("%s already there", id)
                 del new_ones[id]
             elif child.id != UNSORTED_CONTAINER_ID:
@@ -680,7 +680,7 @@ class FlickrStore(BackendStore):
                 self.remove(child.get_id())
         self.info("refresh pass 1: old: %i - new: %i - store: %i",
                   len(old_ones), len(new_ones), len(self.store))
-        for photo in new_ones.values():
+        for photo in list(new_ones.values()):
             if element == 'photo':
                 self.appendPhoto(photo, parent)
             elif element == 'photoset':
@@ -862,13 +862,13 @@ class FlickrStore(BackendStore):
     def flickr_authenticate_app(self):
 
         def got_error(error):
-            print error
+            print(error)
 
         def got_auth_token(result):
-            print "got_auth_token", result
+            print("got_auth_token", result)
             result = result.getroot()
             token = result.find('token').text
-            print 'token', token
+            print('token', token)
             self.flickr_authtoken = token
             self.server.coherence.store_plugin_config(self.server.uuid, {'authtoken': token})
 
@@ -879,10 +879,10 @@ class FlickrStore(BackendStore):
             return d
 
         def got_frob(result):
-            print "flickr", result
+            print("flickr", result)
             result = result.getroot()
             frob = result.text
-            print frob
+            print(frob)
             from twisted.internet import threads
             d = threads.deferToThread(FlickrAuthenticate, self.flickr_api_key, self.flickr_api_secret, frob, self.flickr_userid, self.flickr_password, self.flickr_permissions)
             d.addCallback(get_auth_token, frob)
@@ -906,7 +906,7 @@ class FlickrStore(BackendStore):
                                 api_key='837718c8a622c699edab0ea55fcec224')
 
         def got_results(result):
-            print result
+            print(result)
 
         d.addCallback(got_results)
         return d
@@ -979,7 +979,7 @@ class FlickrStore(BackendStore):
             d.addCallback(self.append_flickr_contact_result, self.contacts)
 
     def upnp_ImportResource(self, *args, **kwargs):
-        print 'upnp_ImportResource', args, kwargs
+        print('upnp_ImportResource', args, kwargs)
         SourceURI = kwargs['SourceURI']
         DestinationURI = kwargs['DestinationURI']
 
@@ -996,11 +996,11 @@ class FlickrStore(BackendStore):
         def gotPage(result):
 
             try:
-                import cStringIO as StringIO
+                import io as StringIO
             except ImportError:
-                import StringIO
+                import io
 
-            self.backend_import(item, StringIO.StringIO(result[0]))
+            self.backend_import(item, io.StringIO(result[0]))
 
         def gotError(error, url):
             self.warning("error requesting %s", url)
@@ -1015,7 +1015,7 @@ class FlickrStore(BackendStore):
         return {'TransferID': transfer_id}
 
     def upnp_CreateObject(self, *args, **kwargs):
-        print "upnp_CreateObject", args, kwargs
+        print("upnp_CreateObject", args, kwargs)
         ContainerID = kwargs['ContainerID']
         Elements = kwargs['Elements']
 
@@ -1066,7 +1066,7 @@ class FlickrStore(BackendStore):
             didl = DIDLElement()
             didl.addItem(new_item.item)
             r = {'ObjectID': new_id, 'Result': didl.toString()}
-            print r
+            print(r)
             return r
 
         return failure.Failure(errorCode(712))
@@ -1075,7 +1075,7 @@ class FlickrStore(BackendStore):
     def encode_multipart_form(self, fields):
         boundary = mimetools.choose_boundary()
         body = []
-        for k, v in fields.items():
+        for k, v in list(fields.items()):
             body.append("--" + boundary.encode("utf-8"))
             header = 'Content-Disposition: form-data; name="%s";' % k
             if isinstance(v, FilePath):
@@ -1102,7 +1102,7 @@ class FlickrStore(BackendStore):
 
     def flickr_upload(self, image, **kwargs):
         fields = {}
-        for k, v in kwargs.items():
+        for k, v in list(kwargs.items()):
             if v != None:
                 fields[k] = v
 
@@ -1114,16 +1114,18 @@ class FlickrStore(BackendStore):
         fields['photo'] = image
 
         (content_type, formdata) = self.encode_multipart_form(fields)
-        headers = {"Content-Type": content_type,
-                  "Content-Length": str(len(formdata))}
+        headers = {b"Content-Type": bytes(
+                       content_type, encoding='utf-8'),
+                   b"Content-Length": bytes(
+                       str(len(formdata)), encoding='utf-8')}
 
-        d = getPage("http://api.flickr.com/services/upload/",
-                              method="POST",
-                              headers=headers,
-                              postdata=formdata)
+        d = getPage(b"http://api.flickr.com/services/upload/",
+                    method=b"POST",
+                    headers=headers,
+                    postdata=formdata)
 
         def got_something(result):
-            print "got_something", result
+            print("got_something", result)
             result = parse_xml(result[0], encoding='utf-8')
             result = result.getroot()
             if(result.attrib['stat'] == 'ok' and
@@ -1149,7 +1151,7 @@ class FlickrStore(BackendStore):
             d = self.flickr_photos_getInfo(photo_id=id)
 
             def add_it(obj, parent):
-                print "add_it", obj, obj.getroot(), parent
+                print("add_it", obj, obj.getroot(), parent)
                 root = obj.getroot()
                 self.appendPhoto(obj.getroot(), parent)
                 return 200
@@ -1159,7 +1161,7 @@ class FlickrStore(BackendStore):
             return d
 
         def got_fail(err):
-            print err
+            print(err)
             return err
 
         d.addCallback(got_photoid, item)
@@ -1174,14 +1176,14 @@ def main():
                     authtoken='xxx-x')
 
     def got_flickr_result(result):
-        print "flickr", result
+        print("flickr", result)
         for photo in result.getiterator('photo'):
             title = photo.get('title').encode('utf-8')
             if len(title) == 0:
-                title = u'untitled'
+                title = 'untitled'
 
-            for k, item in photo.items():
-                print k, item
+            for k, item in list(photo.items()):
+                print(k, item)
 
             url = "http://farm%s.static.flickr.com/%s/%s_%s.jpg" % (
                         photo.get('farm').encode('utf-8'),
@@ -1193,13 +1195,13 @@ def main():
             #            photo.get('server').encode('utf-8'),
             #            photo.get('id').encode('utf-8'),
             #            photo.get('originalsecret').encode('utf-8'))
-            print photo.get('id').encode('utf-8'), title, url
+            print(photo.get('id').encode('utf-8'), title, url)
 
     def got_upnp_result(result):
-        print "upnp", result
+        print("upnp", result)
 
     def got_error(error):
-        print error
+        print(error)
 
     #f.flickr_upload(FilePath('/tmp/image.jpg'),title='test')
 

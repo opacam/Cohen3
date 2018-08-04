@@ -11,13 +11,14 @@ TODO:
 
 """
 import string
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from datetime import datetime
 
 from lxml import etree
+from functools import cmp_to_key
 from coherence.upnp.core import utils
 from coherence import log
-import xml_constants
+from . import xml_constants
 
 
 def qname(tag, ns=None):
@@ -60,11 +61,11 @@ class Resources(list):
 
     def __init__(self):
         super(Resources, self).__init__()
-        self.sort(cmp=self.p_sort)
+        self.sort(key=cmp_to_key(self.p_sort))
 
     def append(self, value):
         list.append(self, value)
-        self.sort(cmp=self.p_sort)
+        self.sort(key=cmp_to_key(self.p_sort))
 
     def p_sort(self, x, y):
         """ we want the following order
@@ -132,13 +133,13 @@ def classChooser(mimetype, sub=None):
             return MusicAlbum
         return Container
     else:
-        if string.find(mimetype, 'image/') == 0:
+        if mimetype.find('image/') == 0:
             return Photo
-        if string.find(mimetype, 'audio/') == 0:
+        if mimetype.find('audio/') == 0:
             if sub == 'music':       # FIXME: this is stupid
                 return MusicTrack
             return AudioItem
-        if string.find(mimetype, 'video/') == 0:
+        if mimetype.find('video/') == 0:
             return VideoItem
         if mimetype == 'application/ogg':
             if sub == 'music':       # FIXME: this is stupid
@@ -202,6 +203,8 @@ class Resource(object):
     """An object representing a resource."""
 
     def __init__(self, data=None, protocol_info=None):
+        if isinstance(data, bytes):
+            data = str(data)
         self.data = data
         self.protocolInfo = protocol_info
         self.bitrate = None
@@ -348,15 +351,16 @@ class PlayContainerResource(Resource):
             raise AttributeError('missing first Child Id')
         self.protocolInfo = protocol_info
 
-        args = ['sid=' + urllib.quote(sid),
-                'cid=' + urllib.quote(str(cid)),
-                'fid=' + urllib.quote(str(fid)),
-                'fii=' + urllib.quote(str(fii)),
-                'sc=' + urllib.quote(''),
-                'md=' + urllib.quote(str(0))]
+        args = ['sid=' + urllib.parse.quote(sid),
+                'cid=' + urllib.parse.quote(str(cid)),
+                'fid=' + urllib.parse.quote(str(fid)),
+                'fii=' + urllib.parse.quote(str(fii)),
+                'sc=' + urllib.parse.quote(''),
+                'md=' + urllib.parse.quote(str(0))]
 
-        self.data = 'dlna-playcontainer://' + urllib.quote(str(udn)) \
-                                            + '?' + '&'.join(args)
+        self.data = 'dlna-playcontainer://' + \
+                    urllib.parse.quote(str(udn)) \
+                    + '?' + '&'.join(args)
 
         if self.protocolInfo is None:
             self.protocolInfo = 'http-get:*:*:*'
@@ -758,7 +762,7 @@ class VideoItem(Item):
     def toElement(self, **kwargs):
         root = Item.toElement(self, **kwargs)
 
-        for attr_name, ns in self.valid_attrs.iteritems():
+        for attr_name, ns in self.valid_attrs.items():
             value = getattr(self, attr_name, None)
             if value:
                 self.debug("Setting value {%s}%s=%s", ns, attr_name, value)
@@ -771,7 +775,7 @@ class VideoItem(Item):
         for child in elt.getchildren():
             tag = child.tag
             val = child.text
-            if tag in self.valid_attrs.keys():
+            if tag in list(self.valid_attrs.keys()):
                 setattr(self, tag, val)
 
 
@@ -1029,4 +1033,4 @@ if __name__ == '__main__':
     res.append(Resource('7', 'http-get:*:*:*'))
 
     for r in res:
-        print r.data, r.protocolInfo
+        print(r.data, r.protocolInfo)

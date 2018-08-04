@@ -28,7 +28,7 @@ class DeviceHttpRoot(resource.Resource, log.Loggable):
         self.info('DeviceHttpRoot %s getChildWithDefault %s %s %s',
                   self.server.device_type, path, request.uri, request.client)
         self.info(request.getAllHeaders())
-        if self.children.has_key(path):
+        if path in self.children:
             return self.children[path]
         if request.uri == '/':
             return self
@@ -187,7 +187,7 @@ class BasicDeviceMixin(object):
             self.version = int(kwargs.get('version', self.coherence.config.get('version', 2)))
 
         try:
-            self.uuid = kwargs['uuid']
+            self.uuid = str(kwargs['uuid'])
             if not self.uuid.startswith('uuid:'):
                 self.uuid = 'uuid:' + self.uuid
         except KeyError:
@@ -195,7 +195,7 @@ class BasicDeviceMixin(object):
             self.uuid = UUID()
 
         self.backend = None
-        urlbase = self.coherence.urlbase
+        urlbase = str(self.coherence.urlbase)
         if urlbase[-1] != '/':
             urlbase += '/'
         self.urlbase = urlbase + str(self.uuid)[5:]
@@ -203,7 +203,7 @@ class BasicDeviceMixin(object):
         kwargs['urlbase'] = self.urlbase
         self.icons = kwargs.get('iconlist', kwargs.get('icons', []))
         if len(self.icons) == 0:
-            if kwargs.has_key('icon'):
+            if 'icon' in kwargs:
                 if isinstance(kwargs['icon'], dict):
                     self.icons.append(kwargs['icon'])
                 else:

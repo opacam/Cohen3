@@ -6,7 +6,7 @@
 from lxml import etree
 
 import time
-from urlparse import urlsplit
+from urllib.parse import urlsplit
 
 from twisted.internet import reactor, defer
 from twisted.web import resource
@@ -123,7 +123,7 @@ class EventSubscriptionServer(resource.Resource, log.Loggable):
                     s = self.subscribers[headers['sid']]
                     s['timeout'] = headers['timeout']
                     s['created'] = time.time()
-                elif not headers.has_key('callback'):
+                elif 'callback' not in headers:
                     request.setResponseCode(404)
                     request.setHeader('SERVER', SERVER_ID)
                     request.setHeader('CONTENT-LENGTH', 0)
@@ -132,8 +132,8 @@ class EventSubscriptionServer(resource.Resource, log.Loggable):
                 from .uuid import UUID
                 sid = UUID()
                 s = {'sid': str(sid),
-                      'callback': headers['callback'][1:len(headers['callback']) - 1],
-                      'seq': 0}
+                     'callback': headers['callback'][1:len(headers['callback']) - 1],
+                     'seq': 0}
                 s['timeout'] = headers['timeout']
                 s['created'] = time.time()
                 self.service.new_subscriber(s)
@@ -223,8 +223,12 @@ class EventProtocol(Protocol, log.Loggable):
         except:
             pass
         self.info("response received from the Service Events HTTP server ")
+        if isinstance(data, bytes):
+            d = str(data)
+        else:
+            d = data
         #self.debug(data)
-        cmd, headers = utils.parse_http_response(data)
+        cmd, headers = utils.parse_http_response(d)
         self.debug("%r %r", cmd, headers)
         if int(cmd[1]) != 200:
             self.warning("response with error code %r received upon our %r request", cmd[1], self.action)
@@ -307,7 +311,7 @@ def subscribe(service, action='subscribe'):
         request.append("Content-Length: 0")
         request.append("")
         request.append("")
-        request = '\r\n'.join(request)
+        request = bytes('\r\n'.join(request), encoding='utf-8')
         logger.debug("event.subscribe.send_request %r %r", request, p)
         try:
             p.transport.writeSomeData(request)
@@ -365,7 +369,11 @@ class NotificationProtocol(Protocol, log.Loggable):
             self.timeout_checker.cancel()
         except:
             pass
-        cmd, headers = utils.parse_http_response(data)
+        if isinstance(data, bytes):
+            d = str(data)
+        else:
+            d = data
+        cmd, headers = utils.parse_http_response(d)
         self.debug("notification response received %r %r", cmd, headers)
         try:
             if int(cmd[1]) != 200:
@@ -400,18 +408,18 @@ def send_notification(s, xml):
         port = 80
 
     def send_request(p, port_item):
-        request = ['NOTIFY %s HTTP/1.1' % path,
-                    'HOST:  %s:%d' % (host, port),
-                    'SEQ:  %d' % s['seq'],
-                    'CONTENT-TYPE:  text/xml;charset="utf-8"',
-                    'SID:  %s' % s['sid'],
-                    'NTS:  upnp:propchange',
-                    'NT:  upnp:event',
-                    'Content-Length: %d' % len(xml),
-                    '',
+        request = [b'NOTIFY %s HTTP/1.1' % path,
+                   b'HOST:  %s:%d' % (host, port),
+                   b'SEQ:  %d' % s['seq'],
+                   b'CONTENT-TYPE:  text/xml;charset="utf-8"',
+                   b'SID:  %s' % s['sid'],
+                   b'NTS:  upnp:propchange',
+                   b'NT:  upnp:event',
+                   b'Content-Length: %d' % len(xml),
+                   b'',
                     xml]
 
-        request = '\r\n'.join(request)
+        request = b'\r\n'.join(request)
         logger.info("send_notification.send_request to %r %r", s['sid'], s['callback'])
         logger.debug("request: %r", request)
         s['seq'] += 1

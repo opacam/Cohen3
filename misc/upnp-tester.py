@@ -20,7 +20,7 @@
 #
 
 import os
-from sets import Set
+from functools import cmp_to_key
 
 from twisted.internet import stdio
 from twisted.protocols import basic
@@ -32,7 +32,7 @@ try:
     from twisted.names import client as namesclient
     from twisted.names import dns
 
-    import StringIO
+    import io
 
 
     class SMTPClient(smtp.ESMTPClient):
@@ -69,10 +69,10 @@ try:
             fp.close()
             tar.add_header('Content-Disposition', 'attachment', filename=os.path.basename(self.mail_file))
             msg.attach(tar)
-            return StringIO.StringIO(msg.as_string())
+            return io.StringIO(msg.as_string())
 
         def sentMail(self, code, resp, numOk, addresses, log):
-            print 'Sent', numOk, 'messages'
+            print('Sent', numOk, 'messages')
 
 
     class SMTPClientFactory(protocol.ClientFactory):
@@ -118,7 +118,7 @@ class UI(basic.LineReceiver):
 
     def cmd_help(self, args):
         "help -- show help"
-        methods = Set([getattr(self, x) for x in dir(self) if x[:4] == "cmd_"])
+        methods = set([getattr(self, x) for x in dir(self) if x[:4] == "cmd_"])
         self.transport.write("Commands:\n")
         for method in methods:
             if hasattr(method, '__doc__'):
@@ -162,7 +162,7 @@ class UI(basic.LineReceiver):
 
                 dl = defer.DeferredList(l)
                 dl.addCallback(finished)
-            except Exception, msg:
+            except Exception as msg:
                 self.transport.write(str("problem creating download directory %s\n" % msg))
 
     def cmd_send(self, args):
@@ -179,7 +179,13 @@ class UI(basic.LineReceiver):
 
             def got_mx(result):
                 mx_list = result[0]
-                mx_list.sort(lambda x, y: cmp(x.payload.preference, y.payload.preference))
+                # mx_list.sort(
+                #     lambda x, y: cmp(
+                #         x.payload.preference, y.payload.preference))
+                mx_list = sorted(
+                    mx_list,
+                    key=lambda x, y: cmp_to_key(
+                        x.payload.preference, y.payload.preference))
                 if len(mx_list) > 0:
                     import posix
                     import pwd
@@ -197,8 +203,7 @@ class UI(basic.LineReceiver):
     cmd_exit = cmd_quit
 
     def print_prompt(self):
-        self.transport.write('>>> ')
-
+        self.transport.write(b'>>> ')
 
 
 if __name__ == '__main__':

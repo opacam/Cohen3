@@ -238,7 +238,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.Loggable):
                 bufferFile.encoding = None
                 try:
                     return bufferFile.render(request)
-                except Exception, error:
+                except Exception as error:
                     self.info(error)
 
         if request.method != 'HEAD':
@@ -325,7 +325,7 @@ class YoutubeVideoItem(BackendItem):
                 'forcetitle': False,
                 'simulate': True,
                 'format': format,
-                'outtmpl': u'%(id)s.%(ext)s',
+                'outtmpl': '%(id)s.%(ext)s',
                 'ignoreerrors': True,
                 'ratelimit': None,
                 }

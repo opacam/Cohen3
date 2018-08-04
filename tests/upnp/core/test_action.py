@@ -190,7 +190,7 @@ class TestAction2(unittest.TestCase):
     def setUp(self):
         self.arguments = _build_action_arguments()
         self.service = DummyServiceWithStateVariables('Brightness')
-        self.action= action.Action(self.service, 'SomeTestAction',
+        self.action= action.Action(self.service, b'SomeTestAction',
                                    NoImplementation, self.arguments)
 
     def test_setup(self):
@@ -207,7 +207,7 @@ class TestAction2(unittest.TestCase):
             self.assertEqual(
                 self.service.get_state_variable('Brightness').value,
                 12)
-            self.assertEqual(client._called_action_name, 'SomeTestAction')
+            self.assertEqual(client._called_action_name, b'SomeTestAction')
             self.assertEqual(client._passed_arguments,
                              {'InstanceID': 23, 'Color': 'red'})
 

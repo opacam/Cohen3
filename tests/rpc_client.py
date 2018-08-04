@@ -8,7 +8,7 @@
 import getopt
 import sys
 import string
-import xmlrpclib
+import xmlrpc.client
 
 command = "status"
 device = ''
@@ -21,7 +21,7 @@ arguments = {}
 try:
     optlist, args = getopt.getopt(sys.argv[1:], "c:d:i:v:u:", ['command=', 'device=', 'id=', 'volume=', 'uri='])
 except getopt.GetoptError:
-    print "falsche parameter"
+    print("falsche parameter")
     sys.exit(1)
 
 for option, param in optlist:
@@ -46,9 +46,9 @@ for p in sys.argv[1:]:
         continue
     k, v = p.split('=')
     arguments[k] = v
-#print 'Arguments', arguments
+# print('Arguments', arguments)
 
-s = xmlrpclib.Server('http://127.0.0.1:30020/RPC2')
+s = xmlrpc.client.Server('http://127.0.0.1:30020/RPC2')
 
 if command == "ping":
     r = s.ping()
@@ -95,4 +95,4 @@ if command == "import_resource" and device != '':
 if command == "put_resource":
     r = s.put_resource(arguments['url'], arguments['path'])
 
-print r
+print(r)

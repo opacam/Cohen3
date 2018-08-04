@@ -72,8 +72,8 @@ class JsonInterface(resource.Resource, log.Loggable):
 
     def call_action(self, action, request):
         kwargs = {}
-        for entry, value_list in request.args.items():
-            kwargs[entry] = unicode(value_list[0])
+        for entry, value_list in list(request.args.items()):
+            kwargs[entry] = str(value_list[0])
 
         def to_json(result):
             self.warning("to_json")

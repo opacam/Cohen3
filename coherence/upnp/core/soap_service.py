@@ -95,7 +95,7 @@ class UPnPPublisher(resource.Resource, log.Loggable):
 
         def print_c(e):
             for c in e.getchildren():
-                print c, c.tag
+                print(c, c.tag)
                 print_c(c)
 
         tree = etree.fromstring(data)
@@ -133,19 +133,19 @@ class UPnPPublisher(resource.Resource, log.Loggable):
             return server.NOT_DONE_YET
         else:
             keywords = {'soap_methodName': methodName}
-            if(headers.has_key('user-agent') and
+            if('user-agent' in headers and
                     headers['user-agent'].find('Xbox/') == 0):
                 keywords['X_UPnPClient'] = 'XBox'
             #if(headers.has_key('user-agent') and
             #        headers['user-agent'].startswith("""Mozilla/4.0 (compatible; UPnP/1.0; Windows""")):
             #    keywords['X_UPnPClient'] = 'XBox'
-            if(headers.has_key('x-av-client-info') and
+            if('x-av-client-info' in headers and
                     headers['x-av-client-info'].find('"PLAYSTATION3') > 0):
                 keywords['X_UPnPClient'] = 'PLAYSTATION3'
-            if(headers.has_key('user-agent') and
+            if('user-agent' in headers and
                     headers['user-agent'].find('Philips-Software-WebClient/4.32') == 0):
                 keywords['X_UPnPClient'] = 'Philips-TV'
-            for k, v in kwargs.items():
+            for k, v in list(kwargs.items()):
                 keywords[str(k)] = v
             self.info('call %s %s', methodName, keywords)
             if hasattr(function, "useKeywords"):

@@ -19,7 +19,7 @@ from coherence.extern.simple_plugin import Plugin
 
 from coherence import log
 
-from urlparse import urlsplit
+from urllib.parse import urlsplit
 
 import re
 from coherence.upnp.core.utils import getPage
@@ -97,7 +97,7 @@ class PlaylistStore(AbstractBackendStore):
         return self.__class__.__name__
 
     def append(self, obj, parent):
-        if isinstance(obj, basestring):
+        if isinstance(obj, str):
             mimetype = 'directory'
         else:
             mimetype = obj['mimetype']
@@ -149,29 +149,29 @@ class PlaylistStore(AbstractBackendStore):
             if playlist:
                 content, header = playlist
                 lines = content.splitlines().__iter__()
-                line = lines.next()
+                line = next(lines)
                 while line is not None:
                     if re.search('#EXTINF', line):
                         channel = re.match('#EXTINF:.*,(.*)', line).group(1)
                         mimetype = 'video/mpeg'
-                        line = lines.next()
+                        line = next(lines)
                         while re.search('#EXTVLCOPT', line):
                             option = re.match('#EXTVLCOPT:(.*)', line).group(1)
                             if option == 'no-video':
                                 mimetype = 'audio/mpeg'
-                            line = lines.next()
+                            line = next(lines)
                         url = line
                         item = PlaylistItem(channel, url, mimetype)
                         parent_item.add_child(item)
                     try:
-                        line = lines.next()
+                        line = next(lines)
                     except StopIteration:
                         line = None
             return items
 
         def gotError(error):
             self.warning("Unable to retrieve playlist: %s", url)
-            print "Error: %s" % error
+            print("Error: %s" % error)
             return None
 
         d = getPage(url)

@@ -33,7 +33,11 @@ class MSearch(DatagramProtocol, log.Loggable):
             self.double_discover_loop = task.LoopingCall(self.double_discover)
             self.double_discover_loop.start(120.0)
 
-    def datagramReceived(self, data, (host, port)):
+    def datagramReceived(self, data, xxx_todo_changeme):
+        (host, port) = xxx_todo_changeme
+        if isinstance(data, bytes):
+            data = data.decode('utf-8')
+
         cmd, headers = utils.parse_http_response(data)
         self.info('datagramReceived from %s:%d, protocol %s code %s', host, port, cmd[0], cmd[1])
         if cmd[0].startswith('HTTP/1.') and cmd[1] == '200':
@@ -62,14 +66,14 @@ class MSearch(DatagramProtocol, log.Loggable):
 
     def discover(self):
         req = ['M-SEARCH * HTTP/1.1',
-                'HOST: %s:%d' % (SSDP_ADDR, SSDP_PORT),
-                'MAN: "ssdp:discover"',
-                'MX: 5',
-                'ST: ssdp:all',
-                '', '']
-        req = '\r\n'.join(req)
+               'HOST: %s:%d' % (SSDP_ADDR, SSDP_PORT),
+               'MAN: "ssdp:discover"',
+               'MX: 5',
+               'ST: ssdp:all',
+               '', '']
+        req = bytes('\r\n'.join(req), encoding='utf-8')
 
         try:
             self.transport.write(req, (SSDP_ADDR, SSDP_PORT))
-        except socket.error, msg:
+        except socket.error as msg:
             self.info("failure sending out the discovery message: %r", msg)

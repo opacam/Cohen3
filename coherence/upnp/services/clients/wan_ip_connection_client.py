@@ -4,6 +4,7 @@
 # Copyright 2010, Frank Scholz <dev@coherence-project.org>
 
 from twisted.internet import defer
+from functools import cmp_to_key
 
 
 class WANIPConnectionClient:
@@ -51,8 +52,9 @@ class WANIPConnectionClient:
 
         def request_cb(r, last_updated_timestamp, v):
             if last_updated_timestamp == v.last_time_touched:
-                mappings = [m[1] for m in r if m[0] == True]
-                mappings.sort(cmp=lambda x, y: cmp(x['NewPortMappingIndex'], y['NewPortMappingIndex']))
+                mappings = [m[1] for m in r if m[0] is True]
+                mappings.sort(key=lambda x, y: cmp_to_key(
+                    x['NewPortMappingIndex'], y['NewPortMappingIndex']))
                 return mappings
             else:
                 #FIXME - we should raise something here, as the mappings have changed during our query

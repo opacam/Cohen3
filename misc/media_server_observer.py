@@ -16,24 +16,24 @@ from coherence.upnp.core import DIDLLite
 
 # browse callback
 def process_media_server_browse(result, client):
-  print "browsing root of", client.device.get_friendly_name()
-  print "result contains", result['NumberReturned'],
-  print "out of", result['TotalMatches'], "total matches."
+  print("browsing root of: {}".format(client.device.get_friendly_name()))
+  print("result contains: {}".format(result['NumberReturned']), end=' ')
+  print("out of: {} {}".format(result['TotalMatches'], "total matches."))
 
   elt = DIDLLite.DIDLElement.fromString(result['Result'])
   for item in elt.getItems():
 
     if item.upnp_class.startswith("object.container"):
-      print "  container", item.title, "(%s)" % item.id,
-      print "with", item.childCount, "items."
+      print("  container", item.title, "(%s)" % item.id, end=' ')
+      print("with", item.childCount, "items.")
 
     if item.upnp_class.startswith("object.item"):
-      print "  item", item.title, "(%s)." % item.id
+      print("  item", item.title, "(%s)." % item.id)
 
 
 # called for each media server found
 def media_server_found(client, udn):
-  print "Media Server found:", client.device.get_friendly_name()
+  print("Media Server found: {}".format(client.device.get_friendly_name()))
 
   d = client.content_directory.browse(0,
                                       browse_flag='BrowseDirectChildren',
@@ -44,7 +44,7 @@ def media_server_found(client, udn):
 
 # sadly they sometimes get removed as well :(
 def media_server_removed(udn):
-  print "Media Server gone:", udn
+  print("Media Server gone:", udn)
 
 
 def start():
@@ -55,7 +55,7 @@ def start():
 
   # now we should also try to discover the ones that are already there:
   for device in control_point.coherence.devices:
-    print device
+    print(device)
 
 if __name__ == "__main__":
   reactor.callWhenRunning(start)

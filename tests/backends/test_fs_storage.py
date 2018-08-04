@@ -17,6 +17,7 @@ from coherence.backends import fs_storage
 import coherence.log
 coherence.log.init()
 
+
 class TestFSStorageAssumptions(unittest.TestCase):
 
     def setUp(self):
@@ -80,6 +81,7 @@ self.storage.get_by_id("1000").get_xml()
 <container xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" childCount="2" id="1000" parentID="-1" restricted="0"><dc:title>media</dc:title><upnp:class>object.container</upnp:class><dc:date>2003-07-23T01:18:00+02:00</dc:date></container>
 '''
 
+
 class TestFSStorage(unittest.TestCase):
 
     def setUp(self):
@@ -117,6 +119,6 @@ class TestFSStorage(unittest.TestCase):
         self.assertEqual(content.get_name(), 'my content')
         self.assertIs(root.get_children(0, 0)[0], content)
         self.assertEqual(self.storage.get_by_id('1002').get_name(),
-                         'audio')
+                         'images')
         self.assertEqual(self.storage.get_by_id('1005').get_name(),
-                         'album-1')
+                         'album-2')

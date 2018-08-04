@@ -32,7 +32,7 @@ class Web(object):
 
 class MenuFragment(athena.LiveElement, log.Loggable):
     logCategory = 'webui_menu_fragment'
-    jsClass = u'Coherence.Base'
+    jsClass = 'Coherence.Base'
     fragmentName = 'coherence-menu'
 
     docFactory = loaders.stan(
@@ -61,11 +61,11 @@ class MenuFragment(athena.LiveElement, log.Loggable):
 
     def add_tab(self, title, active, id):
         self.info("add tab %s to the MenuFragment", title)
-        new_tab = {u'title': unicode(title),
-                   u'active': unicode(active),
-                   u'athenaid': u'athenaid:%d' % id}
+        new_tab = {'title': str(title),
+                   'active': str(active),
+                   'athenaid': 'athenaid:%d' % id}
         for t in self.tabs:
-            if t[u'title'] == new_tab[u'title']:
+            if t['title'] == new_tab['title']:
                 return
         self.tabs.append(new_tab)
         self.callRemote('addTab', new_tab)
@@ -76,7 +76,7 @@ class MenuFragment(athena.LiveElement, log.Loggable):
 
 class DevicesFragment(athena.LiveElement, log.Loggable):
     logCategory = 'webui_device_fragment'
-    jsClass = u'Coherence.Devices'
+    jsClass = 'Coherence.Devices'
     fragmentName = 'coherence-devices'
 
     docFactory = loaders.stan(
@@ -101,8 +101,8 @@ class DevicesFragment(athena.LiveElement, log.Loggable):
         devices = []
         for device in self.coherence.get_devices():
             if device is not None:
-                devices.append({u'name': device.get_markup_name(),
-                        u'usn': unicode(device.get_usn())})
+                devices.append({'name': device.get_markup_name(),
+                        'usn': str(device.get_usn())})
 
         louie.connect(self.add_device,
                 'Coherence.UPnP.Device.detection_completed', louie.Any)
@@ -122,12 +122,12 @@ class DevicesFragment(athena.LiveElement, log.Loggable):
                                                 device.get_friendly_name(),
                                                 device.get_device_type())
         self.callRemote('addDevice',
-                {u'name': device.get_markup_name(),
-                u'usn': unicode(device.get_usn())})
+                {'name': device.get_markup_name(),
+                 'usn': str(device.get_usn())})
 
     def remove_device(self, usn):
         self.info("DevicesFragment remove device %s", usn)
-        self.callRemote('removeDevice', unicode(usn))
+        self.callRemote('removeDevice', str(usn))
 
     def render_devices(self, ctx, data):
         cl = []
@@ -146,7 +146,7 @@ class DevicesFragment(athena.LiveElement, log.Loggable):
 
 class LoggingFragment(athena.LiveElement, log.Loggable):
     logCategory = 'webui_logging_fragment'
-    jsClass = u'Coherence.Logging'
+    jsClass = 'Coherence.Logging'
     fragmentName = 'coherence-logging'
 
     docFactory = loaders.stan(
@@ -179,7 +179,7 @@ class WebUI(athena.LivePage, log.Loggable):
     """
     """
     logCategory = 'webui'
-    jsClass = u'Coherence'
+    jsClass = 'Coherence'
 
     addSlash = True
     docFactory = loaders.xmlstr("""\

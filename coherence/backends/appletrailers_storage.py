@@ -9,6 +9,7 @@
 This is a Media Backend that allows you to access the Trailers from Apple.com
 """
 from lxml import etree
+from functools import cmp_to_key
 
 from coherence.backend import BackendItem, BackendStore
 from coherence.upnp.core import DIDLLite
@@ -221,8 +222,14 @@ class AppleTrailersStore(BackendStore):
             self.server.connection_manager_server.set_variable( \
                 0, 'SourceProtocolInfo', ['http-get:*:video/quicktime:*', 'http-get:*:video/mp4:*'])
         self.container = Container(ROOT_ID, -1, self.name)
-        trailers = self.trailers.values()
-        trailers.sort(cmp=lambda x, y: cmp(x.get_name().lower(), y.get_name().lower()))
+        trailers = list(self.trailers.values())
+        # trailers.sort(cmp=lambda x, y: cmp(
+        #     x.get_name().lower(), y.get_name().lower()))
+        trailers = sorted(
+            trailers,
+            key=lambda x, y: cmp_to_key(
+                x.get_name().lower(),
+                y.get_name().lower()))
         self.container.children = trailers
 
     def __repr__(self):

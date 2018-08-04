@@ -6,15 +6,13 @@
 # Copyright 2013, Hartmut Goebel <h.goebel@crazy-compilers.com>
 #
 
-from __future__ import absolute_import
-
-from uuid import uuid4
+import uuid
 
 
 class UUID:
 
     def __init__(self):
-        self.uuid = 'uuid:' + str(uuid4())
+        self.uuid = 'uuid:' + str(uuid.uuid4())
 
     def __repr__(self):
         return self.uuid
