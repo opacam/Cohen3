@@ -4,7 +4,6 @@
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006,2007,2008,2009 Frank Scholz <coherence@beebits.net>
 
-from twisted.python import failure
 from twisted.python.util import OrderedDict
 
 from coherence import log
@@ -28,7 +27,8 @@ class Argument:
 
     def __repr__(self):
         return "Argument: %s, %s, %s" % (self.get_name(),
-                                         self.get_direction(), self.get_state_variable())
+                                         self.get_direction(),
+                                         self.get_state_variable())
 
     def as_tuples(self):
         r = []
@@ -38,7 +38,8 @@ class Argument:
         return r
 
     def as_dict(self):
-        return {'name': self.name, 'direction': self.direction, 'related_state_variable': self.state_variable}
+        return {'name': self.name, 'direction': self.direction,
+                'related_state_variable': self.state_variable}
 
 
 class Action(log.Loggable):
@@ -65,10 +66,12 @@ class Action(log.Loggable):
         return self.arguments_list
 
     def get_in_arguments(self):
-        return [arg for arg in self.arguments_list if arg.get_direction() == 'in']
+        return [arg for arg in self.arguments_list if
+                arg.get_direction() == 'in']
 
     def get_out_arguments(self):
-        return [arg for arg in self.arguments_list if arg.get_direction() == 'out']
+        return [arg for arg in self.arguments_list if
+                arg.get_direction() == 'out']
 
     def get_service(self):
         return self.service
@@ -92,36 +95,43 @@ class Action(log.Loggable):
             if len(l) > 0:
                 in_arguments.remove(l[0])
             else:
-                self.error("argument %s not valid for action %s", arg_name, self.name)
+                self.error("argument %s not valid for action %s", arg_name,
+                           self.name)
                 return
             if arg_name == 'InstanceID':
                 instance_id = int(arg)
         if len(in_arguments) > 0:
-            self.error("argument %s missing for action %s", [a.get_name() for a in in_arguments], self.name)
+            self.error("argument %s missing for action %s",
+                       [a.get_name() for a in in_arguments], self.name)
             return
 
         action_name = self.name
 
-        if(hasattr(self.service.device.client, 'overlay_actions') and
-           self.name in self.service.device.client.overlay_actions):
-            self.info("we have an overlay method %r for action %r", self.service.device.client.overlay_actions[self.name], self.name)
-            action_name, kwargs = self.service.device.client.overlay_actions[self.name](**kwargs)
+        if (hasattr(self.service.device.client, 'overlay_actions') and
+                self.name in self.service.device.client.overlay_actions):
+            self.info("we have an overlay method %r for action %r",
+                      self.service.device.client.overlay_actions[self.name],
+                      self.name)
+            action_name, kwargs = self.service.device.client.overlay_actions[
+                self.name](**kwargs)
             self.info("changing action to %r %r", action_name, kwargs)
 
         def got_error(failure):
             self.warning("error on %s request with %s %s", self.name, self.
-                                                            service.service_type,
-                                                            self.service.control_url)
+                         service.service_type,
+                         self.service.control_url)
             self.info(failure)
             return failure
 
         if hasattr(self.service.device.client, 'overlay_headers'):
             self.info("action call has headers %r", 'headers' in kwargs)
             if 'headers' in kwargs:
-                kwargs['headers'].update(self.service.device.client.overlay_headers)
+                kwargs['headers'].update(
+                    self.service.device.client.overlay_headers)
             else:
                 kwargs['headers'] = self.service.device.client.overlay_headers
-            self.info("action call with new/updated headers %r", kwargs['headers'])
+            self.info("action call with new/updated headers %r",
+                      kwargs['headers'])
 
         client = self._get_client()
 
@@ -132,7 +142,8 @@ class Action(log.Loggable):
             ordered_arguments['headers'] = kwargs['headers']
 
         d = client.callRemote(action_name, ordered_arguments)
-        d.addCallback(self.got_results, instance_id=instance_id, name=action_name)
+        d.addCallback(self.got_results, instance_id=instance_id,
+                      name=action_name)
         d.addErrback(got_error)
         return d
 
@@ -140,14 +151,14 @@ class Action(log.Loggable):
         instance_id = int(instance_id)
         out_arguments = self.get_out_arguments()
         self.info("call %s (instance %d) returns %d arguments: %r", name,
-                                                                    instance_id,
-                                                                    len(out_arguments),
-                                                                    results)
+                  instance_id,
+                  len(out_arguments),
+                  results)
 
         # XXX A_ARG_TYPE_ arguments probably don't need a variable update
-        #if len(out_arguments) == 1:
+        # if len(out_arguments) == 1:
         #    self.service.get_state_variable(out_arguments[0].get_state_variable(), instance_id).update(results)
-        #elif len(out_arguments) > 1:
+        # elif len(out_arguments) > 1:
 
         if len(out_arguments) > 0:
             for arg_name, value in list(results.items()):
@@ -172,4 +183,5 @@ class Action(log.Loggable):
         return r
 
     def as_dict(self):
-        return {'name': self.get_name(), 'arguments': [a.as_dict() for a in self.arguments_list]}
+        return {'name': self.get_name(),
+                'arguments': [a.as_dict() for a in self.arguments_list]}

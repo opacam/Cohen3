@@ -5,15 +5,11 @@
 
 import os
 
-from twisted.internet import reactor
+from nevow import athena, loaders, tags, static
 from twisted.python import filepath, util
-from nevow import athena, inevow, loaders, tags, static
-from twisted.web import server, resource
-
-from zope.interface import implements, Interface
+from zope.interface import Interface
 
 import coherence.extern.louie as louie
-
 from coherence import log
 
 
@@ -39,7 +35,7 @@ class MenuFragment(athena.LiveElement, log.Loggable):
         tags.div(render=tags.directive('liveElement'))[
             tags.div(id="coherence_menu_box", class_="coherence_menu_box")[""],
         ]
-        )
+    )
 
     def __init__(self, page):
         super(MenuFragment, self).__init__()
@@ -57,6 +53,7 @@ class MenuFragment(athena.LiveElement, log.Loggable):
             return self.tabs
         else:
             return {}
+
     athena.expose(going_live)
 
     def add_tab(self, title, active, id):
@@ -83,7 +80,7 @@ class DevicesFragment(athena.LiveElement, log.Loggable):
         tags.div(render=tags.directive('liveElement'))[
             tags.div(id="Devices-container", class_="coherence_container")[""],
         ]
-        )
+    )
 
     def __init__(self, page, active):
         super(DevicesFragment, self).__init__()
@@ -102,12 +99,12 @@ class DevicesFragment(athena.LiveElement, log.Loggable):
         for device in self.coherence.get_devices():
             if device is not None:
                 devices.append({'name': device.get_markup_name(),
-                        'usn': str(device.get_usn())})
+                                'usn': str(device.get_usn())})
 
         louie.connect(self.add_device,
-                'Coherence.UPnP.Device.detection_completed', louie.Any)
+                      'Coherence.UPnP.Device.detection_completed', louie.Any)
         louie.connect(self.remove_device,
-                'Coherence.UPnP.Device.removed', louie.Any)
+                      'Coherence.UPnP.Device.removed', louie.Any)
 
         return devices
 
@@ -118,12 +115,12 @@ class DevicesFragment(athena.LiveElement, log.Loggable):
 
     def add_device(self, device):
         self.info("DevicesFragment found device %s %s of type %s",
-                                                device.get_usn(),
-                                                device.get_friendly_name(),
-                                                device.get_device_type())
+                  device.get_usn(),
+                  device.get_friendly_name(),
+                  device.get_device_type())
         self.callRemote('addDevice',
-                {'name': device.get_markup_name(),
-                 'usn': str(device.get_usn())})
+                        {'name': device.get_markup_name(),
+                         'usn': str(device.get_usn())})
 
     def remove_device(self, usn):
         self.info("DevicesFragment remove device %s", usn)
@@ -153,7 +150,7 @@ class LoggingFragment(athena.LiveElement, log.Loggable):
         tags.div(render=tags.directive('liveElement'))[
             tags.div(id="Logging-container", class_="coherence_container")[""],
         ]
-        )
+    )
 
     def __init__(self, page, active):
         super(LoggingFragment, self).__init__()
@@ -169,6 +166,7 @@ class LoggingFragment(athena.LiveElement, log.Loggable):
         d.addCallback(self.remove_me)
         d.addErrback(self.remove_me)
         return {}
+
     athena.expose(going_live)
 
     def remove_me(self, result):
@@ -203,16 +201,21 @@ class WebUI(athena.LivePage, log.Loggable):
         self.coherence = self.rootObject.coherence
 
         self.jsModules.mapping.update({
-            'MochiKit': filepath.FilePath(__file__).parent().child('static').child('MochiKit.js').path})
+            'MochiKit': filepath.FilePath(__file__).parent().child(
+                'static').child('MochiKit.js').path})
 
         self.jsModules.mapping.update({
-            'Coherence': filepath.FilePath(__file__).parent().child('static').child('Coherence.js').path})
+            'Coherence': filepath.FilePath(__file__).parent().child(
+                'static').child('Coherence.js').path})
         self.jsModules.mapping.update({
-            'Coherence.Base': filepath.FilePath(__file__).parent().child('static').child('Coherence.Base.js').path})
+            'Coherence.Base': filepath.FilePath(__file__).parent().child(
+                'static').child('Coherence.Base.js').path})
         self.jsModules.mapping.update({
-            'Coherence.Devices': filepath.FilePath(__file__).parent().child('static').child('Coherence.Devices.js').path})
+            'Coherence.Devices': filepath.FilePath(__file__).parent().child(
+                'static').child('Coherence.Devices.js').path})
         self.jsModules.mapping.update({
-            'Coherence.Logging': filepath.FilePath(__file__).parent().child('static').child('Coherence.Logging.js').path})
+            'Coherence.Logging': filepath.FilePath(__file__).parent().child(
+                'static').child('Coherence.Logging.js').path})
         self.menu = MenuFragment(self)
 
     def childFactory(self, ctx, name):
@@ -230,8 +233,12 @@ class WebUI(athena.LivePage, log.Loggable):
 
     def render_listmenu(self, ctx, data):
         l = []
-        l.append(tags.div(id="t", class_="coherence_menu_item")[tags.a(href='/' + 'devices', class_="coherence_menu_link")['Devices']])
-        l.append(tags.div(id="t", class_="coherence_menu_item")[tags.a(href='/' + 'logging', class_="coherence_menu_link")['Logging']])
+        l.append(tags.div(id="t", class_="coherence_menu_item")[
+                     tags.a(href='/' + 'devices', class_="coherence_menu_link")[
+                         'Devices']])
+        l.append(tags.div(id="t", class_="coherence_menu_item")[
+                     tags.a(href='/' + 'logging', class_="coherence_menu_link")[
+                         'Logging']])
         return ctx.tag[l]
 
     def render_menu(self, ctx, data):

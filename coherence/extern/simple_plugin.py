@@ -22,7 +22,6 @@ class Plugin(object):
 
 
 class Reception(object):
-
     """ singleton class which holds information
         about known plugins
 
@@ -57,14 +56,17 @@ class Reception(object):
             sys.path.insert(0, plugin_path)
         for plugin in os.listdir(plugin_path):
             p = os.path.join(plugin_path, plugin)
-            if plugin != '__init__.py' and os.path.isfile(p) and os.path.splitext(p)[1] == '.py':
+            if plugin != '__init__.py' and os.path.isfile(p) and \
+                    os.path.splitext(p)[1] == '.py':
                 try:
                     __import__(os.path.splitext(plugin)[0], None, None, [''])
                 except Exception as msg:
                     if self.log is None:
-                        print("can't import %r - %s" % (os.path.splitext(plugin)[0], msg))
+                        print("can't import %r - %s" % (
+                        os.path.splitext(plugin)[0], msg))
                     else:
-                        self.log("can't import %r - %r" % (os.path.splitext(plugin)[0], msg))
+                        self.log("can't import %r - %r" % (
+                        os.path.splitext(plugin)[0], msg))
 
     def guestlist(self, plugin_class=Plugin):
         """ returns a list of all Plugin subclasses """

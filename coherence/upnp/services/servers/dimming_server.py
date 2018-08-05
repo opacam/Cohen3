@@ -7,10 +7,8 @@
 
 from twisted.web import resource
 
-from coherence.upnp.core.soap_service import UPnPPublisher
-
 from coherence.upnp.core import service
-from coherence import log
+from coherence.upnp.core.soap_service import UPnPPublisher
 
 
 class DimmingControl(service.ServiceControl, UPnPPublisher):
@@ -31,7 +29,8 @@ class DimmingServer(service.ServiceServer, resource.Resource):
         if backend == None:
             backend = self.device.backend
         resource.Resource.__init__(self)
-        service.ServiceServer.__init__(self, 'Dimming', self.device.version, backend)
+        service.ServiceServer.__init__(self, 'Dimming', self.device.version,
+                                       backend)
 
         self.control = DimmingControl(self)
         self.putChild(self.scpd_url, service.scpdXML(self, self.control))

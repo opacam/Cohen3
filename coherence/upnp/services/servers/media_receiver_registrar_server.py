@@ -7,9 +7,8 @@
 
 from twisted.web import resource
 
-from coherence.upnp.core.soap_service import UPnPPublisher
-
 from coherence.upnp.core import service
+from coherence.upnp.core.soap_service import UPnPPublisher
 
 
 class FakeMediaReceiverRegistrarBackend:
@@ -41,7 +40,6 @@ class MediaReceiverRegistrarControl(service.ServiceControl, UPnPPublisher):
 
 
 class MediaReceiverRegistrarServer(service.ServiceServer, resource.Resource):
-
     implementation = 'optional'
 
     def __init__(self, device, backend=None):
@@ -52,7 +50,8 @@ class MediaReceiverRegistrarServer(service.ServiceServer, resource.Resource):
         self.version = 1
         self.namespace = 'microsoft.com'
         self.id_namespace = 'microsoft.com'
-        service.ServiceServer.__init__(self, 'X_MS_MediaReceiverRegistrar', self.version, backend)
+        service.ServiceServer.__init__(self, 'X_MS_MediaReceiverRegistrar',
+                                       self.version, backend)
         self.device_description_tmpl = 'xbox-description-1.xml'
 
         self.control = MediaReceiverRegistrarControl(self)
@@ -66,4 +65,5 @@ class MediaReceiverRegistrarServer(service.ServiceServer, resource.Resource):
         return cl
 
     def render(self, request):
-        return '<html><p>root of the MediaReceiverRegistrar</p><p><ul>%s</ul></p></html>' % self.listchilds(request.uri)
+        return '<html><p>root of the MediaReceiverRegistrar</p><p><ul>%s</ul></p></html>' % self.listchilds(
+            request.uri)

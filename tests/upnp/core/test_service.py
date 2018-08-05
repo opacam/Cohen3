@@ -9,14 +9,13 @@
 Test cases for L{upnp.core.service}
 """
 
-import time
 try:
     import unittest.mock as mock
 except ImportError:
     import mock
 
-from twisted.trial import unittest
 from twisted.internet.defer import Deferred
+from twisted.trial import unittest
 
 from coherence.upnp.core import service, device
 
@@ -24,11 +23,16 @@ from coherence.upnp.core import service, device
 class DummyDevice:
     client = None
     friendly_name = 'Dummy Device'
+
     def get_location(self): return "DummyDevice's Location"
+
     def get_urlbase(self): return "DummyDevice's URL base"
-    def get_id(self):return "DummyDevice's ID"
+
+    def get_id(self): return "DummyDevice's ID"
+
     def make_fullyqualified(self, url):
         return "DummyDevice's FQ-URL/" + url
+
 
 # :todo: put this into a central module
 def raiseError(url):
@@ -36,10 +40,13 @@ def raiseError(url):
     Used for mocking coherence.upnp.core.utils.getPage, behaves as if
     the file was not read.
     """
+
     def _raiseError(*args): raise Exception('Meaningless Error')
+
     d = Deferred()
     d.addCallback(_raiseError)
     return d
+
 
 # :todo: put this into a central module
 def fakeGetPage(content):
@@ -51,6 +58,7 @@ def fakeGetPage(content):
         d = Deferred()
         d.callback((content, {}))
         return d
+
     return returnEmptyPage
 
 
@@ -61,7 +69,7 @@ class DescriptionNotFound(unittest.TestCase):
             self.setUp_main()
 
     def setUp_main(self):
-        self.device= DummyDevice()
+        self.device = DummyDevice()
         self.service = service.Service(
             'my-service-type', 'my-service-id',
             'http://localhost:8080/my-location',
@@ -141,7 +149,7 @@ class DescriptionNotFound(unittest.TestCase):
         svc = self.service
         self.assertEqual(svc.as_dict(),
                          {'type': 'my-service-type',
-                          'actions': [] })
+                          'actions': []})
 
     def test_as_tuple(self):
         """ Test Service.as_tuples() """
@@ -163,7 +171,7 @@ class DescriptionNotFound(unittest.TestCase):
              ('http://localhost/my-service/subscribe',
               "DummyDevice's FQ-URL/http://localhost/my-service/subscribe",
               False)),
-            ])
+        ])
 
     def test_set_timeout(self):
         svc = self.service
@@ -247,8 +255,8 @@ _scdpServiceStates = '''
 </serviceStateTable>
 '''
 
-class CompleteDescription(unittest.TestCase):
 
+class CompleteDescription(unittest.TestCase):
     _scpdXML = _scpdXMLTemplate % (_scdpActions, _scdpServiceStates)
     _expected_actions = [
         {'name': 'GetCurrentConnectionIDs',
@@ -258,7 +266,7 @@ class CompleteDescription(unittest.TestCase):
                'related_state_variable': 'CurrentConnectionIDs'
                }]
          }
-        ]
+    ]
     _expected_variables = [
         [('Name', 'SourceProtocolInfo'),
          ('Evented', 'yes'),
@@ -266,12 +274,12 @@ class CompleteDescription(unittest.TestCase):
          ('Default Value', ''),
          ('Current Value', ''),
          ]
-        ]
+    ]
 
     def setUp(self):
-        #from coherence.upnp.core import utils
-        #utils.parse_xml(self._scpdXML, 'utf-8')
-        #raise NotImplementedError(self._scpdXML)
+        # from coherence.upnp.core import utils
+        # utils.parse_xml(self._scpdXML, 'utf-8')
+        # raise NotImplementedError(self._scpdXML)
         info = {
             'USN': "RootDevice's USN",
             'SERVER': "RootDevice's Server",
@@ -279,7 +287,7 @@ class CompleteDescription(unittest.TestCase):
             'LOCATION': "http://localhost:8080/my-location",
             'MANIFESTATION': "RootDevice's Manifestation",
             'HOST': "RootDevice's Host",
-            }
+        }
         # Create an empty RootDevice without services, actions, icons,
         # etc. Do not use DummyDevice here as we want to test URLs,
         # too.
@@ -345,7 +353,7 @@ class CompleteDescription(unittest.TestCase):
                 # Note: This implicitly tests Action.as_dict(), too,
                 # but saves a lot of code.
                 self.assertEqual(actions_to_test[name].as_dict(),
-                                self._expected_actions[i])
+                                 self._expected_actions[i])
 
         svc = self.service
         compare_actions(svc._actions)
@@ -367,8 +375,8 @@ class CompleteDescription(unittest.TestCase):
         self.assertEqual(len(svc._variables), 1)
         self.assertEqual(list(svc._variables.keys()), [0])
         compare_variables(svc._variables[0])
-        #self.assertEqual(svc._var_subscribers, {})
-        #compare_variables(svc.get_state_variables(0))
+        # self.assertEqual(svc._var_subscribers, {})
+        # compare_variables(svc.get_state_variables(0))
 
     def test_getters(self):
         svc = self.service
@@ -391,19 +399,16 @@ class CompleteDescription(unittest.TestCase):
 
 
 class DescriptionWithoutActions(CompleteDescription):
-
     _scpdXML = _scpdXMLTemplate % ('', _scdpServiceStates)
     _expected_actions = {}
 
 
 class DescriptionWithoutVariables(CompleteDescription):
-
     _scpdXML = _scpdXMLTemplate % (_scdpActions, '')
     _expected_variables = []
 
 
 class DescriptionWithoutNamespaceDeclaration(CompleteDescription):
-
     _scpdXML = _scpdXMLTemplate.replace(' xmlns=', ' dummy=') \
                % ('', _scdpServiceStates)
     _expected_actions = {}
@@ -411,12 +416,10 @@ class DescriptionWithoutNamespaceDeclaration(CompleteDescription):
 
 
 class DescriptionWithWrongNamespace(CompleteDescription):
-
     _scpdXML = _scpdXMLTemplate.replace(' xmlns="urn:', ' xmlns="dummy:') \
                % ('', _scdpServiceStates)
     _expected_actions = {}
     _expected_variables = []
-
 
 # :todo: test-cases for subscribe/unsubscribe, subscribe_for_variable
 # :todo: test-cases for process_event()

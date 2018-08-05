@@ -7,15 +7,16 @@
 
 import os.path
 
-from coherence.upnp.core.utils import StaticFile
-
-from coherence.upnp.services.servers.connection_manager_server import ConnectionManagerServer
-from coherence.upnp.services.servers.rendering_control_server import RenderingControlServer
-from coherence.upnp.services.servers.av_transport_server import AVTransportServer
-
-from coherence.upnp.devices.basics import DeviceHttpRoot, BasicDeviceMixin
-
 from coherence import log
+from coherence.upnp.core.utils import StaticFile
+from coherence.upnp.devices.media_server import RootDeviceXML
+from coherence.upnp.devices.basics import DeviceHttpRoot, BasicDeviceMixin
+from coherence.upnp.services.servers.av_transport_server import \
+    AVTransportServer
+from coherence.upnp.services.servers.connection_manager_server import \
+    ConnectionManagerServer
+from coherence.upnp.services.servers.rendering_control_server import \
+    RenderingControlServer
 
 
 class HttpRoot(DeviceHttpRoot):
@@ -32,9 +33,10 @@ class MediaRenderer(log.Loggable, BasicDeviceMixin):
 
     def fire(self, backend, **kwargs):
 
-        if kwargs.get('no_thread_needed', False) == False:
-            """ this could take some time, put it in a  thread to be sure it doesn't block
-                as we can't tell for sure that every backend is implemented properly """
+        if not kwargs.get('no_thread_needed', False):
+            """ this could take some time, put it in a  thread to be sure 
+                it doesn't block as we can't tell for sure that every 
+                backend is implemented properly """
 
             from twisted.internet import threads
             d = threads.deferToThread(backend, self, **kwargs)
@@ -43,7 +45,9 @@ class MediaRenderer(log.Loggable, BasicDeviceMixin):
                 self.backend = backend
 
             def backend_failure(x):
-                self.warning('backend %s not installed, %s activation aborted - %s', backend, self.device_type, x.getErrorMessage())
+                self.warning(
+                    'backend %s not installed, %s activation aborted - %s',
+                    backend, self.device_type, x.getErrorMessage())
                 self.debug(x)
 
             d.addCallback(backend_ready)
@@ -95,41 +99,60 @@ class MediaRenderer(log.Loggable, BasicDeviceMixin):
 
         version = self.version
         while version > 0:
-            self.web_resource.putChild('description-%d.xml' % version,
-                                    RootDeviceXML(self.coherence.hostname,
-                                    str(self.uuid),
-                                    self.coherence.urlbase,
-                                    device_type=self.device_type,
-                                    version=version,
-                                    #presentation_url='/'+str(self.uuid)[5:],
-                                    friendly_name=self.backend.name,
-                                    model_description='Coherence UPnP A/V %s' % self.device_type,
-                                    model_name='Coherence UPnP A/V %s' % self.device_type,
-                                    services=self._services,
-                                    devices=self._devices,
-                                    icons=self.icons,
-                                    dlna_caps=dlna_caps))
+            self.web_resource.putChild(
+                'description-%d.xml' % version,
+                RootDeviceXML(
+                    self.coherence.hostname,
+                    str(self.uuid),
+                    self.coherence.urlbase,
+                    device_type=self.device_type,
+                    version=version,
+                    # presentation_url='/'+str(self.uuid)[5:],
+                    friendly_name=self.backend.name,
+                    # model_description='Coherence UPnP A/V %s' %
+                    #                   self.device_type,
+                    # model_name='Coherence UPnP A/V %s' % self.device_type,
+                    services=self._services,
+                    devices=self._devices,
+                    icons=self.icons,
+                    dlna_caps=dlna_caps))
             version -= 1
 
-        self.web_resource.putChild('ConnectionManager', self.connection_manager_server)
-        self.web_resource.putChild('RenderingControl', self.rendering_control_server)
+        self.web_resource.putChild('ConnectionManager',
+                                   self.connection_manager_server)
+        self.web_resource.putChild('RenderingControl',
+                                   self.rendering_control_server)
         self.web_resource.putChild('AVTransport', self.av_transport_server)
 
         for icon in self.icons:
             if 'url' in icon:
                 if icon['url'].startswith('file://'):
                     if os.path.exists(icon['url'][7:]):
-                        self.web_resource.putChild(os.path.basename(icon['url']),
-                                                   StaticFile(icon['url'][7:], defaultType=icon['mimetype']))
+                        self.web_resource.putChild(
+                            os.path.basename(icon['url']),
+                            StaticFile(icon['url'][7:],
+                                       defaultType=icon['mimetype']))
                 elif icon['url'] == '.face':
-                    face_path = os.path.abspath(os.path.join(os.path.expanduser('~'), ".face"))
+                    face_path = os.path.abspath(
+                        os.path.join(os.path.expanduser('~'), ".face"))
                     if os.path.exists(face_path):
-                        self.web_resource.putChild('face-icon.png', StaticFile(face_path, defaultType=icon['mimetype']))
+                        self.web_resource.putChild('face-icon.png',
+                                                   StaticFile(face_path,
+                                                              defaultType=icon[
+                                                                  'mimetype']))
                 else:
                     from pkg_resources import resource_filename
-                    icon_path = os.path.abspath(resource_filename(__name__, os.path.join('..', '..', '..', 'misc', 'device-icons', icon['url'])))
+                    icon_path = os.path.abspath(
+                        resource_filename(
+                            __name__,
+                            os.path.join('..', '..', '..', 'misc',
+                                         'device-icons', icon['url'])))
                     if os.path.exists(icon_path):
-                        self.web_resource.putChild(icon['url'], StaticFile(icon_path, defaultType=icon['mimetype']))
+                        self.web_resource.putChild(
+                            icon['url'],
+                            StaticFile(icon_path,
+                                       defaultType=icon['mimetype']))
 
         self.register()
-        self.warning("%s %s (%s) activated with %s", self.backend.name, self.device_type, self.backend, str(self.uuid)[5:])
+        self.warning("%s %s (%s) activated with %s", self.backend.name,
+                     self.device_type, self.backend, str(self.uuid)[5:])

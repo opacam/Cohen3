@@ -8,14 +8,14 @@ import traceback
 from twisted.internet import reactor
 from twisted.web import xmlrpc, client
 
-from coherence.upnp.core import service
-from coherence.upnp.core.event import EventServer
-
-from coherence.upnp.devices.media_server_client import MediaServerClient
-from coherence.upnp.devices.media_renderer_client import MediaRendererClient
-from coherence.upnp.devices.internet_gateway_device_client import InternetGatewayDeviceClient
 import coherence.extern.louie as louie
 from coherence import log
+from coherence.upnp.core import service
+from coherence.upnp.core.event import EventServer
+from coherence.upnp.devices.internet_gateway_device_client import \
+    InternetGatewayDeviceClient
+from coherence.upnp.devices.media_renderer_client import MediaRendererClient
+from coherence.upnp.devices.media_server_client import MediaServerClient
 
 
 class DeviceQuery(object):
@@ -40,14 +40,14 @@ class DeviceQuery(object):
     def check(self, device):
         if self.fired and self.oneshot:
             return
-        if(self.type == 'host' and
-           device.host == self.pattern):
+        if (self.type == 'host' and
+                device.host == self.pattern):
             self.fire(device)
-        elif(self.type == 'friendly_name' and
-           device.friendly_name == self.pattern):
+        elif (self.type == 'friendly_name' and
+              device.friendly_name == self.pattern):
             self.fire(device)
-        elif(self.type == 'uuid' and
-           device.get_uuid() == self.pattern):
+        elif (self.type == 'uuid' and
+              device.get_uuid() == self.pattern):
             self.fire(device)
 
 
@@ -58,7 +58,7 @@ class ControlPoint(log.Loggable):
         log.Loggable.__init__(self)
 
         if not auto_client:
-          auto_client = ['MediaServer', 'MediaRenderer']
+            auto_client = ['MediaServer', 'MediaRenderer']
         self.coherence = coherence
         self.auto_client = auto_client
         self.queries = []
@@ -71,14 +71,22 @@ class ControlPoint(log.Loggable):
             self.info('ControlPoint [check device]: {}'.format(device))
             self.check_device(device)
 
-        louie.connect(self.check_device, 'Coherence.UPnP.Device.detection_completed', louie.Any)
-        louie.connect(self.remove_client, 'Coherence.UPnP.Device.remove_client', louie.Any)
-        louie.connect(self.completed, 'Coherence.UPnP.DeviceClient.detection_completed', louie.Any)
+        louie.connect(self.check_device,
+                      'Coherence.UPnP.Device.detection_completed', louie.Any)
+        louie.connect(self.remove_client, 'Coherence.UPnP.Device.remove_client',
+                      louie.Any)
+        louie.connect(self.completed,
+                      'Coherence.UPnP.DeviceClient.detection_completed',
+                      louie.Any)
 
     def shutdown(self):
-        louie.disconnect(self.check_device, 'Coherence.UPnP.Device.detection_completed', louie.Any)
-        louie.disconnect(self.remove_client, 'Coherence.UPnP.Device.remove_client', louie.Any)
-        louie.disconnect(self.completed, 'Coherence.UPnP.DeviceClient.detection_completed', louie.Any)
+        louie.disconnect(self.check_device,
+                         'Coherence.UPnP.Device.detection_completed', louie.Any)
+        louie.disconnect(self.remove_client,
+                         'Coherence.UPnP.Device.remove_client', louie.Any)
+        louie.disconnect(self.completed,
+                         'Coherence.UPnP.DeviceClient.detection_completed',
+                         louie.Any)
 
     def auto_client_append(self, device_type):
         if device_type in self.auto_client:
@@ -106,12 +114,14 @@ class ControlPoint(log.Loggable):
         else:
             self.queries.append(query)
 
-    def connect(self, receiver, signal=louie.signal.All, sender=louie.sender.Any, weak=True):
+    def connect(self, receiver, signal=louie.signal.All,
+                sender=louie.sender.Any, weak=True):
         """ wrapper method around louie.connect
         """
         louie.connect(receiver, signal=signal, sender=sender, weak=weak)
 
-    def disconnect(self, receiver, signal=louie.signal.All, sender=louie.sender.Any, weak=True):
+    def disconnect(self, receiver, signal=louie.signal.All,
+                   sender=louie.sender.Any, weak=True):
         """ wrapper method around louie.disconnect
         """
         louie.disconnect(receiver, signal=signal, sender=sender, weak=weak)
@@ -127,11 +137,13 @@ class ControlPoint(log.Loggable):
 
     def check_device(self, device):
         if device.client is None:
-            self.info("found device %s of type %s - %r", device.get_friendly_name(),
-                                                device.get_device_type(), device.client)
+            self.info("found device %s of type %s - %r",
+                      device.get_friendly_name(),
+                      device.get_device_type(), device.client)
             short_type = device.get_friendly_device_type()
             if short_type in self.auto_client and short_type is not None:
-                self.info("identified %s %r", short_type, device.get_friendly_name())
+                self.info("identified %s %r", short_type,
+                          device.get_friendly_name())
 
                 if short_type == 'MediaServer':
                     client = MediaServerClient(device)
@@ -146,13 +158,19 @@ class ControlPoint(log.Loggable):
         self.process_queries(device)
 
     def completed(self, client, udn):
-        self.info('sending signal Coherence.UPnP.ControlPoint.%s.detected %r', client.device_type, udn)
-        louie.send('Coherence.UPnP.ControlPoint.%s.detected' % client.device_type, None,
-                               client=client, udn=udn)
+        self.info('sending signal Coherence.UPnP.ControlPoint.%s.detected %r',
+                  client.device_type, udn)
+        louie.send(
+            'Coherence.UPnP.ControlPoint.%s.detected' % client.device_type,
+            None,
+            client=client, udn=udn)
 
     def remove_client(self, udn, client):
-        louie.send('Coherence.UPnP.ControlPoint.%s.removed' % client.device_type, None, udn=udn)
-        self.info("removed %s %s", client.device_type, client.device.get_friendly_name())
+        louie.send(
+            'Coherence.UPnP.ControlPoint.%s.removed' % client.device_type, None,
+            udn=udn)
+        self.info("removed %s %s", client.device_type,
+                  client.device.get_friendly_name())
         client.remove()
 
     def propagate(self, event):
@@ -201,7 +219,7 @@ class XMLRPC(xmlrpc.XMLRPC):
         print("list_devices")
         r = []
         for device in self.control_point.get_devices():
-            #print device.get_friendly_name(), device.get_service_type(), device.get_location(), device.get_id()
+            # print device.get_friendly_name(), device.get_service_type(), device.get_location(), device.get_id()
             d = {}
             d['friendly_name'] = device.get_friendly_name()
             d['device_type'] = device.get_device_type()
@@ -305,7 +323,8 @@ class XMLRPC(xmlrpc.XMLRPC):
         device = self.control_point.get_device_with_id(device_id)
         if device != None:
             client = device.get_client()
-            client.content_directory.import_resource(source_uri, destination_uri)
+            client.content_directory.import_resource(source_uri,
+                                                     destination_uri)
             return "Ok"
         return "Error"
 
@@ -332,6 +351,7 @@ if __name__ == '__main__':
     config['logmode'] = 'warning'
     config['serverport'] = 30020
 
+
     # ctrl = ControlPoint(Coherence(config),auto_client=[])
     # ctrl = ControlPoint(Coherence(config))
 
@@ -352,7 +372,11 @@ if __name__ == '__main__':
 
     def query_devices2():
         print("query_devices with timeout")
-        ctrl.add_query(DeviceQuery('host', '192.168.1.163', the_result, timeout=10, oneshot=False))
+        ctrl.add_query(
+            DeviceQuery('host', '192.168.1.163', the_result, timeout=10,
+                        oneshot=False))
+
+
     # reactor.callLater(2, show_devices)
     # reactor.callLater(3, query_devices)
     # reactor.callLater(4, query_devices2)

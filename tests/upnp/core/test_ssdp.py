@@ -11,8 +11,8 @@ Test cases for L{upnp.core.sspd}
 
 import time
 
-from twisted.trial import unittest
 from twisted.test import proto_helpers
+from twisted.trial import unittest
 
 from coherence.upnp.core import ssdp
 
@@ -29,7 +29,7 @@ SSDP_NOTIFY_1 = (
     'USN: ' + USN_1,
     'Cache-Control: max-age=1842',
     'Server:Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0',
-    )
+)
 
 
 class TestSSDP(unittest.TestCase):
@@ -44,7 +44,7 @@ class TestSSDP(unittest.TestCase):
         data = '\r\n'.join(SSDP_NOTIFY_1) + '\r\n\r\n'
         self.proto.datagramReceived(data, ('10.20.30.40', 1234))
         self.assertTrue(self.proto.isKnown(USN_1))
-        self.assertFalse(self.proto.isKnown(USN_1*2))
+        self.assertFalse(self.proto.isKnown(USN_1 * 2))
         service = self.proto.known[USN_1]
         del service['last-seen']
         self.assertEqual(service, {
@@ -57,7 +57,7 @@ class TestSSDP(unittest.TestCase):
             'MANIFESTATION': 'remote',
             'SILENT': False,
             'EXT': '',
-            })
+        })
 
     def test_ssdp_notify_does_not_send_reply(self):
         data = '\r\n'.join(SSDP_NOTIFY_1) + '\r\n\r\n'
@@ -74,7 +74,7 @@ class TestSSDP(unittest.TestCase):
         service2 = self.proto.known[USN_1]
         last_seen2 = service1['last-seen']
         self.assertIs(service1, service2)
-        self.assertLess(last_seen1, last_seen2+0.5)
+        self.assertLess(last_seen1, last_seen2 + 0.5)
 
     def test_doNotify(self):
         data = '\r\n'.join(SSDP_NOTIFY_1) + '\r\n\r\n'
@@ -92,14 +92,15 @@ class TestSSDP(unittest.TestCase):
             'CACHE-CONTROL: max-age=1842',
             'SERVER: Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0',
             ''
-            ]]
+        ]]
         # :fixme: What is the reason the notification is send twice?
         self.assertEqual(len(self.tr.written), 2)
         self.assertEqual(self.tr.written[0], self.tr.written[1])
         data, (host, port) = self.tr.written[0]
         self.assertEqual(
             (host, port),
-            (bytes(SSDP_ADDR, encoding='utf-8'), bytes(str(SSDP_PORT), encoding='utf-8')))
+            (bytes(SSDP_ADDR, encoding='utf-8'),
+             bytes(str(SSDP_PORT), encoding='utf-8')))
         recieved = data.splitlines(True)
         self.assertEqual(
             sorted(recieved),
@@ -121,12 +122,13 @@ class TestSSDP(unittest.TestCase):
             'CACHE-CONTROL: max-age=1842',
             'SERVER: Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0',
             ''
-            ]]
+        ]]
         self.assertEqual(len(self.tr.written), 1)
         data, (host, port) = self.tr.written[0]
         self.assertEqual(
             (host, port),
-            (bytes(SSDP_ADDR, encoding='utf-8'), bytes(str(SSDP_PORT), encoding='utf-8')))
+            (bytes(SSDP_ADDR, encoding='utf-8'),
+             bytes(str(SSDP_PORT), encoding='utf-8')))
         recieved = data.splitlines(True)
         self.assertEqual(
             sorted(recieved),

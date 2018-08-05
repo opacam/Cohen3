@@ -3,17 +3,16 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
-# Copyright 2008 Frank Scholz <coherence@beebits.net>
-from lxml import etree
 from functools import cmp_to_key
 
+# Copyright 2008 Frank Scholz <coherence@beebits.net>
+from lxml import etree
 from twisted.internet import reactor
 
-from coherence.backend import BackendStore
 from coherence.backend import BackendItem
+from coherence.backend import BackendStore
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.utils import getPage
-
 
 ROOT_CONTAINER_ID = 0
 SERIES_CONTAINER_ID = 100
@@ -39,7 +38,8 @@ class BBCItem(BackendItem):
             self.item = DIDLLite.AudioItem(self.id, self.parent_id, self.name)
             self.item.description = self.description
 
-            res = DIDLLite.Resource(self.location, 'http-get:*:%s:*' % self.mimetype)
+            res = DIDLLite.Resource(self.location,
+                                    'http-get:*:%s:*' % self.mimetype)
             res.duration = self.duration
             res.size = self.size
             self.item.res.append(res)
@@ -101,7 +101,6 @@ class Container(BackendItem):
 
 
 class BBCStore(BackendStore):
-
     implements = ['MediaServer']
     rss_url = "http://open.bbc.co.uk/rad/uriplay/availablecontent"
 
@@ -123,7 +122,7 @@ class BBCStore(BackendStore):
         return self.next_id
 
     def get_by_id(self, id):
-        #print "looking for id %r" % id
+        # print "looking for id %r" % id
         if isinstance(id, str):
             id = id.split('@', 1)
             id = id[0]
@@ -136,8 +135,9 @@ class BBCStore(BackendStore):
     def upnp_init(self):
         if self.server:
             self.server.connection_manager_server.set_variable( \
-                0, 'SourceProtocolInfo', ['http-get:*:audio/mpeg:DLNA.ORG_PN=MP3;DLNA.ORG_OP=11;DLNA.ORG_FLAGS=01700000000000000000000000000000',
-                                          'http-get:*:audio/mpeg:*'])
+                0, 'SourceProtocolInfo', [
+                    'http-get:*:audio/mpeg:DLNA.ORG_PN=MP3;DLNA.ORG_OP=11;DLNA.ORG_FLAGS=01700000000000000000000000000000',
+                    'http-get:*:audio/mpeg:*'])
 
     def update_data(self):
 
@@ -155,44 +155,62 @@ class BBCStore(BackendStore):
 
     def parse_data(self, root):
         self.store = {
-          ROOT_CONTAINER_ID: Container(ROOT_CONTAINER_ID, self, -1, self.name),
-          SERIES_CONTAINER_ID: Container(SERIES_CONTAINER_ID, self, ROOT_CONTAINER_ID, 'Series')
+            ROOT_CONTAINER_ID: Container(ROOT_CONTAINER_ID, self, -1,
+                                         self.name),
+            SERIES_CONTAINER_ID: Container(SERIES_CONTAINER_ID, self,
+                                           ROOT_CONTAINER_ID, 'Series')
         }
 
         self.store[ROOT_CONTAINER_ID].add_child(self.store[SERIES_CONTAINER_ID])
 
         for brand in root.findall('./{http://purl.org/ontology/po/}Brand'):
             first = None
-            for episode in brand.findall('*/{http://purl.org/ontology/po/}Episode'):
-                for version in episode.findall('*/{http://purl.org/ontology/po/}Version'):
-                    seconds = int(version.find('./{http://uriplay.org/elements/}publishedDuration').text)
+            for episode in brand.findall(
+                    '*/{http://purl.org/ontology/po/}Episode'):
+                for version in episode.findall(
+                        '*/{http://purl.org/ontology/po/}Version'):
+                    seconds = int(version.find(
+                        './{http://uriplay.org/elements/}publishedDuration').text)
                     hours = seconds / 3600
                     seconds = seconds - hours * 3600
                     minutes = seconds / 60
                     seconds = seconds - minutes * 60
                     duration = ("%d:%02d:%02d") % (hours, minutes, seconds)
-                    for manifestation in version.findall('./{http://uriplay.org/elements/}manifestedAs'):
-                        encoding = manifestation.find('*/{http://uriplay.org/elements/}dataContainerFormat')
-                        size = manifestation.find('*/{http://uriplay.org/elements/}dataSize')
-                        for location in manifestation.findall('*/*/{http://uriplay.org/elements/}Location'):
-                            uri = location.find('./{http://uriplay.org/elements/}uri')
-                            uri = uri.attrib['{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource']
+                    for manifestation in version.findall(
+                            './{http://uriplay.org/elements/}manifestedAs'):
+                        encoding = manifestation.find(
+                            '*/{http://uriplay.org/elements/}dataContainerFormat')
+                        size = manifestation.find(
+                            '*/{http://uriplay.org/elements/}dataSize')
+                        for location in manifestation.findall(
+                                '*/*/{http://uriplay.org/elements/}Location'):
+                            uri = location.find(
+                                './{http://uriplay.org/elements/}uri')
+                            uri = uri.attrib[
+                                '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource']
                             if first == None:
                                 id = self.get_next_id()
                                 self.store[id] = \
-                                        Container(id, self, SERIES_CONTAINER_ID, brand.find('./{http://purl.org/dc/elements/1.1/}title').text)
-                                self.store[SERIES_CONTAINER_ID].add_child(self.store[id])
+                                    Container(id, self, SERIES_CONTAINER_ID,
+                                              brand.find(
+                                                  './{http://purl.org/dc/elements/1.1/}title').text)
+                                self.store[SERIES_CONTAINER_ID].add_child(
+                                    self.store[id])
                                 first = self.store[id]
 
-                            item = BBCItem(first.id, self.get_next_id(), episode.find('./{http://purl.org/dc/elements/1.1/}title').text, uri)
+                            item = BBCItem(first.id, self.get_next_id(),
+                                           episode.find(
+                                               './{http://purl.org/dc/elements/1.1/}title').text,
+                                           uri)
                             first.add_child(item)
                             item.mimetype = encoding.text
                             item.duration = duration
                             item.size = int(size.text) * 1024
-                            item.description = episode.find('./{http://purl.org/dc/elements/1.1/}description').text
+                            item.description = episode.find(
+                                './{http://purl.org/dc/elements/1.1/}description').text
 
         self.update_id += 1
-        #if self.server:
+        # if self.server:
         #    self.server.content_directory_server.set_variable(0, 'SystemUpdateID', self.update_id)
         #    value = (ROOT_CONTAINER_ID,self.container.update_id)
         #    self.server.content_directory_server.set_variable(0, 'ContainerUpdateIDs', value)

@@ -5,11 +5,9 @@
 
 # Copyright 2010 Frank Scholz <dev@coherence-project.org>
 
-from coherence.upnp.devices.wan_device_client import WANDeviceClient
-
-from coherence import log
-
 import coherence.extern.louie as louie
+from coherence import log
+from coherence.upnp.devices.wan_device_client import WANDeviceClient
 
 
 class InternetGatewayDeviceClient(log.Loggable):
@@ -26,13 +24,19 @@ class InternetGatewayDeviceClient(log.Loggable):
 
         self.detection_completed = False
 
-        louie.connect(self.embedded_device_notified, signal='Coherence.UPnP.EmbeddedDeviceClient.detection_completed', sender=self.device)
+        louie.connect(
+            self.embedded_device_notified,
+            signal='Coherence.UPnP.EmbeddedDeviceClient.detection_completed',
+            sender=self.device)
 
         try:
             wan_device = self.device.get_embedded_device_by_type('WANDevice')[0]
             self.wan_device = WANDeviceClient(wan_device)
         except:
-            self.warning("Embedded WANDevice device not available, device not implemented properly according to the UPnP specification")
+            self.warning(
+                "Embedded WANDevice device not available, "
+                "device not implemented properly according "
+                "to the UPnP specification")
             raise
 
         self.info("InternetGatewayDevice %s", self.device.get_friendly_name())
@@ -48,4 +52,4 @@ class InternetGatewayDeviceClient(log.Loggable):
             return
         self.detection_completed = True
         louie.send('Coherence.UPnP.DeviceClient.detection_completed', None,
-                               client=self, udn=self.device.udn)
+                   client=self, udn=self.device.udn)

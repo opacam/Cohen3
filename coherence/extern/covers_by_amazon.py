@@ -39,14 +39,15 @@ a maximum of one month and requested then from Amazon
 again.
 
 """
-from lxml import etree
-
-import os
-import urllib.request, urllib.parse, urllib.error
 import io
+import os
+import urllib.error
+import urllib.parse
+import urllib.request
 
-from twisted.internet import reactor
+from lxml import etree
 from twisted.internet import defer
+from twisted.internet import reactor
 from twisted.web import client
 
 aws_server = {'de': 'de',
@@ -65,12 +66,11 @@ aws_response_group = '&ResponseGroup=Images'
 aws_ns = 'http://webservices.amazon.com/AWSECommerceService/2005-10-05'
 
 aws_image_size = {'large': 'LargeImage',
-                   'medium': 'MediumImage',
-                   'small': 'SmallImage'}
+                  'medium': 'MediumImage',
+                  'small': 'SmallImage'}
 
 
 class WorkQueue(object):
-
     _instance_ = None  # Singleton
 
     def __new__(cls, *args, **kwargs):
@@ -93,7 +93,7 @@ class WorkQueue(object):
         if len(self.queue) == 0:
             return
         if len(self.workers) >= self.max_workers:
-            #print "WorkQueue - all workers busy"
+            # print "WorkQueue - all workers busy"
             return
         work = self.queue.pop()
         d = defer.maybeDeferred(work[0], *work[1], **work[2])
@@ -107,7 +107,6 @@ class WorkQueue(object):
 
 
 class CoverGetter(object):
-
     """
     retrieve a cover image for a given ASIN,
                                a TITLE or
@@ -145,10 +144,11 @@ class CoverGetter(object):
 
     """
 
-    def __init__(self, filename, aws_key, callback=None, not_found_callback=None,
-                       locale=None,
-                       image_size='large',
-                       title=None, artist=None, asin=None):
+    def __init__(self, filename, aws_key, callback=None,
+                 not_found_callback=None,
+                 locale=None,
+                 image_size='large',
+                 title=None, artist=None, asin=None):
         self.aws_base_query = '/onca/xml?Service=AWSECommerceService' \
                               '&AWSAccessKeyId=%s' % aws_key
 
@@ -177,26 +177,29 @@ class CoverGetter(object):
             query = aws_artist_query
             if artist is not None:
                 artist = sanitize(artist)
-                query = '&'.join((query, 'Artist=%s' % urllib.parse.quote(artist)))
+                query = '&'.join(
+                    (query, 'Artist=%s' % urllib.parse.quote(artist)))
             if title is not None:
                 title = sanitize(title)
-                query = '&'.join((query, 'Title=%s' % urllib.parse.quote(title)))
+                query = '&'.join(
+                    (query, 'Title=%s' % urllib.parse.quote(title)))
         else:
-            raise KeyError("Please supply either asin, title or artist and title arguments")
+            raise KeyError(
+                "Please supply either asin, title or artist and title arguments")
         url = self.server + self.aws_base_query + aws_response_group + query
         WorkQueue(self.send_request, url)
 
     def send_request(self, url, *args, **kwargs):
-        #print "send_request", url
+        # print "send_request", url
         d = client.getPage(url)
         d.addCallback(self.got_response)
         d.addErrback(self.got_error, url)
         return d
 
     def got_image(self, result, convert_from='', convert_to=''):
-        #print "got_image"
-        if(len(convert_from) and len(convert_to)):
-            #print "got_image %d, convert to %s" % (len(result), convert_to)
+        # print "got_image"
+        if (len(convert_from) and len(convert_to)):
+            # print "got_image %d, convert to %s" % (len(result), convert_to)
             try:
                 import Image
 
@@ -206,7 +209,8 @@ class CoverGetter(object):
 
                 im.save(self.filename)
             except ImportError:
-                print("we need the Python Imaging Library to do image conversion")
+                print(
+                    "we need the Python Imaging Library to do image conversion")
 
         if self.filename == None:
             data = result
@@ -214,13 +218,13 @@ class CoverGetter(object):
             data = self.filename
 
         if self.callback is not None:
-            #print "got_image", self.callback
+            # print "got_image", self.callback
             if isinstance(self.callback, tuple):
                 if len(self.callback) == 3:
                     c, a, kw = self.callback
                     if not isinstance(a, tuple):
-                        a = (a, )
-                    a = (data, ) + a
+                        a = (a,)
+                    a = (data,) + a
                     c(*a, **kw)
                 if len(self.callback) == 2:
                     c, a = self.callback
@@ -228,8 +232,8 @@ class CoverGetter(object):
                         c(data, **a)
                     else:
                         if not isinstance(a, tuple):
-                            a = (a, )
-                        a = (data, ) + a
+                            a = (a,)
+                        a = (data,) + a
                         c(*a)
                 if len(self.callback) == 1:
                     c = self.callback
@@ -240,7 +244,8 @@ class CoverGetter(object):
     def got_response(self, result):
         convert_from = convert_to = ''
         result = etree.fromstring(result)
-        image_tag = result.find('.//{%s}%s' % (aws_ns, aws_image_size.get(self.image_size, 'large')))
+        image_tag = result.find('.//{%s}%s' % (
+        aws_ns, aws_image_size.get(self.image_size, 'large')))
         if image_tag is not None:
             image_url = image_tag.findtext('{%s}URL' % aws_ns)
             if self.filename is None:
@@ -254,14 +259,15 @@ class CoverGetter(object):
                 else:
                     _, image_ext = os.path.splitext(image_url)
                     if image_ext != '' and file_ext != image_ext:
-                        #print "hmm, we need a conversion..."
+                        # print "hmm, we need a conversion..."
                         convert_from = image_ext
                         convert_to = file_ext
                 if len(convert_to):
                     d = client.getPage(image_url)
                 else:
                     d = client.downloadPage(image_url, self.filename)
-            d.addCallback(self.got_image, convert_from=convert_from, convert_to=convert_to)
+            d.addCallback(self.got_image, convert_from=convert_from,
+                          convert_to=convert_to)
             d.addErrback(self.got_error, image_url)
         else:
             if self._errcall is not None:
@@ -269,7 +275,7 @@ class CoverGetter(object):
                     if len(self._errcall) == 3:
                         c, a, kw = self._errcall
                         if not isinstance(a, tuple):
-                            a = (a, )
+                            a = (a,)
                         c(*a, **kw)
                     if len(self._errcall) == 2:
                         c, a = self._errcall
@@ -277,7 +283,7 @@ class CoverGetter(object):
                             c(**a)
                         else:
                             if not isinstance(a, tuple):
-                                a = (a, )
+                                a = (a,)
                             c(*a)
                     if len(self._errcall) == 1:
                         c = self._errcall
@@ -293,30 +299,38 @@ if __name__ == '__main__':
 
     from twisted.python import usage
 
+
     class Options(usage.Options):
         optParameters = [['artist', 'a', '', 'artist name'],
                          ['title', 't', '', 'title'],
                          ['asin', 's', '', 'ASIN'],
                          ['filename', 'f', 'cover.jpg', 'filename'],
-                    ]
+                         ]
+
 
     options = Options()
     try:
         options.parseOptions()
     except usage.UsageError as errortext:
         import sys
+
         print('%s: %s' % (sys.argv[0], errortext))
         print('%s: Try --help for usage details.' % (sys.argv[0]))
         sys.exit(1)
 
+
     def got_it(filename, *args, **kwargs):
         print("Mylady, it is an image and its name is", filename, args, kwargs)
+
 
     aws_key = '1XHSE4FQJ0RK0X3S9WR2'
     print(options['asin'], options['artist'], options['title'])
     if len(options['asin']):
-        reactor.callWhenRunning(CoverGetter, options['filename'], aws_key, callback=got_it, asin=options['asin'])
+        reactor.callWhenRunning(CoverGetter, options['filename'], aws_key,
+                                callback=got_it, asin=options['asin'])
     elif len(options['artist']) and len(options['title']):
-        reactor.callWhenRunning(CoverGetter, options['filename'], aws_key, callback=got_it, artist=options['artist'], title=options['title'])
+        reactor.callWhenRunning(CoverGetter, options['filename'], aws_key,
+                                callback=got_it, artist=options['artist'],
+                                title=options['title'])
 
     reactor.run()

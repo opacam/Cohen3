@@ -9,14 +9,16 @@
 Test cases for L{upnp.core.action}
 """
 
-from twisted.trial import unittest
 from twisted.internet.defer import Deferred
+from twisted.trial import unittest
 
 from coherence.upnp.core import action
 
 
 class NoImplementation:
-  pass
+    pass
+
+
 NoImplementation = NoImplementation()
 
 
@@ -54,6 +56,7 @@ class DummyService:
 
     def _get_client(self, name):
         return self.__client
+
 
 class DummyServiceWithStateVariables(DummyService):
     def __init__(self, *argnames):
@@ -101,7 +104,7 @@ def _build_action_arguments():
         action.Argument('InstanceID', 'in', 'A_ARG_TYPE_InstanceID'),
         action.Argument('CurrentBrightness', 'out', 'Brightness'),
         action.Argument('Color', 'in', 'Color'),
-        ]
+    ]
     return args
 
 
@@ -110,8 +113,8 @@ class TestAction(unittest.TestCase):
     def setUp(self):
         self.service = DummyService()
         self.arguments = _build_action_arguments()
-        self.action= action.Action(self.service, 'SomeTestAction',
-                                   NoImplementation, self.arguments)
+        self.action = action.Action(self.service, 'SomeTestAction',
+                                    NoImplementation, self.arguments)
 
     def test_action(self):
         """ Test initialization of Action() instance """
@@ -133,19 +136,19 @@ class TestAction(unittest.TestCase):
         self.assertEqual(self.action.as_dict(),
                          {'name': 'SomeTestAction',
                           'arguments': [
-            {'name': 'InstanceID',
-             'direction': 'in',
-             'related_state_variable': 'A_ARG_TYPE_InstanceID',
-             },
-            {'name': 'CurrentBrightness',
-             'direction': 'out',
-             'related_state_variable': 'Brightness',
-             },
-            {'name': 'Color',
-             'direction': 'in',
-             'related_state_variable': 'Color',
-             },
-            ]})
+                              {'name': 'InstanceID',
+                               'direction': 'in',
+                               'related_state_variable': 'A_ARG_TYPE_InstanceID',
+                               },
+                              {'name': 'CurrentBrightness',
+                               'direction': 'out',
+                               'related_state_variable': 'Brightness',
+                               },
+                              {'name': 'Color',
+                               'direction': 'in',
+                               'related_state_variable': 'Color',
+                               },
+                          ]})
 
     def test_action_as_tuple(self):
         """ Test Action.as_tuples() """
@@ -157,7 +160,9 @@ class TestAction(unittest.TestCase):
 
     def test_action_set_callback(self):
         """ Test Action.set_callback() """
+
         def _this_callback(): pass
+
         act = self.action
         self.assertIs(act.get_callback(), None)
         act.set_callback(_this_callback)
@@ -167,21 +172,21 @@ class TestAction(unittest.TestCase):
         # :fixme: Action.call() does not raise an error if no
         # `in_argument` is passed. IMHO this should be treated as an
         # programming error and should be fixed.
-        #self.assertRaises(..., act.call)
+        # self.assertRaises(..., act.call)
         self.assertIs(self.action.call(), None)
 
     def test_call_action_with_missing_arguments(self):
         # :fixme: Action.call() does not raise an error if an
         # `in_argument` is not passed. IMHO this should be treated as
         # an programming error and should be fixed.
-        #self.assertRaises(..., act.call, InstanceID=22)
+        # self.assertRaises(..., act.call, InstanceID=22)
         self.assertIs(self.action.call(InstanceID=22), None)
 
     def test_call_action_with_wrong_argument(self):
         # :fixme: Action.call() does not raise an error if a invalid
         # `in_argument` is passed. IMHO this should be treated as an
         # programming error and should be fixed.
-        #self.assertRaises(..., act.call, ThisIsNoValidArgName=123)
+        # self.assertRaises(..., act.call, ThisIsNoValidArgName=123)
         self.assertIs(self.action.call(ThisIsNoValidArgName=123), None)
 
 
@@ -190,19 +195,18 @@ class TestAction2(unittest.TestCase):
     def setUp(self):
         self.arguments = _build_action_arguments()
         self.service = DummyServiceWithStateVariables('Brightness')
-        self.action= action.Action(self.service, b'SomeTestAction',
-                                   NoImplementation, self.arguments)
+        self.action = action.Action(self.service, b'SomeTestAction',
+                                    NoImplementation, self.arguments)
 
     def test_setup(self):
         """ Test is setup of this test-case works as expected. """
         self.assertIsInstance(self.service, DummyServiceWithStateVariables)
-        for name in ('Brightness', ):
+        for name in ('Brightness',):
             var = self.service.get_state_variable(name)
             self.assertIsInstance(var, DummyStateVariable)
             self.assertIs(var.value, NoImplementation)
 
     def test_call_action(self):
-
         def check_result(*args, **kw):
             self.assertEqual(
                 self.service.get_state_variable('Brightness').value,
@@ -213,7 +217,7 @@ class TestAction2(unittest.TestCase):
 
         self.assertIs(self.service.get_state_variable('Brightness').value,
                       NoImplementation)
-        client = DummyClient({'CurrentBrightness': 12} )
+        client = DummyClient({'CurrentBrightness': 12})
         self.service._set_client(client)
         result = self.action.call(InstanceID=23, Color='red')
         result.addCallback(check_result)
@@ -223,6 +227,7 @@ class TestAction2(unittest.TestCase):
         """
         Check if missing result values are silently ignored.
         """
+
         def check_result(*args, **kw):
             self.assertEqual(
                 self.service.get_state_variable('Brightness').value,

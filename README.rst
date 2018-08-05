@@ -28,6 +28,17 @@ which looks like no longer supported.
 - PyPI: https://pypi.python.org/pypi/cohen3
 - Free software: MIT licence
 
+NOTE: All the dependencies of the setup.py file are the basic dependencies in
+order to run a media server. Should be mentioned that some of the backends
+needs more dependencies and some of them may not work as expected because there
+aren't tested yet. Here are some of them listed:
+    - youtube: gdata (pip install gdata)
+    - picassa storage: gdata (pip install gdata)
+    - tube service: dbus-python (pip install dbus-python)
+    - dvbd storage: dbus-python (pip install dbus-python)
+    - audio cd storage: PyCDDB and discid (pip install PyCDDB and pip install discid)
+    - media db storage: axiom epsilon
+    - module: coherence.web.ui modile depens on Nevow (pip install Nevow)
 
 Features
 --------

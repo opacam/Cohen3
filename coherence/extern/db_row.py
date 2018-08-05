@@ -1,4 +1,3 @@
-
 # Wraps DB-API 2.0 query results to provide a nice list and dictionary interface.
 # Copyright (C) 2002  Dr. Conan C. Albrecht <conan_albrecht@byu.edu>
 #

@@ -7,7 +7,6 @@
 
 import getopt
 import sys
-import string
 import xmlrpc.client
 
 command = "status"
@@ -19,21 +18,23 @@ id = 1000
 arguments = {}
 
 try:
-    optlist, args = getopt.getopt(sys.argv[1:], "c:d:i:v:u:", ['command=', 'device=', 'id=', 'volume=', 'uri='])
+    optlist, args = getopt.getopt(sys.argv[1:], "c:d:i:v:u:",
+                                  ['command=', 'device=', 'id=', 'volume=',
+                                   'uri='])
 except getopt.GetoptError:
     print("falsche parameter")
     sys.exit(1)
 
 for option, param in optlist:
-    if option in('-c', '--command'):
+    if option in ('-c', '--command'):
         command = param
-    if option in('-d', '--device'):
+    if option in ('-d', '--device'):
         device = param
-    if option in('-i', '--id'):
+    if option in ('-i', '--id'):
         id = param
-    if option in('-v', '--volume'):
+    if option in ('-v', '--volume'):
         volume = param
-    if option in('-u', '--uri'):
+    if option in ('-u', '--uri'):
         uri = param
 
 skip = False
@@ -90,7 +91,8 @@ if command == "create_object" and device != '':
     r = s.create_object(device, id, arguments)
 
 if command == "import_resource" and device != '':
-    r = s.import_resource(device, arguments['source_uri'], arguments['destination_uri'])
+    r = s.import_resource(device, arguments['source_uri'],
+                          arguments['destination_uri'])
 
 if command == "put_resource":
     r = s.put_resource(arguments['url'], arguments['path'])

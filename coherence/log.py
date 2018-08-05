@@ -43,7 +43,7 @@ COLORS = {
 
 
 class ColoredFormatter(logging.Formatter):
-    def __init__(self, msg, use_color = True):
+    def __init__(self, msg, use_color=True):
         logging.Formatter.__init__(self, msg)
         self.use_color = use_color
 
@@ -78,7 +78,6 @@ _srcfiles = (_srcfile, logging._srcfile)
 
 
 class ColoredLogger(logging.Logger):
-
     FORMAT = LOG_FORMAT
     COLOR_FORMAT = formatter_message(FORMAT, True)
 
@@ -96,9 +95,8 @@ class ColoredLogger(logging.Logger):
         # print(self.handlers)
         return
 
-
-# class Logger(ColoredLogger):
-#
+    # class Logger(ColoredLogger):
+    #
     def findCaller(self, stack_info=False, use_color=True):
         """
         Find the stack frame of the caller so that we can note the source

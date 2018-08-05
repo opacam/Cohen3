@@ -10,17 +10,16 @@
 #
 
 import random
-import string
-import time
 import socket
+import time
 
-from twisted.internet.protocol import DatagramProtocol
-from twisted.internet import reactor, error
+from twisted.internet import reactor
 from twisted.internet import task
+from twisted.internet.protocol import DatagramProtocol
 from twisted.web.http import datetimeToString
-from coherence import log, SERVER_ID
-import coherence.extern.louie as louie
 
+import coherence.extern.louie as louie
+from coherence import log, SERVER_ID
 
 SSDP_PORT = 1900
 SSDP_ADDR = '239.255.255.250'
@@ -39,15 +38,18 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         self._callbacks = {}
         self.test = test
         if not self.test:
-          self.port = reactor.listenMulticast(SSDP_PORT, self, listenMultiple=True, interface=interface)
+            self.port = reactor.listenMulticast(
+                SSDP_PORT, self,
+                listenMultiple=True,
+                interface=interface)
 
-          self.port.joinGroup(SSDP_ADDR, interface=interface)
+            self.port.joinGroup(SSDP_ADDR, interface=interface)
 
-          self.resend_notify_loop = task.LoopingCall(self.resendNotify)
-          self.resend_notify_loop.start(777.0, now=False)
+            self.resend_notify_loop = task.LoopingCall(self.resendNotify)
+            self.resend_notify_loop.start(777.0, now=False)
 
-          self.check_valid_loop = task.LoopingCall(self.check_valid)
-          self.check_valid_loop.start(333.0, now=False)
+            self.check_valid_loop = task.LoopingCall(self.check_valid)
+            self.check_valid_loop.start(333.0, now=False)
 
         self.active_calls = []
 
@@ -103,10 +105,10 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         louie.send('UPnP.SSDP.datagram_received', None, data, host, port)
 
     def register(self, manifestation, usn, st, location,
-                        server=SERVER_ID,
-                        cache_control='max-age=1800',
-                        silent=False,
-                        host=None):
+                 server=SERVER_ID,
+                 cache_control='max-age=1800',
+                 silent=False,
+                 host=None):
         """Register a service or device that this SSDP server will
         respond to."""
 
@@ -135,10 +137,11 @@ class SSDPServer(DatagramProtocol, log.Loggable):
                 louie.send(
                     'Coherence.UPnP.SSDP.new_device',
                     None, device_type=st, infos=self.known[usn])
-                #self.callback("new_device", st, self.known[usn])
+                # self.callback("new_device", st, self.known[usn])
             print('\t - ok all')
         except Exception as e:
-            print(('\t -> Error on registering service: {}'.format(manifestation, e)))
+            print(('\t -> Error on registering service: {}'.format(
+                manifestation, e)))
 
     def unRegister(self, usn):
         self.msg("Un-registering {}".format(usn))
@@ -147,7 +150,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
             louie.send(
                 'Coherence.UPnP.SSDP.removed_device',
                 None, device_type=st, infos=self.known[usn])
-            #self.callback("removed_device", st, self.known[usn])
+            # self.callback("removed_device", st, self.known[usn])
 
         del self.known[usn]
 
@@ -167,15 +170,18 @@ class SSDPServer(DatagramProtocol, log.Loggable):
                 self.known[headers['usn']]['last-seen'] = time.time()
                 self.debug('updating last-seen for {}'.format(headers['usn']))
             except KeyError:
-                self.register('remote', headers['usn'], headers['nt'], headers['location'],
-                              headers['server'], headers['cache-control'], host=host)
+                self.register('remote', headers['usn'], headers['nt'],
+                              headers['location'],
+                              headers['server'], headers['cache-control'],
+                              host=host)
         elif headers['nts'] == 'ssdp:byebye':
             if self.isKnown(headers['usn']):
                 self.unRegister(headers['usn'])
         else:
             self.warning('Unknown subtype {} for notification type {}'.format(
                 headers['nts'], headers['nt']))
-        louie.send('Coherence.UPnP.Log', None, 'SSDP', host, 'Notify %s for %s' % (headers['nts'], headers['usn']))
+        louie.send('Coherence.UPnP.Log', None, 'SSDP', host,
+                   'Notify %s for %s' % (headers['nts'], headers['usn']))
 
     def send_it(self, response, destination, delay, usn):
         self.info('send discovery response delayed by '
@@ -203,11 +209,11 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         for i in list(self.known.values()):
             if i['MANIFESTATION'] == 'remote':
                 continue
-            if(headers['st'] == 'ssdp:all' and
-               i['SILENT'] is True):
+            if (headers['st'] == 'ssdp:all' and
+                    i['SILENT'] is True):
                 continue
-            if(i['ST'] == headers['st'] or
-                headers['st'] == 'ssdp:all'):
+            if (i['ST'] == headers['st'] or
+                    headers['st'] == 'ssdp:all'):
                 response = []
                 response.append('HTTP/1.1 200 OK')
 
@@ -235,7 +241,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         resp = [b'NOTIFY * HTTP/1.1',
                 b'HOST: %s:%s' % (SSDP_ADDR, SSDP_PORT),
                 b'NTS: ssdp:alive',
-            ]
+                ]
         stcpy = dict(iter(self.known[usn].items()))
         stcpy['NT'] = stcpy['ST']
         del stcpy['ST']

@@ -11,14 +11,16 @@ Test cases for L{upnp.services.servers.content_directory_server}
 """
 
 import os
-from twisted.trial import unittest
+
 from twisted.internet.defer import Deferred
 from twisted.python.filepath import FilePath
+from twisted.trial import unittest
+
 from coherence.base import Coherence
+from coherence.extern import louie
+from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.uuid import UUID
 from coherence.upnp.devices.control_point import DeviceQuery
-from coherence.upnp.core import DIDLLite
-from coherence.extern import louie
 from tests import wrapped
 
 
@@ -40,12 +42,12 @@ class TestContentDirectoryServer(unittest.TestCase):
         album.child('track-2.ogg').touch()
         louie.reset()
         self.coherence = Coherence(
-          {'unittest': 'yes',
-           'logmode': 'critical',
-           'no-subsystem_log': {'controlpoint': 'error',
-                                'action': 'info',
-                                'soap': 'error'},
-           'controlpoint': 'yes'})
+            {'unittest': 'yes',
+             'logmode': 'critical',
+             'no-subsystem_log': {'controlpoint': 'error',
+                                  'action': 'info',
+                                  'soap': 'error'},
+             'controlpoint': 'yes'})
         self.uuid = str(UUID())
         self.coherence.add_plugin('FSStore',
                                   name='MediaServer-%d' % os.getpid(),
@@ -97,7 +99,6 @@ class TestContentDirectoryServer(unittest.TestCase):
         return d
 
     def test_Browse_Non_Existing_Object(self):
-
         d = Deferred()
 
         @wrapped(d)
@@ -152,7 +153,8 @@ class TestContentDirectoryServer(unittest.TestCase):
 
         @wrapped(d)
         def the_result(mediaserver):
-            mediaserver.client.overlay_headers = {'user-agent': 'Xbox/Coherence emulation'}
+            mediaserver.client.overlay_headers = {
+                'user-agent': 'Xbox/Coherence emulation'}
             cdc = mediaserver.client.content_directory
             self.assertEqual(self.uuid, mediaserver.udn)
             call = cdc.browse(object_id='4', process_result=False)

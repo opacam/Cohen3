@@ -20,32 +20,17 @@ ProxyClient handleStatus HTTP/1.1 403 Invalid ticket
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
 # Copyright 2007, Moritz Struebe <morty@gmx.net>
 
-from twisted.internet import defer
-
-from coherence.upnp.core import utils
-
-from coherence.upnp.core.DIDLLite import classChooser, Container, Resource, DIDLElement
-
-import coherence.extern.louie as louie
-
-from coherence.extern.simple_plugin import Plugin
-
-from coherence import log
-from coherence.backend import BackendItem, BackendStore
-
+from hashlib import md5
 from urllib.parse import urlsplit
 
-try:
-    from hashlib import md5
-except ImportError:
-    # hashlib is new in Python 2.5
-    from md5 import md5
-
-import string
+import coherence.extern.louie as louie
+from coherence import log
+from coherence.extern.simple_plugin import Plugin
+from coherence.upnp.core import utils
+from coherence.upnp.core.DIDLLite import classChooser, Container, Resource
 
 
 class LastFMUser(log.Loggable):
-
     logCategory = 'lastFM_user'
 
     user = None
@@ -81,11 +66,11 @@ class LastFMUser(log.Loggable):
                         self.sessionid = tuple[1]
                         self.info("Got new sessionid: %r", self.sessionid)
                     if tuple[0] == "base_url":
-                        if(self.host != tuple[1]):
+                        if (self.host != tuple[1]):
                             self.host = tuple[1]
                             self.info("Got new host: %s", self.host)
                     if tuple[0] == "base_path":
-                        if(self.basepath != tuple[1]):
+                        if (self.basepath != tuple[1]):
                             self.basepath = tuple[1]
                             self.info("Got new path: %s", self.basepath)
             self.get_tracks()
@@ -94,14 +79,19 @@ class LastFMUser(log.Loggable):
             self.warning("Login to LastFM Failed! %r", error)
             self.debug("%r", error.getTraceback())
 
-        def hexify(s):  # This function might be GPL! Found this code in some other Projects, too.
+        def hexify(
+                s):  # This function might be GPL! Found this code in some other Projects, too.
             result = ""
             for c in s:
                 result = result + ("%02x" % ord(c))
             return result
+
         password = hexify(md5(self.passwd).digest())
         req = self.basepath + "/handshake.php/?version=1&platform=win&username=" + self.user + "&passwordmd5=" + password + "&language=en&player=coherence"
-        utils.getPage("http://" + self.host + req).addCallbacks(got_page, got_error, None, None, None, None)
+        utils.getPage("http://" + self.host + req).addCallbacks(got_page,
+                                                                got_error, None,
+                                                                None, None,
+                                                                None)
 
     def get_tracks(self):
         if self.getting_tracks == True:
@@ -116,9 +106,10 @@ class LastFMUser(log.Loggable):
                 data = {}
 
                 def get_data(name):
-                    #print track.find(name).text.encode('utf-8')
+                    # print track.find(name).text.encode('utf-8')
                     return track.find(name).text.encode('utf-8')
-                #Fixme: This section needs some work
+
+                # Fixme: This section needs some work
                 print("adding Track")
                 data['mimetype'] = 'audio/mpeg'
                 data['name'] = get_data('creator') + " - " + get_data('title')
@@ -127,7 +118,7 @@ class LastFMUser(log.Loggable):
                 data['creator'] = get_data('creator')
                 data['album'] = get_data('album')
                 data['duration'] = get_data('duration')
-                #FIXME: Image is the wrong tag.
+                # FIXME: Image is the wrong tag.
                 data['image'] = get_data('image')
                 data['url'] = track.find('location').text.encode('utf-8')
                 item = self.parent.store.append(data, self.parent)
@@ -140,7 +131,10 @@ class LastFMUser(log.Loggable):
 
         self.getting_tracks = True
         req = self.basepath + "/xspf.php?sk=" + self.sessionid + "&discovery=0&desktop=1.3.1.1"
-        utils.getPage("http://" + self.host + req).addCallbacks(got_page, got_error, None, None, None, None)
+        utils.getPage("http://" + self.host + req).addCallbacks(got_page,
+                                                                got_error, None,
+                                                                None, None,
+                                                                None)
 
     def update(self, item):
         if 0 < self.tracks.count(item):
@@ -151,10 +145,10 @@ class LastFMUser(log.Loggable):
                 self.tracks.remove(track)
                 # Do not remoce so the tracks to answer the browse
                 # request correctly.
-                #track.store.remove(track)
-                #del track
+                # track.store.remove(track)
+                # del track
 
-        #if len(self.tracks) < 5:
+        # if len(self.tracks) < 5:
         self.get_tracks()
 
 
@@ -176,7 +170,7 @@ class LFMProxyStream(utils.ReverseProxyResource, log.Loggable):
         if path == '':
             path = '/'
 
-        #print "ProxyStream init", host, port, path
+        # print "ProxyStream init", host, port, path
         utils.ReverseProxyResource.__init__(self, host, port, path)
 
     def render(self, request):
@@ -189,7 +183,8 @@ class LFMProxyStream(utils.ReverseProxyResource, log.Loggable):
 class LastFMItem(log.Loggable):
     logCategory = 'LastFM_item'
 
-    def __init__(self, id, obj, parent, mimetype, urlbase, UPnPClass, update=False):
+    def __init__(self, id, obj, parent, mimetype, urlbase, UPnPClass,
+                 update=False):
         log.Loggable.__init__(self)
         self.id = id
 
@@ -216,7 +211,7 @@ class LastFMItem(log.Loggable):
         self.child_count = 0
         self.children = []
 
-        if(len(urlbase) and urlbase[-1] != '/'):
+        if (len(urlbase) and urlbase[-1] != '/'):
             urlbase += '/'
 
         if self.mimetype == 'directory':
@@ -224,16 +219,17 @@ class LastFMItem(log.Loggable):
         else:
             self.url = urlbase + str(self.id)
             self.location = LFMProxyStream(obj.get('url'), self)
-            #self.url = obj.get('url')
+            # self.url = obj.get('url')
 
         if self.mimetype == 'directory':
             self.update_id = 0
         else:
             res = Resource(self.url, 'http-get:*:%s:%s' % (obj.get('mimetype'),
-                                                                     ';'.join(('DLNA.ORG_PN=MP3',
-                                                                               'DLNA.ORG_CI=0',
-                                                                               'DLNA.ORG_OP=01',
-                                                                               'DLNA.ORG_FLAGS=01700000000000000000000000000000'))))
+                                                           ';'.join((
+                                                                    'DLNA.ORG_PN=MP3',
+                                                                    'DLNA.ORG_CI=0',
+                                                                    'DLNA.ORG_OP=01',
+                                                                    'DLNA.ORG_FLAGS=01700000000000000000000000000000'))))
             res.size = -1  # None
             self.item.res.append(res)
 
@@ -253,7 +249,8 @@ class LastFMItem(log.Loggable):
             self.update_id += 1
 
     def remove_child(self, child):
-        self.info("remove_from %d (%s) child %d (%s)", self.id, self.get_name(), child.id, child.get_name())
+        self.info("remove_from %d (%s) child %d (%s)", self.id, self.get_name(),
+                  child.id, child.get_name())
         if child in self.children:
             self.child_count -= 1
             if isinstance(self.item, Container):
@@ -301,7 +298,6 @@ class LastFMItem(log.Loggable):
 
 
 class LastFMStore(log.Loggable, Plugin):
-
     logCategory = 'lastFM_store'
 
     implements = ['MediaServer']
@@ -336,19 +332,22 @@ class LastFMStore(log.Loggable, Plugin):
             update = True
 
         self.store[id] = LastFMItem(id, obj, parent, mimetype, self.urlbase,
-                                        UPnPClass, update=update)
+                                    UPnPClass, update=update)
         self.store[id].store = self
-
 
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0, 'SystemUpdateID', self.update_id)
+                self.server.content_directory_server.set_variable(0,
+                                                                  'SystemUpdateID',
+                                                                  self.update_id)
             if parent:
-                #value = '%d,%d' % (parent.get_id(),parent_get_update_id())
+                # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0, 'ContainerUpdateIDs', value)
+                    self.server.content_directory_server.set_variable(0,
+                                                                      'ContainerUpdateIDs',
+                                                                      value)
 
         return self.store[id]
 
@@ -360,11 +359,15 @@ class LastFMStore(log.Loggable, Plugin):
             if hasattr(self, 'update_id'):
                 self.update_id += 1
                 if self.server:
-                    self.server.content_directory_server.set_variable(0, 'SystemUpdateID', self.update_id)
-                #value = '%d,%d' % (parent.get_id(),parent_get_update_id())
+                    self.server.content_directory_server.set_variable(0,
+                                                                      'SystemUpdateID',
+                                                                      self.update_id)
+                # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0, 'ContainerUpdateIDs', value)
+                    self.server.content_directory_server.set_variable(0,
+                                                                      'ContainerUpdateIDs',
+                                                                      value)
         except:
             pass
 
@@ -393,18 +396,20 @@ class LastFMStore(log.Loggable, Plugin):
 
         parent = self.append({'name': 'LastFM', 'mimetype': 'directory'}, None)
 
-        self.LFM = LastFMUser(self.config.get("login"), self.config.get("password"))
+        self.LFM = LastFMUser(self.config.get("login"),
+                              self.config.get("password"))
         self.LFM.parent = parent
         self.LFM.login()
 
         if self.server:
-            self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo',
-                                                                    ['http-get:*:audio/mpeg:*'],
-                                                                    default=True)
+            self.server.connection_manager_server.set_variable(0,
+                                                               'SourceProtocolInfo',
+                                                               [
+                                                                   'http-get:*:audio/mpeg:*'],
+                                                               default=True)
 
 
 def main():
-
     f = LastFMStore(None)
 
     def got_upnp_result(result):
@@ -413,9 +418,7 @@ def main():
     f.upnp_init()
 
 
-
 if __name__ == '__main__':
-
     from twisted.internet import reactor
 
     reactor.callWhenRunning(main)

@@ -15,4 +15,5 @@ def AudioItem(func):
         if e != None:
             e.attrib['dlna:profileID'] = 'JPEG_TN'
         return result
+
     return add

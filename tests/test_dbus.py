@@ -11,20 +11,20 @@ Test cases for L{dbus_service}
 
 import os
 
-from twisted.trial import unittest
 from twisted.internet import reactor
 from twisted.internet.defer import Deferred
+from twisted.trial import unittest
 
+import coherence.extern.louie as louie
 from coherence import __version__
 from coherence.base import Coherence
 from coherence.upnp.core import uuid
-import coherence.extern.louie as louie
-
 from tests import wrapped
 
 try:
     import dbus
     from dbus.mainloop.glib import DBusGMainLoop
+
     DBusGMainLoop(set_as_default=True)
     import dbus.service
 except ImportError:
@@ -35,7 +35,6 @@ OBJECT_PATH = '/org/Coherence'
 
 
 class TestDBUS(unittest.TestCase):
-
     if not dbus:
         skip = "Python dbus-bindings not available."
     elif reactor.__class__.__name__ != 'Glib2Reactor':
@@ -44,7 +43,9 @@ class TestDBUS(unittest.TestCase):
 
     def setUp(self):
         louie.reset()
-        self.coherence = Coherence({'unittest': 'yes', 'logmode': 'error', 'use_dbus': 'yes', 'controlpoint': 'yes'})
+        self.coherence = Coherence(
+            {'unittest': 'yes', 'logmode': 'error', 'use_dbus': 'yes',
+             'controlpoint': 'yes'})
         self.bus = dbus.SessionBus()
         self.coherence_service = self.bus.get_object(BUS_NAME, OBJECT_PATH)
         self.uuid = str(uuid.UUID())
@@ -84,7 +85,8 @@ class TestDBUS(unittest.TestCase):
         @wrapped(d)
         def add_it(uuid):
             self.coherence_service.add_plugin(
-                'SimpleLight', {'name': 'dbus-test-light-%d' % os.getpid(), 'uuid': uuid},
+                'SimpleLight',
+                {'name': 'dbus-test-light-%d' % os.getpid(), 'uuid': uuid},
                 dbus_interface=BUS_NAME,
                 reply_handler=handle_add_plugin_reply,
                 error_handler=d.errback)

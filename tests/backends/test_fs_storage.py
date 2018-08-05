@@ -9,12 +9,12 @@
 Test cases for L{upnp.backends.fs_storage}
 """
 
-from twisted.trial import unittest
 from twisted.python.filepath import FilePath
-
-from coherence.backends import fs_storage
+from twisted.trial import unittest
 
 import coherence.log
+from coherence.backends import fs_storage
+
 coherence.log.init()
 
 
@@ -51,8 +51,10 @@ class TestFSStorageWithMultiContentAssumptions(unittest.TestCase):
 
     def setUp(self):
         f = self.tmp_content = FilePath(self.mktemp())
-        audio = f.child('audio') ; audio.makedirs()
-        video = f.child('video') ; video.makedirs()
+        audio = f.child('audio');
+        audio.makedirs()
+        video = f.child('video');
+        video.makedirs()
         self.storage = fs_storage.FSStore(None, name='my media',
                                           content=[audio.path, video.path],
                                           urlbase='http://fsstore-host/xyz',
@@ -75,6 +77,7 @@ class TestFSStorageWithMultiContentAssumptions(unittest.TestCase):
         self.assertEqual(root.mimetype, 'root')
         self.assertEqual(root.get_name(), 'media')
 
+
 # todo: test get_xml()
 '''
 self.storage.get_by_id("1000").get_xml()
@@ -87,9 +90,12 @@ class TestFSStorage(unittest.TestCase):
     def setUp(self):
         self.tmp_content = FilePath(self.mktemp())
         f = self.tmp_content.child('my content')
-        audio = f.child('audio') ; audio.makedirs()
-        video = f.child('video') ; video.makedirs()
-        images = f.child('images') ; images.makedirs()
+        audio = f.child('audio');
+        audio.makedirs()
+        video = f.child('video');
+        video.makedirs()
+        images = f.child('images');
+        images.makedirs()
         album = audio.child('album-1')
         album.makedirs()
         album.child('track-1.mp3').touch()

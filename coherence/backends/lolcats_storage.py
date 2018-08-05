@@ -27,22 +27,24 @@ Wow. You are still reading. You must be really interessted. Then let's go.
 # just this way to make it easier to document and to understand.
 
 
+# And to parse the RSS-Data (which is XML), we use lxml.etree.fromstring
+from lxml.etree import fromstring
+# And we also import the reactor, that allows us to specify an action to happen
+# later
+from twisted.internet import reactor
 
+# The data itself is stored in BackendItems. They are also the first things we
+# are going to create.
+from coherence.backend import BackendItem
 ########## The imports
 # The entry point for each kind of Backend is a 'BackendStore'. The BackendStore
 # is the instance that does everything Usually. In this Example it can be
 # understood as the 'Server', the object retrieving and serving the data.
 from coherence.backend import BackendStore
-
-# The data itself is stored in BackendItems. They are also the first things we
-# are going to create.
-from coherence.backend import BackendItem
-
 # To make the data 'renderable' we need to define the DIDLite-Class of the Media
 # we are providing. For that we have a bunch of helpers that we also want to
 # import
 from coherence.upnp.core import DIDLLite
-
 # Coherence relies on the Twisted backend. I hope you are familar with the
 # concept of deferreds. If not please read:
 #       http://twistedmatrix.com/projects/core/documentation/howto/async.html
@@ -52,12 +54,6 @@ from coherence.upnp.core import DIDLLite
 # based on the twisted.web.client module to do our requests.
 from coherence.upnp.core.utils import getPage
 
-# And we also import the reactor, that allows us to specify an action to happen
-# later
-from twisted.internet import reactor
-
-# And to parse the RSS-Data (which is XML), we use lxml.etree.fromstring
-from lxml.etree import fromstring
 
 ########## The models
 # After the download and parsing of the data is done, we want to save it. In
@@ -71,17 +67,16 @@ class LolcatsImage(BackendItem):
 
     def __init__(self, parent_id, id, title, url):
         BackendItem.__init__(self)
-        self.parentid = parent_id       # used to be able to 'go back'
+        self.parentid = parent_id  # used to be able to 'go back'
 
         self.update_id = 0
 
-        self.id = id                    # each item has its own and unique id
+        self.id = id  # each item has its own and unique id
 
-        self.location = url             # the url of the picture
+        self.location = url  # the url of the picture
 
-        self.name = title               # the title of the picture. Inside
-                                        # coherence this is called 'name'
-
+        self.name = title  # the title of the picture. Inside
+        # coherence this is called 'name'
 
         # Item.item is a special thing. This is used to explain the client what
         # kind of data this is. For e.g. A VideoItem or a MusicTrack. In our
@@ -93,7 +88,7 @@ class LolcatsImage(BackendItem):
         # and can represent variants of it (different sizes, transcoded formats)
         res = DIDLLite.Resource(self.location, 'http-get:*:image/jpeg:*')
         res.size = None  # FIXME: we should have a size here
-                        #       and a resolution entry would be nice too
+        #       and a resolution entry would be nice too
         self.item.res.append(res)
 
 
@@ -151,6 +146,7 @@ class LolcatsContainer(BackendItem):
     def get_id(self):
         return self.id
 
+
 ########## The server
 # As already said before the implementation of the server is done in an
 # inheritance of a BackendStore. This is where the real code happens (usually).
@@ -158,7 +154,6 @@ class LolcatsContainer(BackendItem):
 # it in the models and returning them on request.
 
 class LolcatsStore(BackendStore):
-
     # this *must* be set. Because the (most used) MediaServer Coherence also
     # allows other kind of Backends (like remote lights).
     implements = ['MediaServer']
@@ -239,12 +234,14 @@ class LolcatsStore(BackendStore):
         # here we define what kind of media content we do provide
         # mostly needed to make some naughty DLNA devices behave
         # will probably move into Coherence internals one day
-        self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo', [
-          'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-          'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-          'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-          'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-          'http-get:*:image/jpeg:*'])
+        self.server.connection_manager_server.set_variable(0,
+                                                           'SourceProtocolInfo',
+                                                           [
+                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+                                                               'http-get:*:image/jpeg:*'])
 
         # and as it was done after we fetched the data the first time
         # we want to take care about the server wide updates as well
@@ -256,10 +253,12 @@ class LolcatsStore(BackendStore):
         # into Coherence internals one day
         if self.server:
             self.server.content_directory_server.set_variable(0,
-                    'SystemUpdateID', self.update_id)
+                                                              'SystemUpdateID',
+                                                              self.update_id)
             value = (self.ROOT_ID, self.container.update_id)
             self.server.content_directory_server.set_variable(0,
-                    'ContainerUpdateIDs', value)
+                                                              'ContainerUpdateIDs',
+                                                              value)
         return result
 
     def update_loop(self):

@@ -23,7 +23,9 @@ deps = [
     'livestreamer',
     'lxml',
     'python-dateutil',
-    'pyopenssl'
+    'pyopenssl',
+    'gdata',
+    'Nevow'
 ]
 if sys.platform in ('win32', 'sunos5'):
     deps.append('Netifaces >= 0.4')

@@ -9,16 +9,12 @@
 Test cases for the L{Coherence base class}
 """
 
-import time
-
-from twisted.trial import unittest
-
 from twisted.internet import reactor
 from twisted.internet.defer import Deferred
-
-from coherence.base import Coherence
+from twisted.trial import unittest
 
 import coherence.extern.louie as louie
+from coherence.base import Coherence
 
 
 class TestCoherence(unittest.TestCase):
@@ -28,7 +24,6 @@ class TestCoherence(unittest.TestCase):
         self.coherence = Coherence({'unittest': 'yes', 'logmode': 'error'})
 
     def tearDown(self):
-
         def cleaner(r):
             self.coherence.clear()
             return r
