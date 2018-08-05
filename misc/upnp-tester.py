@@ -22,9 +22,9 @@
 import os
 from functools import cmp_to_key
 
+from twisted.internet import protocol
 from twisted.internet import stdio
 from twisted.protocols import basic
-from twisted.internet import protocol
 
 try:
     from twisted.mail import smtp
@@ -40,7 +40,8 @@ try:
         """ build an email message and send it to our googlemail account
         """
 
-        def __init__(self, mail_from, mail_to, mail_subject, mail_file, *args, **kwargs):
+        def __init__(self, mail_from, mail_to, mail_subject, mail_file, *args,
+                     **kwargs):
             smtp.ESMTPClient.__init__(self, *args, **kwargs)
             self.mailFrom = mail_from
             self.mailTo = mail_to
@@ -67,7 +68,8 @@ try:
             fp = open(self.mail_file, 'rb')
             tar = MIMEApplication(fp.read(), 'x-tar')
             fp.close()
-            tar.add_header('Content-Disposition', 'attachment', filename=os.path.basename(self.mail_file))
+            tar.add_header('Content-Disposition', 'attachment',
+                           filename=os.path.basename(self.mail_file))
             msg.attach(tar)
             return io.StringIO(msg.as_string())
 
@@ -78,7 +80,8 @@ try:
     class SMTPClientFactory(protocol.ClientFactory):
         protocol = SMTPClient
 
-        def __init__(self, mail_from, mail_to, mail_subject, mail_file, *args, **kwargs):
+        def __init__(self, mail_from, mail_to, mail_subject, mail_file, *args,
+                     **kwargs):
             self.mail_from = mail_from
             self.mail_to = mail_to
             self.mail_subject = mail_subject
@@ -99,7 +102,6 @@ from coherence.base import Coherence
 
 
 class UI(basic.LineReceiver):
-    from os import linesep as delimiter
 
     def connectionMade(self):
         self.print_prompt()
@@ -128,7 +130,9 @@ class UI(basic.LineReceiver):
         "list -- list devices"
         self.transport.write("Devices:\n")
         for d in self.coherence.get_devices():
-            self.transport.write(str("%s %s [%s/%s/%s]\n" % (d.friendly_name, ':'.join(d.device_type.split(':')[3:5]), d.st, d.usn.split(':')[1], d.host)))
+            self.transport.write(str("%s %s [%s/%s/%s]\n" % (
+            d.friendly_name, ':'.join(d.device_type.split(':')[3:5]), d.st,
+            d.usn.split(':')[1], d.host)))
 
     def cmd_extract(self, args):
         "extract <uuid> -- download xml files from device"
@@ -136,26 +140,34 @@ class UI(basic.LineReceiver):
         if device == None:
             self.transport.write("device %s not found - aborting\n" % args[0])
         else:
-            self.transport.write(str("extracting from %s @ %s\n" % (device.friendly_name, device.host)))
+            self.transport.write(str("extracting from %s @ %s\n" % (
+            device.friendly_name, device.host)))
             try:
                 l = []
 
                 def device_extract(workdevice, path):
                     tmp_dir = os.path.join(path, workdevice.get_uuid())
                     os.mkdir(tmp_dir)
-                    d = client.downloadPage(workdevice.get_location(), os.path.join(tmp_dir, 'device-description.xml'))
+                    d = client.downloadPage(
+                        workdevice.get_location(),
+                        os.path.join(tmp_dir, 'device-description.xml'))
                     l.append(d)
 
                     for service in workdevice.services:
-                        d = client.downloadPage(service.get_scpd_url(), os.path.join(tmp_dir, '%s-description.xml' % service.service_type.split(':', 3)[3]))
+                        d = client.downloadPage(
+                            service.get_scpd_url(),
+                            os.path.join(tmp_dir, '%s-description.xml' %
+                                         service.service_type.split(':', 3)[3]))
                         l.append(d)
-
 
                     for ed in workdevice.devices:
                         device_extract(ed, tmp_dir)
 
                 def finished(result):
-                    self.transport.write(str("\nextraction of device %s finished\nfiles have been saved to /tmp/%s\n" % (args[0], args[0])))
+                    self.transport.write(str(
+                        "\nextraction of device %s finished\n"
+                        "files have been saved to /tmp/%s\n" % (
+                            args[0], args[0])))
                     self.print_prompt()
 
                 device_extract(device, '/tmp')
@@ -163,7 +175,8 @@ class UI(basic.LineReceiver):
                 dl = defer.DeferredList(l)
                 dl.addCallback(finished)
             except Exception as msg:
-                self.transport.write(str("problem creating download directory %s\n" % msg))
+                self.transport.write(
+                    str("problem creating download directory %s\n" % msg))
 
     def cmd_send(self, args):
         "send <uuid> -- send before extracted xml files to the Coherence home base"
@@ -190,8 +203,14 @@ class UI(basic.LineReceiver):
                     import posix
                     import pwd
                     import socket
-                    reactor.connectTCP(str(mx_list[0].payload.name), 25,
-                        SMTPClientFactory('@'.join((pwd.getpwuid(posix.getuid())[0], socket.gethostname())), 'upnp.fingerprint@googlemail.com', 'xml-files', os.path.join('/tmp', args[0] + '.tgz')))
+                    reactor.connectTCP(
+                        str(mx_list[0].payload.name), 25,
+                        SMTPClientFactory('@'.join(
+                            (pwd.getpwuid(posix.getuid())[0],
+                             socket.gethostname())),
+                            'upnp.fingerprint@googlemail.com',
+                            'xml-files',
+                            os.path.join('/tmp', args[0] + '.tgz')))
 
             mx = namesclient.lookupMailExchange('googlemail.com')
             mx.addCallback(got_mx)
@@ -207,7 +226,6 @@ class UI(basic.LineReceiver):
 
 
 if __name__ == '__main__':
-
     c = Coherence({'logmode': 'none'})
     ui = UI()
     ui.coherence = c

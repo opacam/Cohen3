@@ -9,7 +9,6 @@
 Test cases for L{backends.ampache_storage}
 """
 from lxml import etree
-
 from twisted.trial import unittest
 
 from coherence.backends import ampache_storage
@@ -68,7 +67,7 @@ SONG_370 = '''
 
 class DummyStore:
     def __init__(self):
-      pass
+        pass
 
     proxy = False
 
@@ -96,7 +95,7 @@ class TestAmpache(unittest.TestCase):
         self.assertEqual(track.genre, None)
         self.assertEqual(track.track_nr, '4')
         self.assertEqual(track.cover, 'http://localhost/image.php?id=129348')
-        self.assertEqual(track.mimetype, 'audio/mpeg') # guessed
+        self.assertEqual(track.mimetype, 'audio/mpeg')  # guessed
         self.assertEqual(track.size, 654321)
         self.assertIs(track.get_path(), None)
         self.assertEqual(track.get_children(), [])
@@ -111,14 +110,16 @@ class TestAmpache(unittest.TestCase):
         self.assertEqual(track.get_id(), 'song.3440')
         self.assertEqual(track.parent_id, 'album.359')
         self.assertEqual(track.duration, '00:10:25')
-        self.assertEqual(track.get_url(), 'http://songserver/ampache/play/index.php?ssid=1e11a4&type=song&oid=3440&uid=4&name=Led%20Zeppelin%20-%20Achilles%20Last%20Stand.mp3')
+        self.assertEqual(track.get_url(),
+                         'http://songserver/ampache/play/index.php?ssid=1e11a4&type=song&oid=3440&uid=4&name=Led%20Zeppelin%20-%20Achilles%20Last%20Stand.mp3')
         self.assertEqual(track.get_name(), 'Achilles Last Stand')
         self.assertEqual(track.title, 'Achilles Last Stand')
         self.assertEqual(track.artist, 'Led Zeppelin')
         self.assertEqual(track.album, 'Presence')
         self.assertEqual(track.genre, None)
         self.assertEqual(track.track_nr, '1')
-        self.assertEqual(track.cover, 'http://songserver/ampache/image.php?id=359&object_type=album&auth=1e11a40&name=art.')
+        self.assertEqual(track.cover,
+                         'http://songserver/ampache/image.php?id=359&object_type=album&auth=1e11a40&name=art.')
         self.assertEqual(track.mimetype, 'audio/mpeg')
         self.assertEqual(track.size, 19485595)
         self.assertIs(track.get_path(), None)

@@ -3,22 +3,18 @@
 
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
 
-import re
-
-from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.python import failure
-
-from coherence.upnp.core.DIDLLite import classChooser, Container, Resource, DIDLElement
-from coherence.upnp.core.soap_service import errorCode
+from twisted.spread import pb
 
 import coherence.extern.louie as louie
-
 from coherence.extern.simple_plugin import Plugin
+from coherence.upnp.core.DIDLLite import classChooser, Container, Resource, \
+    DIDLElement
+from coherence.upnp.core.soap_service import errorCode
 
 
 class ElisaMediaStore(Plugin):
-
     """ this is a backend to the Elisa Media DB
 
         Elisa needs to expose two methods
@@ -87,9 +83,11 @@ class ElisaMediaStore(Plugin):
 
     def upnp_init(self):
         if self.server:
-            self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo',
-                            ['internal:%s:*:*' % self.host,
-                             'http-get:*:audio/mpeg:*'])
+            self.server.connection_manager_server.set_variable(0,
+                                                               'SourceProtocolInfo',
+                                                               [
+                                                                   'internal:%s:*:*' % self.host,
+                                                                   'http-get:*:audio/mpeg:*'])
 
     def upnp_Browse(self, *args, **kwargs):
         ObjectID = kwargs['ObjectID']
@@ -110,7 +108,7 @@ class ElisaMediaStore(Plugin):
                     upnp_item.childCount = len(elisa_item.get('children', []))
                     if len(Filter) > 0:
                         upnp_item.searchable = True
-                        upnp_item.searchClass = ('object', )
+                        upnp_item.searchClass = ('object',)
                 else:
                     internal_url = elisa_item['location'].get('internal')
                     external_url = elisa_item['location'].get('external')
@@ -143,7 +141,8 @@ class ElisaMediaStore(Plugin):
                 if RequestedCount == 0:
                     childs = children[StartingIndex:]
                 else:
-                    childs = children[StartingIndex:StartingIndex + RequestedCount]
+                    childs = children[
+                             StartingIndex:StartingIndex + RequestedCount]
                 for child in childs:
                     if child is not None:
                         item = build_upnp_item(child)
@@ -157,7 +156,7 @@ class ElisaMediaStore(Plugin):
                 total = 1
 
             r = {'Result': didl.toString(), 'TotalMatches': total,
-                  'NumberReturned': didl.numItems()}
+                 'NumberReturned': didl.numItems()}
 
             if hasattr(elisa_item, 'update_id'):
                 r['UpdateID'] = item.update_id
@@ -183,15 +182,13 @@ class ElisaMediaStore(Plugin):
         return dfr
 
 
-
 if __name__ == '__main__':
     def main():
-
         p = 'localhost'
 
         def got_result(result):
             print(result)
-
+        from coherence.backends.mediadb_storage import MediaStore
         f = MediaStore(None, 'my media', p, 'http://localhost/', ())
 
         dfr = f.upnp_Browse(BrowseFlag='BrowseDirectChildren',
@@ -202,6 +199,7 @@ if __name__ == '__main__':
                             Filter='')
         dfr.addCallback(got_result)
         dfr.addCallback(lambda _: reactor.stop())
+
 
     reactor.callLater(0.1, main)
     reactor.run()

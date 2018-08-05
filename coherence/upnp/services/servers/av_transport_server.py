@@ -7,9 +7,8 @@
 
 from twisted.web import resource
 
-from coherence.upnp.core.soap_service import UPnPPublisher
-
 from coherence.upnp.core import service
+from coherence.upnp.core.soap_service import UPnPPublisher
 
 
 class AVTransportControl(service.ServiceControl, UPnPPublisher):
@@ -29,7 +28,8 @@ class AVTransportServer(service.ServiceServer, resource.Resource):
         if backend == None:
             backend = self.device.backend
         resource.Resource.__init__(self)
-        service.ServiceServer.__init__(self, 'AVTransport', self.device.version, backend)
+        service.ServiceServer.__init__(self, 'AVTransport', self.device.version,
+                                       backend)
 
         self.control = AVTransportControl(self)
         self.putChild(self.scpd_url, service.scpdXML(self))
@@ -42,4 +42,5 @@ class AVTransportServer(service.ServiceServer, resource.Resource):
         return cl
 
     def render(self, request):
-        return '<html><p>root of the AVTransport</p><p><ul>%s</ul></p></html>' % self.listchilds(request.uri)
+        return '<html><p>root of the AVTransport</p><p><ul>%s</ul></p></html>' % self.listchilds(
+            request.uri)

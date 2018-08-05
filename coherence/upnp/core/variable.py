@@ -7,8 +7,9 @@
 import time
 
 from coherence.upnp.core import utils
+
 try:
-    #FIXME:
+    # FIXME:
     # there is some circular import, service imports variable, variable imports service
     # how is this done properly?
     #
@@ -24,7 +25,8 @@ import coherence.extern.louie as louie
 class StateVariable(log.Loggable):
     logCategory = 'variable'
 
-    def __init__(self, upnp_service, name, implementation, instance, send_events,
+    def __init__(self, upnp_service, name, implementation, instance,
+                 send_events,
                  data_type, allowed_values):
         log.Loggable.__init__(self)
         self.service = upnp_service
@@ -62,7 +64,7 @@ class StateVariable(log.Loggable):
         r.append(('Data Type', self.data_type))
         r.append(('Default Value', self.default_value))
         r.append(('Current Value', str(self.value)))
-        if(self.allowed_values != None and len(self.allowed_values) > 0):
+        if (self.allowed_values != None and len(self.allowed_values) > 0):
             r.append(('Allowed Values', ','.join(self.allowed_values)))
         return r
 
@@ -85,7 +87,8 @@ class StateVariable(log.Loggable):
         self.never_evented = utils.means_true(value)
 
     def update(self, value):
-        self.info("variable check for update %s %s %s", self.name, value, self.service)
+        self.info("variable check for update %s %s %s", self.name, value,
+                  self.service)
         if not isinstance(self.service, service.Service):
             if self.name == 'ContainerUpdateIDs':
                 old_value = self.value
@@ -100,7 +103,8 @@ class StateVariable(log.Loggable):
                                 break
                             i += 2
                         if len(old_value):
-                            new_value = old_value + ',' + str(value[0]) + ',' + str(value[1])
+                            new_value = old_value + ',' + str(
+                                value[0]) + ',' + str(value[1])
                         else:
                             new_value = str(value[0]) + ',' + str(value[1])
                     else:
@@ -117,8 +121,8 @@ class StateVariable(log.Loggable):
                 if self.data_type == 'string':
                     if isinstance(value, str):
                         value = value.split(',')
-                    if(isinstance(value, tuple) or
-                       isinstance(value, set)):
+                    if (isinstance(value, tuple) or
+                            isinstance(value, set)):
                         value = list(value)
                     if not isinstance(value, list):
                         value = [value]
@@ -131,10 +135,14 @@ class StateVariable(log.Loggable):
                         if len(self.allowed_values):
                             if self.has_vendor_values == True:
                                 new_value.append(v)
-                            elif v.upper() in [x.upper() for x in self.allowed_values]:
+                            elif v.upper() in [x.upper() for x in
+                                               self.allowed_values]:
                                 new_value.append(v)
                             else:
-                                self.warning("Variable %s update, %r value %s doesn't fit in %r", self.name, self.has_vendor_values, v, self.allowed_values)
+                                self.warning(
+                                    "Variable %s update, %r value %s doesn't fit in %r",
+                                    self.name, self.has_vendor_values, v,
+                                    self.allowed_values)
                                 new_value = 'Coherence_Value_Error'
                         else:
                             new_value.append(v)
@@ -152,10 +160,13 @@ class StateVariable(log.Loggable):
                 if len(self.allowed_values):
                     if self.has_vendor_values == True:
                         new_value = value
-                    elif value.upper() in [v.upper() for v in self.allowed_values]:
+                    elif value.upper() in [v.upper() for v in
+                                           self.allowed_values]:
                         new_value = value
                     else:
-                        self.warning("Variable %s NOT updated, value %s doesn't fit", self.name, value)
+                        self.warning(
+                            "Variable %s NOT updated, value %s doesn't fit",
+                            self.name, value)
                         new_value = 'Coherence_Value_Error'
                 else:
                     new_value = value
@@ -169,21 +180,21 @@ class StateVariable(log.Loggable):
                 except ValueError:
                     new_value = 'Coherence_Value_Error'
 
-
         if new_value == 'Coherence_Value_Error':
             return
         if new_value == self.value:
-            self.info("variable NOT updated, no value change %s %s", self.name, self.value)
+            self.info("variable NOT updated, no value change %s %s", self.name,
+                      self.value)
             return
         self.old_value = self.value
         self.value = new_value
         self.last_time_touched = time.time()
 
-        #print "UPDATED %s %r %r %r %r %r" % (self.name,self.service,isinstance( self.service, service.Service),self.instance,self.value,self._callbacks)
+        # print "UPDATED %s %r %r %r %r %r" % (self.name,self.service,isinstance( self.service, service.Service),self.instance,self.value,self._callbacks)
         self.notify()
 
         if isinstance(self.service, service.Service):
-            #self.notify()
+            # self.notify()
             pass
         else:
             self.updated = True
@@ -198,24 +209,27 @@ class StateVariable(log.Loggable):
     def notify(self):
         if self.name.startswith('A_ARG_TYPE_'):
             return
-        self.info("Variable %s sends notify about new value >%r<", self.name, self.value)
-        #if self.old_value == '':
+        self.info("Variable %s sends notify about new value >%r<", self.name,
+                  self.value)
+        # if self.old_value == '':
         #    return
-        louie.send(signal='Coherence.UPnP.StateVariable.%s.changed' % self.name, sender=self.service, variable=self)
-        louie.send(signal='Coherence.UPnP.StateVariable.changed', sender=self.service, variable=self)
-        #print "CALLBACKS %s %r %r" % (self.name,self.instance,self._callbacks)
+        louie.send(signal='Coherence.UPnP.StateVariable.%s.changed' % self.name,
+                   sender=self.service, variable=self)
+        louie.send(signal='Coherence.UPnP.StateVariable.changed',
+                   sender=self.service, variable=self)
+        # print "CALLBACKS %s %r %r" % (self.name,self.instance,self._callbacks)
         for callback in self._callbacks:
             callback(self)
 
     def __repr__(self):
         return "Variable: %s, %s, %d, %s, %s, %s, %s, %s, %s, %s" % \
-                        (self.name,
-                         str(self.service),
-                         self.instance,
-                         self.implementation,
-                         self.data_type,
-                         str(self.allowed_values),
-                         str(self.default_value),
-                         str(self.old_value),
-                         str(self.value),
-                         str(self.send_events))
+               (self.name,
+                str(self.service),
+                self.instance,
+                self.implementation,
+                self.data_type,
+                str(self.allowed_values),
+                str(self.default_value),
+                str(self.old_value),
+                str(self.value),
+                str(self.send_events))

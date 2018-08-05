@@ -8,15 +8,15 @@
 #
 
 
-from coherence.upnp.core.DIDLLite import classChooser, Container, Resource, DIDLElement
-
 from coherence.backend import BackendStore, BackendItem
+from coherence.upnp.core.DIDLLite import classChooser, Container, Resource
 
 
 class AxisCamItem(BackendItem):
     logCategory = 'axis_cam_item'
 
-    def __init__(self, id, obj, parent, mimetype, urlbase, UPnPClass, update=False):
+    def __init__(self, id, obj, parent, mimetype, urlbase, UPnPClass,
+                 update=False):
         BackendItem.__init__(self)
         self.id = id
         if mimetype == 'directory':
@@ -40,7 +40,7 @@ class AxisCamItem(BackendItem):
             self.item.childCount = 0
         self.children = []
 
-        if(len(urlbase) and urlbase[-1] != '/'):
+        if (len(urlbase) and urlbase[-1] != '/'):
             urlbase += '/'
 
         if self.mimetype == 'directory':
@@ -56,11 +56,11 @@ class AxisCamItem(BackendItem):
             self.item.res.append(res)
 
     def __del__(self):
-        #print "AxisCamItem __del__", self.id, self.name
+        # print "AxisCamItem __del__", self.id, self.name
         pass
 
     def remove(self):
-        #print "AxisCamItem remove", self.id, self.name, self.parent
+        # print "AxisCamItem remove", self.id, self.name, self.parent
         if self.parent:
             self.parent.remove_child(self)
         del self.item
@@ -73,7 +73,8 @@ class AxisCamItem(BackendItem):
             self.update_id += 1
 
     def remove_child(self, child):
-        self.info("remove_from %d (%s) child %d (%s)", self.id, self.get_name(), child.id, child.get_name())
+        self.info("remove_from %d (%s) child %d (%s)", self.id, self.get_name(),
+                  child.id, child.get_name())
         if child in self.children:
             if isinstance(self.item, Container):
                 self.item.childCount -= 1
@@ -118,7 +119,6 @@ class AxisCamItem(BackendItem):
 
 
 class AxisCamStore(BackendStore):
-
     logCategory = 'axis_cam_store'
 
     implements = ['MediaServer']
@@ -154,16 +154,20 @@ class AxisCamStore(BackendStore):
             update = True
 
         self.store[id] = AxisCamItem(id, obj, parent, mimetype, self.urlbase,
-                                        UPnPClass, update=update)
+                                     UPnPClass, update=update)
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0, 'SystemUpdateID', self.update_id)
+                self.server.content_directory_server.set_variable(0,
+                                                                  'SystemUpdateID',
+                                                                  self.update_id)
             if parent:
-                #value = '%d,%d' % (parent.get_id(),parent_get_update_id())
+                # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0, 'ContainerUpdateIDs', value)
+                    self.server.content_directory_server.set_variable(0,
+                                                                      'ContainerUpdateIDs',
+                                                                      value)
 
         if mimetype == 'directory':
             return self.store[id]
@@ -203,31 +207,30 @@ class AxisCamStore(BackendStore):
                 self.append(v, parent)
 
         if self.server:
-            self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo',
-                                                                    source_protocols,
-                                                                    default=True)
+            self.server.connection_manager_server.set_variable(0,
+                                                               'SourceProtocolInfo',
+                                                               source_protocols,
+                                                               default=True)
 
 
 def main():
-
     f = AxisCamStore(None)
 
     def got_upnp_result(result):
         print("upnp", result)
 
-    #f.upnp_init()
-    #print f.store
-    #r = f.upnp_Browse(BrowseFlag='BrowseDirectChildren',
+    # f.upnp_init()
+    # print f.store
+    # r = f.upnp_Browse(BrowseFlag='BrowseDirectChildren',
     #                    RequestedCount=0,
     #                    StartingIndex=0,
     #                    ObjectID=0,
     #                    SortCriteria='*',
     #                    Filter='')
-    #got_upnp_result(r)
+    # got_upnp_result(r)
 
 
 if __name__ == '__main__':
-
     from twisted.internet import reactor
 
     reactor.callWhenRunning(main)

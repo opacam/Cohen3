@@ -5,20 +5,14 @@
 
 import os.path
 
-from twisted.internet import reactor, defer
-from twisted.python import failure, util
-
-from coherence.upnp.core import DIDLLite
-from coherence.upnp.core.soap_service import errorCode
-from coherence.upnp.core import utils
-
 import dbus
-
 import dbus.service
+from twisted.internet import defer
+from twisted.python import util
 
 import coherence.extern.louie as louie
-
 from coherence.backend import BackendItem, BackendStore
+from coherence.upnp.core import DIDLLite
 
 ROOT_CONTAINER_ID = 0
 AUDIO_CONTAINER_ID = 100
@@ -66,10 +60,10 @@ image_query = """
 
 
 class Container(BackendItem):
-
     logCategory = 'tracker_store'
 
-    def __init__(self, id, parent_id, name, store=None, children_callback=None, container_class=DIDLLite.Container):
+    def __init__(self, id, parent_id, name, store=None, children_callback=None,
+                 container_class=DIDLLite.Container):
         BackendItem.__init__(self)
         self.id = id
         self.parent_id = parent_id
@@ -127,7 +121,6 @@ class Container(BackendItem):
 
 
 class Artist(BackendItem):
-
     logCategory = 'tracker_store'
 
     def __init__(self, store, id, name):
@@ -186,7 +179,6 @@ class Artist(BackendItem):
 
 
 class Album(BackendItem):
-
     logCategory = 'tracker_store'
 
     def __init__(self, store, id, title, artist):
@@ -244,7 +236,6 @@ class Album(BackendItem):
 
 
 class Track(BackendItem):
-
     logCategory = 'tracker_store'
 
     def __init__(self, store,
@@ -304,7 +295,7 @@ class Track(BackendItem):
         item.album = self.album
 
         item.artist = self.artist
-        #item.date =
+        # item.date =
         item.genre = self.genre
         item.originalTrackNumber = self.track_nr
         item.title = self.title
@@ -320,7 +311,7 @@ class Track(BackendItem):
         if self.bitrate > 0:
             res.bitrate = str(bitrate)
         item.res.append(res)
-        #if self.store.server.coherence.config.get('transcoding', 'no') == 'yes':
+        # if self.store.server.coherence.config.get('transcoding', 'no') == 'yes':
         #    if self.mimetype in ('audio/mpeg',
         #                         'application/ogg','audio/ogg',
         #                         'audio/x-m4a',
@@ -360,7 +351,6 @@ class Track(BackendItem):
 
 
 class Video(BackendItem):
-
     logCategory = 'tracker_store'
 
     def __init__(self, store,
@@ -406,7 +396,7 @@ class Video(BackendItem):
 
         # create item
         item = DIDLLite.VideoItem(self.id, self.parent_id)
-        #item.date =
+        # item.date =
         item.title = self.title
 
         item.albumArtURI = self.cover
@@ -435,7 +425,6 @@ class Video(BackendItem):
 
 
 class Image(BackendItem):
-
     logCategory = 'tracker_store'
 
     def __init__(self, store,
@@ -465,12 +454,11 @@ class Image(BackendItem):
         return 0
 
     def get_item(self, parent_id=None):
-
         self.debug("Image get_item %r @ %r", self.id, self.parent_id)
 
         # create item
         item = DIDLLite.ImageItem(self.id, self.parent_id)
-        #item.date =
+        # item.date =
         item.title = self.title
 
         # add http resource
@@ -495,7 +483,6 @@ class Image(BackendItem):
 
 
 class TrackerStore(BackendStore):
-
     """ this is a backend to Meta Tracker
         http://www.gnome.org/projects/tracker/index.html
 
@@ -508,7 +495,8 @@ class TrackerStore(BackendStore):
     def __init__(self, server, **kwargs):
 
         if server.coherence.config.get('use_dbus', 'no') != 'yes':
-            raise Exception('this backend needs use_dbus enabled in the configuration')
+            raise Exception(
+                'this backend needs use_dbus enabled in the configuration')
         BackendStore.__init__(self, server, **kwargs)
 
         self.config = kwargs
@@ -528,31 +516,37 @@ class TrackerStore(BackendStore):
 
         self.bus = dbus.SessionBus()
         tracker_object = self.bus.get_object(BUS_NAME, OBJECT_PATH)
-        self.tracker_interface = dbus.Interface(tracker_object, 'org.freedesktop.Tracker')
-        self.search_interface = dbus.Interface(tracker_object, 'org.freedesktop.Tracker.Search')
-        self.keywords_interface = dbus.Interface(tracker_object, 'org.freedesktop.Tracker.Keywords')
-        self.metadata_interface = dbus.Interface(tracker_object, 'org.freedesktop.Tracker.Metadata')
+        self.tracker_interface = dbus.Interface(tracker_object,
+                                                'org.freedesktop.Tracker')
+        self.search_interface = dbus.Interface(tracker_object,
+                                               'org.freedesktop.Tracker.Search')
+        self.keywords_interface = dbus.Interface(tracker_object,
+                                                 'org.freedesktop.Tracker.Keywords')
+        self.metadata_interface = dbus.Interface(tracker_object,
+                                                 'org.freedesktop.Tracker.Metadata')
         self.query_id = -1
 
         self.containers = {}
         self.tracks = {}
         self.containers[ROOT_CONTAINER_ID] = \
-                    Container(ROOT_CONTAINER_ID, -1, self.name, store=self)
+            Container(ROOT_CONTAINER_ID, -1, self.name, store=self)
 
         def queries_finished(r):
-            louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
+            louie.send('Coherence.UPnP.Backend.init_completed', None,
+                       backend=self)
 
         def queries_failed(r):
             error = ''
-            louie.send('Coherence.UPnP.Backend.init_failed', None, backend=self, msg=error)
+            louie.send('Coherence.UPnP.Backend.init_failed', None, backend=self,
+                       msg=error)
 
         services = kwargs.get('service', 'Music,Videos,Images')
         services = [x.strip().lower() for x in services.split(',')]
 
         l = []
         mapping = {'music': self.get_tracks,
-                    'videos': self.get_videos,
-                    'images': self.get_images}
+                   'videos': self.get_videos,
+                   'images': self.get_images}
         for service in services:
             try:
                 l.append(mapping[service]())
@@ -561,9 +555,13 @@ class TrackerStore(BackendStore):
         if len(l) > 0:
             dl = defer.DeferredList(l)
             dl.addCallback(queries_finished)
-            dl.addErrback(lambda x: louie.send('Coherence.UPnP.Backend.init_failed', None, backend=self, msg='Connection to Tracker service(s) failed!'))
+            dl.addErrback(
+                lambda x: louie.send('Coherence.UPnP.Backend.init_failed', None,
+                                     backend=self,
+                                     msg='Connection to Tracker service(s) failed!'))
         else:
-            louie.send('Coherence.UPnP.Backend.init_failed', None, backend=self, msg='No Tracker service defined!')
+            louie.send('Coherence.UPnP.Backend.init_failed', None, backend=self,
+                       msg='No Tracker service defined!')
 
     def __repr__(self):
         return "TrackerStore"
@@ -588,9 +586,11 @@ class TrackerStore(BackendStore):
                 if type == 'song':
                     return self.containers[AUDIO_ALL_CONTAINER_ID].children[id]
                 if type == 'album':
-                    return self.containers[AUDIO_ALBUM_CONTAINER_ID].children[id]
+                    return self.containers[AUDIO_ALBUM_CONTAINER_ID].children[
+                        id]
                 if type == 'artist':
-                    return self.containers[AUDIO_ARTIST_CONTAINER_ID].children[id]
+                    return self.containers[AUDIO_ARTIST_CONTAINER_ID].children[
+                        id]
                 if type == 'video':
                     return self.containers[VIDEO_ALL_CONTAINER_ID].children[id]
                 if type == 'image':
@@ -625,29 +625,36 @@ class TrackerStore(BackendStore):
                 videos.append(video_item)
 
             videos = sorted(videos,
-                            key=lambda x, y: (x.get_name().lower() > y.get_name().lower()) -
-                                             (x.get_name().lower() < y.get_name().lower()))
+                            key=lambda x, y: (
+                                                         x.get_name().lower() > y.get_name().lower()) -
+                                             (
+                                                         x.get_name().lower() < y.get_name().lower()))
             for video_item in videos:
                 self.containers[VIDEO_ALL_CONTAINER_ID].add_child(video_item)
 
         self.containers[VIDEO_CONTAINER_ID] = \
-                    Container(VIDEO_CONTAINER_ID, ROOT_CONTAINER_ID, 'Video', store=self)
-        self.containers[ROOT_CONTAINER_ID].add_child(self.containers[VIDEO_CONTAINER_ID])
+            Container(VIDEO_CONTAINER_ID, ROOT_CONTAINER_ID, 'Video',
+                      store=self)
+        self.containers[ROOT_CONTAINER_ID].add_child(
+            self.containers[VIDEO_CONTAINER_ID])
 
         self.containers[VIDEO_ALL_CONTAINER_ID] = \
-                Container(VIDEO_ALL_CONTAINER_ID, VIDEO_CONTAINER_ID, 'All Videos',
-                          store=self,
-                          children_callback=None)
-        self.containers[VIDEO_CONTAINER_ID].add_child(self.containers[VIDEO_ALL_CONTAINER_ID])
+            Container(VIDEO_ALL_CONTAINER_ID, VIDEO_CONTAINER_ID, 'All Videos',
+                      store=self,
+                      children_callback=None)
+        self.containers[VIDEO_CONTAINER_ID].add_child(
+            self.containers[VIDEO_ALL_CONTAINER_ID])
 
         fields = ['Video:Title', 'Video:Duration',
-                'File:Size', 'File:Mime']
+                  'File:Size', 'File:Mime']
 
         d = defer.Deferred()
         d.addCallback(parse_videos_query_result)
         d.addErrback(handle_error)
-        self.search_interface.Query(self.query_id, 'Videos', fields, '', '', video_query, False, 0, -1,
-                                    reply_handler=lambda x: d.callback(x), error_handler=lambda x: d.errback(x))
+        self.search_interface.Query(self.query_id, 'Videos', fields, '', '',
+                                    video_query, False, 0, -1,
+                                    reply_handler=lambda x: d.callback(x),
+                                    error_handler=lambda x: d.errback(x))
         return d
 
     def get_images(self):
@@ -674,30 +681,36 @@ class TrackerStore(BackendStore):
                 images.append(image_item)
 
             images = sorted(
-                images, key=lambda x, y: (x.get_name().lower() > y.get_name().lower()) -
-                                         (x.get_name().lower() < y.get_name().lower()))
+                images,
+                key=lambda x, y: (x.get_name().lower() > y.get_name().lower()) -
+                                 (x.get_name().lower() < y.get_name().lower()))
             for image_item in images:
                 self.containers[IMAGE_ALL_CONTAINER_ID].add_child(image_item)
 
         self.containers[IMAGE_CONTAINER_ID] = \
-                    Container(IMAGE_CONTAINER_ID, ROOT_CONTAINER_ID, 'Images', store=self)
-        self.containers[ROOT_CONTAINER_ID].add_child(self.containers[IMAGE_CONTAINER_ID])
+            Container(IMAGE_CONTAINER_ID, ROOT_CONTAINER_ID, 'Images',
+                      store=self)
+        self.containers[ROOT_CONTAINER_ID].add_child(
+            self.containers[IMAGE_CONTAINER_ID])
 
         self.containers[IMAGE_ALL_CONTAINER_ID] = \
-                Container(IMAGE_ALL_CONTAINER_ID, IMAGE_CONTAINER_ID, 'All Images',
-                          store=self,
-                          children_callback=None)
-        self.containers[IMAGE_CONTAINER_ID].add_child(self.containers[IMAGE_ALL_CONTAINER_ID])
+            Container(IMAGE_ALL_CONTAINER_ID, IMAGE_CONTAINER_ID, 'All Images',
+                      store=self,
+                      children_callback=None)
+        self.containers[IMAGE_CONTAINER_ID].add_child(
+            self.containers[IMAGE_ALL_CONTAINER_ID])
 
         fields = ['Image:Title', 'Image:Album',
-                'Image:Date', 'Image:Width', 'Image:Height',
-                'File:Size', 'File:Mime']
+                  'Image:Date', 'Image:Width', 'Image:Height',
+                  'File:Size', 'File:Mime']
 
         d = defer.Deferred()
         d.addCallback(parse_images_query_result)
         d.addErrback(handle_error)
-        self.search_interface.Query(self.query_id, 'Images', fields, '', '', image_query, False, 0, -1,
-                                    reply_handler=lambda x: d.callback(x), error_handler=lambda x: d.errback(x))
+        self.search_interface.Query(self.query_id, 'Images', fields, '', '',
+                                    image_query, False, 0, -1,
+                                    reply_handler=lambda x: d.callback(x),
+                                    error_handler=lambda x: d.errback(x))
         return d
 
     def get_tracks(self):
@@ -735,7 +748,8 @@ class TrackerStore(BackendStore):
                     album_item = albums[track_item.album]
                     album_item.add_child(track_item)
                 except:
-                    album_item = Album(self, self.albums, track_item.album, track_item.artist)
+                    album_item = Album(self, self.albums, track_item.album,
+                                       track_item.artist)
                     albums[str(track_item.album)] = album_item
                     self.albums += 1
                     album_item.add_child(track_item)
@@ -744,7 +758,8 @@ class TrackerStore(BackendStore):
                         artist_item = artists[track_item.artist]
                         artist_item.add_child(album_item)
                     except:
-                        artist_item = Artist(self, self.artists, track_item.artist)
+                        artist_item = Artist(self, self.artists,
+                                             track_item.artist)
                         artists[str(track_item.artist)] = artist_item
                         self.artists += 1
                         artist_item.add_child(album_item)
@@ -756,87 +771,105 @@ class TrackerStore(BackendStore):
             sorted_keys = list(artists.keys())
             sorted_keys.sort()
             for key in sorted_keys:
-                self.containers[AUDIO_ARTIST_CONTAINER_ID].add_child(artists[key])
+                self.containers[AUDIO_ARTIST_CONTAINER_ID].add_child(
+                    artists[key])
 
         self.containers[AUDIO_CONTAINER_ID] = \
-                    Container(AUDIO_CONTAINER_ID, ROOT_CONTAINER_ID, 'Audio', store=self)
-        self.containers[ROOT_CONTAINER_ID].add_child(self.containers[AUDIO_CONTAINER_ID])
+            Container(AUDIO_CONTAINER_ID, ROOT_CONTAINER_ID, 'Audio',
+                      store=self)
+        self.containers[ROOT_CONTAINER_ID].add_child(
+            self.containers[AUDIO_CONTAINER_ID])
 
         self.containers[AUDIO_ALL_CONTAINER_ID] = \
-                Container(AUDIO_ALL_CONTAINER_ID, AUDIO_CONTAINER_ID, 'All Tracks',
-                          store=self,
-                          children_callback=None)
-        self.containers[AUDIO_CONTAINER_ID].add_child(self.containers[AUDIO_ALL_CONTAINER_ID])
+            Container(AUDIO_ALL_CONTAINER_ID, AUDIO_CONTAINER_ID, 'All Tracks',
+                      store=self,
+                      children_callback=None)
+        self.containers[AUDIO_CONTAINER_ID].add_child(
+            self.containers[AUDIO_ALL_CONTAINER_ID])
 
         self.containers[AUDIO_ALBUM_CONTAINER_ID] = \
-                Container(AUDIO_ALBUM_CONTAINER_ID, AUDIO_CONTAINER_ID, 'Albums',
-                          store=self,
-                          children_callback=None)
-        self.containers[AUDIO_CONTAINER_ID].add_child(self.containers[AUDIO_ALBUM_CONTAINER_ID])
+            Container(AUDIO_ALBUM_CONTAINER_ID, AUDIO_CONTAINER_ID, 'Albums',
+                      store=self,
+                      children_callback=None)
+        self.containers[AUDIO_CONTAINER_ID].add_child(
+            self.containers[AUDIO_ALBUM_CONTAINER_ID])
 
         self.containers[AUDIO_ARTIST_CONTAINER_ID] = \
-                Container(AUDIO_ARTIST_CONTAINER_ID, AUDIO_CONTAINER_ID, 'Artists',
-                          store=self,
-                          children_callback=None)
-        self.containers[AUDIO_CONTAINER_ID].add_child(self.containers[AUDIO_ARTIST_CONTAINER_ID])
+            Container(AUDIO_ARTIST_CONTAINER_ID, AUDIO_CONTAINER_ID, 'Artists',
+                      store=self,
+                      children_callback=None)
+        self.containers[AUDIO_CONTAINER_ID].add_child(
+            self.containers[AUDIO_ARTIST_CONTAINER_ID])
 
         self.containers[AUDIO_PLAYLIST_CONTAINER_ID] = \
-                Container(AUDIO_PLAYLIST_CONTAINER_ID, AUDIO_CONTAINER_ID, 'Playlists',
-                          store=self,
-                          children_callback=None,
-                          container_class=DIDLLite.PlaylistContainer)
-        self.containers[AUDIO_CONTAINER_ID].add_child(self.containers[AUDIO_PLAYLIST_CONTAINER_ID])
+            Container(AUDIO_PLAYLIST_CONTAINER_ID, AUDIO_CONTAINER_ID,
+                      'Playlists',
+                      store=self,
+                      children_callback=None,
+                      container_class=DIDLLite.PlaylistContainer)
+        self.containers[AUDIO_CONTAINER_ID].add_child(
+            self.containers[AUDIO_PLAYLIST_CONTAINER_ID])
 
         self.containers[AUDIO_GENRE_CONTAINER_ID] = \
-                Container(AUDIO_GENRE_CONTAINER_ID, AUDIO_CONTAINER_ID, 'Genres',
-                          store=self,
-                          children_callback=None)
-        self.containers[AUDIO_CONTAINER_ID].add_child(self.containers[AUDIO_GENRE_CONTAINER_ID])
+            Container(AUDIO_GENRE_CONTAINER_ID, AUDIO_CONTAINER_ID, 'Genres',
+                      store=self,
+                      children_callback=None)
+        self.containers[AUDIO_CONTAINER_ID].add_child(
+            self.containers[AUDIO_GENRE_CONTAINER_ID])
 
-        self.wmc_mapping.update({'4': lambda: self.get_by_id(AUDIO_ALL_CONTAINER_ID),       # all tracks
-                                 '5': lambda: self.get_by_id(AUDIO_GENRE_CONTAINER_ID),     # all genres
-                                 '6': lambda: self.get_by_id(AUDIO_ARTIST_CONTAINER_ID),    # all artists
-                                 '7': lambda: self.get_by_id(AUDIO_ALBUM_CONTAINER_ID),     # all albums
-                                 '13': lambda: self.get_by_id(AUDIO_PLAYLIST_CONTAINER_ID),  # all playlists
-                                })
+        self.wmc_mapping.update(
+            {'4': lambda: self.get_by_id(AUDIO_ALL_CONTAINER_ID),  # all tracks
+             '5': lambda: self.get_by_id(AUDIO_GENRE_CONTAINER_ID),
+             # all genres
+             '6': lambda: self.get_by_id(AUDIO_ARTIST_CONTAINER_ID),
+             # all artists
+             '7': lambda: self.get_by_id(AUDIO_ALBUM_CONTAINER_ID),
+             # all albums
+             '13': lambda: self.get_by_id(AUDIO_PLAYLIST_CONTAINER_ID),
+             # all playlists
+             })
 
         fields = ['Audio:Title', 'Audio:Artist',
-                'Audio:Album', 'Audio:Genre',
-                'Audio:Duration', 'Audio:AlbumTrackCount',
-                'Audio:TrackNo', 'Audio:Codec',
-                'File:Size', 'File:Mime']
+                  'Audio:Album', 'Audio:Genre',
+                  'Audio:Duration', 'Audio:AlbumTrackCount',
+                  'Audio:TrackNo', 'Audio:Codec',
+                  'File:Size', 'File:Mime']
 
         d = defer.Deferred()
         d.addCallback(parse_tracks_query_result)
         d.addErrback(handle_error)
-        self.search_interface.Query(self.query_id, 'Music', fields, '', '', tracks_query, False, 0, -1,
-                                    reply_handler=lambda x: d.callback(x), error_handler=lambda x: d.errback(x))
+        self.search_interface.Query(self.query_id, 'Music', fields, '', '',
+                                    tracks_query, False, 0, -1,
+                                    reply_handler=lambda x: d.callback(x),
+                                    error_handler=lambda x: d.errback(x))
         return d
 
     def upnp_init(self):
         if self.server:
-            self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo',
-                            ['http-get:*:audio/mpeg:*',
-                             'internal:%s:audio/mpeg:*' % self.server.coherence.hostname,
-                             'http-get:*:application/ogg:*',
-                             'internal:%s:application/ogg:*' % self.server.coherence.hostname,
-                             'http-get:*:audio/ogg:*',
-                             'internal:%s:audio/ogg:*' % self.server.coherence.hostname,
-                             'http-get:*:video/ogg:*',
-                             'internal:%s:video/ogg:*' % self.server.coherence.hostname,
-                             'http-get:*:video/mpeg:*',
-                             'internal:%s:video/mpeg:*' % self.server.coherence.hostname,
-                             'http-get:*:video/x-msvideo:*',
-                             'internal:%s:video/x-msvideo:*' % self.server.coherence.hostname,
-                             'http-get:*:video/avi:*',
-                             'internal:%s:video/avi:*' % self.server.coherence.hostname,
-                             'http-get:*:video/mp4:*',
-                             'internal:%s:video/mp4:*' % self.server.coherence.hostname,
-                             'http-get:*:video/quicktime:*',
-                             'internal:%s:video/quicktime:*' % self.server.coherence.hostname,
-                             'http-get:*:image/jpg:*',
-                             'internal:%s:image/jpg:*' % self.server.coherence.hostname,
-                             'http-get:*:image/png:*',
-                             'internal:%s:image/png:*' % self.server.coherence.hostname,
-                             'http-get:*:image/gif:*',
-                             'internal:%s:image/gif:*' % self.server.coherence.hostname, ])
+            self.server.connection_manager_server.set_variable(0,
+                                                               'SourceProtocolInfo',
+                                                               [
+                                                                   'http-get:*:audio/mpeg:*',
+                                                                   'internal:%s:audio/mpeg:*' % self.server.coherence.hostname,
+                                                                   'http-get:*:application/ogg:*',
+                                                                   'internal:%s:application/ogg:*' % self.server.coherence.hostname,
+                                                                   'http-get:*:audio/ogg:*',
+                                                                   'internal:%s:audio/ogg:*' % self.server.coherence.hostname,
+                                                                   'http-get:*:video/ogg:*',
+                                                                   'internal:%s:video/ogg:*' % self.server.coherence.hostname,
+                                                                   'http-get:*:video/mpeg:*',
+                                                                   'internal:%s:video/mpeg:*' % self.server.coherence.hostname,
+                                                                   'http-get:*:video/x-msvideo:*',
+                                                                   'internal:%s:video/x-msvideo:*' % self.server.coherence.hostname,
+                                                                   'http-get:*:video/avi:*',
+                                                                   'internal:%s:video/avi:*' % self.server.coherence.hostname,
+                                                                   'http-get:*:video/mp4:*',
+                                                                   'internal:%s:video/mp4:*' % self.server.coherence.hostname,
+                                                                   'http-get:*:video/quicktime:*',
+                                                                   'internal:%s:video/quicktime:*' % self.server.coherence.hostname,
+                                                                   'http-get:*:image/jpg:*',
+                                                                   'internal:%s:image/jpg:*' % self.server.coherence.hostname,
+                                                                   'http-get:*:image/png:*',
+                                                                   'internal:%s:image/png:*' % self.server.coherence.hostname,
+                                                                   'http-get:*:image/gif:*',
+                                                                   'internal:%s:image/gif:*' % self.server.coherence.hostname, ])

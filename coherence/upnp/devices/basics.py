@@ -51,9 +51,10 @@ class DeviceHttpRoot(resource.Resource, log.Loggable):
         return cl
 
     def render(self, request):
-        return '<html><p>root of the %s %s</p><p><ul>%s</ul></p></html>' % (self.server.backend.name,
-                                                                           self.server.device_type,
-                                                                           self.listchilds(request.uri))
+        return '<html><p>root of the %s %s</p><p><ul>%s</ul></p></html>' % (
+        self.server.backend.name,
+        self.server.device_type,
+        self.listchilds(request.uri))
 
 
 # class RootDeviceXML(static.Data):
@@ -184,7 +185,8 @@ class BasicDeviceMixin(object):
     def __init__(self, coherence, backend, **kwargs):
         self.coherence = coherence
         if not hasattr(self, 'version'):
-            self.version = int(kwargs.get('version', self.coherence.config.get('version', 2)))
+            self.version = int(
+                kwargs.get('version', self.coherence.config.get('version', 2)))
 
         try:
             self.uuid = str(kwargs['uuid'])
@@ -209,14 +211,17 @@ class BasicDeviceMixin(object):
                 else:
                     self.icons = kwargs['icon']
 
-        louie.connect(self.init_complete, 'Coherence.UPnP.Backend.init_completed', louie.Any)
-        louie.connect(self.init_failed, 'Coherence.UPnP.Backend.init_failed', louie.Any)
+        louie.connect(self.init_complete,
+                      'Coherence.UPnP.Backend.init_completed', louie.Any)
+        louie.connect(self.init_failed, 'Coherence.UPnP.Backend.init_failed',
+                      louie.Any)
         reactor.callLater(0.2, self.fire, backend, **kwargs)
 
     def init_failed(self, backend, msg):
         if self.backend != backend:
             return
-        self.warning('backend not installed, %s activation aborted - %s' % (self.device_type, msg.getErrorMessage()))
+        self.warning('backend not installed, %s activation aborted - %s' % (
+        self.device_type, msg.getErrorMessage()))
         self.debug(msg)
         try:
             del self.coherence.active_backends[str(self.uuid)]
@@ -228,18 +233,23 @@ class BasicDeviceMixin(object):
         uuid = str(self.uuid)
         host = self.coherence.hostname
         self.msg('%s register' % self.device_type)
-        # we need to do this after the children are there, since we send notifies
-        s.register('local',
-                    '%s::upnp:rootdevice' % uuid,
-                    'upnp:rootdevice',
-                    self.coherence.urlbase + uuid[5:] + '/' + 'description-%d.xml' % self.version,
-                    host=host)
+        # we need to do this after the children are there,
+        # since we send notifies
+        s.register(
+            'local',
+            '%s::upnp:rootdevice' % uuid,
+            'upnp:rootdevice',
+            self.coherence.urlbase + uuid[5:] + '/' +
+            'description-%d.xml' % self.version,
+            host=host)
 
-        s.register('local',
-                    uuid,
-                    uuid,
-                    self.coherence.urlbase + uuid[5:] + '/' + 'description-%d.xml' % self.version,
-                    host=host)
+        s.register(
+            'local',
+            uuid,
+            uuid,
+            self.coherence.urlbase + uuid[5:] + '/' +
+            'description-%d.xml' % self.version,
+            host=host)
 
         version = self.version
         while version > 0:
@@ -247,14 +257,17 @@ class BasicDeviceMixin(object):
                 silent = False
             else:
                 silent = True
-            s.register('local',
-                        '%s::urn:schemas-upnp-org:device:%s:%d' % (uuid, self.device_type, version),
-                        'urn:schemas-upnp-org:device:%s:%d' % (self.device_type, version),
-                        self.coherence.urlbase + uuid[5:] + '/' + 'description-%d.xml' % version,
-                        silent=silent,
-                        host=host)
+            s.register(
+                'local',
+                '%s::urn:schemas-upnp-org:device:%s:%d' % (
+                    uuid, self.device_type, version),
+                'urn:schemas-upnp-org:device:%s:%d' % (
+                    self.device_type, version),
+                self.coherence.urlbase + uuid[5:] + '/' +
+                'description-%d.xml' % version,
+                silent=silent,
+                host=host)
             version -= 1
-
 
         for service in self._services:
             device_version = self.version
@@ -273,12 +286,16 @@ class BasicDeviceMixin(object):
                 if hasattr(service, 'device_description_tmpl'):
                     device_description_tmpl = service.device_description_tmpl
 
-                s.register('local',
-                            '%s::urn:%s:service:%s:%d' % (uuid, namespace, service.id, service_version),
-                            'urn:%s:service:%s:%d' % (namespace, service.id, service_version),
-                            self.coherence.urlbase + uuid[5:] + '/' + device_description_tmpl,
-                            silent=silent,
-                            host=host)
+                s.register(
+                    'local',
+                    '%s::urn:%s:service:%s:%d' % (
+                        uuid, namespace, service.id, service_version),
+                    'urn:%s:service:%s:%d' % (
+                        namespace, service.id, service_version),
+                    self.coherence.urlbase + uuid[5:] +
+                    '/' + device_description_tmpl,
+                    silent=silent,
+                    host=host)
 
                 silent = True
                 service_version -= 1
@@ -300,7 +317,8 @@ class BasicDeviceMixin(object):
                 service.check_subscribers_loop.stop()
             except:
                 pass
-            if hasattr(service, 'check_moderated_loop') and service.check_moderated_loop != None:
+            if hasattr(service, 'check_moderated_loop') and \
+                    service.check_moderated_loop != None:
                 try:
                     service.check_moderated_loop.stop()
                 except:
@@ -316,7 +334,8 @@ class BasicDeviceMixin(object):
 
         version = self.version
         while version > 0:
-            s.doByebye('%s::urn:schemas-upnp-org:device:%s:%d' % (uuid, self.device_type, version))
+            s.doByebye('%s::urn:schemas-upnp-org:device:%s:%d' % (
+            uuid, self.device_type, version))
             for service in self._services:
                 if hasattr(service, 'version') and service.version < version:
                     continue
@@ -324,7 +343,8 @@ class BasicDeviceMixin(object):
                     namespace = service.namespace
                 except AttributeError:
                     namespace = 'schemas-upnp-org'
-                s.doByebye('%s::urn:%s:service:%s:%d' % (uuid, namespace, service.id, version))
+                s.doByebye('%s::urn:%s:service:%s:%d' % (
+                uuid, namespace, service.id, version))
 
             version -= 1
 

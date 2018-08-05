@@ -3,9 +3,11 @@
 """
 
 import warnings
+
 from coherence.dispatcher import Dispatcher
 
-warnings.warn("extern.louie will soon be deprecated in favor of coherence.dispatcher.")
+warnings.warn(
+    "extern.louie will soon be deprecated in favor of coherence.dispatcher.")
 
 
 class Any(object): pass
@@ -19,14 +21,16 @@ class Anonymous(object): pass
 
 # fake the API
 class Dummy(object): pass
+
+
 signal = Dummy()
 sender = Dummy()
 
-#senders
+# senders
 sender.Anonymous = Anonymous
 sender.Any = Any
 
-#signals
+# signals
 signal.All = All
 
 
@@ -44,6 +48,7 @@ class GlobalDispatcher(Dispatcher):
             return self.receivers[signal]
         except KeyError:
             return []
+
 
 global _global_dispatcher
 _global_dispatcher = GlobalDispatcher()

@@ -18,13 +18,13 @@ PV_NS = 'http://www.pv.com/pvns/'
 DIDLLITE_NS = 'urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/'
 
 namespaces = {
-  DC_NS: 'dc',
-  UPNP_NS: 'upnp',
-  DLNA_NS: 'dlna',
-  PV_NS: 'pv',
-  DLNA_DEVICE_NS: 'dev',
-  UPNP_EVENT_NS: 'e',
+    DC_NS: 'dc',
+    UPNP_NS: 'upnp',
+    DLNA_NS: 'dlna',
+    PV_NS: 'pv',
+    DLNA_DEVICE_NS: 'dev',
+    UPNP_EVENT_NS: 'e',
 }
 
 for k, v in namespaces.items():
-  etree.register_namespace(v, k)
+    etree.register_namespace(v, k)

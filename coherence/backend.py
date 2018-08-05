@@ -3,23 +3,20 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
-# Copyright 2007,, Frank Scholz <coherence@beebits.net>
-from lxml import etree
+import time
 from functools import cmp_to_key
 
-import time
-from coherence.extern.simple_plugin import Plugin
-
-from coherence import log
+# Copyright 2007,, Frank Scholz <coherence@beebits.net>
+from lxml import etree
 
 import coherence.extern.louie as louie
-
-from coherence.upnp.core.utils import getPage
+from coherence import log
+from coherence.extern.simple_plugin import Plugin
 from coherence.upnp.core import DIDLLite
+from coherence.upnp.core.utils import getPage
 
 
 class Backend(log.Loggable, Plugin):
-
     """ the base class for all backends
 
         if there are any UPnP service actions, that can't
@@ -57,7 +54,7 @@ class Backend(log.Loggable, Plugin):
         """ this has to be done in the actual backend, maybe it has
             to wait for an answer from an external data-source first
         """
-        #self.init_completed()
+        # self.init_completed()
 
     def init_completed(self, *args, **kwargs):
         """ inform Coherence that this backend is ready for
@@ -66,7 +63,7 @@ class Backend(log.Loggable, Plugin):
             as we don't under which circumstances it is called
         """
         louie.send('Coherence.UPnP.Backend.init_completed',
-                None, backend=self)
+                   None, backend=self)
 
     def upnp_init(self):
         """ this method gets called after the device is fired,
@@ -77,7 +74,6 @@ class Backend(log.Loggable, Plugin):
 
 
 class BackendStore(Backend):
-
     """ the base class for all MediaServer backend stores
     """
 
@@ -110,19 +106,22 @@ class BackendStore(Backend):
         if not self.urlbase.endswith('/'):
             self.urlbase += '/'
 
-        self.wmc_mapping = {'4': '4', '5': '5', '6': '6', '7': '7', '14': '14', 'F': 'F',
-                            '11': '11', '16': '16', 'B': 'B', 'C': 'C', 'D': 'D',
+        self.wmc_mapping = {'4': '4', '5': '5', '6': '6', '7': '7', '14': '14',
+                            'F': 'F',
+                            '11': '11', '16': '16', 'B': 'B', 'C': 'C',
+                            'D': 'D',
                             '13': '13', '17': '17',
-                            '8': '8', '9': '9', '10': '10', '15': '15', 'A': 'A', 'E': 'E'}
+                            '8': '8', '9': '9', '10': '10', '15': '15',
+                            'A': 'A', 'E': 'E'}
 
         self.wmc_mapping.update({'4': lambda: self._get_all_items(0),
                                  '8': lambda: self._get_all_items(0),
                                  'B': lambda: self._get_all_items(0),
-                                })
+                                 })
 
         """ and send out the signal when ready
         """
-        #louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
+        # louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
 
     def release(self):
         """ if anything needs to be cleaned up upon
@@ -185,7 +184,6 @@ class BackendStore(Backend):
 
 
 class BackendItem(log.Loggable):
-
     """ the base class for all MediaServer backend items
     """
 
@@ -213,18 +211,18 @@ class BackendItem(log.Loggable):
         """
         log.Loggable.__init__(self)
         self.name = 'my_name'  # the basename of a file, the album title,
-                               # the artists name,...
-                               # is expected to be unicode
+        # the artists name,...
+        # is expected to be unicode
         self.item = None
-        self.update_id = 0 # the update id of that item,
-                           # when an UPnP ContentDirectoryService Container
-                           # this should be incremented on every modification
+        self.update_id = 0  # the update id of that item,
+        # when an UPnP ContentDirectoryService Container
+        # this should be incremented on every modification
 
-        self.location = None # the filepath of our media file, or alternatively
-                             # a FilePath or a ReverseProxyResource object
+        self.location = None  # the filepath of our media file, or alternatively
+        # a FilePath or a ReverseProxyResource object
 
-        self.cover = None # if we have some album art image, let's put
-                          # the filepath or link into here
+        self.cover = None  # if we have some album art image, let's put
+        # the filepath or link into here
 
     def get_children(self, start=0, end=0):
         """ called by the CDS and the MediaServer web
@@ -292,7 +290,7 @@ class BackendItem(log.Loggable):
 class BackendRssMixin:
 
     def __init__(self):
-      pass
+        pass
 
     def update_data(self, rss_url, container=None):
         """ creates a deferred chain to retrieve the rdf file,
@@ -300,10 +298,10 @@ class BackendRssMixin:
         """
 
         def fail(f):
-          # TODO fix loggable thing
-          self.info("fail %r", f)
-          self.debug(f.getTraceback())
-          return f
+            # TODO fix loggable thing
+            self.info("fail %r", f)
+            self.debug(f.getTraceback())
+            return f
 
         dfr = getPage(rss_url)
         dfr.addCallback(etree.fromstring)
@@ -352,6 +350,7 @@ class Container(BackendItem):
 
         def childs_sort(x, y):
             return cmp_to_key(x.name, y.name)
+
         self.sorting_method = childs_sort
 
     def register_child(self, child, external_id=None):
@@ -399,7 +398,8 @@ class Container(BackendItem):
 
     def get_item(self):
         if self.item is None:
-            self.item = DIDLLite.Container(self.storage_id, self.parent_id, self.name)
+            self.item = DIDLLite.Container(self.storage_id, self.parent_id,
+                                           self.name)
         self.item.childCount = len(self.children)
         return self.item
 
@@ -416,7 +416,8 @@ class Container(BackendItem):
 class LazyContainer(Container):
     logCategory = 'lazyContainer'
 
-    def __init__(self, parent, title, external_id=None, refresh=0, childrenRetriever=None, **kwargs):
+    def __init__(self, parent, title, external_id=None, refresh=0,
+                 childrenRetriever=None, **kwargs):
         Container.__init__(self, parent, title)
 
         self.childrenRetrievingNeeded = True
@@ -444,7 +445,8 @@ class LazyContainer(Container):
         if self.children_retrieval_campaign_in_progress is True:
             self.retrieved_children[external_id] = child
         else:
-            Container.add_child(self, child, external_id=external_id, update=update)
+            Container.add_child(self, child, external_id=external_id,
+                                update=update)
 
     def update_children(self, new_children, old_children):
         children_to_be_removed = {}
@@ -459,7 +461,7 @@ class LazyContainer(Container):
             children_to_be_removed[id] = item
         for id, item in list(new_children.items()):
             if id in old_children:
-                #print(id, "already there")
+                # print(id, "already there")
                 children_to_be_replaced[id] = old_children[id]
                 del children_to_be_removed[id]
             else:
@@ -468,7 +470,8 @@ class LazyContainer(Container):
         # Phase 2
         # Now, we remove, update or add the relevant items
         # to the list of items
-        self.debug("Refresh pass 2: %d %d %d", len(children_to_be_removed), len(children_to_be_replaced), len(children_to_be_added))
+        self.debug("Refresh pass 2: %d %d %d", len(children_to_be_removed),
+                   len(children_to_be_replaced), len(children_to_be_added))
         # Remove relevant items from Container children
         for id, item in list(children_to_be_removed.items()):
             self.remove_child(item, external_id=id, update=False)
@@ -480,7 +483,7 @@ class LazyContainer(Container):
             if hasattr(old_item, 'replace_by'):
                 replaced = old_item.replace_by(new_item)
             if replaced is False:
-                #print "No replacement possible: we remove and add the item again"
+                # print "No replacement possible: we remove and add the item again"
                 self.remove_child(old_item, external_id=id, update=False)
                 self.add_child(new_item, external_id=id, update=False)
         # Add relevant items to COntainer children
@@ -497,7 +500,8 @@ class LazyContainer(Container):
     def end_children_retrieval_campaign(self, success=True):
         self.children_retrieval_campaign_in_progress = False
         if success is True:
-            self.update_children(self.retrieved_children, self.children_by_external_id)
+            self.update_children(self.retrieved_children,
+                                 self.children_by_external_id)
             self.update_id += 1
         self.last_updated = time.time()
         self.retrieved_children = {}
@@ -507,7 +511,8 @@ class LazyContainer(Container):
         def items_retrieved(result, page, start_offset):
             if self.childrenRetrievingNeeded is True:
                 new_offset = len(self.retrieved_children)
-                return self.retrieve_children(new_offset, page + 1)  # we try the next page
+                return self.retrieve_children(new_offset,
+                                              page + 1)  # we try the next page
             return self.retrieved_children
 
         self.childrenRetrievingNeeded = False
@@ -532,7 +537,8 @@ class LazyContainer(Container):
         if self.childrenRetriever is not None:
             d = self.retrieve_children(start)
             if start == 0:
-                d.addCallbacks(all_items_retrieved, error_while_retrieving_items)
+                d.addCallbacks(all_items_retrieved,
+                               error_while_retrieving_items)
             return d
         else:
             self.end_children_retrieval_campaign()
@@ -552,11 +558,12 @@ class LazyContainer(Container):
             return self.retrieve_all_children(start, request_count)
         return Container.get_children(self, start, request_count)
 
+
 ROOT_CONTAINER_ID = 0
 SEED_ITEM_ID = 1000
 
 
-class AbstractBackendStore (BackendStore):
+class AbstractBackendStore(BackendStore):
     def __init__(self, server, **kwargs):
         BackendStore.__init__(self, server, **kwargs)
         self.next_id = SEED_ITEM_ID

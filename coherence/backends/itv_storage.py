@@ -8,21 +8,13 @@
 
 from functools import cmp_to_key
 
-from twisted.internet import defer, reactor
+from twisted.internet import reactor
 from twisted.web import server
 
-from coherence.upnp.core import utils
-
-from coherence.upnp.core import DIDLLite
-
-from coherence.extern.simple_plugin import Plugin
-
 from coherence import log
-from coherence.backend import BackendItem, BackendStore
-
-import zlib
-
 from coherence.backend import BackendStore, BackendItem
+from coherence.upnp.core import DIDLLite
+from coherence.upnp.core import utils
 
 ROOT_CONTAINER_ID = 0
 
@@ -52,18 +44,20 @@ class ProxyStream(utils.ReverseProxyUriResource, log.Loggable):
         if self.stream_url is None:
             def got_playlist(result):
                 if result is None:
-                    self.warning('Error to retrieve playlist - nothing retrieved')
+                    self.warning(
+                        'Error to retrieve playlist - nothing retrieved')
                     return requestFinished(result)
                 result = result[0].split('\n')
                 for line in result:
                     if line.startswith('File1='):
                         self.stream_url = line[6:].split(";")[0]
                         break
-                #print "stream URL:", self.stream_url
+                # print "stream URL:", self.stream_url
                 if self.stream_url is None:
-                    self.warning('Error to retrieve playlist - inconsistent playlist file')
+                    self.warning(
+                        'Error to retrieve playlist - inconsistent playlist file')
                     return requestFinished(result)
-                #self.resetUri(self.stream_url)
+                # self.resetUri(self.stream_url)
                 request.uri = self.stream_url
                 return self.render(request)
 
@@ -72,7 +66,7 @@ class ProxyStream(utils.ReverseProxyUriResource, log.Loggable):
                 return None
 
             playlist_url = self.uri
-            #print "playlist URL:", playlist_url
+            # print "playlist URL:", playlist_url
             d = utils.getPage(playlist_url, timeout=20)
             d.addCallbacks(got_playlist, got_error)
             return server.NOT_DONE_YET
@@ -174,7 +168,7 @@ class ITVItem(BackendItem):
             self.item.date = self.date
             res = DIDLLite.Resource(self.url, 'http-get:*:%s:*' % self.mimetype)
             res.duration = self.duration
-            #res.size = 0 #None
+            # res.size = 0 #None
             self.item.res.append(res)
         return self.item
 
@@ -183,18 +177,27 @@ class ITVItem(BackendItem):
 
 
 class ITVStore(BackendStore):
-
     logCategory = 'itv'
 
     implements = ['MediaServer']
 
-    description = ('Shoutcast TV', 'cexposes the list of video streams from Shoutcast TV.', None)
+    description = (
+    'Shoutcast TV', 'cexposes the list of video streams from Shoutcast TV.',
+    None)
 
-    options = [{'option': 'name', 'text': 'Server Name:', 'type': 'string', 'default': 'my media', 'help': 'the name under this MediaServer shall show up with on other UPnP clients'},
-       {'option': 'version', 'text': 'UPnP Version:', 'type': 'int', 'default': 2, 'enum': (2, 1), 'help': 'the highest UPnP version this MediaServer shall support', 'level': 'advance'},
-       {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string', 'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set', 'level': 'advance'},
-       {'option': 'genrelist', 'text': 'Server URL', 'type': 'string', 'default': SHOUTCAST_WS_URL}
-    ]
+    options = [{'option': 'name', 'text': 'Server Name:', 'type': 'string',
+                'default': 'my media',
+                'help': 'the name under this MediaServer shall show up with on other UPnP clients'},
+               {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
+                'default': 2, 'enum': (2, 1),
+                'help': 'the highest UPnP version this MediaServer shall support',
+                'level': 'advance'},
+               {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
+                'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set',
+                'level': 'advance'},
+               {'option': 'genrelist', 'text': 'Server URL', 'type': 'string',
+                'default': SHOUTCAST_WS_URL}
+               ]
 
     def __init__(self, server, **kwargs):
         BackendStore.__init__(self, server, **kwargs)
@@ -252,10 +255,12 @@ class ITVStore(BackendStore):
         self.current_connection_id = None
 
         if self.server:
-            self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo',
-                                                                    ['http-get:*:%s:*' % VIDEO_MIMETYPE,
-                                                                     ],
-                                                                   default=True)
+            self.server.connection_manager_server.set_variable(0,
+                                                               'SourceProtocolInfo',
+                                                               [
+                                                                   'http-get:*:%s:*' % VIDEO_MIMETYPE,
+                                                                   ],
+                                                               default=True)
         rootItem = Container(ROOT_CONTAINER_ID, self, -1, self.name)
         self.store[ROOT_CONTAINER_ID] = rootItem
         self.retrieveList_attemptCount = 0
@@ -266,9 +271,12 @@ class ITVStore(BackendStore):
 
         def got_page(result):
             if self.retrieveList_attemptCount == 0:
-                self.info("Connection to ShoutCast service successful for TV listing")
+                self.info(
+                    "Connection to ShoutCast service successful for TV listing")
             else:
-                self.warning("Connection to ShoutCast service successful for TV listing after %d attempts.", self.retrieveList_attemptCount)
+                self.warning(
+                    "Connection to ShoutCast service successful for TV listing after %d attempts.",
+                    self.retrieveList_attemptCount)
             result = result[0]
             result = utils.parse_xml(result, encoding='utf-8')
 
@@ -307,13 +315,14 @@ class ITVStore(BackendStore):
                 genre = station.get('genre')
                 parentItem = genreItems[genre]
                 self.appendFeed({'name': station.get('name'),
-                                    'mimetype': station['mimetype'],
-                                    'id': station.get('station_id'),
-                                    'url': station.get('url')},
-                            parentItem)
+                                 'mimetype': station['mimetype'],
+                                 'id': station.get('station_id'),
+                                 'url': station.get('url')},
+                                parentItem)
 
         def got_error(error):
-            self.warning("Connection to ShoutCast service failed. Will retry in 5s!")
+            self.warning(
+                "Connection to ShoutCast service failed. Will retry in 5s!")
             self.debug("%r", error.getTraceback())
             # will retry later
             self.retrieveList_attemptCount += 1

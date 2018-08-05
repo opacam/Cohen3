@@ -3,15 +3,18 @@
 
 # Copyright 2009, Dominik Ruf <dominikruf at googlemail dot com>
 
+import http.client
+import urllib.error
+import urllib.parse
+import urllib.request
+from urllib.parse import urlsplit
+from xml.etree.ElementTree import ElementTree
+
 from coherence.backend import BackendItem
 from coherence.backend import BackendStore
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.utils import ReverseProxyUriResource
 
-from xml.etree.ElementTree import ElementTree
-import urllib.request, urllib.parse, urllib.error
-import http.client
-from urllib.parse import urlsplit
 try:
     import feedparser
 except:
@@ -39,7 +42,7 @@ class RedirectingReverseProxyUriResource(ReverseProxyUriResource):
         conn = http.client.HTTPConnection(netloc)
         conn.request('HEAD', '%s?%s#%s' % (path, query, fragment))
         res = conn.getresponse()
-        if(res.status == 301 or res.status == 302):
+        if (res.status == 301 or res.status == 302):
             return self.follow_redirect(res.getheader('location'))
         else:
             return uri
@@ -78,7 +81,8 @@ class FeedEnclosure(BackendItem):
         self.parent = parent
         self.external_id = id
         self.name = title
-        self.location = RedirectingReverseProxyUriResource(enclosure.url.encode('latin-1'))
+        self.location = RedirectingReverseProxyUriResource(
+            enclosure.url.encode('latin-1'))
 
         # doing this because some (Fraunhofer Podcast) feeds say there mime type is audio/x-mpeg
         # which at least my XBOX doesn't like
@@ -87,14 +91,15 @@ class FeedEnclosure(BackendItem):
             mime_type = MIME_TYPES_EXTENTION_MAPPING[ext]
         else:
             mime_type = enclosure.type
-        if(enclosure.type.startswith('audio')):
+        if (enclosure.type.startswith('audio')):
             self.item = DIDLLite.AudioItem(id, parent, self.name)
-        elif(enclosure.type.startswith('video')):
+        elif (enclosure.type.startswith('video')):
             self.item = DIDLLite.VideoItem(id, parent, self.name)
-        elif(enclosure.type.startswith('image')):
+        elif (enclosure.type.startswith('image')):
             self.item = DIDLLite.ImageItem(id, parent, self.name)
 
-        res = DIDLLite.Resource("%s%d" % (store.urlbase, id), 'http-get:*:%s:*' % mime_type)
+        res = DIDLLite.Resource("%s%d" % (store.urlbase, id),
+                                'http-get:*:%s:*' % mime_type)
 
         self.item.res.append(res)
 
@@ -109,18 +114,21 @@ class FeedStore(BackendStore):
         BackendStore.__init__(self, server, **kwargs)
         self.name = kwargs.get('name', 'Feed Store')
         self.urlbase = kwargs.get('urlbase', '')
-        if(len(self.urlbase) > 0 and
-            self.urlbase[len(self.urlbase) - 1] != '/'):
+        if (len(self.urlbase) > 0 and
+                self.urlbase[len(self.urlbase) - 1] != '/'):
             self.urlbase += '/'
         self.feed_urls = kwargs.get('feed_urls')
         self.opml_url = kwargs.get('opml_url')
-        if(not(self.feed_urls or self.opml_url)):
-            raise FeedStorageConfigurationException("either feed_urls or opml_url has to be set")
-        if(self.feed_urls and self.opml_url):
-            raise FeedStorageConfigurationException("only feed_urls OR opml_url can be set")
+        if (not (self.feed_urls or self.opml_url)):
+            raise FeedStorageConfigurationException(
+                "either feed_urls or opml_url has to be set")
+        if (self.feed_urls and self.opml_url):
+            raise FeedStorageConfigurationException(
+                "only feed_urls OR opml_url can be set")
 
         self.server = server
-        self.refresh = int(kwargs.get('refresh', 1)) * (60 * 60)  # TODO: not used yet
+        self.refresh = int(kwargs.get('refresh', 1)) * (
+                    60 * 60)  # TODO: not used yet
         self.store = {}
         self.wmc_mapping = {'4': str(AUDIO_ALL_CONTAINER_ID),  # all tracks
                             '7': str(AUDIO_ALBUM_CONTAINER_ID),  # all albums
@@ -128,15 +136,23 @@ class FeedStore(BackendStore):
                             '15': str(VIDEO_FOLDER_CONTAINER_ID),  # all videos
                             }
 
-        self.store[ROOT_CONTAINER_ID] = FeedContainer(-1, ROOT_CONTAINER_ID, self.name)
-        self.store[AUDIO_ALL_CONTAINER_ID] = FeedContainer(-1, AUDIO_ALL_CONTAINER_ID, 'AUDIO_ALL_CONTAINER')
-        self.store[AUDIO_ALBUM_CONTAINER_ID] = FeedContainer(-1, AUDIO_ALBUM_CONTAINER_ID, 'AUDIO_ALBUM_CONTAINER')
-        self.store[VIDEO_FOLDER_CONTAINER_ID] = FeedContainer(-1, VIDEO_FOLDER_CONTAINER_ID, 'VIDEO_FOLDER_CONTAINER')
+        self.store[ROOT_CONTAINER_ID] = FeedContainer(-1, ROOT_CONTAINER_ID,
+                                                      self.name)
+        self.store[AUDIO_ALL_CONTAINER_ID] = FeedContainer(-1,
+                                                           AUDIO_ALL_CONTAINER_ID,
+                                                           'AUDIO_ALL_CONTAINER')
+        self.store[AUDIO_ALBUM_CONTAINER_ID] = FeedContainer(-1,
+                                                             AUDIO_ALBUM_CONTAINER_ID,
+                                                             'AUDIO_ALBUM_CONTAINER')
+        self.store[VIDEO_FOLDER_CONTAINER_ID] = FeedContainer(-1,
+                                                              VIDEO_FOLDER_CONTAINER_ID,
+                                                              'VIDEO_FOLDER_CONTAINER')
 
         try:
             self._update_data()
         except Exception as e:
-            self.error('error while updateing the feed contant for %s: %s', self.name, str(e))
+            self.error('error while updateing the feed contant for %s: %s',
+                       self.name, str(e))
         self.init_completed()
 
     def get_by_id(self, id):
@@ -147,19 +163,20 @@ class FeedStore(BackendStore):
         try:
             return self.store[int(id)]
         except (ValueError, KeyError):
-            self.info("can't get item %d from %s feed storage", int(id), self.name)
+            self.info("can't get item %d from %s feed storage", int(id),
+                      self.name)
         return None
 
     def _update_data(self):
         """get the feed xml, parse it, etc."""
         feed_urls = []
-        if(self.opml_url):
+        if (self.opml_url):
             tree = ElementTree(file=urllib.request.urlopen(self.opml_url))
             body = tree.find('body')
             for outline in body.findall('outline'):
                 feed_urls.append(outline.attrib['url'])
 
-        if(self.feed_urls):
+        if (self.feed_urls):
             feed_urls = self.feed_urls.split()
         container_id = 100
         item_id = 1001
@@ -169,22 +186,34 @@ class FeedStore(BackendStore):
             conn.request('HEAD', '%s?%s#%s' % (path, query, fragment))
             res = conn.getresponse()
             if res.status >= 400:
-                self.warning('error getting %s status code: %d', feed_url, res.status)
+                self.warning('error getting %s status code: %d', feed_url,
+                             res.status)
                 continue
             fp_dict = feedparser.parse(feed_url)
             name = fp_dict.feed.title
-            self.store[container_id] = FeedContainer(ROOT_CONTAINER_ID, container_id, name)
-            self.store[ROOT_CONTAINER_ID].children.append(self.store[container_id])
-            self.store[VIDEO_FOLDER_CONTAINER_ID].children.append(self.store[container_id])
-            self.store[AUDIO_ALBUM_CONTAINER_ID].children.append(self.store[container_id])
+            self.store[container_id] = FeedContainer(ROOT_CONTAINER_ID,
+                                                     container_id, name)
+            self.store[ROOT_CONTAINER_ID].children.append(
+                self.store[container_id])
+            self.store[VIDEO_FOLDER_CONTAINER_ID].children.append(
+                self.store[container_id])
+            self.store[AUDIO_ALBUM_CONTAINER_ID].children.append(
+                self.store[container_id])
             for item in fp_dict.entries:
                 for enclosure in item.enclosures:
-                    self.store[item_id] = FeedEnclosure(self, container_id, item_id, '%04d - %s' % (item_id, item.title), enclosure)
-                    self.store[container_id].children.append(self.store[item_id])
+                    self.store[item_id] = FeedEnclosure(self, container_id,
+                                                        item_id, '%04d - %s' % (
+                                                        item_id, item.title),
+                                                        enclosure)
+                    self.store[container_id].children.append(
+                        self.store[item_id])
                     if enclosure.type.startswith('audio'):
-                        self.store[AUDIO_ALL_CONTAINER_ID].children.append(self.store[item_id])
-                        if not isinstance(self.store[container_id].item, DIDLLite.MusicAlbum):
-                            self.store[container_id].item = DIDLLite.MusicAlbum(container_id, AUDIO_ALBUM_CONTAINER_ID, name)
+                        self.store[AUDIO_ALL_CONTAINER_ID].children.append(
+                            self.store[item_id])
+                        if not isinstance(self.store[container_id].item,
+                                          DIDLLite.MusicAlbum):
+                            self.store[container_id].item = DIDLLite.MusicAlbum(
+                                container_id, AUDIO_ALBUM_CONTAINER_ID, name)
 
                     item_id += 1
             if container_id <= 1000:

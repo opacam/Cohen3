@@ -7,15 +7,14 @@
 
 # Content Directory service
 
+from twisted.internet import defer
 from twisted.python import failure
 from twisted.web import resource
-from twisted.internet import defer
-
-from coherence.upnp.core.soap_service import UPnPPublisher
-from coherence.upnp.core.soap_service import errorCode
-from coherence.upnp.core.DIDLLite import DIDLElement
 
 from coherence.upnp.core import service
+from coherence.upnp.core.DIDLLite import DIDLElement
+from coherence.upnp.core.soap_service import UPnPPublisher
+from coherence.upnp.core.soap_service import errorCode
 
 
 class ContentDirectoryControl(service.ServiceControl, UPnPPublisher):
@@ -37,7 +36,8 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         if backend is None:
             backend = self.device.backend
         resource.Resource.__init__(self)
-        service.ServiceServer.__init__(self, 'ContentDirectory', self.device.version, backend)
+        service.ServiceServer.__init__(self, 'ContentDirectory',
+                                       self.device.version, backend)
 
         self.control = ContentDirectoryControl(self)
         self.putChild('scpd.xml', service.scpdXML(self, self.control))
@@ -53,7 +53,8 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         return cl
 
     def render(self, request):
-        return '<html><p>root of the ContentDirectory</p><p><ul>%s</ul></p></html>' % self.listchilds(request.uri)
+        return '<html><p>root of the ContentDirectory</p><p><ul>%s</ul></p></html>' % self.listchilds(
+            request.uri)
 
     def upnp_Search(self, *args, **kwargs):
         ContainerID = kwargs['ContainerID']
@@ -127,11 +128,14 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             return dl
 
         def proceed(result):
-            if(kwargs.get('X_UPnPClient', '') == 'XBox' and
-               hasattr(result, 'get_artist_all_tracks')):
-                d = defer.maybeDeferred(result.get_artist_all_tracks, StartingIndex, StartingIndex + RequestedCount)
+            if (kwargs.get('X_UPnPClient', '') == 'XBox' and
+                    hasattr(result, 'get_artist_all_tracks')):
+                d = defer.maybeDeferred(result.get_artist_all_tracks,
+                                        StartingIndex,
+                                        StartingIndex + RequestedCount)
             else:
-                d = defer.maybeDeferred(result.get_children, StartingIndex, StartingIndex + RequestedCount)
+                d = defer.maybeDeferred(result.get_children, StartingIndex,
+                                        StartingIndex + RequestedCount)
             d.addCallback(process_result, found_item=result)
             d.addErrback(got_error)
             return d
@@ -143,8 +147,8 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
         wmc_mapping = getattr(self.backend, "wmc_mapping", None)
         if kwargs.get('X_UPnPClient', '') == 'XBox':
-            if(wmc_mapping is not None and
-               ContainerID in wmc_mapping):
+            if (wmc_mapping is not None and
+                    ContainerID in wmc_mapping):
                 """ fake a Windows Media Connect Server
                 """
                 root_id = wmc_mapping[ContainerID]
@@ -156,7 +160,8 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                             if int(RequestedCount) == 0:
                                 items = item[StartingIndex:]
                             else:
-                                items = item[StartingIndex:StartingIndex + RequestedCount]
+                                items = item[
+                                        StartingIndex:StartingIndex + RequestedCount]
                             return process_result(items, total=total)
                         else:
                             if isinstance(item, defer.Deferred):
@@ -189,7 +194,8 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         try:
             ObjectID = kwargs['ObjectID']
         except:
-            self.debug("hmm, a Browse action and no ObjectID argument? An XBox maybe?")
+            self.debug(
+                "hmm, a Browse action and no ObjectID argument? An XBox maybe?")
             try:
                 ObjectID = kwargs['ContainerID']
             except:
@@ -206,13 +212,13 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         total = 0
         items = []
 
-
         if BrowseFlag == 'BrowseDirectChildren':
             parent_container = str(ObjectID)
         else:
             requested_id = str(ObjectID)
 
-        self.info("upnp_Browse request %r %r %r %r", ObjectID, BrowseFlag, StartingIndex, RequestedCount)
+        self.info("upnp_Browse request %r %r %r %r", ObjectID, BrowseFlag,
+                  StartingIndex, RequestedCount)
 
         didl = DIDLElement(upnp_client=kwargs.get('X_UPnPClient', ''),
                            requested_id=requested_id,
@@ -264,22 +270,23 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             return build_response(total)
 
         def build_response(tm):
-          r = {'Result': didl.toString(),
-               'TotalMatches': tm,
-               'NumberReturned': didl.numItems()}
+            r = {'Result': didl.toString(),
+                 'TotalMatches': tm,
+                 'NumberReturned': didl.numItems()}
 
-          if hasattr(item, 'update_id'):
-            r['UpdateID'] = item.update_id
-          elif hasattr(self.backend, 'update_id'):
-            r['UpdateID'] = self.backend.update_id  # FIXME
-          else:
-            r['UpdateID'] = 0
+            if hasattr(item, 'update_id'):
+                r['UpdateID'] = item.update_id
+            elif hasattr(self.backend, 'update_id'):
+                r['UpdateID'] = self.backend.update_id  # FIXME
+            else:
+                r['UpdateID'] = 0
 
-          return r
+            return r
 
         def proceed(result):
             if BrowseFlag == 'BrowseDirectChildren':
-                d = defer.maybeDeferred(result.get_children, StartingIndex, StartingIndex + RequestedCount)
+                d = defer.maybeDeferred(result.get_children, StartingIndex,
+                                        StartingIndex + RequestedCount)
             else:
                 d = defer.maybeDeferred(result.get_item)
 
@@ -303,7 +310,8 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                         if int(RequestedCount) == 0:
                             items = item[StartingIndex:]
                         else:
-                            items = item[StartingIndex:StartingIndex + RequestedCount]
+                            items = item[
+                                    StartingIndex:StartingIndex + RequestedCount]
                         return process_result(items, total=total)
                     else:
                         if isinstance(item, defer.Deferred):

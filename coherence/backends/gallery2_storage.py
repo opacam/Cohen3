@@ -4,19 +4,13 @@
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
 # Copyright 2008, Jean-Michel Sizun <jm.sizun@free.fr>
 
+from coherence.extern.galleryremote import Gallery
 from twisted.internet import defer
 
-from coherence.upnp.core import utils
-from coherence.upnp.core.utils import ReverseProxyUriResource
-
-from coherence.upnp.core.DIDLLite import classChooser, Container, Resource, DIDLElement
-
-from coherence.backend import BackendStore
 from coherence.backend import BackendItem
-
-from urllib.parse import urlsplit
-
-from coherence.extern.galleryremote import Gallery
+from coherence.backend import BackendStore
+from coherence.upnp.core.DIDLLite import classChooser, Container, Resource
+from coherence.upnp.core.utils import ReverseProxyUriResource
 
 
 class ProxyGallery2Image(ReverseProxyUriResource):
@@ -32,7 +26,8 @@ class ProxyGallery2Image(ReverseProxyUriResource):
 class Gallery2Item(BackendItem):
     logCategory = 'gallery2_item'
 
-    def __init__(self, id, obj, parent, mimetype, urlbase, UPnPClass, update=False):
+    def __init__(self, id, obj, parent, mimetype, urlbase, UPnPClass,
+                 update=False):
         BackendItem.__init__(self)
         self.id = id
 
@@ -61,14 +56,14 @@ class Gallery2Item(BackendItem):
         self.child_count = 0
         self.children = None
 
-        if(len(urlbase) and urlbase[-1] != '/'):
+        if (len(urlbase) and urlbase[-1] != '/'):
             urlbase += '/'
 
         if parent == None:
             self.gallery2_url = None
             self.url = urlbase + str(self.id)
         elif self.mimetype == 'directory':
-            #self.gallery2_url = parent.store.get_url_for_album(self.gallery2_id)
+            # self.gallery2_url = parent.store.get_url_for_album(self.gallery2_id)
             self.url = urlbase + str(self.id)
         else:
             self.gallery2_url = parent.store.get_url_for_image(self.gallery2_id)
@@ -98,7 +93,7 @@ class Gallery2Item(BackendItem):
             self.update_id += 1
 
     def remove_child(self, child):
-        #self.info("remove_from %d (%s) child %d (%s)" % (self.id, self.get_name(), child.id, child.get_name()))
+        # self.info("remove_from %d (%s) child %d (%s)" % (self.id, self.get_name(), child.id, child.get_name()))
         if child in self.children:
             self.child_count -= 1
             if isinstance(self.item, Container):
@@ -109,7 +104,7 @@ class Gallery2Item(BackendItem):
     def get_children(self, start=0, request_count=0):
         def process_items(result=None):
             if self.children == None:
-                return  []
+                return []
             if request_count == 0:
                 return self.children[start:]
             else:
@@ -154,20 +149,30 @@ class Gallery2Item(BackendItem):
 
 
 class Gallery2Store(BackendStore):
-
     logCategory = 'gallery2_store'
 
     implements = ['MediaServer']
 
-    description = ('Gallery2', 'exposes the photos from a Gallery2 photo repository.', None)
+    description = (
+    'Gallery2', 'exposes the photos from a Gallery2 photo repository.', None)
 
-    options = [{'option': 'name', 'text': 'Server Name:', 'type': 'string', 'default': 'my media', 'help': 'the name under this MediaServer shall show up with on other UPnP clients'},
-       {'option': 'version', 'text': 'UPnP Version:', 'type': 'int', 'default': 2, 'enum': (2, 1), 'help': 'the highest UPnP version this MediaServer shall support', 'level': 'advance'},
-       {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string', 'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set', 'level': 'advance'},
-       {'option': 'server_url', 'text': 'Server URL:', 'type': 'string'},
-       {'option': 'username', 'text': 'User ID:', 'type': 'string', 'group': 'User Account'},
-       {'option': 'password', 'text': 'Password:', 'type': 'string', 'group': 'User Account'},
-    ]
+    options = [{'option': 'name', 'text': 'Server Name:', 'type': 'string',
+                'default': 'my media',
+                'help': 'the name under this MediaServer shall show up with on other UPnP clients'},
+               {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
+                'default': 2, 'enum': (2, 1),
+                'help': 'the highest UPnP version this MediaServer shall support',
+                'level': 'advance'},
+               {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
+                'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set',
+                'level': 'advance'},
+               {'option': 'server_url', 'text': 'Server URL:',
+                'type': 'string'},
+               {'option': 'username', 'text': 'User ID:', 'type': 'string',
+                'group': 'User Account'},
+               {'option': 'password', 'text': 'Password:', 'type': 'string',
+                'group': 'User Account'},
+               ]
 
     def __init__(self, server, **kwargs):
         BackendStore.__init__(self, server, **kwargs)
@@ -181,17 +186,22 @@ class Gallery2Store(BackendStore):
         self.update_id = 0
         self.store = {}
 
-        self.gallery2_server_url = self.config.get('server_url', 'http://localhost/gallery2')
+        self.gallery2_server_url = self.config.get('server_url',
+                                                   'http://localhost/gallery2')
         self.gallery2_username = self.config.get('username', None)
         self.gallery2_password = self.config.get('password', None)
 
-        self.store[1000] = Gallery2Item(1000, {'title': 'Gallery2', 'gallery2_id': '0', 'mimetype': 'directory'}, None,
-                                                        'directory', self.urlbase, Container, update=True)
+        self.store[1000] = Gallery2Item(1000, {'title': 'Gallery2',
+                                               'gallery2_id': '0',
+                                               'mimetype': 'directory'}, None,
+                                        'directory', self.urlbase, Container,
+                                        update=True)
         self.store[1000].store = self
 
         self.gallery2_remote = Gallery(self.gallery2_server_url, 2)
         if not None in [self.gallery2_username, self.gallery2_password]:
-            d = self.gallery2_remote.login(self.gallery2_username, self.gallery2_password)
+            d = self.gallery2_remote.login(self.gallery2_username,
+                                           self.gallery2_password)
             d.addCallback(lambda x: self.retrieveAlbums('0', self.store[1000]))
             d.addCallback(self.init_completed)
         else:
@@ -210,18 +220,20 @@ class Gallery2Store(BackendStore):
         UPnPClass = classChooser(mimetype)
         id = self.getnextID()
         update = False
-        #if hasattr(self, 'update_id'):
+        # if hasattr(self, 'update_id'):
         #    update = True
 
         item = Gallery2Item(id, obj, parent, mimetype, self.urlbase,
-                                        UPnPClass, update=update)
+                            UPnPClass, update=update)
         self.store[id] = item
         self.store[id].store = self
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0, 'SystemUpdateID', self.update_id)
-            #if parent:
+                self.server.content_directory_server.set_variable(0,
+                                                                  'SystemUpdateID',
+                                                                  self.update_id)
+            # if parent:
             #    value = (parent.get_id(),parent.get_update_id())
             #    if self.server:
             #        self.server.content_directory_server.set_variable(0, 'ContainerUpdateIDs', value)
@@ -261,20 +273,21 @@ class Gallery2Store(BackendStore):
     def upnp_init(self):
         self.current_connection_id = None
         if self.server:
-            self.server.connection_manager_server.set_variable(0, 'SourceProtocolInfo',
-                                                                  'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                                  'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                                  'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                                  'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                                  'http-get:*:image/jpeg:*,'
-                                                                  'http-get:*:image/gif:*,'
-                                                                  'http-get:*:image/png:*',
-                                                                default=True)
+            self.server.connection_manager_server.set_variable(0,
+                                                               'SourceProtocolInfo',
+                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+                                                               'http-get:*:image/jpeg:*,'
+                                                               'http-get:*:image/gif:*,'
+                                                               'http-get:*:image/png:*',
+                                                               default=True)
 
     def retrieveAlbums(self, album_gallery2_id, parent):
         d = self.gallery2_remote.fetch_albums()
 
-        def gotAlbums (albums):
+        def gotAlbums(albums):
             if albums:
                 albums = [
                     album for album in list(albums.values()) if
@@ -291,19 +304,19 @@ class Gallery2Store(BackendStore):
                         title = album.get('title')
                         description = album.get('summary')
                         store_item = {
-                                  'name': id,
-                                  'gallery2_id': gallery2_id,
-                                  'parent_id': parent_gallery2_id,
-                                  'title': title,
-                                  'description': description,
-                                  'mimetype': 'directory',
-                                    }
+                            'name': id,
+                            'gallery2_id': gallery2_id,
+                            'parent_id': parent_gallery2_id,
+                            'title': title,
+                            'description': description,
+                            'mimetype': 'directory',
+                        }
                         self.append(store_item, parent)
 
         d.addCallback(gotAlbums)
         return d
 
-    def retrieveItemsForAlbum (self, album_id, parent):
+    def retrieveItemsForAlbum(self, album_id, parent):
         # retrieve subalbums
         d1 = self.retrieveAlbums(album_id, parent)
 
@@ -325,14 +338,14 @@ class Gallery2Store(BackendStore):
                         gallery2_id = image_gallery2_id
 
                     store_item = {
-                                  'name': id,
-                                  'gallery2_id': gallery2_id,
-                                  'parent_id': parent_gallery2_id,
-                                  'thumbnail_gallery2_id': thumbnail_gallery2_id,
-                                  'title': title,
-                                  'description': description,
-                                  'mimetype': 'image/jpeg',
-                                }
+                        'name': id,
+                        'gallery2_id': gallery2_id,
+                        'parent_id': parent_gallery2_id,
+                        'thumbnail_gallery2_id': thumbnail_gallery2_id,
+                        'title': title,
+                        'description': description,
+                        'mimetype': 'image/jpeg',
+                    }
                     self.append(store_item, parent)
 
         d2.addCallback(gotImages)
@@ -341,7 +354,6 @@ class Gallery2Store(BackendStore):
 
 
 def main():
-
     f = Gallery2Store(None)
 
     def got_upnp_result(result):
@@ -351,7 +363,6 @@ def main():
 
 
 if __name__ == '__main__':
-
     from twisted.internet import reactor
 
     reactor.callWhenRunning(main)

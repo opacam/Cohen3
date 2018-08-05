@@ -11,9 +11,8 @@ Test cases for L{upnp.core.msearch}
 
 import time
 
-from twisted.trial import unittest
-from twisted.internet import protocol
 from twisted.test import proto_helpers
+from twisted.trial import unittest
 
 from coherence.upnp.core import msearch, ssdp
 
@@ -30,7 +29,7 @@ MSEARCH_RESPONSE_1 = (
     'Server: Linux/armv5-linux UPnP/1.0 DLNADOC/1.50 MediaServer/7.3/735',
     'ST: urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1',
     'USN: ' + USN_1,
-    )
+)
 
 
 class TestMSearch(unittest.TestCase):
@@ -47,7 +46,7 @@ class TestMSearch(unittest.TestCase):
         data = '\r\n'.join(MSEARCH_RESPONSE_1) + '\r\n\r\n'
         self.proto.datagramReceived(data, ('10.20.30.40', 1234))
         self.assertTrue(self.ssdp_server.isKnown(USN_1))
-        self.assertFalse(self.ssdp_server.isKnown(USN_1*2))
+        self.assertFalse(self.ssdp_server.isKnown(USN_1 * 2))
         service = self.ssdp_server.known[USN_1]
         del service['last-seen']
         self.assertEqual(service, {
@@ -60,7 +59,7 @@ class TestMSearch(unittest.TestCase):
             'MANIFESTATION': 'remote',
             'SILENT': False,
             'EXT': '',
-            })
+        })
 
     def test_msearch_request_does_not_send_reply(self):
         data = '\r\n'.join(MSEARCH_RESPONSE_1) + '\r\n\r\n'
@@ -77,7 +76,7 @@ class TestMSearch(unittest.TestCase):
         service2 = self.ssdp_server.known[USN_1]
         last_seen2 = service1['last-seen']
         self.assertIs(service1, service2)
-        self.assertLess(last_seen1, last_seen2+0.5)
+        self.assertLess(last_seen1, last_seen2 + 0.5)
 
     def test_discover(self):
         self.assertEqual(self.tr.written, [])
@@ -89,7 +88,7 @@ class TestMSearch(unittest.TestCase):
             'MX: 5',
             'ST: ssdp:all',
             ''
-            ]]
+        ]]
         # :fixme: What is the reason the notification is send twice?
         self.assertEqual(len(self.tr.written), 1)
         data, (host, port) = self.tr.written[0]

@@ -10,20 +10,22 @@ TODO:
 - use more XPath expressions in fromElement() methods
 
 """
-import string
-import urllib.request, urllib.parse, urllib.error
+import urllib.error
+import urllib.parse
+import urllib.request
 from datetime import datetime
+from functools import cmp_to_key
 
 from lxml import etree
-from functools import cmp_to_key
-from coherence.upnp.core import utils
+
 from coherence import log
+from coherence.upnp.core import utils
 from . import xml_constants
 
 
 def qname(tag, ns=None):
     if not ns:
-      return tag
+        return tag
     return "{%s}%s" % (ns, tag)
 
 
@@ -56,7 +58,6 @@ def is_video(mimetype):
 
 
 class Resources(list):
-
     """ a list of resources, always sorted after an append """
 
     def __init__(self):
@@ -101,29 +102,31 @@ class Resources(list):
             if res.importUri is not None:
                 continue
             # print "res", res.protocolInfo, res.data
-            remote_protocol, remote_network, remote_content_format, _ = res.protocolInfo.split(':')
+            remote_protocol, remote_network, remote_content_format, _ = \
+                res.protocolInfo.split(':')
             # print "remote", remote_protocol,remote_network,remote_content_format
             if (protocol_type is not None and
-               remote_protocol.lower() != protocol_type.lower()):
+                    remote_protocol.lower() != protocol_type.lower()):
                 continue
             for protocol_info in local_protocol_infos:
-                local_protocol, local_network, local_content_format, _ = protocol_info.split(':')
+                local_protocol, local_network, local_content_format, _ = \
+                    protocol_info.split(':')
                 # print "local", local_protocol,local_network,local_content_format
                 if (remote_protocol == local_protocol
                     or remote_protocol == '*'
                     or local_protocol == '*') \
-                    and (remote_network == local_network
-                         or remote_network == '*'
-                         or local_network == '*') \
-                    and (remote_content_format.startswith(local_content_format)
-                         or remote_content_format == '*'
-                         or local_content_format == '*'):
-                  result.append(res)
+                        and (remote_network == local_network
+                             or remote_network == '*'
+                             or local_network == '*') \
+                        and (
+                        remote_content_format.startswith(local_content_format)
+                        or remote_content_format == '*'
+                        or local_content_format == '*'):
+                    result.append(res)
         return result
 
 
 def classChooser(mimetype, sub=None):
-
     if mimetype == 'root':
         return Container
     if mimetype == 'item':
@@ -136,24 +139,25 @@ def classChooser(mimetype, sub=None):
         if mimetype.find('image/') == 0:
             return Photo
         if mimetype.find('audio/') == 0:
-            if sub == 'music':       # FIXME: this is stupid
+            if sub == 'music':  # FIXME: this is stupid
                 return MusicTrack
             return AudioItem
         if mimetype.find('video/') == 0:
             return VideoItem
         if mimetype == 'application/ogg':
-            if sub == 'music':       # FIXME: this is stupid
+            if sub == 'music':  # FIXME: this is stupid
                 return MusicTrack
             return AudioItem
         if mimetype == 'application/x-flac':
-            if sub == 'music':       # FIXME: this is stupid
+            if sub == 'music':  # FIXME: this is stupid
                 return MusicTrack
             return AudioItem
     return None
 
-simple_dlna_tags = ['DLNA.ORG_OP=01',      # operations parameter
-                    'DLNA.ORG_PS=1',       # play speed parameter
-                    'DLNA.ORG_CI=0',       # transcoded parameter
+
+simple_dlna_tags = ['DLNA.ORG_OP=01',  # operations parameter
+                    'DLNA.ORG_PS=1',  # play speed parameter
+                    'DLNA.ORG_CI=0',  # transcoded parameter
                     'DLNA.ORG_FLAGS=01100000000000000000000000000000']
 
 
@@ -217,12 +221,14 @@ class Resource(object):
         self.importUri = None
 
         if self.protocolInfo is not None:
-            protocol, network, content_format, additional_info = self.protocolInfo.split(':')
+            protocol, network, content_format, additional_info = self.protocolInfo.split(
+                ':')
             if additional_info == '*':
                 self.protocolInfo = ':'.join([protocol,
                                               network,
                                               content_format,
-                                              build_dlna_additional_info(content_format)])
+                                              build_dlna_additional_info(
+                                                  content_format)])
             elif additional_info == '#':
                 self.protocolInfo = ':'.join([protocol,
                                               network,
@@ -230,13 +236,14 @@ class Resource(object):
                                               '*'])
 
     def get_additional_info(self, upnp_client=''):
-        protocol, network, content_format, additional_info = self.protocolInfo.split(':')
-        if upnp_client in ('XBox', 'Philips-TV', ):
+        protocol, network, content_format, additional_info = \
+            self.protocolInfo.split(':')
+        if upnp_client in ('XBox', 'Philips-TV',):
             """ we don't need the DLNA tags there,
                 and maybe they irritate these poor things anyway
             """
             additional_info = '*'
-        elif upnp_client in ('PLAYSTATION3', ):
+        elif upnp_client in ('PLAYSTATION3',):
             if content_format.startswith('video/'):
                 additional_info = '*'
 
@@ -250,20 +257,26 @@ class Resource(object):
 
     def toElement(self, **kwargs):
         root = etree.Element('res')
-        if kwargs.get('upnp_client', '') in ('XBox', ):
-            protocol, network, content_format, additional_info = self.protocolInfo.split(':')
+        if kwargs.get('upnp_client', '') in ('XBox',):
+            protocol, network, content_format, additional_info = \
+                self.protocolInfo.split(':')
             if content_format in ['video/divx', 'video/x-msvideo']:
                 content_format = 'video/avi'
             if content_format == 'audio/x-wav':
                 content_format = 'audio/wav'
-            additional_info = self.get_additional_info(upnp_client=kwargs.get('upnp_client', ''))
-            root.attrib['protocolInfo'] = ':'.join((protocol, network, content_format, additional_info))
+            additional_info = self.get_additional_info(
+                upnp_client=kwargs.get('upnp_client', ''))
+            root.attrib['protocolInfo'] = ':'.join(
+                (protocol, network, content_format, additional_info))
         else:
-            protocol, network, content_format, additional_info = self.protocolInfo.split(':')
+            protocol, network, content_format, additional_info = \
+                self.protocolInfo.split(':')
             if content_format == 'video/x-msvideo':
                 content_format = 'video/divx'
-            additional_info = self.get_additional_info(upnp_client=kwargs.get('upnp_client', ''))
-            root.attrib['protocolInfo'] = ':'.join((protocol, network, content_format, additional_info))
+            additional_info = self.get_additional_info(
+                upnp_client=kwargs.get('upnp_client', ''))
+            root.attrib['protocolInfo'] = ':'.join(
+                (protocol, network, content_format, additional_info))
 
         root.text = self.data
 
@@ -307,7 +320,8 @@ class Resource(object):
         return instance
 
     def transcoded(self, format):
-        protocol, network, content_format, additional_info = self.protocolInfo.split(':')
+        protocol, network, content_format, additional_info = \
+            self.protocolInfo.split(':')
         dlna_tags = simple_dlna_tags[:]
         # dlna_tags[1] = 'DLNA.ORG_OP=00'
         dlna_tags[2] = 'DLNA.ORG_CI=1'
@@ -328,9 +342,11 @@ class Resource(object):
             return None
 
         additional_info = ';'.join([dlna_pn] + dlna_tags)
-        new_protocol_info = ':'.join((protocol, network, content_format, additional_info))
+        new_protocol_info = ':'.join(
+            (protocol, network, content_format, additional_info))
 
-        new_res = Resource(self.data + '/transcoded/%s' % format, new_protocol_info)
+        new_res = Resource(self.data + '/transcoded/%s' % format,
+                           new_protocol_info)
         new_res.size = None
         new_res.duration = self.duration
         new_res.resolution = self.resolution
@@ -391,7 +407,8 @@ class Object(log.Loggable):
     refID = None
     server_uuid = None
 
-    def __init__(self, id=None, parentID=None, title=None, restricted=False, creator=None):
+    def __init__(self, id=None, parentID=None, title=None, restricted=False,
+                 creator=None):
         log.Loggable.__init__(self)
         self.id = id
         self.parentID = parentID
@@ -408,7 +425,8 @@ class Object(log.Loggable):
         root.attrib['id'] = str(self.id)
         root.attrib['parentID'] = str(self.parentID)
 
-        etree.SubElement(root, qname('title', xml_constants.DC_NS)).text = self.title
+        etree.SubElement(root, qname('title', xml_constants.DC_NS)).text = \
+            self.title
 
         if kwargs.get('upnp_client', '') != 'XBox':
             if self.refID:
@@ -418,7 +436,8 @@ class Object(log.Loggable):
             if kwargs.get('requested_id') == '0':
                 t = root.find(qname('title', xml_constants.DC_NS))
                 t.text = 'root'
-            # if kwargs.get('requested_id') != '0' and kwargs.get('requested_id') != root.attrib['id']:
+            # if kwargs.get('requested_id') != '0' and
+            #         kwargs.get('requested_id') != root.attrib['id']:
             if kwargs.get('requested_id') != root.attrib['id']:
                 if kwargs.get('upnp_client', '') != 'XBox':
                     root.attrib['refID'] = root.attrib['id']
@@ -431,33 +450,43 @@ class Object(log.Loggable):
                     pass
                 if kwargs.get('upnp_client', '') != 'XBox':
                     self.info("Changing ID from %r to %r, with parentID %r",
-                              root.attrib['refID'], root.attrib['id'], root.attrib['parentID'])
+                              root.attrib['refID'], root.attrib['id'],
+                              root.attrib['parentID'])
                 else:
                     self.info("Changing ID from %r to %r, with parentID %r",
-                              self.id, root.attrib['id'], root.attrib['parentID'])
+                              self.id, root.attrib['id'],
+                              root.attrib['parentID'])
         elif kwargs.get('parent_container', None):
-            if(kwargs.get('parent_container') != '0' and
-               kwargs.get('parent_container') != root.attrib['parentID']):
+            if (kwargs.get('parent_container') != '0' and
+                    kwargs.get('parent_container') != root.attrib['parentID']):
                 if kwargs.get('upnp_client', '') != 'XBox':
                     root.attrib['refID'] = root.attrib['id']
-                root.attrib['id'] = '@'.join((root.attrib['id'], kwargs.get('parent_container')))
+                root.attrib['id'] = '@'.join(
+                    (root.attrib['id'], kwargs.get('parent_container')))
                 root.attrib['parentID'] = kwargs.get('parent_container')
                 if kwargs.get('upnp_client', '') != 'XBox':
-                    self.info("Changing ID from %r to %r, with parentID from %r to %r",
-                              root.attrib['refID'], root.attrib['id'], self.parentID, root.attrib['parentID'])
+                    self.info(
+                        "Changing ID from %r to %r, with parentID from %r to %r",
+                        root.attrib['refID'], root.attrib['id'], self.parentID,
+                        root.attrib['parentID'])
                 else:
-                    self.info("Changing ID from %r to %r, with parentID from %r to %r",
-                              self.id, root.attrib['id'], self.parentID, root.attrib['parentID'])
+                    self.info(
+                        "Changing ID from %r to %r, with parentID from %r to %r",
+                        self.id, root.attrib['id'], self.parentID,
+                        root.attrib['parentID'])
 
-        etree.SubElement(root, qname('class', xml_constants.UPNP_NS)).text = self.upnp_class
+        etree.SubElement(
+            root, qname('class', xml_constants.UPNP_NS)).text = self.upnp_class
 
         if kwargs.get('upnp_client', '') == 'XBox':
-          u = root.find(qname('class', xml_constants.UPNP_NS))
-          if kwargs.get('parent_container', None) is not None and u.text.startswith('object.container'):
-            if kwargs.get('parent_container') in ('14', '15', '16'):
-              u.text = 'object.container.storageFolder'
-          if self.upnp_class == 'object.container':
-            u.text = 'object.container.storageFolder'
+            u = root.find(qname('class', xml_constants.UPNP_NS))
+            if kwargs.get('parent_container',
+                          None) is not None and u.text.startswith(
+                    'object.container'):
+                if kwargs.get('parent_container') in ('14', '15', '16'):
+                    u.text = 'object.container.storageFolder'
+            if self.upnp_class == 'object.container':
+                u.text = 'object.container.storageFolder'
 
         if self.restricted:
             root.attrib['restricted'] = '1'
@@ -465,50 +494,72 @@ class Object(log.Loggable):
             root.attrib['restricted'] = '0'
 
         if self.creator is not None:
-            etree.SubElement(root, qname('creator', xml_constants.DC_NS)).text = self.creator
+            etree.SubElement(
+                root, qname('creator', xml_constants.DC_NS)).text = self.creator
 
         if self.writeStatus is not None:
-            etree.SubElement(root, qname('writeStatus', xml_constants.UPNP_NS)).text = self.writeStatus
+            etree.SubElement(
+                root, qname('writeStatus', xml_constants.UPNP_NS)).text = \
+                self.writeStatus
 
         if self.date is not None:
             if isinstance(self.date, datetime):
-                etree.SubElement(root, qname('date', xml_constants.DC_NS)).text = self.date.isoformat()
+                etree.SubElement(
+                    root, qname('date', xml_constants.DC_NS)).text = \
+                    self.date.isoformat()
             else:
-                etree.SubElement(root, qname('date', xml_constants.DC_NS)).text = self.date
+                etree.SubElement(
+                    root, qname('date', xml_constants.DC_NS)).text = self.date
         else:
-            etree.SubElement(root, qname('date', xml_constants.DC_NS)).text = utils.datefaker().isoformat()
+            etree.SubElement(
+                root, qname('date', xml_constants.DC_NS)).text = \
+                utils.datefaker().isoformat()
 
         if self.albumArtURI is not None:
-            e = etree.SubElement(root, qname('albumArtURI', xml_constants.UPNP_NS))
+            e = etree.SubElement(root,
+                                 qname('albumArtURI', xml_constants.UPNP_NS))
             e.text = self.albumArtURI
             e.attrib[qname('profileID', xml_constants.DLNA_NS)] = 'JPEG_TN'
 
         if self.artist is not None:
-            etree.SubElement(root, qname('artist', xml_constants.UPNP_NS)).text = self.artist
+            etree.SubElement(
+                root, qname('artist', xml_constants.UPNP_NS)).text = self.artist
 
         if self.genre is not None:
-            etree.SubElement(root, qname('genre', xml_constants.UPNP_NS)).text = self.genre
+            etree.SubElement(
+                root, qname('genre', xml_constants.UPNP_NS)).text = self.genre
 
         if self.genres is not None:
             for genre in self.genres:
-                etree.SubElement(root, qname('genre', xml_constants.UPNP_NS)).text = genre
+                etree.SubElement(
+                    root, qname('genre', xml_constants.UPNP_NS)).text = genre
 
         if self.originalTrackNumber is not None:
-          etree.SubElement(root, qname('originalTrackNumber', xml_constants.UPNP_NS)).text = str(self.originalTrackNumber)
+            etree.SubElement(
+                root,
+                qname('originalTrackNumber', xml_constants.UPNP_NS)).text = \
+                str(self.originalTrackNumber)
 
         if self.description is not None:
-            etree.SubElement(root, qname('description', xml_constants.DC_NS)).text = self.description
+            etree.SubElement(
+                root, qname('description', xml_constants.DC_NS)).text = \
+                self.description
 
         if self.longDescription is not None:
-            etree.SubElement(root, qname('longDescription', xml_constants.UPNP_NS)).text = self.longDescription
+            etree.SubElement(
+                root, qname('longDescription',xml_constants.UPNP_NS)).text = \
+                self.longDescription
 
         if self.server_uuid is not None:
-            etree.SubElement(root, qname('server_uuid', xml_constants.UPNP_NS)).text = self.server_uuid
+            etree.SubElement(
+                root, qname('server_uuid', xml_constants.UPNP_NS)).text = \
+                self.server_uuid
 
         return root
 
     def toString(self, **kwargs):
-        return etree.tostring(self.toElement(**kwargs), encoding='utf-8').decode('utf-8')
+        return etree.tostring(self.toElement(**kwargs),
+                              encoding='utf-8').decode('utf-8')
 
     def fromElement(self, elt):
         """
@@ -522,7 +573,8 @@ class Object(log.Loggable):
 
         self.refID = elt.attrib.get('refID', None)
 
-        if elt.attrib.get('restricted', None) in [1, 'true', 'True', '1', 'yes', 'Yes']:
+        if elt.attrib.get('restricted', None) in [1, 'true', 'True', '1', 'yes',
+                                                  'Yes']:
             self.restricted = True
         else:
             self.restricted = False
@@ -585,17 +637,22 @@ class Item(Object):
         root = Object.toElement(self, **kwargs)
 
         if self.director is not None:
-            etree.SubElement(root, qname('director', xml_constants.UPNP_NS)).text = self.director
+            etree.SubElement(
+                root, qname('director', xml_constants.UPNP_NS)).text = \
+                self.director
 
         if self.refID is not None:
             etree.SubElement(root, 'refID').text = self.refID
 
         if self.actors is not None:
             for actor in self.actors:
-                etree.SubElement(root, qname('actor', xml_constants.DC_NS)).text = actor
+                etree.SubElement(
+                    root, qname('actor', xml_constants.DC_NS)).text = actor
 
         if self.language is not None:
-           etree.SubElement(root, qname('language', xml_constants.DC_NS)).text = self.language
+            etree.SubElement(
+                root, qname('language', xml_constants.DC_NS)).text = \
+                self.language
 
         if kwargs.get('transcoding', False):
             res = self.res.get_matching(['*:*:*:*'], protocol_type='http-get')
@@ -650,16 +707,23 @@ class ImageItem(Item):
         root = Item.toElement(self, **kwargs)
 
         if self.rating is not None:
-            etree.SubElement(root, qname('rating', xml_constants.UPNP_NS)).text = str(self.rating)
+            etree.SubElement(
+                root, qname('rating', xml_constants.UPNP_NS)).text = \
+                str(self.rating)
 
         if self.storageMedium is not None:
-            etree.SubElement(root, qname('storageMedium', xml_constants.UPNP_NS)).text = self.storageMedium
+            etree.SubElement(
+                root, qname('storageMedium', xml_constants.UPNP_NS)).text = \
+                self.storageMedium
 
         if self.publisher is not None:
-            etree.SubElement(root, qname('publisher', xml_constants.DC_NS)).text = self.publisher
+            etree.SubElement(
+                root, qname('publisher', xml_constants.DC_NS)).text = \
+                self.publisher
 
         if self.rights is not None:
-            etree.SubElement(root, qname('rights', xml_constants.DC_NS)).text = self.rights
+            etree.SubElement(
+                root, qname('rights', xml_constants.DC_NS)).text = self.rights
 
         return root
 
@@ -671,7 +735,8 @@ class Photo(ImageItem):
     def toElement(self, **kwargs):
         root = ImageItem.toElement(self, **kwargs)
         if self.album is not None:
-            etree.SubElement(root, qname('album', xml_constants.UPNP_NS)).text = self.album
+            etree.SubElement(
+                root, qname('album', xml_constants.UPNP_NS)).text = self.album
         return root
 
 
@@ -693,16 +758,23 @@ class AudioItem(Item):
         root = Item.toElement(self, **kwargs)
 
         if self.publisher is not None:
-            etree.SubElement(root, qname('publisher', xml_constants.DC_NS)).text = self.publisher
+            etree.SubElement(
+                root, qname('publisher', xml_constants.DC_NS)).text = \
+                self.publisher
 
         if self.language is not None:
-            etree.SubElement(root, qname('language', xml_constants.DC_NS)).text = self.language
+            etree.SubElement(
+                root, qname('language', xml_constants.DC_NS)).text = \
+                self.language
 
         if self.relation is not None:
-            etree.SubElement(root, qname('relation', xml_constants.DC_NS)).text = self.relation
+            etree.SubElement(
+                root, qname('relation', xml_constants.DC_NS)).text = \
+                self.relation
 
         if self.rights is not None:
-            etree.SubElement(root, qname('rights', xml_constants.DC_NS)).text = self.rights
+            etree.SubElement(
+                root, qname('rights', xml_constants.DC_NS)).text = self.rights
 
         return root
 
@@ -730,16 +802,23 @@ class MusicTrack(AudioItem):
         root = AudioItem.toElement(self, **kwargs)
 
         if self.album is not None:
-            etree.SubElement(root, qname('album', xml_constants.UPNP_NS)).text = self.album
+            etree.SubElement(
+                root, qname('album', xml_constants.UPNP_NS)).text = self.album
 
         if self.playlist is not None:
-            etree.SubElement(root, qname('playlist', xml_constants.UPNP_NS)).text = self.playlist
+            etree.SubElement(
+                root, qname('playlist', xml_constants.UPNP_NS)).text = \
+                self.playlist
 
         if self.storageMedium is not None:
-            etree.SubElement(root, qname('storageMedium', xml_constants.UPNP_NS)).text = self.storageMedium
+            etree.SubElement(
+                root, qname('storageMedium', xml_constants.UPNP_NS)).text = \
+                self.storageMedium
 
         if self.contributor is not None:
-            etree.SubElement(root, qname('contributor', xml_constants.DC_NS)).text = self.contributor
+            etree.SubElement(
+                root, qname('contributor', xml_constants.DC_NS)).text = \
+                self.contributor
 
         return root
 
@@ -784,11 +863,13 @@ class Movie(VideoItem):
 
     def __init__(self, *args, **kwargs):
         VideoItem.__init__(self, *args, **kwargs)
-        self.valid_attrs.update(dict(storageMedium=xml_constants.UPNP_NS,
-                                     DVDRegionCode=xml_constants.UPNP_NS,
-                                     channelName=xml_constants.UPNP_NS,
-                                     scheduledStartTime=xml_constants.UPNP_NS,
-                                     sccheduledEndTime=xml_constants.UPNP_NS))
+        self.valid_attrs.update(
+            dict(
+                storageMedium=xml_constants.UPNP_NS,
+                DVDRegionCode=xml_constants.UPNP_NS,
+                channelName=xml_constants.UPNP_NS,
+                scheduledStartTime=xml_constants.UPNP_NS,
+                sccheduledEndTime=xml_constants.UPNP_NS))
 
 
 class VideoBroadcast(VideoItem):
@@ -830,12 +911,15 @@ class Container(Object):
             root.attrib['childCount'] = str(self.childCount)
 
         if self.createClass is not None:
-            etree.SubElement(root, qname('createclass', xml_constants.UPNP_NS)).text = self.createClass
+            etree.SubElement(
+                root, qname('createclass', xml_constants.UPNP_NS)).text = \
+                self.createClass
 
         if not isinstance(self.searchClass, (list, tuple)):
             self.searchClass = [self.searchClass]
         for i in self.searchClass:
-            sc = etree.SubElement(root, qname('searchClass', xml_constants.UPNP_NS))
+            sc = etree.SubElement(
+                root, qname('searchClass', xml_constants.UPNP_NS))
             sc.attrib['includeDerived'] = '1'
             sc.text = i
 
@@ -855,7 +939,8 @@ class Container(Object):
         if v is not None:
             self.childCount = int(v)
         # self.searchable = int(elt.attrib.get('searchable','0'))
-        self.searchable = elt.attrib.get('searchable', '0') in [1, 'True', 'true', '1']
+        self.searchable = \
+            elt.attrib.get('searchable', '0') in [1, 'True', 'true', '1']
         self.searchClass = []
         for child in elt.getchildren():
             if child.tag.endswith('createclass'):
@@ -913,7 +998,6 @@ class StorageFolder(Container):
 
 
 class DIDLElement(log.Loggable):
-
     logCategory = 'didllite'
 
     def __init__(self, upnp_client='',
@@ -922,9 +1006,11 @@ class DIDLElement(log.Loggable):
                  transcoding=False):
         log.Loggable.__init__(self)
 
-        self.element = etree.Element('DIDL-Lite', nsmap={None: xml_constants.DIDLLITE_NS,
-                                                         'dc': xml_constants.DC_NS,
-                                                         'upnp': xml_constants.UPNP_NS})
+        self.element = etree.Element(
+            'DIDL-Lite',
+            nsmap={None: xml_constants.DIDLLITE_NS,
+                   'dc': xml_constants.DC_NS,
+                   'upnp': xml_constants.UPNP_NS})
         self._items = []
 
         self.upnp_client = upnp_client
@@ -937,19 +1023,21 @@ class DIDLElement(log.Loggable):
         self.element.append(e.toElement())
 
     def addItem(self, item):
-        self.element.append(item.toElement(upnp_client=self.upnp_client,
-                                           parent_container=self.parent_container,
-                                           requested_id=self.requested_id,
-                                           transcoding=self.transcoding))
+        self.element.append(item.toElement(
+            upnp_client=self.upnp_client,
+            parent_container=self.parent_container,
+            requested_id=self.requested_id,
+            transcoding=self.transcoding))
         self._items.append(item)
 
     def rebuild(self):
         self.element.clear()
         for item in self._items:
-          self.element.append(item.toElement(upnp_client=self.upnp_client,
-                                             parent_container=self.parent_container,
-                                             requested_id=self.requested_id,
-                                             transcoding=self.transcoding))
+            self.element.append(item.toElement(
+                upnp_client=self.upnp_client,
+                parent_container=self.parent_container,
+                requested_id=self.requested_id,
+                transcoding=self.transcoding))
 
     def numItems(self):
         return len(self._items)
@@ -961,7 +1049,8 @@ class DIDLElement(log.Loggable):
         """ sigh - having that optional preamble here
             breaks some of the older ContentDirectoryClients
         """
-        return etree.tostring(self.element, encoding='utf-8', pretty_print=True).decode('utf-8')
+        return etree.tostring(self.element, encoding='utf-8',
+                              pretty_print=True).decode('utf-8')
 
     def get_upnp_class(self, name):
         try:
@@ -984,7 +1073,8 @@ class DIDLElement(log.Loggable):
         instance = cls()
         elt = etree.fromstring(data)
         for node in elt.getchildren():
-            upnp_class_name = node.findtext('{%s}class' % 'urn:schemas-upnp-org:metadata-1-0/upnp/')
+            upnp_class_name = node.findtext(
+                '{%s}class' % 'urn:schemas-upnp-org:metadata-1-0/upnp/')
             upnp_class = instance.get_upnp_class(upnp_class_name.strip())
             new_node = upnp_class.fromString(etree.tostring(node))
             instance.addItem(new_node)
@@ -1019,7 +1109,6 @@ upnp_classes = {'object': Object,
                 'object.container.storageVolume': StorageVolume,
                 'object.container.storageFolder': StorageFolder,
                 }
-
 
 if __name__ == '__main__':
 

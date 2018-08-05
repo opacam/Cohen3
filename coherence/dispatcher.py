@@ -1,4 +1,3 @@
-
 from twisted.internet import defer
 
 
@@ -18,15 +17,19 @@ class Receiver(object):
         return self.callback(*args, **kw)
 
     def __repr__(self):
-        return "<Receiver %s for %s: %s (%s, %s)>" % (id(self),
+        return "<Receiver %s for %s: %s (%s, %s)>" % \
+               (id(self),
                 self.signal,
                 self.callback,
                 ', '.join(
-                        ['%r' % x for x in self.arguments]
-                        ),
+                  ['%r' % x for x in
+                   self.arguments]
+                ),
                 ', '.join(
-                        ['%s=%s' % (x, y) for x, y in self.keywords.items()]
-                        )
+                  ['%s=%s' % (x, y) for
+                   x, y in
+                   self.keywords.items()]
+                )
                 )
 
 
@@ -34,7 +37,6 @@ class UnknownSignal(Exception): pass
 
 
 class Dispatcher(object):
-
     __signals__ = {}
 
     def __init__(self):

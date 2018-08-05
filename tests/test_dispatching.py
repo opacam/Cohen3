@@ -1,8 +1,8 @@
-
-from twisted.trial import unittest
 from twisted.internet import defer
+from twisted.trial import unittest
+
 from coherence.dispatcher import Dispatcher, UnknownSignal, Receiver, \
-        SignalingProperty, ChangedSignalingProperty, CustomSignalingProperty
+    SignalingProperty, ChangedSignalingProperty, CustomSignalingProperty
 
 
 class TestDispatcher(Dispatcher):
@@ -41,7 +41,6 @@ class TestDispatching(unittest.TestCase):
         self.target = SimpleTarget()
 
     def test_simple_emit(self):
-
         receiver = self.dispatcher.connect('test', self.target.callback)
         self.dispatcher.emit('test')
         self.assertEqual(self.target.called, 1)
@@ -54,7 +53,6 @@ class TestDispatching(unittest.TestCase):
         self.assertEqual(self.target.called, 2)
 
     def test_simple_deferred_emit(self):
-
         receiver = self.dispatcher.connect('test', self.target.callback)
         self.dispatcher.deferred_emit('test')
         self.assertEqual(self.target.called, 1)
@@ -67,7 +65,6 @@ class TestDispatching(unittest.TestCase):
         self.assertEqual(self.target.called, 2)
 
     def test_simple_save_emit(self):
-
         def call(res):
             return self.dispatcher.save_emit('test')
 
@@ -119,17 +116,17 @@ class TestDispatching(unittest.TestCase):
 
     def test_emit_with_multiple_receiver(self):
         rc1 = self.dispatcher.connect('test', self.target.updater,
-                1, 2, variable='va1')
+                                      1, 2, variable='va1')
         rc2 = self.dispatcher.connect('test', self.target.updater,
-                'value', 2, variable='variable')
+                                      'value', 2, variable='variable')
         rc3 = self.dispatcher.connect('test', self.target.updater,
-                'other', 2, variable='one')
+                                      'other', 2, variable='one')
 
         self.dispatcher.emit('test', self, 'other', key_a='q')
         # check rc1
         self.assertEqual(self.target.va1, 1)
         self.assertEqual(self.target.va1_other, 'q')
-        #check rc2
+        # check rc2
         self.assertEqual(self.target.variable, 'value')
         self.assertEqual(self.target.variable_other, 'q')
         # check rc3
@@ -144,7 +141,7 @@ class TestDispatching(unittest.TestCase):
         # check rc1
         self.assertEqual(self.target.va1, 1)
         self.assertEqual(self.target.va1_other, 'thistime')
-        #check rc2
+        # check rc2
         self.assertEqual(self.target.variable, 'value')
         self.assertEqual(self.target.variable_other, 'q')
         # check rc3
@@ -163,15 +160,14 @@ class TestDispatching(unittest.TestCase):
         self.dispatcher.disconnect(rc3)
 
     def test_emit_multiple_with_failing_in_between(self):
-
         rc1 = self.dispatcher.connect('test', self.target.plus,
-                1, variable='called_a')
+                                      1, variable='called_a')
         rc2 = self.dispatcher.connect('test', self.target.plus,
-                2, variable='called_b')
+                                      2, variable='called_b')
         rc3 = self.dispatcher.connect('test', self.target.fail_before,
-                3, variable='called_c')
+                                      3, variable='called_c')
         rc4 = self.dispatcher.connect('test', self.target.plus,
-                4, variable='called_d')
+                                      4, variable='called_d')
 
         self.dispatcher.emit('test')
         self.assertEqual(self.target.called_a, 1)
@@ -189,6 +185,7 @@ class TestDispatching(unittest.TestCase):
         self.dispatcher.disconnect(rc2)
         self.dispatcher.disconnect(rc3)
         self.dispatcher.disconnect(rc4)
+
 
 # Receiver tests
 
@@ -257,7 +254,8 @@ class TestReceiver(unittest.TestCase):
         self.assertEqual(self.kw, {'test': 'a', 'and_one': 'more'})
 
     def test_calling_with_clashing_kw(self):
-        rec = Receiver('test', self._callback, (1, 2, 3), {'test': 'a', 'p': 'a'})
+        rec = Receiver('test', self._callback, (1, 2, 3),
+                       {'test': 'a', 'p': 'a'})
         self.assertEqual(rec.signal, 'test')
         rec(p='q')
         self.assertEqual(self.called, 1)
@@ -270,7 +268,8 @@ class TestReceiver(unittest.TestCase):
         self.assertEqual(self.kw, {'test': 'a', 'other': 'wise', 'p': 'a'})
 
     def test_calling_with_clashing_kw_and_args(self):
-        rec = Receiver('test', self._callback, (1, 2, 3), {'test': 'a', 'p': 'a'})
+        rec = Receiver('test', self._callback, (1, 2, 3),
+                       {'test': 'a', 'p': 'a'})
         self.assertEqual(rec.signal, 'test')
         # without
         rec()
@@ -290,6 +289,7 @@ class TestReceiver(unittest.TestCase):
         self.assertIn('callback', '%r' % rec)
         self.assertIn('0, 1, 2', '%r' % rec)
 
+
 # Signal Descriptor test
 
 class SimpleSignaler(object):
@@ -303,7 +303,6 @@ class SimpleSignaler(object):
 
 
 class DummySignaler(SimpleSignaler):
-
     simple_with_default = SignalingProperty('simple2', default=0)
 
     double_a = SignalingProperty('same-signal')
@@ -344,7 +343,7 @@ class TestSignalingDescriptors(unittest.TestCase):
 
     def test_simple(self):
         self.signaler.simple = 'A'
-        self._check(values=[('simple', ('A', ), {})])
+        self._check(values=[('simple', ('A',), {})])
 
         # empty
         self.signaler.emitted = []
@@ -354,7 +353,7 @@ class TestSignalingDescriptors(unittest.TestCase):
 
     def test_simple_with_default(self):
         self.signaler.simple_with_default = 'B'
-        self._check(values=[('simple2', ('B', ), {})])
+        self._check(values=[('simple2', ('B',), {})])
 
         # empty
         self.signaler.emitted = []
@@ -385,8 +384,8 @@ class TestSignalingDescriptors(unittest.TestCase):
     def test_double_same_var(self):
         self.signaler.double_a = 'A1'
         self.signaler.double_b = 'B2'
-        self._check(values=[('same-signal', ('A1', ), {}),
-                ('same-signal', ('B2', ), {})])
+        self._check(values=[('same-signal', ('A1',), {}),
+                            ('same-signal', ('B2',), {})])
 
         # empty
         self.signaler.emitted = []
@@ -399,14 +398,14 @@ class TestSignalingDescriptors(unittest.TestCase):
         # but changing them different works
         self.signaler.double_a = 'B1'
         self.signaler.double_b = 'A2'
-        self._check(values=[('same-signal', ('B1', ), {}),
-                ('same-signal', ('A2', ), {})])
+        self._check(values=[('same-signal', ('B1',), {}),
+                            ('same-signal', ('A2',), {})])
 
     def test_double_differnt_var(self):
         self.signaler.double_c = 'A1'
         self.signaler.double_d = 'B2'
-        self._check(values=[('dif-var', ('A1', ), {}),
-                ('dif-var', ('B2', ), {})])
+        self._check(values=[('dif-var', ('A1',), {}),
+                            ('dif-var', ('B2',), {})])
 
         # empty
         self.signaler.emitted = []
@@ -418,13 +417,13 @@ class TestSignalingDescriptors(unittest.TestCase):
         # but they still allow changes
         self.signaler.double_c = 'B1'
         self.signaler.double_d = 'A2'
-        self._check(values=[('dif-var', ('B1', ), {}),
-                ('dif-var', ('A2', ), {})])
+        self._check(values=[('dif-var', ('B1',), {}),
+                            ('dif-var', ('A2',), {})])
 
     def test_custom(self):
         self.signaler.x = 'Pocahontas'
-        self._check(values=[('x-changed', ('Pocahontas', ), {})],
-            x='Pocahontas', x_get=2, x_set=1)
+        self._check(values=[('x-changed', ('Pocahontas',), {})],
+                    x='Pocahontas', x_get=2, x_set=1)
         self.assertEqual(self.signaler.x, 'Pocahontas')
 
         # settings again to the same value is boring me
@@ -438,15 +437,15 @@ class TestSignalingDescriptors(unittest.TestCase):
 
     def test_custom_square(self):
         self.signaler.x_square = 10
-        self._check(values=[('x-square', (100, ), {})],
-            x=100, x_get=2, x_set=1)
+        self._check(values=[('x-square', (100,), {})],
+                    x=100, x_get=2, x_set=1)
         self.assertEqual(self.signaler.x, 100)
 
     def test_custom_square_nearly_the_same(self):
         self.signaler._x = 10
         self.signaler.x_square = 10
-        self._check(values=[('x-square', (100, ), {})],
-            x=100, x_get=2, x_set=1)
+        self._check(values=[('x-square', (100,), {})],
+                    x=100, x_get=2, x_set=1)
         self.assertEqual(self.signaler.x, 100)
 
     def _check(self, values=[], x=0, x_set=0, x_get=0):

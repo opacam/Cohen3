@@ -13,9 +13,11 @@
 """
 
 import pygst
+
 pygst.require('0.10')
 import gst
 import gobject
+
 gobject.threads_init()
 
 import os.path
@@ -44,14 +46,14 @@ class FakeTransformer(gst.Element, log.Loggable):
     logCategory = 'faker_datasink'
 
     _sinkpadtemplate = gst.PadTemplate("sinkpadtemplate",
-                                        gst.PAD_SINK,
-                                        gst.PAD_ALWAYS,
-                                        gst.caps_new_any())
+                                       gst.PAD_SINK,
+                                       gst.PAD_ALWAYS,
+                                       gst.caps_new_any())
 
     _srcpadtemplate = gst.PadTemplate("srcpadtemplate",
-                                        gst.PAD_SRC,
-                                        gst.PAD_ALWAYS,
-                                        gst.caps_new_any())
+                                      gst.PAD_SRC,
+                                      gst.PAD_ALWAYS,
+                                      gst.caps_new_any())
 
     def __init__(self, destination=None, request=None):
         gst.Element.__init__(self)
@@ -71,7 +73,7 @@ class FakeTransformer(gst.Element, log.Loggable):
 
     def get_fake_header(self):
         return struct.pack(">L4s", 32, 'ftyp') + \
-            "mp42\x00\x00\x00\x00mp42mp41isomiso2"
+               "mp42\x00\x00\x00\x00mp42mp41isomiso2"
 
     def chainfunc(self, pad, buffer):
         if self.proxy:
@@ -82,7 +84,8 @@ class FakeTransformer(gst.Element, log.Loggable):
         self.buffer = self.buffer + buffer.data
         if not self.buffer_size:
             try:
-                self.buffer_size, a_type = struct.unpack(">L4s", self.buffer[:8])
+                self.buffer_size, a_type = struct.unpack(">L4s",
+                                                         self.buffer[:8])
             except:
                 return gst.FLOW_OK
 
@@ -98,17 +101,17 @@ class FakeTransformer(gst.Element, log.Loggable):
 
         return gst.FLOW_OK
 
+
 gobject.type_register(FakeTransformer)
 
 
 class DataSink(gst.Element, log.Loggable):
-
     logCategory = 'transcoder_datasink'
 
     _sinkpadtemplate = gst.PadTemplate("sinkpadtemplate",
-                                        gst.PAD_SINK,
-                                        gst.PAD_ALWAYS,
-                                        gst.caps_new_any())
+                                       gst.PAD_SINK,
+                                       gst.PAD_ALWAYS,
+                                       gst.caps_new_any())
 
     def __init__(self, destination=None, request=None):
         gst.Element.__init__(self)
@@ -159,6 +162,7 @@ class DataSink(gst.Element, log.Loggable):
                 self.request.finish()
         return True
 
+
 gobject.type_register(DataSink)
 
 
@@ -190,7 +194,7 @@ class GStreamerPipeline(resource.Resource, log.Loggable):
 
     def start(self, request=None):
         self.info("GStreamerPipeline start %r %r", request,
-                self.pipeline_description)
+                  self.pipeline_description)
         self.requests.append(request)
         self.pipeline.set_state(gst.STATE_PLAYING)
 
@@ -249,8 +253,8 @@ class GStreamerPipeline(resource.Resource, log.Loggable):
         request.write('')
 
         headers = request.getAllHeaders()
-        if('connection' in headers and
-           headers['connection'] == 'close'):
+        if ('connection' in headers and
+                headers['connection'] == 'close'):
             pass
         if self.requests:
             if self.streamheader:
@@ -273,8 +277,8 @@ class GStreamerPipeline(resource.Resource, log.Loggable):
         self.info("requestFinished %r", result)
         """ we need to find a way to destroy the pipeline here
         """
-        #from twisted.internet import reactor
-        #reactor.callLater(0, self.pipeline.set_state, gst.STATE_NULL)
+        # from twisted.internet import reactor
+        # reactor.callLater(0, self.pipeline.set_state, gst.STATE_NULL)
         self.requests.remove(request)
         if not self.requests:
             self.cleanup()
@@ -283,8 +287,8 @@ class GStreamerPipeline(resource.Resource, log.Loggable):
         t = message.type
         print("on_message", t)
         if t == gst.MESSAGE_ERROR:
-            #err, debug = message.parse_error()
-            #print "Error: %s" % err, debug
+            # err, debug = message.parse_error()
+            # print "Error: %s" % err, debug
             self.cleanup()
         elif t == gst.MESSAGE_EOS:
             self.cleanup()
@@ -303,7 +307,7 @@ class BaseTranscoder(resource.Resource, log.Loggable):
     def __init__(self, uri, destination=None):
         self.info('uri %s %r', uri, type(uri))
         if uri[:7] not in ['file://', 'http://']:
-            uri = 'file://' + urllib.parse.quote(uri)   # FIXME
+            uri = 'file://' + urllib.parse.quote(uri)  # FIXME
         self.uri = uri
         self.destination = destination
         resource.Resource.__init__(self)
@@ -321,8 +325,8 @@ class BaseTranscoder(resource.Resource, log.Loggable):
         request.write('')
 
         headers = request.getAllHeaders()
-        if('connection' in headers and
-           headers['connection'] == 'close'):
+        if ('connection' in headers and
+                headers['connection'] == 'close'):
             pass
 
         self.start(request)
@@ -338,16 +342,16 @@ class BaseTranscoder(resource.Resource, log.Loggable):
         self.info("requestFinished %r", result)
         """ we need to find a way to destroy the pipeline here
         """
-        #from twisted.internet import reactor
-        #reactor.callLater(0, self.pipeline.set_state, gst.STATE_NULL)
+        # from twisted.internet import reactor
+        # reactor.callLater(0, self.pipeline.set_state, gst.STATE_NULL)
         gobject.idle_add(self.cleanup)
 
     def on_message(self, bus, message):
         t = message.type
         print("on_message", t)
         if t == gst.MESSAGE_ERROR:
-            #err, debug = message.parse_error()
-            #print "Error: %s" % err, debug
+            # err, debug = message.parse_error()
+            # print "Error: %s" % err, debug
             self.cleanup()
         elif t == gst.MESSAGE_EOS:
             self.cleanup()
@@ -366,8 +370,9 @@ class PCMTranscoder(BaseTranscoder, InternalTranscoder):
             "%s ! decodebin ! audioconvert name=conv" % self.uri)
 
         conv = self.pipeline.get_by_name('conv')
-        caps = gst.Caps("audio/x-raw-int,rate=44100,endianness=4321,channels=2,width=16,depth=16,signed=true")
-        #FIXME: UGLY. 'filter' is a python builtin!
+        caps = gst.Caps(
+            "audio/x-raw-int,rate=44100,endianness=4321,channels=2,width=16,depth=16,signed=true")
+        # FIXME: UGLY. 'filter' is a python builtin!
         filter = gst.element_factory_make("capsfilter", "filter")
         filter.set_property("caps", caps)
         self.pipeline.add(filter)
@@ -383,7 +388,6 @@ class PCMTranscoder(BaseTranscoder, InternalTranscoder):
 
 
 class WAVTranscoder(BaseTranscoder, InternalTranscoder):
-
     contentType = 'audio/x-wav'
     name = 'wav'
 
@@ -395,8 +399,8 @@ class WAVTranscoder(BaseTranscoder, InternalTranscoder):
         sink = DataSink(destination=self.destination, request=request)
         self.pipeline.add(sink)
         enc.link(sink)
-        #bus = self.pipeline.get_bus()
-        #bus.connect('message', self.on_message)
+        # bus = self.pipeline.get_bus()
+        # bus.connect('message', self.on_message)
         self.pipeline.set_state(gst.STATE_PLAYING)
 
         d = request.notifyFinish()
@@ -404,7 +408,6 @@ class WAVTranscoder(BaseTranscoder, InternalTranscoder):
 
 
 class MP3Transcoder(BaseTranscoder, InternalTranscoder):
-
     contentType = 'audio/mpeg'
     name = 'mp3'
 
@@ -444,7 +447,6 @@ class MP4Transcoder(BaseTranscoder, InternalTranscoder):
 
 
 class MP2TSTranscoder(BaseTranscoder, InternalTranscoder):
-
     contentType = 'video/mpeg'
     name = 'mpegts'
 
@@ -541,23 +543,23 @@ class ExternalProcessProtocol(protocol.ProcessProtocol):
         print("pp connection made")
 
     def outReceived(self, data):
-        #print "outReceived with %d bytes!" % len(data)
+        # print "outReceived with %d bytes!" % len(data)
         self.caller.write_data(data)
 
     def errReceived(self, data):
-        #print "errReceived! with %d bytes!" % len(data)
+        # print "errReceived! with %d bytes!" % len(data)
         print("pp (err):", data.strip())
 
     def inConnectionLost(self):
-        #print "inConnectionLost! stdin is closed! (we probably did it)"
+        # print "inConnectionLost! stdin is closed! (we probably did it)"
         pass
 
     def outConnectionLost(self):
-        #print "outConnectionLost! The child closed their stdout!"
+        # print "outConnectionLost! The child closed their stdout!"
         pass
 
     def errConnectionLost(self):
-        #print "errConnectionLost! The child closed their stderr."
+        # print "errConnectionLost! The child closed their stderr."
         pass
 
     def processEnded(self, status_object):
@@ -581,7 +583,7 @@ class ExternalProcessProducer(object):
 
     def write_data(self, data):
         if data:
-            #print "write %d bytes of data" % len(data)
+            # print "write %d bytes of data" % len(data)
             self.written += len(data)
             # this .write will spin the reactor, calling .doWrite and then
             # .resumeProducing again, so be prepared for a re-entrant call
@@ -593,7 +595,7 @@ class ExternalProcessProducer(object):
             self.request = None
 
     def resumeProducing(self):
-        #print "resumeProducing", self.request
+        # print "resumeProducing", self.request
         if not self.request:
             return
         if self.process is None:
@@ -602,7 +604,7 @@ class ExternalProcessProducer(object):
             argv[0] = os.path.basename(argv[0])
             from twisted.internet import reactor
             self.process = reactor.spawnProcess(ExternalProcessProtocol(self),
-                    executable, argv, {})
+                                                executable, argv, {})
 
     def pauseProducing(self):
         pass
@@ -645,11 +647,11 @@ def transcoder_class_wrapper(klass, content_type, pipeline):
         transcoder.contentType = content_type
         transcoder.pipeline_description = pipeline
         return transcoder
+
     return create_object
 
 
 class TranscoderManager(log.Loggable):
-
     """ singleton class which holds information
         about all available transcoders
 
@@ -718,33 +720,35 @@ class TranscoderManager(log.Loggable):
                 pipeline = transcoder['pipeline']
                 if not '%s' in pipeline:
                     self.warning("Can't create transcoder %r:"
-                            " missing placehoder '%%s' in 'pipeline'",
-                            transcoder)
+                                 " missing placehoder '%%s' in 'pipeline'",
+                                 transcoder)
                     continue
 
                 try:
                     transcoder_name = transcoder['name'].decode('ascii')
                 except UnicodeEncodeError:
                     self.warning("Can't create transcoder %r:"
-                            " the 'name' contains non-ascii letters",
-                            transcoder)
+                                 " the 'name' contains non-ascii letters",
+                                 transcoder)
                     continue
 
                 transcoder_type = transcoder['type'].lower()
 
                 if transcoder_type == 'gstreamer':
                     wrapped = transcoder_class_wrapper(GStreamerTranscoder,
-                            transcoder['target'], transcoder['pipeline'])
+                                                       transcoder['target'],
+                                                       transcoder['pipeline'])
                 elif transcoder_type == 'process':
                     wrapped = transcoder_class_wrapper(ExternalProcessPipeline,
-                            transcoder['target'], transcoder['pipeline'])
+                                                       transcoder['target'],
+                                                       transcoder['pipeline'])
                 else:
                     self.warning("unknown transcoder type %r", transcoder_type)
                     continue
 
                 self.transcoders[transcoder_name] = wrapped
 
-        #FIXME reduce that to info later
+        # FIXME reduce that to info later
         self.warning("available transcoders %r", self.transcoders)
 
     def select(self, name, uri, backend=None):
@@ -760,6 +764,7 @@ class TranscoderManager(log.Loggable):
 
         transcoder = self.transcoders[name](uri)
         return transcoder
+
 
 if __name__ == '__main__':
     t = Transcoder(None)

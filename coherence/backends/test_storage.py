@@ -67,16 +67,15 @@ In the config file the definition of this backend could look like this:
         </plugin>
 
 """
-from lxml import etree
-
 import os
 
-from twisted.python.filepath import FilePath
+from lxml import etree
 from twisted.internet import protocol, reactor
+from twisted.python.filepath import FilePath
 from twisted.web import resource, server
 
-from coherence.backend import BackendStore, BackendRssMixin
 from coherence.backend import BackendItem
+from coherence.backend import BackendStore
 
 try:
     from coherence.transcoder import GStreamerPipeline
@@ -103,19 +102,19 @@ class ExternalProcessProtocol(protocol.ProcessProtocol):
         self.caller.write_data(data)
 
     def errReceived(self, data):
-        #print "errReceived! with %d bytes!" % len(data)
+        # print "errReceived! with %d bytes!" % len(data)
         print("pp (err):", data.strip())
 
     def inConnectionLost(self):
-        #print "inConnectionLost! stdin is closed! (we probably did it)"
+        # print "inConnectionLost! stdin is closed! (we probably did it)"
         pass
 
     def outConnectionLost(self):
-        #print "outConnectionLost! The child closed their stdout!"
+        # print "outConnectionLost! The child closed their stdout!"
         pass
 
     def errConnectionLost(self):
-        #print "errConnectionLost! The child closed their stderr."
+        # print "errConnectionLost! The child closed their stderr."
         pass
 
     def processEnded(self, status_object):
@@ -179,7 +178,8 @@ class ExternalProcessProducer(log.Loggable):
             argv = self.pipeline.split()
             executable = argv[0]
             argv[0] = os.path.basename(argv[0])
-            self.process = reactor.spawnProcess(ExternalProcessProtocol(self), executable, argv, {})
+            self.process = reactor.spawnProcess(ExternalProcessProtocol(self),
+                                                executable, argv, {})
 
     def pauseProducing(self):
         pass
@@ -215,11 +215,13 @@ class Item(BackendItem):
     def get_item(self):
         print("get_item %r" % self.item)
         if self.item == None:
-            self.item = self.upnp_class(self.id, self.parent.id, self.get_name())
+            self.item = self.upnp_class(self.id, self.parent.id,
+                                        self.get_name())
             self.item.description = self.description
             self.item.date = self.date
 
-            res = DIDLLite.Resource(self.url, 'http-get:*:%s:%s' % (self.mimetype, self.fourth_field))
+            res = DIDLLite.Resource(self.url, 'http-get:*:%s:%s' % (
+            self.mimetype, self.fourth_field))
             res.duration = self.duration
             res.size = self.get_size()
             self.item.res.append(res)
@@ -282,8 +284,8 @@ class Container(BackendItem):
 
     def add_child(self, child):
         print("ADD CHILD %r" % child)
-        #id = child.id
-        #if isinstance(child.id, basestring):
+        # id = child.id
+        # if isinstance(child.id, basestring):
         #    _,id = child.id.split('.')
         self.children.append(child)
         self.item.childCount += 1
@@ -318,7 +320,6 @@ class Container(BackendItem):
 
 
 class TestStore(BackendStore):
-
     implements = ['MediaServer']
 
     def __init__(self, server, *args, **kwargs):
@@ -330,7 +331,7 @@ class TestStore(BackendStore):
         self.store = {}
 
         self.store[ROOT_CONTAINER_ID] = \
-                        Container(ROOT_CONTAINER_ID, self, -1, self.name)
+            Container(ROOT_CONTAINER_ID, self, -1, self.name)
 
         items = kwargs.get('item', [])
         if not isinstance(items, list):
@@ -363,28 +364,35 @@ class TestStore(BackendStore):
                     item_id = str(item_id) + extension
 
                 if type in ('file', 'url'):
-                    new_item = Item(self.store[ROOT_CONTAINER_ID], item_id, name, location, self.urlbase + str(item_id))
+                    new_item = Item(self.store[ROOT_CONTAINER_ID], item_id,
+                                    name, location, self.urlbase + str(item_id))
                 elif type == 'gstreamer':
                     pipeline = item.get('pipeline')
                     try:
                         pipeline = GStreamerPipeline(pipeline, mimetype)
-                        new_item = ResourceItem(self.store[ROOT_CONTAINER_ID], item_id, name, pipeline, self.urlbase + str(item_id))
+                        new_item = ResourceItem(self.store[ROOT_CONTAINER_ID],
+                                                item_id, name, pipeline,
+                                                self.urlbase + str(item_id))
                     except NameError:
-                        self.warning("Can't enable GStreamerPipeline, probably pygst not installed")
+                        self.warning(
+                            "Can't enable GStreamerPipeline, probably pygst not installed")
                         continue
 
                 elif type == 'process':
                     pipeline = item.get('command')
                     pipeline = ExternalProcessPipeline(pipeline, mimetype)
-                    new_item = ResourceItem(self.store[ROOT_CONTAINER_ID], item_id, name, pipeline, self.urlbase + str(item_id))
+                    new_item = ResourceItem(self.store[ROOT_CONTAINER_ID],
+                                            item_id, name, pipeline,
+                                            self.urlbase + str(item_id))
 
                 try:
-                    new_item.upnp_class = self.get_upnp_class(item.get('upnp_class', 'object.item'))
+                    new_item.upnp_class = self.get_upnp_class(
+                        item.get('upnp_class', 'object.item'))
                 except:
                     pass
-                #item.description = u'some text what's the file about'
-                #item.date = something
-                #item.size = something
+                # item.description = u'some text what's the file about'
+                # item.date = something
+                # item.size = something
                 new_item.mimetype = mimetype
                 new_item.fourth_field = item.get('fourth_field', '*')
 
@@ -394,7 +402,7 @@ class TestStore(BackendStore):
             except:
                 import traceback
                 self.warning(traceback.format_exc())
-        #print self.store
+        # print self.store
 
         self.init_completed()
 

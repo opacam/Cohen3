@@ -12,24 +12,26 @@ TODO:
 
 """
 
-from twisted.internet import reactor, defer, task
-
-from coherence.extern import db_row
-from coherence.upnp.core import DIDLLite
-from coherence.backend import BackendItem, BackendStore
-from coherence.log import Loggable
-import coherence.extern.louie as louie
-
+import mimetypes
+import os
+import re
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from sqlite3 import dbapi2
+from urllib.parse import urlsplit
+
+from twisted.internet import defer, task
+
+import coherence.extern.louie as louie
+from coherence.backend import BackendItem, BackendStore
+from coherence.extern import db_row
+from coherence.log import Loggable
+from coherence.upnp.core import DIDLLite
+
 # fallback on pysqlite2.dbapi2
 
-import re
-import os
-import time
-from urllib.parse import urlsplit
-import urllib.request, urllib.error, urllib.parse
-
-import mimetypes
 mimetypes.init()
 mimetypes.add_type('audio/x-m4a', '.m4a')
 mimetypes.add_type('video/mp4', '.mp4')
@@ -120,7 +122,6 @@ class SQLiteDB(Loggable):
 
 
 class Container(BackendItem):
-
     get_path = None
 
     def __init__(self, id, parent_id, name, children_callback=None, store=None,
@@ -288,7 +289,8 @@ class Album(BackendItem):
         return count
 
     def get_item(self):
-        item = DIDLLite.MusicAlbum(self.get_id(), AUDIO_ALBUM_CONTAINER_ID, self.title)
+        item = DIDLLite.MusicAlbum(self.get_id(), AUDIO_ALBUM_CONTAINER_ID,
+                                   self.title)
         item.artist = self.artist.name
         item.childCount = self.get_child_count()
         if self.cover:
@@ -626,7 +628,8 @@ class BansheeDB(Loggable):
             q = "select * from CoreAlbums where AlbumID in " \
                 "(select distinct(AlbumID) from CoreTracks where " \
                 "PrimarySourceID=?) order by Title"
-            for row in self.db.sql_execute(q, self.get_local_music_library_id()):
+            for row in self.db.sql_execute(q,
+                                           self.get_local_music_library_id()):
                 try:
                     artist = artists[row.ArtistID]
                 except KeyError:
@@ -723,7 +726,8 @@ class BansheeDB(Loggable):
             q = "select * from CoreTracks where TrackID in " \
                 "(select distinct(TrackID) from CoreTracks where " \
                 "PrimarySourceID=?) order by AlbumID,TrackNumber"
-            for row in self.db.sql_execute(q, self.get_local_music_library_id()):
+            for row in self.db.sql_execute(q,
+                                           self.get_local_music_library_id()):
                 if row.AlbumID not in albums:
                     album = self.get_album_with_id(row.AlbumID)
                     albums[row.AlbumID] = album
@@ -776,7 +780,8 @@ class BansheeStore(BackendStore, BansheeDB):
 
         self.containers = {}
         self.containers[ROOT_CONTAINER_ID] = Container(ROOT_CONTAINER_ID,
-                                                       -1, self.name, store=self)
+                                                       -1, self.name,
+                                                       store=self)
         louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
 
     def upnp_init(self):
@@ -812,7 +817,7 @@ class BansheeStore(BackendStore, BansheeDB):
         self.containers[AUDIO_CONTAINER].add_child(playlists)
 
         videos = Container(VIDEO_CONTAINER, ROOT_CONTAINER_ID,
-                          'Videos', store=self)
+                           'Videos', store=self)
         self.containers[ROOT_CONTAINER_ID].add_child(videos)
         self.containers[VIDEO_CONTAINER] = videos
 

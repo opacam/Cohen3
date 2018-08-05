@@ -3,12 +3,11 @@
 
 # Copyright 2007 - Frank Scholz <coherence@beebits.net>
 from lxml import etree
-
 from twisted.python import failure
 
 from coherence import log
-from coherence.upnp.core.utils import getPage
 from coherence.upnp.core import soap_lite
+from coherence.upnp.core.utils import getPage
 
 
 class SOAPProxy(log.Loggable):
@@ -26,7 +25,8 @@ class SOAPProxy(log.Loggable):
 
     logCategory = 'soap'
 
-    def __init__(self, url, namespace=None, envelope_attrib=None, header=None, soapaction=None):
+    def __init__(self, url, namespace=None, envelope_attrib=None, header=None,
+                 soapaction=None):
         log.Loggable.__init__(self)
         self.url = url
         self.namespace = namespace
@@ -42,15 +42,18 @@ class SOAPProxy(log.Loggable):
             soapaction = '#'.join((self.namespace[1], soapaction))
         self.action = soapaction.split('#')[1]
 
-        self.info("callRemote %r %r %r %r", self.soapaction, soapmethod, self.namespace, self.action)
+        self.info("callRemote %r %r %r %r", self.soapaction, soapmethod,
+                  self.namespace, self.action)
 
         headers = {b'content-type': b'text/xml ;charset="utf-8"',
-                   b'SOAPACTION': bytes('"%s"' % soapaction, encoding='utf-8'), }
+                   b'SOAPACTION': bytes('"%s"' % soapaction,
+                                        encoding='utf-8'), }
         if 'headers' in arguments:
             headers.update(arguments['headers'])
             del arguments['headers']
 
-        payload = soap_lite.build_soap_call(self.action, arguments, ns=self.namespace[1])
+        payload = soap_lite.build_soap_call(self.action, arguments,
+                                            ns=self.namespace[1])
 
         self.info("callRemote soapaction:  %s %s", self.action, self.url)
         self.debug("callRemote payload:  %s", payload)
@@ -65,10 +68,13 @@ class SOAPProxy(log.Loggable):
                     'error.value.__traceback__',
                     error.value.__traceback__))
                 tree = etree.fromstring(error.value.__traceback__)
-                body = tree.find('{http://schemas.xmlsoap.org/soap/envelope/}Body')
+                body = tree.find(
+                    '{http://schemas.xmlsoap.org/soap/envelope/}Body')
                 return failure.Failure(Exception("%s - %s" % (
-                  body.find('.//{urn:schemas-upnp-org:control-1-0}errorCode').text,
-                  body.find('.//{urn:schemas-upnp-org:control-1-0}errorDescription').text)))
+                    body.find(
+                        './/{urn:schemas-upnp-org:control-1-0}errorCode').text,
+                    body.find(
+                        './/{urn:schemas-upnp-org:control-1-0}errorDescription').text)))
             except:
                 import traceback
                 self.debug(traceback.format_exc())
@@ -93,7 +99,8 @@ class SOAPProxy(log.Loggable):
 
         tree = etree.fromstring(page)
         body = tree.find('{http://schemas.xmlsoap.org/soap/envelope/}Body')
-        response = body.find('{%s}%sResponse' % (self.namespace[1], self.action))
+        response = body.find(
+            '{%s}%sResponse' % (self.namespace[1], self.action))
         if response is None:
             """ fallback for improper SOAP action responses """
             response = body.find('%sResponse' % self.action)

@@ -7,13 +7,12 @@
 import socket
 import time
 
-from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor
 from twisted.internet import task
-
-from coherence.upnp.core import utils
+from twisted.internet.protocol import DatagramProtocol
 
 import coherence.extern.louie as louie
+from coherence.upnp.core import utils
 
 SSDP_PORT = 1900
 SSDP_ADDR = '239.255.255.250'
@@ -39,19 +38,23 @@ class MSearch(DatagramProtocol, log.Loggable):
             data = data.decode('utf-8')
 
         cmd, headers = utils.parse_http_response(data)
-        self.info('datagramReceived from %s:%d, protocol %s code %s', host, port, cmd[0], cmd[1])
+        self.info('datagramReceived from %s:%d, protocol %s code %s', host,
+                  port, cmd[0], cmd[1])
         if cmd[0].startswith('HTTP/1.') and cmd[1] == '200':
             self.msg('for %r', headers['usn'])
             if not self.ssdp_server.isKnown(headers['usn']):
-                self.info('register as remote %s, %s, %s', headers['usn'], headers['st'], headers['location'])
-                self.ssdp_server.register('remote',
-                                            headers['usn'], headers['st'],
-                                            headers['location'],
-                                            headers['server'],
-                                            headers['cache-control'],
-                                            host=host)
+                self.info('register as remote %s, %s, %s', headers['usn'],
+                          headers['st'], headers['location'])
+                self.ssdp_server.register(
+                    'remote',
+                    headers['usn'], headers['st'],
+                    headers['location'],
+                    headers['server'],
+                    headers['cache-control'],
+                    host=host)
             else:
-                self.ssdp_server.known[headers['usn']]['last-seen'] = time.time()
+                self.ssdp_server.known[headers['usn']][
+                    'last-seen'] = time.time()
                 self.debug('updating last-seen for %r', headers['usn'])
 
         # make raw data available

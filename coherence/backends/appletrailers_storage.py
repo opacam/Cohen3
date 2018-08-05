@@ -8,14 +8,15 @@
 """
 This is a Media Backend that allows you to access the Trailers from Apple.com
 """
-from lxml import etree
 from functools import cmp_to_key
+
+from lxml import etree
+from twisted.internet import task, reactor
+from twisted.web import client
 
 from coherence.backend import BackendItem, BackendStore
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.utils import ReverseProxyUriResource
-from twisted.web import client
-from twisted.internet import task, reactor
 
 XML_URL = "http://www.apple.com/trailers/home/xml/current.xml"
 
@@ -28,20 +29,21 @@ class AppleTrailerProxy(ReverseProxyUriResource):
         ReverseProxyUriResource.__init__(self, uri)
 
     def render(self, request):
-        request.received_headers['user-agent'] = 'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)'
+        request.received_headers[
+            'user-agent'] = 'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)'
         return ReverseProxyUriResource.render(self, request)
 
 
 class Trailer(BackendItem):
 
     def __init__(self, parent_id, urlbase, id=None, name=None, cover=None,
-            url=None):
+                 url=None):
         BackendItem.__init__(self)
         self.parentid = parent_id
         self.id = id
         self.name = name
         self.cover = cover
-        if(len(urlbase) and urlbase[-1] != '/'):
+        if (len(urlbase) and urlbase[-1] != '/'):
             urlbase += '/'
         self.url = urlbase + str(self.id)
         self.location = AppleTrailerProxy(url)
@@ -53,11 +55,10 @@ class Trailer(BackendItem):
 
 
 class Container(BackendItem):
-
     logCategory = 'apple_trailers'
 
     def __init__(self, id, parent_id, name, store=None, \
-            children_callback=None):
+                 children_callback=None):
         BackendItem.__init__(self)
         self.id = id
         self.parent_id = parent_id
@@ -70,9 +71,9 @@ class Container(BackendItem):
         self.item.childCount = None  # self.get_child_count()
 
     def get_children(self, start=0, end=0):
-        if(end - start > 25 or
-           start - end == start or
-           end - start == 0):
+        if (end - start > 25 or
+                start - end == start or
+                end - start == 0):
             end = start + 25
         if end != 0:
             return self.children[start:end]
@@ -92,7 +93,6 @@ class Container(BackendItem):
 
 
 class AppleTrailersStore(BackendStore):
-
     logCategory = 'apple_trailers'
     implements = ['MediaServer']
 
@@ -173,7 +173,8 @@ class AppleTrailersStore(BackendStore):
         except:
             pass
 
-        res = DIDLLite.Resource(trailer.get_path(), 'http-get:*:video/quicktime:*')
+        res = DIDLLite.Resource(trailer.get_path(),
+                                'http-get:*:video/quicktime:*')
         res.duration = duration
         try:
             res.size = item.find('./preview/large').get('filesize', None)
@@ -187,7 +188,9 @@ class AppleTrailersStore(BackendStore):
             dlna_tags[2] = 'DLNA.ORG_CI=1'
             url = self.urlbase + str(trailer.id) + '?transcoded=mp4'
             new_res = DIDLLite.Resource(url,
-                'http-get:*:%s:%s' % ('video/mp4', ';'.join([dlna_pn] + dlna_tags)))
+                                        'http-get:*:%s:%s' % ('video/mp4',
+                                                              ';'.join([
+                                                                           dlna_pn] + dlna_tags)))
             new_res.size = None
             res.duration = duration
             trailer.item.res.append(new_res)
@@ -196,11 +199,14 @@ class AppleTrailersStore(BackendStore):
             dlna_tags = DIDLLite.simple_dlna_tags[:]
             dlna_tags[2] = 'DLNA.ORG_CI=1'
             dlna_tags[3] = 'DLNA.ORG_FLAGS=00f00000000000000000000000000000'
-            url = self.urlbase + str(trailer.id) + '?attachment=poster&transcoded=thumb&type=jpeg'
+            url = self.urlbase + str(
+                trailer.id) + '?attachment=poster&transcoded=thumb&type=jpeg'
             new_res = DIDLLite.Resource(url,
-                'http-get:*:%s:%s' % ('image/jpeg', ';'.join([dlna_pn] + dlna_tags)))
+                                        'http-get:*:%s:%s' % ('image/jpeg',
+                                                              ';'.join([
+                                                                           dlna_pn] + dlna_tags)))
             new_res.size = None
-            #new_res.resolution = "160x160"
+            # new_res.resolution = "160x160"
             trailer.item.res.append(new_res)
             if not hasattr(trailer.item, 'attachments'):
                 trailer.item.attachments = {}
@@ -220,7 +226,8 @@ class AppleTrailersStore(BackendStore):
     def upnp_init(self):
         if self.server:
             self.server.connection_manager_server.set_variable( \
-                0, 'SourceProtocolInfo', ['http-get:*:video/quicktime:*', 'http-get:*:video/mp4:*'])
+                0, 'SourceProtocolInfo',
+                ['http-get:*:video/quicktime:*', 'http-get:*:video/mp4:*'])
         self.container = Container(ROOT_ID, -1, self.name)
         trailers = list(self.trailers.values())
         # trailers.sort(cmp=lambda x, y: cmp(

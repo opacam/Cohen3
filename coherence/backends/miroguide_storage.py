@@ -9,14 +9,16 @@
 # Copyright 2009, Jean-Michel Sizun
 # Copyright 2009 Frank Scholz <coherence@beebits.net>
 
-import urllib.request, urllib.parse, urllib.error
+import urllib.error
+import urllib.parse
+import urllib.request
 
-from coherence.upnp.core import utils
-from coherence.upnp.core import DIDLLite
-from coherence.backend import BackendStore, BackendItem, Container, LazyContainer, \
-     AbstractBackendStore
-
+from coherence.backend import BackendItem, Container, \
+    LazyContainer, \
+    AbstractBackendStore
 from coherence.backends.youtube_storage import TestVideoProxy
+from coherence.upnp.core import DIDLLite
+from coherence.upnp.core import utils
 
 
 class VideoItem(BackendItem):
@@ -35,9 +37,10 @@ class VideoItem(BackendItem):
         self.item = None
 
         self.location = TestVideoProxy(self.video_url, hash(self.video_url),
-                                   store.proxy_mode,
-                                   store.cache_directory, store.cache_maxsize, store.buffer_size
-                                   )
+                                       store.proxy_mode,
+                                       store.cache_directory,
+                                       store.cache_maxsize, store.buffer_size
+                                       )
 
     def get_item(self):
         if self.item == None:
@@ -63,23 +66,37 @@ class VideoItem(BackendItem):
 
 
 class MiroGuideStore(AbstractBackendStore):
-
     logCategory = 'miroguide_store'
 
     implements = ['MediaServer']
 
-    description = ('Miro Guide', 'connects to the MIRO Guide service and exposes the podcasts catalogued by the service. ', None)
+    description = ('Miro Guide',
+                   'connects to the MIRO Guide service and exposes the podcasts catalogued by the service. ',
+                   None)
 
-    options = [{'option': 'name', 'text': 'Server Name:', 'type': 'string', 'default': 'my media', 'help': 'the name under this MediaServer shall show up with on other UPnP clients'},
-       {'option': 'version', 'text': 'UPnP Version:', 'type': 'int', 'default': 2, 'enum': (2, 1), 'help': 'the highest UPnP version this MediaServer shall support', 'level': 'advance'},
-       {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string', 'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set', 'level': 'advance'},
-       {'option': 'language', 'text': 'Language:', 'type': 'string', 'default': 'English'},
-       {'option': 'refresh', 'text': 'Refresh period', 'type': 'string'},
-       {'option': 'proxy_mode', 'text': 'Proxy mode:', 'type': 'string', 'enum': ('redirect', 'proxy', 'cache', 'buffered')},
-       {'option': 'buffer_size', 'text': 'Buffering size:', 'type': 'int'},
-       {'option': 'cache_directory', 'text': 'Cache directory:', 'type': 'dir', 'group': 'Cache'},
-       {'option': 'cache_maxsize', 'text': 'Cache max size:', 'type': 'int', 'group': 'Cache'},
-    ]
+    options = [{'option': 'name', 'text': 'Server Name:', 'type': 'string',
+                'default': 'my media',
+                'help': 'the name under this MediaServer shall show up with on other UPnP clients'},
+               {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
+                'default': 2, 'enum': (2, 1),
+                'help': 'the highest UPnP version this MediaServer shall support',
+                'level': 'advance'},
+               {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
+                'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set',
+                'level': 'advance'},
+               {'option': 'language', 'text': 'Language:', 'type': 'string',
+                'default': 'English'},
+               {'option': 'refresh', 'text': 'Refresh period',
+                'type': 'string'},
+               {'option': 'proxy_mode', 'text': 'Proxy mode:', 'type': 'string',
+                'enum': ('redirect', 'proxy', 'cache', 'buffered')},
+               {'option': 'buffer_size', 'text': 'Buffering size:',
+                'type': 'int'},
+               {'option': 'cache_directory', 'text': 'Cache directory:',
+                'type': 'dir', 'group': 'Cache'},
+               {'option': 'cache_maxsize', 'text': 'Cache max size:',
+                'type': 'int', 'group': 'Cache'},
+               ]
 
     def __init__(self, server, **kwargs):
         AbstractBackendStore.__init__(self, server, **kwargs)
@@ -91,7 +108,8 @@ class MiroGuideStore(AbstractBackendStore):
         self.refresh = int(kwargs.get('refresh', 60)) * 60
 
         self.proxy_mode = kwargs.get('proxy_mode', 'redirect')
-        self.cache_directory = kwargs.get('cache_directory', '/tmp/coherence-cache')
+        self.cache_directory = kwargs.get('cache_directory',
+                                          '/tmp/coherence-cache')
         try:
             if self.proxy_mode != 'redirect':
                 os.mkdir(self.cache_directory)
@@ -108,9 +126,12 @@ class MiroGuideStore(AbstractBackendStore):
         languagesItem = Container(rootItem, "All by Languages")
         rootItem.add_child(languagesItem)
 
-        self.appendLanguage("Recent Videos", self.language, rootItem, sort='-age', count=15)
-        self.appendLanguage("Top Rated", self.language, rootItem, sort='rating', count=15)
-        self.appendLanguage("Most Popular", self.language, rootItem, sort='-popular', count=15)
+        self.appendLanguage("Recent Videos", self.language, rootItem,
+                            sort='-age', count=15)
+        self.appendLanguage("Top Rated", self.language, rootItem, sort='rating',
+                            count=15)
+        self.appendLanguage("Most Popular", self.language, rootItem,
+                            sort='-popular', count=15)
 
         def gotError(error):
             print("ERROR: %s" % error)
@@ -120,7 +141,8 @@ class MiroGuideStore(AbstractBackendStore):
                 print("Unable to retrieve list of categories")
                 return
             data, header = result
-            categories = eval(data)  # FIXME add some checks to avoid code injection
+            categories = eval(
+                data)  # FIXME add some checks to avoid code injection
             for category in categories:
                 name = category['name'].encode('ascii', 'strict')
                 category_url = category['url'].encode('ascii', 'strict')
@@ -135,7 +157,8 @@ class MiroGuideStore(AbstractBackendStore):
                 print("Unable to retrieve list of languages")
                 return
             data, header = result
-            languages = eval(data)  # FIXME add some checks to avoid code injection
+            languages = eval(
+                data)  # FIXME add some checks to avoid code injection
             for language in languages:
                 name = language['name'].encode('ascii', 'strict')
                 language_url = language['url'].encode('ascii', 'strict')
@@ -151,15 +174,21 @@ class MiroGuideStore(AbstractBackendStore):
         return self.__class__.__name__
 
     def appendCategory(self, name, category_id, parent):
-        item = LazyContainer(parent, name, category_id, self.refresh, self.retrieveChannels, filter="category", filter_value=category_id, per_page=100)
+        item = LazyContainer(parent, name, category_id, self.refresh,
+                             self.retrieveChannels, filter="category",
+                             filter_value=category_id, per_page=100)
         parent.add_child(item, external_id=category_id)
 
     def appendLanguage(self, name, language_id, parent, sort='name', count=0):
-        item = LazyContainer(parent, name, language_id, self.refresh, self.retrieveChannels, filter="language", filter_value=language_id, per_page=100, sort=sort, count=count)
+        item = LazyContainer(parent, name, language_id, self.refresh,
+                             self.retrieveChannels, filter="language",
+                             filter_value=language_id, per_page=100, sort=sort,
+                             count=count)
         parent.add_child(item, external_id=language_id)
 
     def appendChannel(self, name, channel_id, parent):
-        item = LazyContainer(parent, name, channel_id, self.refresh, self.retrieveChannelItems, channel_id=channel_id)
+        item = LazyContainer(parent, name, channel_id, self.refresh,
+                             self.retrieveChannelItems, channel_id=channel_id)
         parent.add_child(item, external_id=channel_id)
 
     def upnp_init(self):
@@ -167,25 +196,29 @@ class MiroGuideStore(AbstractBackendStore):
 
         if self.server:
             self.server.connection_manager_server.set_variable(
-               0, 'SourceProtocolInfo',
-               ['http-get:*:%s:*' % 'video/'],  # FIXME put list of all possible video mimetypes
-               default=True)
+                0, 'SourceProtocolInfo',
+                ['http-get:*:%s:*' % 'video/'],
+                # FIXME put list of all possible video mimetypes
+                default=True)
 
         self.wmc_mapping = {'15': self.get_root_id()}
 
-    def retrieveChannels (self, parent, filter, filter_value, per_page=100, page=0, offset=0, count=0, sort='name'):
+    def retrieveChannels(self, parent, filter, filter_value, per_page=100,
+                         page=0, offset=0, count=0, sort='name'):
         filter_value = urllib.parse.quote(filter_value.encode("utf-8"))
 
         limit = count
         if (count == 0):
             limit = per_page
-        uri = "https://www.miroguide.com/api/get_channels?limit=%d&offset=%d&filter=%s&filter_value=%s&sort=%s" % (limit, offset, filter, filter_value, sort)
-        #print uri
+        uri = "https://www.miroguide.com/api/get_channels?limit=%d&offset=%d&filter=%s&filter_value=%s&sort=%s" % (
+        limit, offset, filter, filter_value, sort)
+        # print uri
         d = utils.getPage(uri)
 
         def gotChannels(result):
             if result is None:
-                print("Unable to retrieve channel for category %s" % category_id)
+                print(
+                    "Unable to retrieve channel for category %s" % category_id)
                 return
             data, header = result
             channels = eval(data)
@@ -201,7 +234,7 @@ class MiroGuideStore(AbstractBackendStore):
                 name = channel['name']
                 self.appendChannel(name, id, parent)
             if ((count == 0) and (len(channels) >= per_page)):
-                #print "reached page limit (%d)" % len(channels)
+                # print "reached page limit (%d)" % len(channels)
                 parent.childrenRetrievingNeeded = True
 
         def gotError(error):
@@ -210,7 +243,7 @@ class MiroGuideStore(AbstractBackendStore):
         d.addCallbacks(gotChannels, gotError)
         return d
 
-    def retrieveChannelItems (self, parent, channel_id):
+    def retrieveChannelItems(self, parent, channel_id):
         uri = "https://www.miroguide.com/api/get_channel?id=%s" % channel_id
         d = utils.getPage(uri)
 
@@ -224,16 +257,16 @@ class MiroGuideStore(AbstractBackendStore):
             if ('item' in channel):
                 items = channel['item']
             for item in items:
-                #print "item:",item
+                # print "item:",item
                 url = item['url']
                 description = item['description']
-                #print "description:", description
+                # print "description:", description
                 name = item['name']
                 thumbnail_url = None
                 if ('thumbnail_url' in channel):
-                    #print "Thumbnail:", channel['thumbnail_url']
+                    # print "Thumbnail:", channel['thumbnail_url']
                     thumbnail_url = channel['thumbnail_url']
-                #size = size['size']
+                # size = size['size']
                 item = VideoItem(name, description, url, thumbnail_url, self)
                 item.parent = parent
                 parent.add_child(item, external_id=url)

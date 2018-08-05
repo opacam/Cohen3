@@ -3,16 +3,13 @@
 
 # Copyright 2007 - Frank Scholz <coherence@beebits.net>
 from lxml import etree
-
-from twisted.web import server, resource
-from twisted.python import failure
 from twisted.internet import defer
-
-from coherence import log, SERVER_ID
-
-from coherence.upnp.core import soap_lite
+from twisted.python import failure
+from twisted.web import server, resource
 
 import coherence.extern.louie as louie
+from coherence import log, SERVER_ID
+from coherence.upnp.core import soap_lite
 
 
 class errorCode(Exception):
@@ -59,7 +56,8 @@ class UPnPPublisher(resource.Resource, log.Loggable):
     def _gotResult(self, result, request, methodName, ns):
         self.debug('_gotResult %s %s %s %s', result, request, methodName, ns)
 
-        response = soap_lite.build_soap_call(methodName, result, ns=ns, is_response=True)
+        response = soap_lite.build_soap_call(methodName, result, ns=ns,
+                                             is_response=True)
         self._sendResponse(request, response)
 
     def _gotError(self, failure, request, methodName, ns):
@@ -91,7 +89,8 @@ class UPnPPublisher(resource.Resource, log.Loggable):
         self.info('soap_request: %s', headers)
 
         # allow external check of data
-        louie.send('UPnPTest.Control.Client.CommandReceived', None, headers, data)
+        louie.send('UPnPTest.Control.Client.CommandReceived', None, headers,
+                   data)
 
         def print_c(e):
             for c in e.getchildren():
@@ -114,8 +113,8 @@ class UPnPPublisher(resource.Resource, log.Loggable):
             kwargs[child.tag] = self.decode_result(child)
             args.append(kwargs[child.tag])
 
-        #p, header, body, attrs = SOAPpy.parseSOAPRPC(data, 1, 1, 1)
-        #methodName, args, kwargs, ns = p._name, p._aslist, p._asdict, p._ns
+        # p, header, body, attrs = SOAPpy.parseSOAPRPC(data, 1, 1, 1)
+        # methodName, args, kwargs, ns = p._name, p._aslist, p._asdict, p._ns
 
         try:
             headers['content-type'].index('text/xml')
@@ -126,24 +125,25 @@ class UPnPPublisher(resource.Resource, log.Loggable):
         self.debug('headers: %r', headers)
 
         function, useKeywords = self.lookupFunction(methodName)
-        #print 'function', function, 'keywords', useKeywords, 'args', args, 'kwargs', kwargs
+        # print 'function', function, 'keywords', useKeywords, 'args', args, 'kwargs', kwargs
 
         if not function:
             self._methodNotFound(request, methodName)
             return server.NOT_DONE_YET
         else:
             keywords = {'soap_methodName': methodName}
-            if('user-agent' in headers and
+            if ('user-agent' in headers and
                     headers['user-agent'].find('Xbox/') == 0):
                 keywords['X_UPnPClient'] = 'XBox'
-            #if(headers.has_key('user-agent') and
+            # if(headers.has_key('user-agent') and
             #        headers['user-agent'].startswith("""Mozilla/4.0 (compatible; UPnP/1.0; Windows""")):
             #    keywords['X_UPnPClient'] = 'XBox'
-            if('x-av-client-info' in headers and
+            if ('x-av-client-info' in headers and
                     headers['x-av-client-info'].find('"PLAYSTATION3') > 0):
                 keywords['X_UPnPClient'] = 'PLAYSTATION3'
-            if('user-agent' in headers and
-                    headers['user-agent'].find('Philips-Software-WebClient/4.32') == 0):
+            if ('user-agent' in headers and
+                    headers['user-agent'].find(
+                        'Philips-Software-WebClient/4.32') == 0):
                 keywords['X_UPnPClient'] = 'Philips-TV'
             for k, v in list(kwargs.items()):
                 keywords[str(k)] = v

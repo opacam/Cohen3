@@ -28,6 +28,7 @@ def fakeXMLparse(content):
         the file contains `content`.
         """
         return etree.fromstring(content)
+
     return parse
 
 
@@ -49,7 +50,8 @@ class DescriptionNotFound(unittest.TestCase):
         # description XML for can not be found. As ServiceServer is
         # used for services Coherence is implementing, the XML file
         # ought to exist.
-        self.assertRaises(IOError, service.ServiceServer, 'UnknownService', 1, None)
+        self.assertRaises(IOError, service.ServiceServer, 'UnknownService', 1,
+                          None)
 
 
 class EmptyDescription(unittest.TestCase):
@@ -59,37 +61,41 @@ class EmptyDescription(unittest.TestCase):
         # is used for services Coherence is implementing, the XML file
         # ought to be valid.
         with mock.patch(etree.__name__ + '.parse', fakeXMLparse('')):
-            self.assertRaises(etree.ParseError, service.ServiceServer, 'UnknownService', 1, None)
+            self.assertRaises(etree.ParseError, service.ServiceServer,
+                              'UnknownService', 1, None)
 
 
 class InvalidDescriptionXML(unittest.TestCase):
 
     def test_init(self):
-      # In thie case, the description XML is empty. As ServiceServer
-      # is used for services Coherence is implementing, the XML file
-      # ought to be valid.
-      with mock.patch(etree.__name__ + '.parse', fakeXMLparse('<x>')):
-        self.assertRaises(etree.ParseError, service.ServiceServer, 'UnknownService', 1, None)
+        # In thie case, the description XML is empty. As ServiceServer
+        # is used for services Coherence is implementing, the XML file
+        # ought to be valid.
+        with mock.patch(etree.__name__ + '.parse', fakeXMLparse('<x>')):
+            self.assertRaises(etree.ParseError, service.ServiceServer,
+                              'UnknownService', 1, None)
 
 
 def kwargs_patching_wrapper(func, kwargs_patch):
-  def inner(*args, **kwargs):
-      kwargs.update(kwargs_patch)
-      return func(*args, **kwargs)
-  return inner
+    def inner(*args, **kwargs):
+        kwargs.update(kwargs_patch)
+        return func(*args, **kwargs)
+
+    return inner
 
 
 class ValidButEmptyDescriptionXML(unittest.TestCase):
 
     def setUp(self):
 
-      with mock.patch(etree.__name__ + '.parse', fakeXMLparse('<x></x>')):
-        self.setUp_main()
+        with mock.patch(etree.__name__ + '.parse', fakeXMLparse('<x></x>')):
+            self.setUp_main()
 
     def setUp_main(self):
         # :todo: use service.ServiceServer, see comment at
         # ServiceServer4Test
-        self.service_server = ServiceServer4Test('UnknownService', version=1, backend=None)
+        self.service_server = ServiceServer4Test('UnknownService', version=1,
+                                                 backend=None)
 
     def tearDown(self):
         try:
@@ -109,7 +115,8 @@ class ValidButEmptyDescriptionXML(unittest.TestCase):
         self.assertEqual(srv.backend, None)
         self.assertEqual(srv.namespace, 'schemas-upnp-org')
         self.assertEqual(srv.id_namespace, 'upnp-org')
-        self.assertEqual(srv.service_type, 'urn:schemas-upnp-org:service:UnknownService:1')
+        self.assertEqual(srv.service_type,
+                         'urn:schemas-upnp-org:service:UnknownService:1')
         self.assertEqual(srv.scpd_url, 'scpd.xml')
         self.assertEqual(srv.control_url, 'control')
         self.assertEqual(srv.subscription_url, 'subscribe')
@@ -126,7 +133,7 @@ class ValidButEmptyDescriptionXML(unittest.TestCase):
         # :todo: implement a test for
         # self.putChild(self.subscription_url, EventSubscriptionServer(self))
 
-        self.assertIsInstance(srv.check_subscribers_loop,task.LoopingCall)
+        self.assertIsInstance(srv.check_subscribers_loop, task.LoopingCall)
         self.assertIs(srv.check_moderated_loop, None)
 
     def test_getters(self):
@@ -137,20 +144,23 @@ class ValidButEmptyDescriptionXML(unittest.TestCase):
         self.assertEqual(srv.get_subscribers(), {})
 
         self.assertEqual(srv.get_id(), 'UnknownService')
-        self.assertEqual(srv.get_type(), 'urn:schemas-upnp-org:service:UnknownService:1')
+        self.assertEqual(srv.get_type(),
+                         'urn:schemas-upnp-org:service:UnknownService:1')
 
     def test_build_single_notification(self):
         srv = self.service_server
         # note: parameter `instance` is ignored.:fixme: remove it?
         with mock.patch(etree.__name__ + '.tostring',
-                        kwargs_patching_wrapper(etree.tostring, {'pretty_print': False})):
-          self.assertSequenceEqual(
-              srv.build_single_notification(0, 'DummyVariable', 987),
-              # :todo: this tested result heavily depends on how ElementTree handles the namespace.
-              (b'<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0">'
-               b'<e:property><DummyVariable>987</DummyVariable></e:property>'
-               b'</e:propertyset>'))
-          self.assertRaises(TypeError, srv.build_single_notification, 0, 321, 987)
+                        kwargs_patching_wrapper(etree.tostring,
+                                                {'pretty_print': False})):
+            self.assertSequenceEqual(
+                srv.build_single_notification(0, 'DummyVariable', 987),
+                # :todo: this tested result heavily depends on how ElementTree handles the namespace.
+                (b'<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0">'
+                 b'<e:property><DummyVariable>987</DummyVariable></e:property>'
+                 b'</e:propertyset>'))
+            self.assertRaises(TypeError, srv.build_single_notification, 0, 321,
+                              987)
 
     def test_build_last_change_event(self):
         srv = self.service_server
@@ -167,7 +177,6 @@ class ValidButEmptyDescriptionXML(unittest.TestCase):
         # we have non of those.
         self.assertIs(srv.propagate_notification([]), None)
 
-
 # :todo: test get_action(name)
 # :todo: test rm_notification
 # :todo: testsubscribtions
@@ -178,5 +187,3 @@ class ValidButEmptyDescriptionXML(unittest.TestCase):
 # get_scpdXML
 # register_vendor_variable, register_vendor_action
 # init_var_and_actions
-
-

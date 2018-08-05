@@ -1,22 +1,21 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
+import xml.etree.ElementTree as ET
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
 from urllib.parse import urlsplit, urlparse
-import xml.etree.ElementTree as ET
 
-from lxml import etree
-from coherence import SERVER_ID
-from twisted.web import http, static
-from twisted.web import client, error
-from twisted.web import proxy, resource, server
 from twisted.internet import reactor, defer, abstract
 from twisted.python import failure
+from twisted.web import client, error
+from twisted.web import http, static
+from twisted.web import proxy, resource, server
 
+from coherence import SERVER_ID
 from coherence import log
-logger = log.getLogger('utils')
 
+logger = log.getLogger('utils')
 
 try:
     from twisted.protocols._c_urlarg import unquote
@@ -25,6 +24,7 @@ except ImportError:
 
 try:
     import netifaces
+
     have_netifaces = True
 except ImportError:
     have_netifaces = False
@@ -46,11 +46,11 @@ def generalise_boolean(value):
         return '1'
     return '0'
 
+
 generalize_boolean = generalise_boolean
 
 
 def parse_xml(data, encoding="utf-8", dump_invalid_data=False):
-
     parser = ET.XMLParser()
 
     # my version of twisted.web returns page_infos as a dictionary in
@@ -78,7 +78,6 @@ def parse_xml(data, encoding="utf-8", dump_invalid_data=False):
 
 
 def parse_http_response(data):
-
     """ don't try to get the body, there are reponses without """
     if isinstance(data, bytes):
         data = data.decode('utf-8')
@@ -159,7 +158,8 @@ def get_host_address():
         if have_netifaces:
             interfaces = netifaces.interfaces()
             if len(interfaces):
-                return get_ip_address(interfaces[0])    # on windows assume first interface is primary
+                return get_ip_address(interfaces[
+                                          0])  # on windows assume first interface is primary
     else:
         try:
             route_file = '/proc/net/route'
@@ -208,7 +208,6 @@ def get_host_address():
 
 
 def de_chunk_payload(response):
-
     import io
     """ This method takes a chunked HTTP data object and unchunks it."""
     newresponse = io.StringIO()
@@ -249,7 +248,7 @@ class Request(server.Request):
         # Resource Identification
         url = str(self.path)
 
-        #remove trailing "/", if ever
+        # remove trailing "/", if ever
         url = url.rstrip('/')
 
         scheme, netloc, path, query, fragment = urlsplit(url)
@@ -265,7 +264,8 @@ class Request(server.Request):
 
             resrc = self.site.getResourceFor(self)
             if resrc is None:
-                self.setResponseCode(http.NOT_FOUND, "Error: No resource for path %s" % path)
+                self.setResponseCode(http.NOT_FOUND,
+                                     "Error: No resource for path %s" % path)
                 self.finish()
             elif isinstance(resrc, defer.Deferred):
                 resrc.addCallback(deferred_rendering)
@@ -278,29 +278,28 @@ class Request(server.Request):
 
 
 class Site(server.Site):
-
     noisy = False
     requestFactory = Request
 
     def startFactory(self):
         pass
-        #http._logDateTimeStart()
+        # http._logDateTimeStart()
 
 
 class ProxyClient(proxy.ProxyClient, log.Loggable):
 
     def __init__(self, command, rest, version, headers, data, father):
         log.Loggable.__init__(self)
-        #headers["connection"] = "close"
+        # headers["connection"] = "close"
         self.send_data = 0
         proxy.ProxyClient.__init__(self, command, rest, version,
-                                 headers, data, father)
+                                   headers, data, father)
 
     def handleStatus(self, version, code, message):
         if message:
             # Add a whitespace to message, this allows empty messages
             # transparently
-            message = " %s" % (message, )
+            message = " %s" % (message,)
         if version == 'ICY':
             version = 'HTTP/1.1'
         proxy.ProxyClient.handleStatus(self, version, code, message)
@@ -315,7 +314,6 @@ class ProxyClient(proxy.ProxyClient, log.Loggable):
 
 
 class ProxyClientFactory(proxy.ProxyClientFactory):
-
     # :fixme: Why here proxy.ProxyClient is used instad of our own
     # ProxyClent? Is out ProxyClient used at all?
     protocol = proxy.ProxyClient
@@ -395,7 +393,6 @@ class ReverseProxyResource(proxy.ReverseProxyResource):
 
 
 class ReverseProxyUriResource(ReverseProxyResource):
-
     uri = None
 
     def __init__(self, uri, reactor=reactor):
@@ -415,7 +412,7 @@ class ReverseProxyUriResource(ReverseProxyResource):
             rest = '?'.join((path, params))
         ReverseProxyResource.__init__(self, host, port, rest, reactor)
 
-    def resetUri (self, uri):
+    def resetUri(self, uri):
         self.uri = uri
         _, host_port, path, params, _ = urlsplit(uri)
         if host_port.find(':') != -1:
@@ -429,13 +426,10 @@ class ReverseProxyUriResource(ReverseProxyResource):
 
 # already on twisted.web since at least 8.0.0
 class myHTTPPageGetter(client.HTTPPageGetter):
-
     followRedirect = True
 
 
-
 class HeaderAwareHTTPClientFactory(client.HTTPClientFactory):
-
     protocol = myHTTPPageGetter
     noisy = False
 
@@ -502,7 +496,7 @@ def downloadPage(url, file, contextFactory=None, *args, **kwargs):
     elif not 'agent' in kwargs:
         kwargs['agent'] = "Coherence PageGetter"
     return client.downloadPage(url, file, contextFactory=contextFactory,
-                        *args, **kwargs)
+                               *args, **kwargs)
 
 
 # StaticFile used to be a patched version of static.File. The later
@@ -523,8 +517,8 @@ class BufferFile(static.File):
         self.upnp_retry = None
 
     def render(self, request):
-        #print ""
-        #print "BufferFile", request
+        # print ""
+        # print "BufferFile", request
 
         # FIXME detect when request is REALLY finished
         if request is None or request.finished:
@@ -535,10 +529,11 @@ class BufferFile(static.File):
         self.restat()
 
         if self.type is None:
-            self.type, self.encoding = static.getTypeAndEncoding(self.basename(),
-                                                          self.contentTypes,
-                                                          self.contentEncodings,
-                                                          self.defaultType)
+            self.type, self.encoding = static.getTypeAndEncoding(
+                self.basename(),
+                self.contentTypes,
+                self.contentEncodings,
+                self.defaultType)
 
         if not self.exists():
             return self.childNotFound.render(request)
@@ -546,13 +541,13 @@ class BufferFile(static.File):
         if self.isdir():
             return self.redirect(request)
 
-        #for content-length
+        # for content-length
         if (self.target_size > 0):
             fsize = size = int(self.target_size)
         else:
             fsize = size = int(self.getFileSize())
 
-        #print fsize
+        # print fsize
 
         if size == int(self.getFileSize()):
             request.setHeader('accept-ranges', 'bytes')
@@ -575,14 +570,14 @@ class BufferFile(static.File):
         trans = True
 
         range = request.getHeader('range')
-        #print "StaticFile", range
+        # print "StaticFile", range
 
         tsize = size
         if range is not None:
             # This is a request for partial data...
             bytesrange = range.split('=')
             assert bytesrange[0] == 'bytes', \
-                   "Syntactically invalid http range header!"
+                "Syntactically invalid http range header!"
             start, end = bytesrange[1].split('-', 1)
             if start:
                 start = int(start)
@@ -599,7 +594,7 @@ class BufferFile(static.File):
 
                 f.seek(start)
                 if end:
-                    #print(":%s" % end)
+                    # print(":%s" % end)
                     end = int(end)
                 else:
                     end = size - 1
@@ -624,7 +619,7 @@ class BufferFile(static.File):
                 request.setResponseCode(http.PARTIAL_CONTENT)
                 request.setHeader('content-range', "bytes %s-%s/%s " % (
                     str(start), str(end), str(tsize)))
-                #print "StaticFile", start, end, tsize
+                # print "StaticFile", start, end, tsize
 
         request.setHeader('content-length', str(fsize))
 
@@ -633,7 +628,7 @@ class BufferFile(static.File):
             # won't be overwritten.
             request.method = 'HEAD'
             return ''
-        #print "StaticFile out", request.headers, request.code
+        # print "StaticFile out", request.headers, request.code
 
         # return data
         # size is the byte position to stop sending, not how many bytes to send
@@ -657,10 +652,11 @@ class BufferFileTransfer(object):
         request.registerProducer(self, 0)
 
     def resumeProducing(self):
-        #print "resumeProducing", self.request,self.size,self.written
+        # print "resumeProducing", self.request,self.size,self.written
         if not self.request:
             return
-        data = self.file.read(min(abstract.FileDescriptor.bufferSize, self.size - self.written))
+        data = self.file.read(
+            min(abstract.FileDescriptor.bufferSize, self.size - self.written))
         if data:
             self.written += len(data)
             # this .write will spin the reactor, calling .doWrite and then
@@ -675,11 +671,12 @@ class BufferFileTransfer(object):
         pass
 
     def stopProducing(self):
-        #print "stopProducing",self.request
+        # print "stopProducing",self.request
         self.request.unregisterProducer()
         self.file.close()
         self.request.finish()
         self.request = None
+
 
 from datetime import datetime, tzinfo, timedelta
 import random
@@ -705,12 +702,13 @@ class _CEST(_tz):
     _offset = timedelta(minutes=120)
     _name = 'CEST'
 
-_bdates = [datetime(1997,2,28,17,20,tzinfo=_CET()),  # Sebastian Oliver
-           datetime(1999,9,19,4,12,tzinfo=_CEST()),  # Patrick Niklas
-           datetime(2000,9,23,4,8,tzinfo=_CEST()),   # Saskia Alexa
-           datetime(2003,7,23,1,18,tzinfo=_CEST()),  # Mara Sophie
-                                                     # you are the best!
-         ]
+
+_bdates = [datetime(1997, 2, 28, 17, 20, tzinfo=_CET()),  # Sebastian Oliver
+           datetime(1999, 9, 19, 4, 12, tzinfo=_CEST()),  # Patrick Niklas
+           datetime(2000, 9, 23, 4, 8, tzinfo=_CEST()),  # Saskia Alexa
+           datetime(2003, 7, 23, 1, 18, tzinfo=_CEST()),  # Mara Sophie
+           # you are the best!
+           ]
 
 
 def datefaker():

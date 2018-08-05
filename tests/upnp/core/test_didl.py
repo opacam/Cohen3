@@ -68,7 +68,9 @@ class TestDIDLLite(unittest.TestCase):
             expects an Album container in return
         """
         wrong_didl_fragment = copy(didl_fragment)
-        wrong_didl_fragment = wrong_didl_fragment.replace('object.container.album.musicAlbum', 'object.container.album.videoAlbum')
+        wrong_didl_fragment = wrong_didl_fragment.replace(
+            'object.container.album.musicAlbum',
+            'object.container.album.videoAlbum')
         didl_element = DIDLLite.DIDLElement.fromString(wrong_didl_fragment)
         items = didl_element.getItems()
         self.assertEqual(len(items), 1)
