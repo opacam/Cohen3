@@ -1,3 +1,13 @@
+0.8.0 - Moves to python 3
+------------------------------
+
+General:
+    - Renames project from Cohen to Cohen3
+    - Migrates source code to python version 3
+    - Reformat, Cleanup and  some PEP8 fixes
+    - Twisted >= 18.7.0 is now required
+    - Louie-latest is now required (instead of Louie)
+
 0.7.3 - Fixes and improvements
 ------------------------------
 

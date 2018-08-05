@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Cohen documentation build configuration file, created by
+# Cohen3 documentation build configuration file, created by
 # sphinx-quickstart on Fri May  1 23:29:12 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -54,9 +54,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Cohen'
-copyright = u'2015, unintended'
-author = u'unintended'
+project = 'Cohen3'
+copyright = '2018, opacam'
+author = 'opacam'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -111,7 +111,7 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
-github_project = 'unintended/Cohen'
+github_project = 'opacam/Cohen3'
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -219,14 +219,14 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Cohendoc'
+htmlhelp_basename = 'Cohen3doc'
 
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-  ('cli', 'Cohen', u'DLNA/UPnP Media Server', [author, "Frank Scholz"], 1)
+  ('cli', 'Cohen3', 'DLNA/UPnP Media Server', [author, "unintended", "Frank Scholz"], 1)
 ]
 
 # If true, show URL addresses after external links.
