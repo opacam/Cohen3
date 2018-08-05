@@ -6,12 +6,12 @@ Command-Line Interface
 SYNOPSIS
 --------
 
-``cohen`` <options> [--plugin=<BACKEND> [ , <PARAM_NAME> : <PARAM_VALUE> ] ...]
+``cohen3`` <options> [--plugin=<BACKEND> [ , <PARAM_NAME> : <PARAM_VALUE> ] ...]
 
 DESCRIPTION
 -----------
 
-Cohen is a Python DLNA/UPnP Media Server made to broadcast digital media content over your network.
+Cohen3 is a Python DLNA/UPnP Media Server made to broadcast digital media content over your network.
 
 The core of Cohen provides a (hopefully complete) implementation
 of:
@@ -42,11 +42,11 @@ OPTIONS
 EXAMPLES
 --------
 
-:cohen --plugin=backend\:FSStore,name\:MyCoherence:
+:cohen3 --plugin=backend\:FSStore,name\:MyCoherence:
     Start cohen activating the `FSStore` backend.
 
-:cohen --plugin=backend\:MediaStore,medialocation\:$HOME/Music/,mediadb\:/tmp/media.db:
-    Start cohen activating the `MediaStore` backend with media
+:cohen3 --plugin=backend\:MediaStore,medialocation\:$HOME/Music/,mediadb\:/tmp/media.db:
+    Start cohen3 activating the `MediaStore` backend with media
     located in `$HOME/Music` and the media metadata store in
     `/tmp/media.db`.
 
@@ -62,7 +62,7 @@ LastFMStore, AxisCamStore, YouTubeStore, TEDStore, IRadioStore, TwitchStore
 FILES
 -----
 
-:$HOME/.cohen: default config file
+:$HOME/.cohen3: default config file
 
 ENVIRONMENT VARIABLES
 ---------------------
@@ -74,4 +74,4 @@ ENVIRONMENT VARIABLES
 SEE ALSO
 --------
 
-Project Homepage https://github.com/unintended/Cohen
+Project Homepage https://github.com/opacam/Cohen3

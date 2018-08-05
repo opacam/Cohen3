@@ -1,14 +1,14 @@
 language: python
 python:
-- '2.7'
+- '3.5'
 install:
 - pip install .
 script: nosetests
 deploy:
   provider: pypi
-  user: unintended
+  user: opacam
   password:
-    secure: gQZE3O5sSfpn5t4lMHaaW+HEXDP/xqHMzIbN9lbJMwnmqNZuZIO4gZTWwlqY0XIWeMZLnmRr+pqNy2vQUuoaU1TWVeymGx4rnWEKGvg7V94kIbJOWiFu6Ag43fTkCBB90V/ZkZ8UK9E2aZw7kCNizhVSJO096VJdQ7ryVfTrZZQ=
+    secure:
   on:
     tags: true
-    repo: unintended/Cohen
+    repo: opacam/Cohen3
