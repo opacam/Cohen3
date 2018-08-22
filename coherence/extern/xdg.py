@@ -18,7 +18,8 @@ def xdg_content():
     xdg_config_home = os.path.expanduser(getenv('XDG_CONFIG_HOME', '~/.config'))
     user_dirs_file = os.path.join(xdg_config_home, 'user-dirs.dirs')
     if os.path.exists(user_dirs_file):
-        for line in open(user_dirs_file).readlines():
+        f = open(user_dirs_file)
+        for line in f.readlines():
             if not line.startswith('#'):
                 line = line.strip()
                 key, value = line.split('=')
@@ -29,6 +30,7 @@ def xdg_content():
                     content.append((value, info[0], info[1]))
                 except KeyError:
                     pass
+        f.close()
 
     if len(content) > 0:
         return content
