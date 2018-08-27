@@ -13,7 +13,6 @@ configobj = "==5.0.6"
 constantly = "==15.1.0"
 cryptography = "==2.3"
 futures = "==3.1.1"
-gdata = "==2.0.18"
 hyperlink = "==18.0.0"
 idna = "==2.7"
 incremental = "==17.5.0"
@@ -36,6 +35,8 @@ Twisted = "==18.7.0"
 pycairo = "*"
 pygobject = "*"
 dbus-python = "*"
+treq = "*"
+gdata = {git = "https://github.com/dvska/gdata-python3"}
 
 [dev-packages]
 pipenv = "==2018.7.1"

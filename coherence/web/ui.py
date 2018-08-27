@@ -225,7 +225,7 @@ class WebUI(athena.LivePage, log.Loggable):
         except:
             ch = super(WebUI, self).childFactory(ctx, name)
             if ch is None:
-                p = util.sibpath(__file__, name)
+                p = util.sibpath(__file__, name.decode('utf-8'))
                 self.info('looking for file %s', p)
                 if os.path.exists(p):
                     ch = static.File(p)

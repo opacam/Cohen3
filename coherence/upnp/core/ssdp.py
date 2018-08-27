@@ -112,7 +112,9 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         """Register a service or device that this SSDP server will
         respond to."""
 
-        self.info('Registering {} ({})'.format(st, location))
+        self.info('Registering {} ({}) -> {}'.format(st, location, manifestation))
+        self.debug('\t-searching usn: {}'.format(usn))
+        self.debug('\t-self.known: {}'.format(self.known))
 
         try:
             self.known[usn] = {}
@@ -138,7 +140,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
                     'Coherence.UPnP.SSDP.new_device',
                     None, device_type=st, infos=self.known[usn])
                 # self.callback("new_device", st, self.known[usn])
-            print('\t - ok all')
+            # print('\t - ok all')
         except Exception as e:
             print(('\t -> Error on registering service: {}'.format(
                 manifestation, e)))
@@ -188,8 +190,8 @@ class SSDPServer(DatagramProtocol, log.Loggable):
                   '{} for {} to {}'.format(delay, usn, destination))
         try:
             self.transport.write(
-                bytes(str(response), encoding='utf-8'),
-                bytes(str(destination), encoding='utf-8'))
+               response.encode('ascii'),
+               destination.encode('ascii'))
         except (AttributeError, socket.error) as msg:
             self.info('failure sending out byebye notification: {}'.format(msg))
 
@@ -215,16 +217,16 @@ class SSDPServer(DatagramProtocol, log.Loggable):
             if (i['ST'] == headers['st'] or
                     headers['st'] == 'ssdp:all'):
                 response = []
-                response.append('HTTP/1.1 200 OK')
+                response.append(b'HTTP/1.1 200 OK')
 
                 for k, v in list(i.items()):
                     if k == 'USN':
                         usn = v
                     if k not in ('MANIFESTATION', 'SILENT', 'HOST'):
-                        response.append('%s: %s' % (k, v))
-                response.append('DATE: %s' % datetimeToString())
+                        response.append(b'%r: %r' % (k, v))
+                response.append(b'DATE: %r' % datetimeToString())
 
-                response.extend(('', ''))
+                response.extend((b'', b''))
                 delay = random.randint(0, int(headers['mx']))
 
                 reactor.callLater(
@@ -239,7 +241,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         self.info('Sending alive notification for {}'.format(usn))
 
         resp = [b'NOTIFY * HTTP/1.1',
-                b'HOST: %s:%s' % (SSDP_ADDR, SSDP_PORT),
+                b'HOST: %r:%r' % (SSDP_ADDR, SSDP_PORT),
                 b'NTS: ssdp:alive',
                 ]
         stcpy = dict(iter(self.known[usn].items()))
@@ -250,8 +252,8 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         del stcpy['HOST']
         del stcpy['last-seen']
 
-        resp.extend([bytes(
-            ': '.join(x), encoding='utf-8') for x in iter(stcpy.items())])
+        resp.extend([
+            '{}: {}'.format(k, v).encode('ascii') for k, v in stcpy.items()])
         resp.extend((b'', b''))
         self.debug('doNotify content {}'.format(resp))
         try:
@@ -266,7 +268,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         self.info('Sending byebye notification for %s', usn)
 
         resp = [b'NOTIFY * HTTP/1.1',
-                b'HOST: %s:%s' % (SSDP_ADDR, SSDP_PORT),
+                b'HOST: %r:%r' % (SSDP_ADDR, SSDP_PORT),
                 b'NTS: ssdp:byebye',
                 ]
         try:
@@ -277,8 +279,8 @@ class SSDPServer(DatagramProtocol, log.Loggable):
             del stcpy['SILENT']
             del stcpy['HOST']
             del stcpy['last-seen']
-            resp.extend([bytes(
-                ': '.join(x), encoding='utf-8') for x in iter(stcpy.items())])
+            resp.extend([
+                '{}: {}'.format(k, v).encode('ascii') for k, v in stcpy.items()])
             resp.extend((b'', b''))
             self.debug('doByebye content %s', resp)
             if self.transport:

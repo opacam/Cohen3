@@ -74,7 +74,7 @@ class MSearch(DatagramProtocol, log.Loggable):
                'MX: 5',
                'ST: ssdp:all',
                '', '']
-        req = bytes('\r\n'.join(req), encoding='utf-8')
+        req = '\r\n'.join(req).encode('ascii')
 
         try:
             self.transport.write(req, (SSDP_ADDR, SSDP_PORT))

@@ -21,14 +21,14 @@ SSDP_ADDR = '239.255.255.250'
 
 USN_1 = 'uuid:e711a4bf::upnp:rootdevice'
 SSDP_NOTIFY_1 = (
-    'NOTIFY * HTTP/1.1',
-    'Host:239.255.255.250:1900',
-    'NT:upnp:rootdevice',
-    'NTS:ssdp:alive',
-    'Location:http://10.10.222.94:2869/upnp?content=uuid:e711a4bf',
-    'USN: ' + USN_1,
-    'Cache-Control: max-age=1842',
-    'Server:Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0',
+    b'NOTIFY * HTTP/1.1',
+    b'Host:239.255.255.250:1900',
+    b'NT:upnp:rootdevice',
+    b'NTS:ssdp:alive',
+    b'Location:http://10.10.222.94:2869/upnp?content=uuid:e711a4bf',
+    b'USN: ' + USN_1.encode('ascii'),
+    b'Cache-Control: max-age=1842',
+    b'Server:Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0',
 )
 
 
@@ -41,7 +41,7 @@ class TestSSDP(unittest.TestCase):
 
     def test_ssdp_notify(self):
         self.assertEqual(self.proto.known, {})
-        data = '\r\n'.join(SSDP_NOTIFY_1) + '\r\n\r\n'
+        data = b'\r\n'.join(SSDP_NOTIFY_1) + b'\r\n\r\n'
         self.proto.datagramReceived(data, ('10.20.30.40', 1234))
         self.assertTrue(self.proto.isKnown(USN_1))
         self.assertFalse(self.proto.isKnown(USN_1 * 2))
@@ -60,12 +60,12 @@ class TestSSDP(unittest.TestCase):
         })
 
     def test_ssdp_notify_does_not_send_reply(self):
-        data = '\r\n'.join(SSDP_NOTIFY_1) + '\r\n\r\n'
+        data = b'\r\n'.join(SSDP_NOTIFY_1) + b'\r\n\r\n'
         self.proto.datagramReceived(data, ('127.0.0.1', 1234))
         self.assertEqual(self.tr.written, [])
 
     def test_ssdp_notify_updates_timestamp(self):
-        data = '\r\n'.join(SSDP_NOTIFY_1) + '\r\n\r\n'
+        data = b'\r\n'.join(SSDP_NOTIFY_1) + b'\r\n\r\n'
         self.proto.datagramReceived(data, ('10.20.30.40', 1234))
         service1 = self.proto.known[USN_1]
         last_seen1 = service1['last-seen']
@@ -77,59 +77,55 @@ class TestSSDP(unittest.TestCase):
         self.assertLess(last_seen1, last_seen2 + 0.5)
 
     def test_doNotify(self):
-        data = '\r\n'.join(SSDP_NOTIFY_1) + '\r\n\r\n'
+        data = b'\r\n'.join(SSDP_NOTIFY_1) + b'\r\n\r\n'
         self.proto.datagramReceived(data, ('10.20.30.40', 1234))
         self.assertEqual(self.tr.written, [])
-        self.proto.doNotify(b'uuid:e711a4bf::upnp:rootdevice')
-        expected = [(l + '\r\n') for l in [
-            'NOTIFY * HTTP/1.1',
-            'HOST: 239.255.255.250:1900',
-            'NT: upnp:rootdevice',
-            'NTS: ssdp:alive',
-            'EXT: ',
-            'LOCATION: http://10.10.222.94:2869/upnp?content=uuid:e711a4bf',
-            'USN: ' + USN_1,
-            'CACHE-CONTROL: max-age=1842',
-            'SERVER: Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0',
-            ''
-        ]]
+        self.proto.doNotify('uuid:e711a4bf::upnp:rootdevice')
+        expected = [
+            b'\r\n',
+            b'CACHE-CONTROL: max-age=1842\r\n',
+            b'EXT: \r\n',
+            b"HOST: '239.255.255.250':1900\r\n",
+            b'LOCATION: http://10.10.222.94:2869/upnp?content=uuid:e711a4bf\r\n',
+            b'NOTIFY * HTTP/1.1\r\n',
+            b'NT: upnp:rootdevice\r\n',
+            b'NTS: ssdp:alive\r\n',
+            b'SERVER: Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0\r\n',
+            b'USN: ' + USN_1.encode('ascii') + b'\r\n']
         # :fixme: What is the reason the notification is send twice?
         self.assertEqual(len(self.tr.written), 2)
         self.assertEqual(self.tr.written[0], self.tr.written[1])
         data, (host, port) = self.tr.written[0]
         self.assertEqual(
             (host, port),
-            (bytes(SSDP_ADDR, encoding='utf-8'),
-             bytes(str(SSDP_PORT), encoding='utf-8')))
+            (SSDP_ADDR, SSDP_PORT))
         recieved = data.splitlines(True)
         self.assertEqual(
             sorted(recieved),
-            sorted([bytes(str(i), encoding='utf-8') for i in expected]))
+            sorted(expected))
 
     def test_doByebye(self):
-        data = '\r\n'.join(SSDP_NOTIFY_1) + '\r\n\r\n'
+        data = b'\r\n'.join(SSDP_NOTIFY_1) + b'\r\n\r\n'
         self.proto.datagramReceived(data, ('10.20.30.40', 1234))
         self.assertEqual(self.tr.written, [])
-        self.proto.doByebye(b'uuid:e711a4bf::upnp:rootdevice')
-        expected = [(l + '\r\n') for l in [
-            'NOTIFY * HTTP/1.1',
-            'HOST: 239.255.255.250:1900',
-            'NT: upnp:rootdevice',
-            'NTS: ssdp:byebye',
-            'EXT: ',
-            'LOCATION: http://10.10.222.94:2869/upnp?content=uuid:e711a4bf',
-            'USN: ' + USN_1,
-            'CACHE-CONTROL: max-age=1842',
-            'SERVER: Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0',
-            ''
-        ]]
+        self.proto.doByebye('uuid:e711a4bf::upnp:rootdevice')
+        expected = [
+            b'\r\n',
+            b'CACHE-CONTROL: max-age=1842\r\n',
+            b'EXT: \r\n',
+            b"HOST: '239.255.255.250':1900\r\n",
+            b'LOCATION: http://10.10.222.94:2869/upnp?content=uuid:e711a4bf\r\n',
+            b'NOTIFY * HTTP/1.1\r\n',
+            b'NT: upnp:rootdevice\r\n',
+            b'NTS: ssdp:byebye\r\n',
+            b'SERVER: Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0\r\n',
+            b'USN: ' + USN_1.encode('ascii') + b'\r\n']
         self.assertEqual(len(self.tr.written), 1)
         data, (host, port) = self.tr.written[0]
         self.assertEqual(
             (host, port),
-            (bytes(SSDP_ADDR, encoding='utf-8'),
-             bytes(str(SSDP_PORT), encoding='utf-8')))
+            (SSDP_ADDR, SSDP_PORT))
         recieved = data.splitlines(True)
         self.assertEqual(
             sorted(recieved),
-            sorted([bytes(str(i), encoding='utf-8') for i in expected]))
+            sorted(expected))

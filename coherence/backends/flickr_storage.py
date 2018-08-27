@@ -450,12 +450,12 @@ class FlickrStore(BackendStore):
 
         ignore_patterns = kwargs.get('ignore_patterns', [])
         ignore_file_pattern = re.compile(
-            '|'.join(['^\..*'] + list(ignore_patterns)))
+            r'|'.join([r'^\..*'] + list(ignore_patterns)))
 
         self.wmc_mapping = {'16': 0}
 
         self.update_id = 0
-        self.flickr = Proxy('http://api.flickr.com/services/xmlrpc/')
+        self.flickr = Proxy(b'http://api.flickr.com/services/xmlrpc/')
         self.flickr_api_key = '837718c8a622c699edab0ea55fcec224'
         self.flickr_api_secret = '30a684822c341c3c'
         self.store = {}
@@ -1252,10 +1252,8 @@ class FlickrStore(BackendStore):
         fields['photo'] = image
 
         (content_type, formdata) = self.encode_multipart_form(fields)
-        headers = {b"Content-Type": bytes(
-            content_type, encoding='utf-8'),
-            b"Content-Length": bytes(
-                str(len(formdata)), encoding='utf-8')}
+        headers = {b"Content-Type": content_type.encode('ascii'),
+            b"Content-Length": str(len(formdata)).encode('ascii')}
 
         d = getPage(b"http://api.flickr.com/services/upload/",
                     method=b"POST",

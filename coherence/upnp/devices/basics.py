@@ -28,14 +28,18 @@ class DeviceHttpRoot(resource.Resource, log.Loggable):
         self.info('DeviceHttpRoot %s getChildWithDefault %s %s %s',
                   self.server.device_type, path, request.uri, request.client)
         self.info(request.getAllHeaders())
+        if isinstance(path, bytes):
+            path = path.decode('utf-8')
         if path in self.children:
             return self.children[path]
-        if request.uri == '/':
+        if request.uri == b'/':
             return self
         return self.getChild(path, request)
 
     def getChild(self, name, request):
         self.info('DeviceHttpRoot %s getChild %s', name, request)
+        if isinstance(name, bytes):
+            name = name.decode('utf-8')
         ch = None
         if ch is None:
             p = util.sibpath(__file__, name)

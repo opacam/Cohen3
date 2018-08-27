@@ -45,6 +45,8 @@ class SimpleRoot(resource.Resource, log.Loggable):
 
     def getChild(self, name, request):
         self.debug('SimpleRoot getChild %s, %s', name, request)
+        if isinstance(name, bytes):
+            name = name.decode('utf-8')
         if name == 'oob':
             """ we have an out-of-band request """
             return static.File(
@@ -61,10 +63,10 @@ class SimpleRoot(resource.Resource, log.Loggable):
         try:
             return self.coherence.children[name]
         except:
-            self.warning("Cannot find device for requested name: %s", name)
+            self.warning("Cannot find device for requested name: %r", name)
             request.setResponseCode(404)
             return static.Data(
-                '<html><p>No device for requested UUID: %s</p></html>' % name,
+                b'<html><p>No device for requested UUID: %s</p></html>' % name.encode('ascii'),
                 'text/html')
 
     def listchilds(self, uri):
@@ -88,10 +90,10 @@ class SimpleRoot(resource.Resource, log.Loggable):
         result = """<html>
     <head><title>Coherence</title></head>
     <body><a href="http://coherence.beebits.net">Coherence</a> - a Python DLNA/UPnP framework for the Digital Living
-    <p>Hosting:<ul>%s</ul></p>
+    <p>Hosting:<ul>%r</ul></p>
     </body>
-    </html>""" % self.listchilds(request.uri)
-        return result.encode('utf-8')
+    </html>""" % self.listchilds(request.uri.encode('utf-8'))
+        return result
 
 
 class WebServer(log.Loggable):
@@ -104,7 +106,7 @@ class WebServer(log.Loggable):
 
         coherence.web_server_port = self.port.getHost().port
 
-        self.warning("WebServer on port %d ready", coherence.web_server_port)
+        self.warning("WebServer on port %r ready", coherence.web_server_port)
 
 
 class Plugins(log.Loggable):

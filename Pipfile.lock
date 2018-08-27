@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "397f46d3fc4bc10008a1856e7dffc33e100fd3e458dfb2647117386a15d2e3d1"
+            "sha256": "136d56b6965712e61e4f5d50bf8ba2b73914a8a05b1aa46141211a7943bc5588"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -150,12 +150,8 @@
             "version": "==3.1.1"
         },
         "gdata": {
-            "hashes": [
-                "sha256:33639ec575854c7fb51f92b981259ad22dbbc7ec54f29750c8ac72dd51431e43",
-                "sha256:56e7d22de819c22b13ceb0fe1869729b4287f89ebbd4bb55380d7bcf61a1fdb6"
-            ],
-            "index": "pypi",
-            "version": "==2.0.18"
+            "git": "https://github.com/dvska/gdata-python3",
+            "ref": "5cc5a83a469d87f804d1fda8760ec76bcb6050c9"
         },
         "hyperlink": {
             "hashes": [
@@ -248,6 +244,20 @@
             "index": "pypi",
             "version": "==1.3.7"
         },
+        "pyasn1": {
+            "hashes": [
+                "sha256:b9d3abc5031e61927c82d4d96c1cec1e55676c1a991623cfed28faea73cdd7ca",
+                "sha256:f58f2a3d12fd754aa123e9fa74fb7345333000a035f3921dbdaa08597aa53137"
+            ],
+            "version": "==0.4.4"
+        },
+        "pyasn1-modules": {
+            "hashes": [
+                "sha256:a0cf3e1842e7c60fde97cb22d275eb6f9524f5c5250489e292529de841417547",
+                "sha256:a38a8811ea784c0136abfdba73963876328f66172db21a05a82f9515909bfb4e"
+            ],
+            "version": "==0.2.2"
+        },
         "pycairo": {
             "hashes": [
                 "sha256:0f0a35ec923d87bc495f6753b1e540fd046d95db56a35250c44089fbce03b698"
@@ -302,6 +312,13 @@
             "index": "pypi",
             "version": "==2.19.1"
         },
+        "service-identity": {
+            "hashes": [
+                "sha256:0e76f3c042cc0f5c7e6da002cf646f59dc4023962d1d1166343ce53bdad39e17",
+                "sha256:4001fbb3da19e0df22c47a06d29681a398473af4aa9d745eca525b3b2c2302ab"
+            ],
+            "version": "==17.0.0"
+        },
         "singledispatch": {
             "hashes": [
                 "sha256:5b06af87df13818d14f08a028e42f566640aef80805c3b50c5056b086e3c2b9c",
@@ -317,6 +334,14 @@
             ],
             "index": "pypi",
             "version": "==1.11.0"
+        },
+        "treq": {
+            "hashes": [
+                "sha256:91e09ff6b524cc90aa5e934b909c8d0d1a9d36ebd618b6c38e37b17013e69f48",
+                "sha256:b936621beee3af98eca6dd74e0a8f939d8163c50714466a4994d22983a713ec2"
+            ],
+            "index": "pypi",
+            "version": "==18.6.0"
         },
         "twisted": {
             "hashes": [
