@@ -62,7 +62,7 @@
             <dataType>i4</dataType>
         </stateVariable>
     </serviceStateTable>
-<actionList>
+    <actionList>
         <action>
             <name>GetProtocolInfo</name>
             <argumentList>
