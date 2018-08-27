@@ -355,7 +355,16 @@ class Service(log.Loggable):
     def parse_actions(self):
 
         def gotPage(x):
-            self.scpdXML, headers = x
+            if isinstance(x, tuple):
+                self.scpdXML, headers = x
+                processPage(self.scpdXML)
+            else:
+                headers = x.headers.getAllRawHeaders()
+                content = x.content()
+                content.addCallback(processPage)
+
+        def processPage(scpdXML):
+            self.scpdXML = scpdXML
             try:
                 tree = etree.fromstring(self.scpdXML)
             except Exception as e:
@@ -364,9 +373,11 @@ class Service(log.Loggable):
                         self.get_scpd_url(), e))
                 return
             ns = UPNP_SERVICE_NS
+            print('processPage tree is: {}'.format(tree))
 
             for action_node in tree.findall('.//{%s}action' % ns):
                 name = action_node.findtext('{%s}name' % ns)
+                print('\t->processing action: {}'.format(name))
                 arguments = []
                 for argument in action_node.findall('.//{%s}argument' % ns):
                     arg_name = argument.findtext('{%s}name' % ns)
@@ -401,7 +412,7 @@ class Service(log.Loggable):
                 """
                 self._variables.get(instance)[name].has_vendor_values = True
 
-            # print 'service parse:', self, self.device
+            # print('service parse:', self, self.device)
             self.detection_completed = True
             louie.send('Coherence.UPnP.Service.detection_completed',
                        sender=self.device, device=self.device)
@@ -1006,7 +1017,7 @@ class scpdXML(static.Data):
     def __init__(self, server, control=None):
         self.service_server = server
         self.control = control
-        static.Data.__init__(self, None, 'text/xml')
+        static.Data.__init__(self, b'', 'text/xml')
 
     def render(self, request):
         if self.data is None:

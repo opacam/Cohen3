@@ -37,7 +37,7 @@ class SOAPProxy(log.Loggable):
 
     def callRemote(self, soapmethod, arguments):
         soapaction = soapmethod or self.soapaction
-        url_bytes = bytes(self.url, encoding='utf-8')
+        url_bytes = self.url.encode('ascii')
         if '#' not in soapaction:
             soapaction = '#'.join((self.namespace[1], soapaction))
         self.action = soapaction.split('#')[1]
@@ -46,8 +46,7 @@ class SOAPProxy(log.Loggable):
                   self.namespace, self.action)
 
         headers = {b'content-type': b'text/xml ;charset="utf-8"',
-                   b'SOAPACTION': bytes('"%s"' % soapaction,
-                                        encoding='utf-8'), }
+                   b'SOAPACTION': '"{}"'.format(soapaction).encode('ascii'), }
         if 'headers' in arguments:
             headers.update(arguments['headers'])
             del arguments['headers']

@@ -26,7 +26,7 @@ std_headers = {
     'Accept-Language': 'en-us,en;q=0.5',
 }
 
-simple_title_chars = string.ascii_letters.decode('ascii') + string.digits.decode('ascii')
+simple_title_chars = string.ascii_letters + string.digits
 
 
 def preferredencoding():

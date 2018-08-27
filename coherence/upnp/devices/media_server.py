@@ -34,9 +34,9 @@ from coherence.upnp.services.servers.media_receiver_registrar_server import \
 from coherence.upnp.services.servers.scheduled_recording_server import \
     ScheduledRecordingServer
 
-COVER_REQUEST_INDICATOR = re.compile(".*?cover\.[A-Z|a-z]{3,4}$")
-ATTACHMENT_REQUEST_INDICATOR = re.compile(".*?attachment=.*$")
-TRANSCODED_REQUEST_INDICATOR = re.compile(".*/transcoded/.*$")
+COVER_REQUEST_INDICATOR = re.compile(b".*?cover\.[A-Z|a-z]{3,4}$")
+ATTACHMENT_REQUEST_INDICATOR = re.compile(b".*?attachment=.*$")
+TRANSCODED_REQUEST_INDICATOR = re.compile(b".*/transcoded/.*$")
 
 
 class MSRoot(resource.Resource, log.Loggable):
@@ -53,19 +53,25 @@ class MSRoot(resource.Resource, log.Loggable):
                   self.server.device_type, request.method,
                   path, request.uri, request.client)
         headers = request.getAllHeaders()
+        if isinstance(path, bytes):
+            path = path.decode('utf-8')
+        if path.endswith('\''):
+            self.warning('\t modified wrong path from {} to {}'.format(
+                path, path[:-1]))
+            path = path[:-1]
         self.msg(request.getAllHeaders())
 
         try:
-            if headers['getcontentfeatures.dlna.org'] != '1':
+            if headers[b'getcontentfeatures.dlna.org'] != '1':
                 request.setResponseCode(400)
                 return static.Data(
-                    '<html><p>wrong value for getcontentFeatures.dlna.org</p></html>',
+                    b'<html><p>wrong value for getcontentFeatures.dlna.org</p></html>',
                     'text/html')
         except:
             pass
 
-        if request.method == 'HEAD':
-            if 'getcaptioninfo.sec' in headers:
+        if request.method == b'HEAD':
+            if b'getcaptioninfo.sec' in headers:
                 self.warning("requesting srt file for id %s", path)
                 ch = self.store.get_by_id(path)
                 try:
@@ -74,20 +80,20 @@ class MSRoot(resource.Resource, log.Loggable):
                     if caption is None:
                         raise KeyError
                     request.setResponseCode(200)
-                    request.setHeader('CaptionInfo.sec', caption)
-                    return static.Data('', 'text/html')
+                    request.setHeader(b'CaptionInfo.sec', caption)
+                    return static.Data(b'', 'text/html')
                 except:
                     print(traceback.format_exc())
                     request.setResponseCode(404)
                     return static.Data(
-                        '<html><p>the requested srt file was not found</p></html>',
+                        b'<html><p>the requested srt file was not found</p></html>',
                         'text/html')
 
         try:
-            request._dlna_transfermode = headers['transfermode.dlna.org']
+            request._dlna_transfermode = headers[b'transfermode.dlna.org']
         except KeyError:
-            request._dlna_transfermode = 'Streaming'
-        if request.method in ('GET', 'HEAD'):
+            request._dlna_transfermode = b'Streaming'
+        if request.method in (b'GET', b'HEAD'):
             if COVER_REQUEST_INDICATOR.match(request.uri):
                 self.info("request cover for id %s", path)
 
@@ -100,7 +106,7 @@ class MSRoot(resource.Resource, log.Loggable):
                             return StaticFile(file)
                     request.setResponseCode(404)
                     return static.Data(
-                        '<html><p>cover requested not found</p></html>',
+                        b'<html><p>cover requested not found</p></html>',
                         'text/html')
 
                 dfr = defer.maybeDeferred(self.store.get_by_id, path)
@@ -135,12 +141,12 @@ class MSRoot(resource.Resource, log.Loggable):
                                     self.debug(traceback.format_exc())
                                 request.setResponseCode(404)
                                 return static.Data(
-                                    '<html><p>the requested transcoded file was not found</p></html>',
+                                    b'<html><p>the requested transcoded file was not found</p></html>',
                                     'text/html')
                             else:
                                 request.setResponseCode(404)
                                 return static.Data(
-                                    "<html><p>This MediaServer doesn't support transcoding</p></html>",
+                                    b"<html><p>This MediaServer doesn't support transcoding</p></html>",
                                     'text/html')
                         else:
                             return ch.item.attachments[
@@ -148,7 +154,7 @@ class MSRoot(resource.Resource, log.Loggable):
                     except:
                         request.setResponseCode(404)
                         return static.Data(
-                            '<html><p>the requested attachment was not found</p></html>',
+                            b'<html><p>the requested attachment was not found</p></html>',
                             'text/html')
 
                 dfr = defer.maybeDeferred(self.store.get_by_id, path)
@@ -157,13 +163,13 @@ class MSRoot(resource.Resource, log.Loggable):
                 return dfr
 
         if request.method in (
-        'GET', 'HEAD') and TRANSCODED_REQUEST_INDICATOR.match(request.uri):
+                b'GET', b'HEAD') and TRANSCODED_REQUEST_INDICATOR.match(request.uri):
             self.info("request transcoding to %s for id %s",
-                      request.uri.split('/')[-1], path)
+                      request.uri.split(b'/')[-1], path)
             if self.server.coherence.config.get('transcoding', 'no') == 'yes':
                 def got_stuff_to_transcode(ch):
                     # FIXME create a generic transcoder class and sort the details there
-                    format = request.uri.split('/')[
+                    format = request.uri.split(b'/')[
                         -1]  # request.args['transcoded'][0]
                     uri = ch.get_path()
                     try:
@@ -174,7 +180,7 @@ class MSRoot(resource.Resource, log.Loggable):
                         self.debug(traceback.format_exc())
                         request.setResponseCode(404)
                         return static.Data(
-                            '<html><p>the requested transcoded file was not found</p></html>',
+                            b'<html><p>the requested transcoded file was not found</p></html>',
                             'text/html')
 
                 dfr = defer.maybeDeferred(self.store.get_by_id, path)
@@ -184,10 +190,10 @@ class MSRoot(resource.Resource, log.Loggable):
 
             request.setResponseCode(404)
             return static.Data(
-                "<html><p>This MediaServer doesn't support transcoding</p></html>",
+                b"<html><p>This MediaServer doesn't support transcoding</p></html>",
                 'text/html')
 
-        if request.method == 'POST' and request.uri.endswith('?import'):
+        if request.method == b'POST' and request.uri.endswith(b'?import'):
             d = self.import_file(path, request)
             if isinstance(d, defer.Deferred):
                 d.addBoth(self.import_response, path)
@@ -195,10 +201,10 @@ class MSRoot(resource.Resource, log.Loggable):
                 return d
             return self.import_response(None, path)
 
-        if ('user-agent' in headers and
-                (headers['user-agent'].find('Xbox/') == 0 or  # XBox
-                 headers['user-agent'].startswith(
-                     """Mozilla/4.0 (compatible; UPnP/1.0; Windows""")) and  # wmp11
+        if (b'user-agent' in headers and
+                (headers[b'user-agent'].find(b'Xbox/') == 0 or  # XBox
+                 headers[b'user-agent'].startswith(
+                     b"""Mozilla/4.0 (compatible; UPnP/1.0; Windows""")) and  # wmp11
                 path in ['description-1.xml', 'description-2.xml']):
             self.info(
                 'XBox/WMP alert, we need to simulate a Windows Media Connect server')
@@ -219,16 +225,16 @@ class MSRoot(resource.Resource, log.Loggable):
                 msg = "<plugin active=\"yes\">"
                 msg += "<backend>" + backend_type + "</backend>"
                 for key, value in list(backend.config.items()):
-                    msg += "<" + key + ">" + value + "</" + key + ">"
+                    msg += "<" + key + ">" + str(value )+ "</" + key + ">"
                 msg += "</plugin>"
-                return msg
+                return msg.encode('ascii')
 
-            if request.method in ('GET', 'HEAD'):
+            if request.method in (b'GET', b'HEAD'):
                 # the client wants to retrieve the configuration parameters for the backend
                 msg = constructConfigData(backend)
                 request.setResponseCode(200)
                 return static.Data(msg, 'text/xml')
-            elif request.method in ('POST'):
+            elif request.method in (b'POST'):
                 # the client wants to update the configuration parameters for the backend
                 # we relaunch the backend with the new configuration (after content validation)
 
@@ -269,22 +275,22 @@ class MSRoot(resource.Resource, log.Loggable):
                         else:
                             msg = "<html><p>Device restarted. Config file not modified</p></html>"  # constructConfigData(new_backend)
                     request.setResponseCode(202)
-                    return static.Data(msg, 'text/html')  # 'text/xml')
+                    return static.Data(msg.encode('ascii'), 'text/html')
                 except SyntaxError as e:
                     request.setResponseCode(400)
                     return static.Data(
-                        "<html><p>Invalid data posted:<BR>%s</p></html>" % e,
+                        "<html><p>Invalid data posted:<BR>{}</p></html>".format(e).encode('ascii'),
                         'text/html')
             else:
                 # invalid method requested
                 request.setResponseCode(405)
                 return static.Data(
-                    "<html><p>This resource does not allow the requested HTTP method</p></html>",
+                    b"<html><p>This resource does not allow the requested HTTP method</p></html>",
                     'text/html')
 
         if path in self.children:
             return self.children[path]
-        if request.uri == '/':
+        if request.uri == b'/':
             return self
         return self.getChild(path, request)
 
@@ -340,15 +346,15 @@ class MSRoot(resource.Resource, log.Loggable):
     def process_child(self, ch, name, request):
         if ch is not None:
             self.info('Child found %s', ch)
-            if (request.method == 'GET' or
-                    request.method == 'HEAD'):
+            if (request.method == b'GET' or
+                    request.method == b'HEAD'):
                 headers = request.getAllHeaders()
-                if 'content-length' in headers:
+                if b'content-length' in headers:
                     self.warning(
                         '%s request with content-length %s header - sanitizing',
                         request.method,
-                        headers['content-length'])
-                    del request.received_headers['content-length']
+                        headers[b'content-length'])
+                    del request.received_headers[b'content-length']
                 self.debug('data', )
                 if len(request.content.getvalue()) > 0:
                     """ shall we remove that?
@@ -388,6 +394,7 @@ class MSRoot(resource.Resource, log.Loggable):
 
         if ch is None:
             p = util.sibpath(__file__, name)
+            self.debug('checking if msroot is file: %r', p)
             if os.path.exists(p):
                 ch = StaticFile(p)
         self.info('MSRoot ch %s', ch)
@@ -396,6 +403,7 @@ class MSRoot(resource.Resource, log.Loggable):
     def getChild(self, name, request):
         self.info('getChild %s, %s', name, request)
         ch = self.store.get_by_id(name)
+        self.info('\t-child is: %r', ch)
         if isinstance(ch, defer.Deferred):
             ch.addCallback(self.process_child, name, request)
             # ch.addCallback(self.delayed_response, request)
@@ -404,15 +412,15 @@ class MSRoot(resource.Resource, log.Loggable):
 
     def list_content(self, name, item, request):
         self.info('list_content %s %s %s', name, item, request)
-        page = """<html><head><title>%s</title></head><body><p>%s</p>""" % \
+        page = b"""<html><head><title>%s</title></head><body><p>%s</p>""" % \
                (item.get_name().encode('ascii', 'xmlcharrefreplace'),
                 item.get_name().encode('ascii', 'xmlcharrefreplace'))
 
         if (hasattr(item, 'mimetype') and item.mimetype in ['directory',
                                                             'root']):
             uri = request.uri
-            if uri[-1] != '/':
-                uri += '/'
+            if uri[-1] != b'/':
+                uri += b'/'
 
             def build_page(r, page):
                 # print "build_page", r
@@ -432,7 +440,7 @@ class MSRoot(resource.Resource, log.Loggable):
                                     'ascii', 'xmlcharrefreplace')
                             self.debug('has get_path %s', path)
                         else:
-                            path = request.uri.split('/')
+                            path = request.uri.split(b'/')
                             path[-1] = str(c.get_id())
                             path = '/'.join(path)
                             self.debug('got path %s', path)
@@ -452,7 +460,7 @@ class MSRoot(resource.Resource, log.Loggable):
                                 (path, title)
                 page += """</ul>"""
                 page += """</body></html>"""
-                return static.Data(page, 'text/html')
+                return static.Data(page.encode('ascii'), 'text/html')
 
             children = item.get_children()
             if isinstance(children, defer.Deferred):
@@ -473,20 +481,20 @@ class MSRoot(resource.Resource, log.Loggable):
         else:
             pass
         page += """</body></html>"""
-        return static.Data(page, 'text/html')
+        return static.Data(page.encode('ascii'), 'text/html')
 
     def listchilds(self, uri):
         self.info('listchilds %s', uri)
-        if uri[-1] != '/':
-            uri += '/'
-        cl = '<p><a href=%s0>content</a></p>' % uri
-        cl += '<li><a href=%sconfig>config</a></li>' % uri
+        if uri[-1] != b'/':
+            uri += b'/'
+        cl = b'<p><a href=%s0>content</a></p>' % uri
+        cl += b'<li><a href=%sconfig>config</a></li>' % uri
         for c in self.children:
-            cl += '<li><a href=%s%s>%s</a></li>' % (uri, c, c)
+            cl += b'<li><a href=%s%s>%s</a></li>' % (uri, c, c)
         return cl
 
     def import_response(self, result, id):
-        return static.Data('<html><p>import of %s finished</p></html>' % id,
+        return static.Data(b'<html><p>import of %r finished</p></html>' % id,
                            'text/html')
 
     def render(self, request):

@@ -54,7 +54,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
     def render(self, request):
         return '<html><p>root of the ContentDirectory</p><p><ul>%s</ul></p></html>' % self.listchilds(
-            request.uri)
+            request.uri.decode('utf-8'))
 
     def upnp_Search(self, *args, **kwargs):
         ContainerID = kwargs['ContainerID']

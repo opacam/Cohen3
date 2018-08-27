@@ -40,12 +40,15 @@ class JsonInterface(resource.Resource, log.Loggable):
         self.warning('do_the_render, %s, %s, %s %r %s', request.method,
                      request.path, request.uri, request.args, request.client)
         msg = "Houston, we've got a problem"
+        path = request.path
+        if isinstance(path, bytes):
+            path = path.encode('utf-8')
         path = request.path.split('/')
         path = path[2:]
         self.warning('path %r', path)
-        if request.method in ('GET', 'POST'):
+        if request.method in (b'GET', b'POST'):
             request.postpath = None
-            if request.method == 'GET':
+            if request.method == b'GET':
                 if path[0] == 'devices':
                     return self.list_devices(request)
                 else:
@@ -68,7 +71,9 @@ class JsonInterface(resource.Resource, log.Loggable):
                         msg = "device with id %r not found" % path[0]
 
         request.setResponseCode(404, message=msg)
-        return static.Data("<html><p>%s</p></html>" % msg, 'text/html')
+        return static.Data(
+            "<html><p>{}</p></html>".format(msg).encode('ascii'),
+            'text/html')
 
     def list_devices(self, request):
         devices = []
@@ -88,7 +93,7 @@ class JsonInterface(resource.Resource, log.Loggable):
         def fail(f):
             request.setResponseCode(404)
             return static.Data(
-                "<html><p>Houston, we've got a problem</p></html>", 'text/html')
+                b"<html><p>Houston, we've got a problem</p></html>", 'text/html')
 
         d = action.call(**kwargs)
         d.addCallback(to_json)

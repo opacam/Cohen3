@@ -320,7 +320,7 @@ def subscribe(service, action='subscribe'):
         request.append("Content-Length: 0")
         request.append("")
         request.append("")
-        request = bytes('\r\n'.join(request), encoding='utf-8')
+        request = '\r\n'.join(request).encode('ascii')
         logger.debug("event.subscribe.send_request %r %r", request, p)
         try:
             p.transport.writeSomeData(request)
@@ -342,7 +342,7 @@ def subscribe(service, action='subscribe'):
     def prepare_connection(service, action):
         logger.info("event.subscribe.prepare_connection action: %r %r",
                     action, service.event_connection)
-        if service.event_connection == None:
+        if service.event_connection is None:
             c = ClientCreator(reactor, EventProtocol, service=service,
                               action=action)
             logger.info("event.subscribe.prepare_connection: %r %r",
