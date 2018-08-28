@@ -151,8 +151,10 @@ class Loggable(object):
         global loggers
         if loggers.get(self.logCategory):
             self._logger = loggers.get(self.logCategory)
+            self._logger.propagate = False
         else:
             self._logger = logging.getLogger(self.logCategory)
+            self._logger.propagate = False
             loggers[self.logCategory] = self._logger
             self.debug('Added logger with logCategory: {}'.format(
                 self.logCategory))
@@ -184,7 +186,14 @@ class Loggable(object):
     msg = info
 
 
-getLogger = logging.getLogger
+def getLogger(logCategory):
+    global loggers
+    if loggers.get(logCategory):
+        log = loggers.get(logCategory)
+    else:
+        log = logging.getLogger(logCategory)
+    log.propagate = False
+    return log
 
 
 def init(logfilename=None, loglevel=logging.WARN):
@@ -193,6 +202,7 @@ def init(logfilename=None, loglevel=logging.WARN):
         return loggers.get('coherence')
     else:
         logger = logging.getLogger()
+        logger.propagate = False
         logging.addLevelName(100, 'NONE')
 
         logging.basicConfig(
