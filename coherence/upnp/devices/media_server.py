@@ -515,7 +515,7 @@ class RootDeviceXML(static.Data):
         uuid = str(uuid)
         root = etree.Element('root', nsmap={None: xml_constants.UPNP_DEVICE_NS})
         device_type = 'urn:schemas-upnp-org:device:%s:%d' % (
-        device_type, int(version))
+            device_type, int(version))
         e = etree.SubElement(root, 'specVersion')
         etree.SubElement(e, 'major').text = '1'
         etree.SubElement(e, 'minor').text = '0'
@@ -607,14 +607,14 @@ class RootDeviceXML(static.Data):
                 except:
                     namespace = 'upnp-org'
 
-        etree.SubElement(s, 'serviceId').text = \
-            'urn:%s:serviceId:%s' % (namespace, id)
-        etree.SubElement(s, 'SCPDURL').text = \
-            '/' + uuid[5:] + '/' + id + '/' + service.scpd_url
-        etree.SubElement(s, 'controlURL').text = \
-            '/' + uuid[5:] + '/' + id + '/' + service.control_url
-        etree.SubElement(s, 'eventSubURL').text = \
-            '/' + uuid[5:] + '/' + id + '/' + service.subscription_url
+                etree.SubElement(s, 'serviceId').text = \
+                    'urn:%s:serviceId:%s' % (namespace, id)
+                etree.SubElement(s, 'SCPDURL').text = \
+                    '/' + uuid[5:] + '/' + id + '/' + service.scpd_url
+                etree.SubElement(s, 'controlURL').text = \
+                    '/' + uuid[5:] + '/' + id + '/' + service.control_url
+                etree.SubElement(s, 'eventSubURL').text = \
+                    '/' + uuid[5:] + '/' + id + '/' + service.subscription_url
 
         if devices:
             etree.SubElement(d, 'deviceList')
