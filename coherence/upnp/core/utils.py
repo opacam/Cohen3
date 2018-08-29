@@ -130,7 +130,6 @@ def get_ip_address(ifname):
     import struct
 
     system_type = uname()[0]
-
     if system_type == "Linux":
         SIOCGIFADDR = 0x8915
     else:
@@ -138,13 +137,15 @@ def get_ip_address(ifname):
 
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        return socket.inet_ntoa(fcntl.ioctl(
+        ip = socket.inet_ntoa(fcntl.ioctl(
             s.fileno(),
             SIOCGIFADDR,
-            struct.pack('256s', ifname[:15])
+            struct.pack(b'256s', ifname[:15].encode('ascii'))
         )[20:24])
     except:
-        return '127.0.0.1'
+        ip = '127.0.0.1'
+    # print('ip is: {}'.format(ip))
+    return ip
 
 
 def get_host_address():
