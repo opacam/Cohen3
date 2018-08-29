@@ -242,31 +242,36 @@ class Request(server.Request):
         self.site = self.channel.site
 
         # set various default headers
-        self.setHeader('server', SERVER_ID)
-        self.setHeader('date', http.datetimeToString())
-        self.setHeader('content-type', "text/html")
+        self.setHeader(b'server', SERVER_ID.encode('ascii'))
+        self.setHeader(b'date', http.datetimeToString())
+        self.setHeader(b'content-type', b"text/html")
 
         # Resource Identification
-        url = str(self.path)
+        url = self.path
+        if isinstance(url, bytes):
+            url = url.decode('utf-8')
 
         # remove trailing "/", if ever
         url = url.rstrip('/')
 
         scheme, netloc, path, query, fragment = urlsplit(url)
+        clean_path = path[1:]
         self.prepath = []
         if path == "":
             self.postpath = []
         else:
-            self.postpath = list(map(unquote, path[1:].split('/')))
-
+            raw_p = list(map(unquote, clean_path.split('/')))
+            self.postpath = list(i.encode('ascii') for i in raw_p)
         try:
             def deferred_rendering(r):
                 self.render(r)
 
             resrc = self.site.getResourceFor(self)
             if resrc is None:
-                self.setResponseCode(http.NOT_FOUND,
-                                     "Error: No resource for path %s" % path)
+                self.setResponseCode(
+                    http.NOT_FOUND,
+                    "Error: No resource for path {}".format(
+                        path).encode('ascii'))
                 self.finish()
             elif isinstance(resrc, defer.Deferred):
                 resrc.addCallback(deferred_rendering)
@@ -274,7 +279,8 @@ class Request(server.Request):
             else:
                 self.render(resrc)
 
-        except:
+        except Exception as e:
+            logger.error('Error on render Request: {}'.format(e))
             self.processingFailed(failure.Failure())
 
 
