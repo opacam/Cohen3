@@ -38,7 +38,7 @@ class Reception(object):
         if obj is not None:
             return obj
         else:
-            obj = super(Reception, cls).__new__(cls, *args, **kwargs)
+            obj = super(Reception, cls).__new__(cls)
             cls._instance_ = obj
             return obj
 
