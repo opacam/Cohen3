@@ -44,14 +44,19 @@ class Service(log.Loggable):
     def __init__(self, service_type, service_id, location, control_url,
                  event_sub_url, presentation_url, scpd_url, device):
         log.Loggable.__init__(self)
+        self.debug('Service.__init__: ...')
 
         self.service_type = service_type
         self.detection_completed = False
         self.id = service_id
-        self.control_url = control_url
-        self.event_sub_url = event_sub_url
-        self.presentation_url = presentation_url
-        self.scpd_url = scpd_url
+        self.control_url = control_url if isinstance(location, bytes) else \
+            control_url.encode('ascii') if control_url else None
+        self.event_sub_url = event_sub_url if isinstance(event_sub_url, bytes) else \
+            event_sub_url.encode('ascii') if event_sub_url else None
+        self.presentation_url = presentation_url if isinstance(presentation_url, bytes) else \
+            presentation_url.encode('ascii') if presentation_url else None
+        self.scpd_url = scpd_url if isinstance(scpd_url, bytes) else \
+            scpd_url.encode('ascii') if scpd_url else None
         self.device = device
         self._actions = {}
         self._variables = {0: {}}
@@ -63,9 +68,11 @@ class Service(log.Loggable):
         self.last_time_updated = None
 
         self.client = None
-
+        self.info('\t- parsing ...')
+        if isinstance(location, bytes):
+            location = location.decode('utf-8')
         parsed = urlparse(location)
-        self.url_base = "%s://%s" % (parsed[0], parsed[1])
+        self.url_base = "{}://{}".format(parsed[0], parsed[1]).encode('ascii')
 
         self.parse_actions()
         self.info('{} {} {} initialized'.format(
@@ -77,13 +84,15 @@ class Service(log.Loggable):
         def append(name, attribute):
             try:
                 if isinstance(attribute, tuple):
-                    if callable(attribute[0]):
+                    a0 = attribute[0] if isinstance(attribute[0], str) else \
+                        attribute[0].decode('utf-8')
+                    if callable(a0):
                         v1 = attribute[0]()
-                    elif hasattr(self, attribute[0]):
-                        v1 = getattr(self, attribute[0])
+                    elif hasattr(self, a0):
+                        v1 = getattr(self, a0)
                     else:
-                        v1 = attribute[0]
-                    if v1 in [None, 'None']:
+                        v1 = a0
+                    if v1 in [None, 'None', b'']:
                         return
                     if callable(attribute[1]):
                         v2 = attribute[1]()
@@ -91,7 +100,7 @@ class Service(log.Loggable):
                         v2 = getattr(self, attribute[1])
                     else:
                         v2 = attribute[1]
-                    if v2 in [None, 'None']:
+                    if v2 in [None, 'None', b'']:
                         return
                     if len(attribute) > 2:
                         r.append((name, (v1, v2, attribute[2])))
@@ -104,7 +113,7 @@ class Service(log.Loggable):
                     v = getattr(self, attribute)
                 else:
                     v = attribute
-                if v not in [None, 'None']:
+                if v not in [None, 'None', b'']:
                     r.append((name, v))
             except:
                 import traceback
@@ -117,13 +126,14 @@ class Service(log.Loggable):
         r.append(('Type', self.service_type))
         r.append(('ID', self.id))
         append('Service Description URL', (
-        self.scpd_url, lambda: self.device.make_fullyqualified(self.scpd_url)))
-        append('Control URL', (self.control_url,
-                               lambda: self.device.make_fullyqualified(
-                                   self.control_url), False))
-        append('Event Subscription URL', (self.event_sub_url,
-                                          lambda: self.device.make_fullyqualified(
-                                              self.event_sub_url), False))
+            self.scpd_url, lambda: self.device.make_fullyqualified(
+                self.scpd_url)))
+        append('Control URL', (
+            self.control_url, lambda: self.device.make_fullyqualified(
+                self.control_url), False))
+        append('Event Subscription URL', (
+            self.event_sub_url, lambda: self.device.make_fullyqualified(
+                self.event_sub_url), False))
 
         return r
 
@@ -140,10 +150,14 @@ class Service(log.Loggable):
     #    pass
 
     def _get_client(self, name):
+        self.debug('Service._get_client: {}'.format(name))
         url = self.get_control_url()
+        self.debug('\t- url: {}'.format(url))
         namespace = self.get_type()
         action = "%s#%s" % (namespace, name)
+        self.debug('\t- action: {}'.format(action))
         client = SOAPProxy(url, namespace=("u", namespace), soapaction=action)
+        self.debug('\t- client: {}'.format(client))
         return client
 
     def remove(self):
@@ -353,18 +367,14 @@ class Service(log.Loggable):
         self.last_time_updated = time.time()
 
     def parse_actions(self):
+        self.debug('Service.parse_actions: ...')
 
         def gotPage(x):
-            if isinstance(x, tuple):
-                self.scpdXML, headers = x
-                processPage(self.scpdXML)
+            data, headers = x
+            if isinstance(data, str):
+                self.scpdXML = data.encode('ascii')
             else:
-                headers = x.headers.getAllRawHeaders()
-                content = x.content()
-                content.addCallback(processPage)
-
-        def processPage(scpdXML):
-            self.scpdXML = scpdXML
+                self.scpdXML = data
             try:
                 tree = etree.fromstring(self.scpdXML)
             except Exception as e:
@@ -373,11 +383,11 @@ class Service(log.Loggable):
                         self.get_scpd_url(), e))
                 return
             ns = UPNP_SERVICE_NS
-            print('processPage tree is: {}'.format(tree))
+            # self.debug('processPage tree is: {}'.format(tree))
 
             for action_node in tree.findall('.//{%s}action' % ns):
                 name = action_node.findtext('{%s}name' % ns)
-                print('\t->processing action: {}'.format(name))
+                # self.debug('\t->processing action: {}'.format(name))
                 arguments = []
                 for argument in action_node.findall('.//{%s}argument' % ns):
                     arg_name = argument.findtext('{%s}name' % ns)
@@ -433,10 +443,9 @@ class Service(log.Loggable):
             louie.send('Coherence.UPnP.Service.detection_failed', self.device,
                        device=self.device)
 
-        utils.getPage(self.get_scpd_url()).addCallbacks(gotPage, gotError, None,
-                                                        None,
-                                                        [self.get_scpd_url()],
-                                                        None)
+        d = utils.getPage(self.get_scpd_url())
+        d.addCallbacks(gotPage, gotError, None, None,
+                       [self.get_scpd_url()], None)
 
 
 moderated_variables = \
@@ -465,6 +474,8 @@ class ServiceServer(log.Loggable):
         self.id = id
         self.version = version
         self.backend = backend
+        self.debug('ServiceServer.__init__: {} '
+                   '[version: {}, backend: {}]'.format(id, version, backend))
         if getattr(self, "namespace", None) is None:
             self.namespace = 'schemas-upnp-org'
         if getattr(self, "id_namespace", None) is None:
@@ -472,10 +483,11 @@ class ServiceServer(log.Loggable):
 
         self.service_type = 'urn:%s:service:%s:%d' % (
         self.namespace, id, int(self.version))
+        self.debug('\t-service_type: {}'.format(self.service_type))
 
-        self.scpd_url = 'scpd.xml'
-        self.control_url = 'control'
-        self.subscription_url = 'subscribe'
+        self.scpd_url = b'scpd.xml'
+        self.control_url = b'control'
+        self.subscription_url = b'subscribe'
         self.event_metadata = ''
         if id == 'AVTransport':
             self.event_metadata = 'urn:schemas-upnp-org:metadata-1-0/AVT/'
@@ -498,8 +510,11 @@ class ServiceServer(log.Loggable):
                 self.last_change = self._variables[0]['LastChange']
         except:
             pass
-
+        self.debug('ServiceServer.__init__: putChild {} ...wait'.format(
+            self.subscription_url))
         self.putChild(self.subscription_url, EventSubscriptionServer(self))
+        self.debug('ServiceServer.__init__: putChild {} => OK'.format(
+            self.subscription_url))
 
         self.check_subscribers_loop = task.LoopingCall(self.check_subscribers)
         self.check_subscribers_loop.start(120.0, now=False)
@@ -1012,19 +1027,23 @@ class ServiceServer(log.Loggable):
                     v.dependant_variable)
 
 
-class scpdXML(static.Data):
+class scpdXML(static.Data, log.Loggable):
+    logCategory = 'service_scpdxml'
 
     def __init__(self, server, control=None):
+        log.Loggable.__init__(self)
+        self.debug('scpdXML.__init: {}  [{}]'.format(server, control))
         self.service_server = server
         self.control = control
         static.Data.__init__(self, b'', 'text/xml')
 
     def render(self, request):
-        if self.data is None:
+        if self.data in [None, b'']:
             self.data = self.build_xml()
         return static.Data.render(self, request)
 
     def build_xml(self):
+        self.debug('scpdXML.build_xml: {}'.format(self.service_server))
         root = etree.Element('scpd',
                              nsmap={None: 'urn:schemas-upnp-org:service-1-0'})
         e = etree.SubElement(root, 'specVersion')
@@ -1132,6 +1151,7 @@ class ServiceControl(log.Loggable):
             instance = 0
 
         self.info("soap__generic %s %s %s", action, __name__, kwargs)
+        # self.debug("\t- action.name %r", action.name)
         del kwargs['soap_methodName']
         if ('X_UPnPClient' in kwargs and
                 kwargs['X_UPnPClient'] == 'XBox'):
@@ -1158,10 +1178,11 @@ class ServiceControl(log.Loggable):
             return failure.Failure(errorCode(402))
 
         def callit(*args, **kwargs):
-            # print 'callit args', args
-            # print 'callit kwargs', kwargs
+            # self.debug('callit args', args)
+            # self.debug('callit kwargs', kwargs)
             result = {}
             callback = action.get_callback()
+            # self.debug('callit callback', callback)
             if callback != None:
                 return callback(**kwargs)
             return result

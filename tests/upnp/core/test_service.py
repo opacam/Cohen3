@@ -31,7 +31,9 @@ class DummyDevice:
     def get_id(self): return "DummyDevice's ID"
 
     def make_fullyqualified(self, url):
-        return "DummyDevice's FQ-URL/" + url
+        return "DummyDevice's FQ-URL/{}".format(
+            url if isinstance(url, str) else
+            url.decode('utf-8')).encode('ascii')
 
 
 # :todo: put this into a central module
@@ -92,12 +94,12 @@ class DescriptionNotFound(unittest.TestCase):
         self.assertEqual(svc.id, 'my-service-id')
         # parameter location  goes into  url_base
         self.assertEqual(svc.control_url,
-                         'http://localhost/my-service/control')
+                         b'http://localhost/my-service/control')
         self.assertEqual(svc.event_sub_url,
-                         'http://localhost/my-service/subscribe')
+                         b'http://localhost/my-service/subscribe')
         self.assertEqual(svc.presentation_url,
-                         'http://localhost/my-service/view')
-        self.assertEqual(svc.scpd_url, 'http://localhost/my-service/scpd')
+                         b'http://localhost/my-service/view')
+        self.assertEqual(svc.scpd_url, b'http://localhost/my-service/scpd')
         self.assertIs(svc.device, self.device)
         # not completed as we have *no* valid description
         self.assertFalse(svc.detection_completed)
@@ -113,7 +115,7 @@ class DescriptionNotFound(unittest.TestCase):
         self.assertIs(svc.event_connection, None)
         self.assertIs(svc.client, None)
 
-        self.assertEqual(svc.url_base, 'http://localhost:8080')
+        self.assertEqual(svc.url_base, b'http://localhost:8080')
 
     def test_scpdXML(self):
         svc = self.service
@@ -132,17 +134,17 @@ class DescriptionNotFound(unittest.TestCase):
         self.assertEqual(svc.get_state_variables(0), {})
         self.assertEqual(
             svc.get_control_url(),
-            "DummyDevice's FQ-URL/http://localhost/my-service/control")
+            b"DummyDevice's FQ-URL/http://localhost/my-service/control")
         self.assertEqual(
             svc.get_event_sub_url(),
-            "DummyDevice's FQ-URL/http://localhost/my-service/subscribe")
+            b"DummyDevice's FQ-URL/http://localhost/my-service/subscribe")
         self.assertEqual(
             svc.get_presentation_url(),
-            "DummyDevice's FQ-URL/http://localhost/my-service/view")
+            b"DummyDevice's FQ-URL/http://localhost/my-service/view")
         self.assertEqual(
             svc.get_scpd_url(),
-            "DummyDevice's FQ-URL/http://localhost/my-service/scpd")
-        self.assertEqual(svc.get_base_url(), "DummyDevice's FQ-URL/.")
+            b"DummyDevice's FQ-URL/http://localhost/my-service/scpd")
+        self.assertEqual(svc.get_base_url(), b"DummyDevice's FQ-URL/.")
 
     def test_as_dict(self):
         """ Test Service.as_dict() """
@@ -162,14 +164,14 @@ class DescriptionNotFound(unittest.TestCase):
             ("ID", 'my-service-id'),
             ("Service Description URL",
              ('http://localhost/my-service/scpd',
-              "DummyDevice's FQ-URL/http://localhost/my-service/scpd")),
+              b"DummyDevice's FQ-URL/http://localhost/my-service/scpd")),
             ("Control URL",
              ('http://localhost/my-service/control',
-              "DummyDevice's FQ-URL/http://localhost/my-service/control",
+              b"DummyDevice's FQ-URL/http://localhost/my-service/control",
               False)),
             ("Event Subscription URL",
              ('http://localhost/my-service/subscribe',
-              "DummyDevice's FQ-URL/http://localhost/my-service/subscribe",
+              b"DummyDevice's FQ-URL/http://localhost/my-service/subscribe",
               False)),
         ])
 
@@ -200,8 +202,8 @@ class EmptyDescription(DescriptionNotFound):
     def test_scpdXML(self):
         svc = self.service
         # scpdXML is empty as we have not parsed any description
-        self.assertEqual(svc.scpdXML, '')
-        self.assertEqual(svc.get_scpdXML(), '')
+        self.assertEqual(svc.scpdXML, b'')
+        self.assertEqual(svc.get_scpdXML(), b'')
 
 
 class InvalidDescriptionXML(DescriptionNotFound):
@@ -219,8 +221,8 @@ class InvalidDescriptionXML(DescriptionNotFound):
     def test_scpdXML(self):
         svc = self.service
         # :fixme: rethink if invalid scpdXML should really be stored
-        self.assertEqual(svc.scpdXML, '<x>')
-        self.assertEqual(svc.get_scpdXML(), '<x>')
+        self.assertEqual(svc.scpdXML, b'<x>')
+        self.assertEqual(svc.get_scpdXML(), b'<x>')
 
 
 _scpdXMLTemplate = '''\
@@ -324,9 +326,9 @@ class CompleteDescription(unittest.TestCase):
         self.assertEqual(svc.id, 'urn:upnp-org:serviceId:RenderingControl')
         # parameter location  goes into  url_base
         self.assertEqual(svc.control_url, '/my-service/control')
-        self.assertEqual(svc.event_sub_url, '/my-service/subscribe')
-        self.assertEqual(svc.presentation_url, '/my-service/view')
-        self.assertEqual(svc.scpd_url, '/my-service/scpd')
+        self.assertEqual(svc.event_sub_url, b'/my-service/subscribe')
+        self.assertEqual(svc.presentation_url, b'/my-service/view')
+        self.assertEqual(svc.scpd_url, b'/my-service/scpd')
         self.assertIs(svc.device, self.device)
         # completed as we have a valid description
         self.assertTrue(svc.detection_completed)
@@ -338,12 +340,12 @@ class CompleteDescription(unittest.TestCase):
         self.assertIs(svc.event_connection, None)
         self.assertIs(svc.client, None)
         # :fixme: this one is *not* used in make_fullyqualified, rethink
-        self.assertEqual(svc.url_base, 'http://localhost:8080')
+        self.assertEqual(svc.url_base, b'http://localhost:8080')
 
     def test_scpdXML(self):
         svc = self.service
-        self.assertEqual(svc.scpdXML, self._scpdXML)
-        self.assertEqual(svc.get_scpdXML(), self._scpdXML)
+        self.assertEqual(svc.scpdXML.decode('utf-8'), self._scpdXML)
+        self.assertEqual(svc.get_scpdXML().decode('utf-8'), self._scpdXML)
 
     def test_actions(self):
 
@@ -388,14 +390,14 @@ class CompleteDescription(unittest.TestCase):
         self.assertEqual(svc.get_timeout(), 0)
         self.assertEqual(svc.get_sid(), None)
         self.assertEqual(svc.get_control_url(),
-                         'http://localhost:8888/my-service/control')
+                         b'http://localhost:8888/my-service/control')
         self.assertEqual(svc.get_event_sub_url(),
-                         'http://localhost:8888/my-service/subscribe')
+                         b'http://localhost:8888/my-service/subscribe')
         self.assertEqual(svc.get_presentation_url(),
-                         'http://localhost:8888/my-service/view')
+                         b'http://localhost:8888/my-service/view')
         self.assertEqual(svc.get_scpd_url(),
-                         'http://localhost:8888/my-service/scpd')
-        self.assertEqual(svc.get_base_url(), "http://localhost:8888/")
+                         b'http://localhost:8888/my-service/scpd')
+        self.assertEqual(svc.get_base_url(), b"http://localhost:8888/")
 
 
 class DescriptionWithoutActions(CompleteDescription):

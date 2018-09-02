@@ -28,6 +28,10 @@ class SOAPProxy(log.Loggable):
     def __init__(self, url, namespace=None, envelope_attrib=None, header=None,
                  soapaction=None):
         log.Loggable.__init__(self)
+        if not isinstance(url, bytes):
+            self.warning('SOAPProxy.__init__: '
+                         'url is not string bytes...modifying')
+            url = url.encode('ascii')
         self.url = url
         self.namespace = namespace
         self.header = header
@@ -37,22 +41,25 @@ class SOAPProxy(log.Loggable):
 
     def callRemote(self, soapmethod, arguments):
         soapaction = soapmethod or self.soapaction
-        url_bytes = self.url.encode('ascii')
         if '#' not in soapaction:
             soapaction = '#'.join((self.namespace[1], soapaction))
-        self.action = soapaction.split('#')[1]
+        self.action = soapaction.split('#')[1].encode('ascii')
 
         self.info("callRemote %r %r %r %r", self.soapaction, soapmethod,
                   self.namespace, self.action)
+        self.debug('\t- arguments: {}'.format(arguments))
+        self.debug('\t- action: {}'.format(self.action))
+        self.debug('\t- namespace: {}'.format(self.namespace))
 
-        headers = {b'content-type': b'text/xml ;charset="utf-8"',
-                   b'SOAPACTION': '"{}"'.format(soapaction).encode('ascii'), }
+        headers = {'content-type': 'text/xml ;charset="utf-8"',
+                   'SOAPACTION': '"{}"'.format(soapaction), }
         if 'headers' in arguments:
             headers.update(arguments['headers'])
             del arguments['headers']
 
         payload = soap_lite.build_soap_call(self.action, arguments,
                                             ns=self.namespace[1])
+        self.debug('\t- payload: {}'.format(payload))
 
         self.info("callRemote soapaction:  %s %s", self.action, self.url)
         self.debug("callRemote payload:  %s", payload)
@@ -80,11 +87,11 @@ class SOAPProxy(log.Loggable):
             return error
 
         return getPage(
-            url_bytes,
+            self.url,
             postdata=payload,
             method=b"POST",
             headers=headers).addCallbacks(
-            self._cbGotResult, gotError, None, None, [url_bytes], None)
+            self._cbGotResult, gotError, None, None, [self.url], None)
 
     def _cbGotResult(self, result):
         page, headers = result
@@ -94,15 +101,17 @@ class SOAPProxy(log.Loggable):
                 print(c, c.tag)
                 print_c(c)
 
-        self.debug("result: %r", page)
+        self.debug("_cbGotResult.action: %r", self.action)
+        self.debug("_cbGotResult.result: %r", page)
 
+        a = self.action.decode('utf-8')
         tree = etree.fromstring(page)
         body = tree.find('{http://schemas.xmlsoap.org/soap/envelope/}Body')
         response = body.find(
-            '{%s}%sResponse' % (self.namespace[1], self.action))
+            '{%s}%sResponse' % (self.namespace[1], a))
         if response is None:
             """ fallback for improper SOAP action responses """
-            response = body.find('%sResponse' % self.action)
+            response = body.find('%sResponse' % a)
         self.debug("callRemote response  %s", response)
         result = {}
         if response is not None:
@@ -112,6 +121,7 @@ class SOAPProxy(log.Loggable):
         return result
 
     def decode_result(self, element):
+        self.debug('decode_result [element]: {}'.format(element))
         type = element.get('{http://www.w3.org/1999/XMLSchema-instance}type')
         if type is not None:
             try:

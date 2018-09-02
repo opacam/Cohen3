@@ -55,9 +55,9 @@ AVAILABLE STORES
 
 BetterLight, AmpacheStore, FlickrStore, MiroStore, ElisaPlayer,
 ElisaMediaStore, Gallery2Store, DVBDStore, FSStore, BuzztardPlayer,
-BuzztardStore, GStreamerPlayer, SimpleLight, ITVStore, SWR3Store,
-TrackerStore, LolcatsStore, BBCStore, MediaStore, AppleTrailerStore,
-LastFMStore, AxisCamStore, YouTubeStore, TEDStore, IRadioStore, TwitchStore
+BuzztardStore, GStreamerPlayer, ITVStore, SWR3Store, TrackerStore,
+LolcatsStore, BBCStore, MediaStore, AppleTrailerStore, LastFMStore,
+AxisCamStore, YouTubeStore, TEDStore, IRadioStore, TwitchStore
 
 FILES
 -----

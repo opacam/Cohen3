@@ -55,10 +55,12 @@ class MediaReceiverRegistrarServer(service.ServiceServer, resource.Resource):
         self.device_description_tmpl = 'xbox-description-1.xml'
 
         self.control = MediaReceiverRegistrarControl(self)
-        self.putChild('scpd.xml', service.scpdXML(self, self.control))
-        self.putChild('control', self.control)
+        self.putChild(b'scpd.xml', service.scpdXML(self, self.control))
+        self.putChild(b'control', self.control)
 
     def listchilds(self, uri):
+        if isinstance(uri, bytes):
+            uri = uri.decode('utf-8')
         cl = ''
         for c in self.children:
             cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)

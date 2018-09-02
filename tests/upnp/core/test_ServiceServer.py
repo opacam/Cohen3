@@ -117,9 +117,9 @@ class ValidButEmptyDescriptionXML(unittest.TestCase):
         self.assertEqual(srv.id_namespace, 'upnp-org')
         self.assertEqual(srv.service_type,
                          'urn:schemas-upnp-org:service:UnknownService:1')
-        self.assertEqual(srv.scpd_url, 'scpd.xml')
-        self.assertEqual(srv.control_url, 'control')
-        self.assertEqual(srv.subscription_url, 'subscribe')
+        self.assertEqual(srv.scpd_url, b'scpd.xml')
+        self.assertEqual(srv.control_url, b'control')
+        self.assertEqual(srv.subscription_url, b'subscribe')
         self.assertEqual(srv.event_metadata, '')
 
         self.assertEqual(srv._actions, {})

@@ -707,6 +707,8 @@ class FlickrStore(BackendStore):
         return len(self.store)
 
     def get_by_id(self, id):
+        if isinstance(id, bytes):
+            id = id.decode('utf-8')
         if isinstance(id, str) and id.startswith('upload.'):
             self.info("get_by_id looking for %s", id)
             try:

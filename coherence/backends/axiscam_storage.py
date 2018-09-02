@@ -179,8 +179,9 @@ class AxisCamStore(BackendStore):
 
     def get_by_id(self, id):
         if isinstance(id, str):
-            id = id.split('@', 1)
-            id = id[0]
+            id = id.split('@', 1)[0]
+        elif isinstance(id, bytes):
+            id = id.decode('utf-8').split('@', 1)[0]
         id = int(id)
         if id == 0:
             id = 1000

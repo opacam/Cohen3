@@ -17,6 +17,7 @@ from twisted.internet import reactor
 from twisted.internet import task
 from twisted.internet.protocol import DatagramProtocol
 from twisted.web.http import datetimeToString
+from twisted.test import proto_helpers
 
 import coherence.extern.louie as louie
 from coherence import log, SERVER_ID
@@ -69,6 +70,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
 
     def datagramReceived(self, data, xxx_todo_changeme):
         """Handle a received multicast datagram."""
+        self.debug('datagramReceived: {}'.format(data))
         (host, port) = xxx_todo_changeme
         if isinstance(data, bytes):
             data = data.decode('utf-8')
@@ -114,7 +116,6 @@ class SSDPServer(DatagramProtocol, log.Loggable):
 
         self.info('Registering {} ({}) -> {}'.format(st, location, manifestation))
         self.debug('\t-searching usn: {}'.format(usn))
-        self.debug('\t-self.known: {}'.format(self.known))
 
         try:
             self.known[usn] = {}
@@ -131,6 +132,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
             self.known[usn]['last-seen'] = time.time()
 
             self.msg(self.known[usn])
+            self.debug('\t-self.known: {}'.format(self.known))
 
             if manifestation == 'local':
                 self.doNotify(usn)
@@ -141,9 +143,9 @@ class SSDPServer(DatagramProtocol, log.Loggable):
                     None, device_type=st, infos=self.known[usn])
                 # self.callback("new_device", st, self.known[usn])
             # print('\t - ok all')
-        except Exception as e:
-            print(('\t -> Error on registering service: {}'.format(
-                manifestation, e)))
+        except Exception as err:
+            self.error('\t -> Error on registering service: '
+                       '{} [error: "{}"]'.format(manifestation, err))
 
     def unRegister(self, usn):
         self.msg("Un-registering {}".format(usn))
@@ -188,10 +190,12 @@ class SSDPServer(DatagramProtocol, log.Loggable):
     def send_it(self, response, destination, delay, usn):
         self.info('send discovery response delayed by '
                   '{} for {} to {}'.format(delay, usn, destination))
+        r = response if isinstance(response, bytes) else \
+            response.encode('ascii')
+        d = destination if isinstance(destination, bytes) else \
+            destination.encode('ascii')
         try:
-            self.transport.write(
-               response.encode('ascii'),
-               destination.encode('ascii'))
+            self.transport.write(r, d)
         except (AttributeError, socket.error) as msg:
             self.info('failure sending out byebye notification: {}'.format(msg))
 
@@ -239,10 +243,11 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         if self.known[usn]['SILENT'] is True:
             return
         self.info('Sending alive notification for {}'.format(usn))
+        # self.info('\t - self.known[usn]: {}'.format(self.known[usn]))
 
-        resp = [b'NOTIFY * HTTP/1.1',
-                b'HOST: %r:%r' % (SSDP_ADDR, SSDP_PORT),
-                b'NTS: ssdp:alive',
+        resp = ['NOTIFY * HTTP/1.1',
+                'HOST: %s:%d' % (SSDP_ADDR, SSDP_PORT),
+                'NTS: ssdp:alive',
                 ]
         stcpy = dict(iter(self.known[usn].items()))
         stcpy['NT'] = stcpy['ST']
@@ -253,12 +258,20 @@ class SSDPServer(DatagramProtocol, log.Loggable):
         del stcpy['last-seen']
 
         resp.extend([
-            '{}: {}'.format(k, v).encode('ascii') for k, v in stcpy.items()])
-        resp.extend((b'', b''))
-        self.debug('doNotify content {}'.format(resp))
+            '%r: %r' % (k, v) for k, v in stcpy.items()])
+        resp.extend(('', ''))
+        r = '\r\n'.join(resp).encode('ascii')
+        self.debug('doNotify content {}  [transport is: {}]'.format(r, self.transport))
+        if not self.transport:
+            try:
+                self.warning('transport not initialized...'
+                             'trying to initialize a FakeDatagramTransport')
+                self.transport = proto_helpers.FakeDatagramTransport()
+            except Exception as er:
+                self.error('Cannot initialize transport: {}'.format(er))
         try:
-            self.transport.write(b'\r\n'.join(resp), (SSDP_ADDR, SSDP_PORT))
-            self.transport.write(b'\r\n'.join(resp), (SSDP_ADDR, SSDP_PORT))
+            self.transport.write(r, (SSDP_ADDR, SSDP_PORT))
+            self.transport.write(r, (SSDP_ADDR, SSDP_PORT))
         except (AttributeError, socket.error) as msg:
             self.info('failure sending out alive notification: {}'.format(msg))
 
@@ -267,9 +280,9 @@ class SSDPServer(DatagramProtocol, log.Loggable):
 
         self.info('Sending byebye notification for %s', usn)
 
-        resp = [b'NOTIFY * HTTP/1.1',
-                b'HOST: %r:%r' % (SSDP_ADDR, SSDP_PORT),
-                b'NTS: ssdp:byebye',
+        resp = ['NOTIFY * HTTP/1.1',
+                'HOST: %r:%r' % (SSDP_ADDR, SSDP_PORT),
+                'NTS: ssdp:byebye',
                 ]
         try:
             stcpy = dict(iter(self.known[usn].items()))
@@ -280,16 +293,20 @@ class SSDPServer(DatagramProtocol, log.Loggable):
             del stcpy['HOST']
             del stcpy['last-seen']
             resp.extend([
-                '{}: {}'.format(k, v).encode('ascii') for k, v in stcpy.items()])
-            resp.extend((b'', b''))
+                '%r: %r' % (k, v) for k, v in stcpy.items()])
+            resp.extend(('', ''))
+            r = '\r\n'.join(resp).encode('ascii')
             self.debug('doByebye content %s', resp)
-            if self.transport:
-                try:
-                    self.transport.write(
-                        b'\r\n'.join(resp), (SSDP_ADDR, SSDP_PORT))
-                except (AttributeError, socket.error) as msg:
-                    self.info(
-                        "failure sending out byebye notification: %r", msg)
+            if not self.transport:
+                self.warning('transport not initialized...'
+                             'trying to initialize a FakeDatagramTransport')
+                self.transport = proto_helpers.FakeDatagramTransport()
+                self.makeConnection(self.transport)
+            try:
+                self.transport.write(r, (SSDP_ADDR, SSDP_PORT))
+            except (AttributeError, socket.error) as msg:
+                self.info(
+                    "failure sending out byebye notification: %r", msg)
         except KeyError as msg:
             self.debug("error building byebye notification: %r", msg)
 

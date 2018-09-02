@@ -43,7 +43,7 @@ class EventServer(resource.Resource, log.Loggable):
         request.setResponseCode(200)
 
         command = {'method': request.method, 'path': request.path}
-        headers = request.received_headers
+        headers = request.responseHeaders
         louie.send('UPnP.Event.Server.message_received', None, command, headers,
                    data)
 
@@ -52,7 +52,7 @@ class EventServer(resource.Resource, log.Loggable):
         else:
             self.debug("data: %s", data)
             headers = request.getAllHeaders()
-            sid = headers['sid']
+            sid = headers[b'sid']
             try:
                 tree = etree.fromstring(data)
             except (SyntaxError, AttributeError):
@@ -115,7 +115,7 @@ class EventSubscriptionServer(resource.Resource, log.Loggable):
         request.setResponseCode(200)
 
         command = {'method': request.method, 'path': request.path}
-        headers = request.received_headers
+        headers = request.responseHeaders
         louie.send('UPnP.Event.Client.message_received', None, command, headers,
                    data)
 
@@ -124,32 +124,32 @@ class EventSubscriptionServer(resource.Resource, log.Loggable):
         else:
             headers = request.getAllHeaders()
             try:
-                if headers['sid'] in self.subscribers:
-                    s = self.subscribers[headers['sid']]
-                    s['timeout'] = headers['timeout']
+                if headers[b'sid'] in self.subscribers:
+                    s = self.subscribers[headers[b'sid']]
+                    s['timeout'] = headers[b'timeout']
                     s['created'] = time.time()
-                elif 'callback' not in headers:
+                elif b'callback' not in headers:
                     request.setResponseCode(404)
-                    request.setHeader('SERVER', SERVER_ID)
-                    request.setHeader('CONTENT-LENGTH', 0)
-                    return ""
+                    request.setHeader(b'SERVER', SERVER_ID.encode('ascii'))
+                    request.setHeader(b'CONTENT-LENGTH', 0)
+                    return b""
             except:
                 from .uuid import UUID
                 sid = UUID()
                 s = {'sid': str(sid),
                      'callback':
-                         headers['callback'][1:len(headers['callback']) - 1],
+                         headers[b'callback'][1:len(headers[b'callback']) - 1],
                      'seq': 0,
-                     'timeout': headers['timeout'],
+                     'timeout': headers[b'timeout'],
                      'created': time.time()}
                 self.service.new_subscriber(s)
 
-            request.setHeader('SID', s['sid'])
-            # request.setHeader('Subscription-ID', sid)  wrong example in the UPnP UUID spec?
-            request.setHeader('TIMEOUT', s['timeout'])
-            request.setHeader('SERVER', SERVER_ID)
-            request.setHeader('CONTENT-LENGTH', 0)
-        return ""
+            request.setHeader(b'SID', s['sid'])
+            # request.setHeader(b'Subscription-ID', sid)  wrong example in the UPnP UUID spec?
+            request.setHeader(b'TIMEOUT', s['timeout'])
+            request.setHeader(b'SERVER', SERVER_ID.encode('ascii'))
+            request.setHeader(b'CONTENT-LENGTH', 0)
+        return b""
 
     def render_UNSUBSCRIBE(self, request):
         self.info(
@@ -160,7 +160,7 @@ class EventSubscriptionServer(resource.Resource, log.Loggable):
         request.setResponseCode(200)
 
         command = {'method': request.method, 'path': request.path}
-        headers = request.received_headers
+        headers = request.responseHeaders
         louie.send('UPnP.Event.Client.message_received', None, command, headers,
                    data)
 
@@ -168,7 +168,7 @@ class EventSubscriptionServer(resource.Resource, log.Loggable):
             self.debug("data: %s", data)
         else:
             headers = request.getAllHeaders()
-            self.subscribers.pop(headers['sid'], None)
+            self.subscribers.pop(headers[b'sid'], None)
             # print self.subscribers
         return ""
 
@@ -228,12 +228,8 @@ class EventProtocol(Protocol, log.Loggable):
         except:
             pass
         self.info("response received from the Service Events HTTP server ")
-        if isinstance(data, bytes):
-            d = str(data)
-        else:
-            d = data
         # self.debug(data)
-        cmd, headers = utils.parse_http_response(d)
+        cmd, headers = utils.parse_http_response(data)
         self.debug("%r %r", cmd, headers)
         if int(cmd[1]) != 200:
             self.warning(
@@ -279,7 +275,8 @@ def subscribe(service, action='subscribe'):
     logger = log.getLogger("event_protocol")
     logger.info("event.subscribe, action: %r", action)
 
-    _, host_port, path, _, _ = urlsplit(service.get_base_url())
+    service_base = service.get_base_url().decode('utf-8')
+    _, host_port, path, _, _ = urlsplit(service_base)
     if host_port.find(':') != -1:
         host, port = tuple(host_port.split(':'))
         port = int(port)
@@ -326,7 +323,7 @@ def subscribe(service, action='subscribe'):
             p.transport.writeSomeData(request)
         except AttributeError:
             logger.info("transport for event %r already gone", action)
-        # print "event.subscribe.send_request", d
+        # logger.debug("event.subscribe.send_request ", request)
         # return d
 
     def got_error(failure, action):
@@ -364,8 +361,8 @@ def subscribe(service, action='subscribe'):
         reactor.addSystemEventTrigger( 'before', 'shutdown', prepare_connection, service, action)
     """
 
+    # logger.debug("event.subscribe finished")
     return prepare_connection(service, action)
-    # print "event.subscribe finished"
 
 
 class NotificationProtocol(Protocol, log.Loggable):
@@ -410,26 +407,30 @@ def send_notification(s, xml):
     return its response
     """
     logger = log.getLogger("notification_protocol")
+    # logger.debug('\t-send_notification s is: {}'.format(s))
+    # logger.debug('\t-send_notification xml is: {}'.format(xml))
 
     _, host_port, path, _, _ = urlsplit(s['callback'])
-    if path == '':
-        path = '/'
-    if host_port.find(':') != -1:
-        host, port = tuple(host_port.split(':'))
+    # logger.debug('\t-send_notification host_port is: {}'.format(host_port))
+    # logger.debug('\t-send_notification path is: {}'.format(path))
+    if path == b'':
+        path = b'/'
+    if host_port.find(b':') != -1:
+        host, port = tuple(host_port.split(b':'))
         port = int(port)
     else:
         host = host_port
         port = 80
 
     def send_request(p, port_item):
-        request = [b'NOTIFY %s HTTP/1.1' % path,
-                   b'HOST:  %s:%d' % (host, port),
-                   b'SEQ:  %d' % s['seq'],
+        request = [b'NOTIFY %r HTTP/1.1' % path,
+                   b'HOST:  %r:%r' % (host, port),
+                   b'SEQ:  %r' % s['seq'],
                    b'CONTENT-TYPE:  text/xml;charset="utf-8"',
-                   b'SID:  %s' % s['sid'],
+                   b'SID:  %r' % s['sid'],
                    b'NTS:  upnp:propchange',
                    b'NT:  upnp:event',
-                   b'Content-Length: %d' % len(xml),
+                   b'Content-Length: %r' % len(xml),
                    b'',
                    xml]
 
