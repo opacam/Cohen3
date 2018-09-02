@@ -47,7 +47,7 @@ UPNPERRORS = {
     611: 'Invalid Control URL',
     612: 'No Such Session', }
 
-logger = log.getLogger('soap_lite')
+logger = log.get_logger('soap_lite')
 
 
 def build_soap_error(status,

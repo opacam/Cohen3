@@ -272,7 +272,7 @@ def subscribe(service, action='subscribe'):
     return the device response
     """
 
-    logger = log.getLogger("event_protocol")
+    logger = log.get_logger("event_protocol")
     logger.info("event.subscribe, action: %r", action)
 
     service_base = service.get_base_url().decode('utf-8')
@@ -406,7 +406,7 @@ def send_notification(s, xml):
     send a notification a subscriber
     return its response
     """
-    logger = log.getLogger("notification_protocol")
+    logger = log.get_logger("notification_protocol")
     # logger.debug('\t-send_notification s is: {}'.format(s))
     # logger.debug('\t-send_notification xml is: {}'.format(xml))
 
