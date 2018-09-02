@@ -16,12 +16,12 @@ import coherence.extern.louie as louie
 from coherence import log
 
 
-class DeviceHttpRoot(resource.Resource, log.Loggable):
+class DeviceHttpRoot(resource.Resource, log.LogAble):
     logCategory = 'basicdevice'
 
     def __init__(self, server):
         resource.Resource.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.server = server
 
     def getChildWithDefault(self, path, request):

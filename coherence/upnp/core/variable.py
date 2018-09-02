@@ -22,13 +22,13 @@ from coherence import log
 import coherence.extern.louie as louie
 
 
-class StateVariable(log.Loggable):
+class StateVariable(log.LogAble):
     logCategory = 'variable'
 
     def __init__(self, upnp_service, name, implementation, instance,
                  send_events,
                  data_type, allowed_values):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.service = upnp_service
 
         self.name = name

@@ -21,11 +21,11 @@ hostname = None
 web_server_port = None
 
 
-class EventServer(resource.Resource, log.Loggable):
+class EventServer(resource.Resource, log.LogAble):
     logCategory = 'event_server'
 
     def __init__(self, control_point):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         resource.Resource.__init__(self)
         self.coherence = control_point.coherence
         self.control_point = control_point
@@ -68,7 +68,7 @@ class EventServer(resource.Resource, log.Loggable):
         return ""
 
 
-class EventSubscriptionServer(resource.Resource, log.Loggable):
+class EventSubscriptionServer(resource.Resource, log.LogAble):
     """
     This class ist the server part on the device side. It listens to subscribe
     requests and registers the subscriber to send event messages to this device.
@@ -96,7 +96,7 @@ class EventSubscriptionServer(resource.Resource, log.Loggable):
 
     def __init__(self, service):
         resource.Resource.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.service = service
         self.subscribers = service.get_subscribers()
         try:
@@ -173,13 +173,13 @@ class EventSubscriptionServer(resource.Resource, log.Loggable):
         return ""
 
 
-class Event(dict, log.Loggable):
+class Event(dict, log.LogAble):
     logCategory = 'event'
     ns = "urn:schemas-upnp-org:event-1-0"
 
     def __init__(self, sid, elements=None, raw=None):
         dict.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self._sid = sid
         self.raw = raw
         if elements != None:
@@ -207,11 +207,11 @@ class Event(dict, log.Loggable):
             self.update({tag[idx:]: value})
 
 
-class EventProtocol(Protocol, log.Loggable):
+class EventProtocol(Protocol, log.LogAble):
     logCategory = 'event_protocol'
 
     def __init__(self, service, action):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.service = service
         self.action = action
 
@@ -365,7 +365,7 @@ def subscribe(service, action='subscribe'):
     return prepare_connection(service, action)
 
 
-class NotificationProtocol(Protocol, log.Loggable):
+class NotificationProtocol(Protocol, log.LogAble):
     logCategory = "notification_protocol"
 
     def connectionMade(self):

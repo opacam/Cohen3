@@ -26,7 +26,7 @@ SSDP_PORT = 1900
 SSDP_ADDR = '239.255.255.250'
 
 
-class SSDPServer(DatagramProtocol, log.Loggable):
+class SSDPServer(DatagramProtocol, log.LogAble):
     """A class implementing a SSDP server.  The notifyReceived and
     searchReceived methods are called when the appropriate type of
     datagram is received by the server."""
@@ -34,7 +34,7 @@ class SSDPServer(DatagramProtocol, log.Loggable):
 
     def __init__(self, test=False, interface=''):
         # Create SSDP server
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.known = {}
         self._callbacks = {}
         self.test = test

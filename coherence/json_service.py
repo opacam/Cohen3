@@ -11,12 +11,12 @@ from twisted.web import resource, static
 from coherence import log
 
 
-class JsonInterface(resource.Resource, log.Loggable):
+class JsonInterface(resource.Resource, log.LogAble):
     logCategory = 'json'
 
     def __init__(self, controlpoint):
         resource.Resource.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.controlpoint = controlpoint
         self.controlpoint.coherence.add_web_resource('json', self)
         self.children = {}

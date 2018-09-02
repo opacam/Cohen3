@@ -26,7 +26,7 @@ class Web(object):
         self.coherence = coherence
 
 
-class MenuFragment(athena.LiveElement, log.Loggable):
+class MenuFragment(athena.LiveElement, log.LogAble):
     logCategory = 'webui_menu_fragment'
     jsClass = 'Coherence.Base'
     fragmentName = 'coherence-menu'
@@ -71,7 +71,7 @@ class MenuFragment(athena.LiveElement, log.Loggable):
         self.info("remove view from MenuFragment")
 
 
-class DevicesFragment(athena.LiveElement, log.Loggable):
+class DevicesFragment(athena.LiveElement, log.LogAble):
     logCategory = 'webui_device_fragment'
     jsClass = 'Coherence.Devices'
     fragmentName = 'coherence-devices'
@@ -141,7 +141,7 @@ class DevicesFragment(athena.LiveElement, log.Loggable):
         return ctx.tag[tags.ul[cl]]
 
 
-class LoggingFragment(athena.LiveElement, log.Loggable):
+class LoggingFragment(athena.LiveElement, log.LogAble):
     logCategory = 'webui_logging_fragment'
     jsClass = 'Coherence.Logging'
     fragmentName = 'coherence-logging'
@@ -173,7 +173,7 @@ class LoggingFragment(athena.LiveElement, log.Loggable):
         self.info("remove view from the LoggingFragment")
 
 
-class WebUI(athena.LivePage, log.Loggable):
+class WebUI(athena.LivePage, log.LogAble):
     """
     """
     logCategory = 'webui'

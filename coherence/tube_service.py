@@ -29,12 +29,12 @@ from coherence.upnp.devices.basics import DeviceHttpRoot
 from .upnp.core import xml_constants
 
 
-class MirabeauProxy(resource.Resource, log.Loggable):
+class MirabeauProxy(resource.Resource, log.LogAble):
     logCategory = 'mirabeau'
 
     def __init__(self):
         resource.Resource.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.isLeaf = 0
 
     def getChildWithDefault(self, path, request):
@@ -235,11 +235,11 @@ class TubeServiceProxy(service.ServiceServer, resource.Resource):
             self._variables.get(instance)[name].has_vendor_values = True
 
 
-class TubeDeviceProxy(log.Loggable):
+class TubeDeviceProxy(log.LogAble):
     logCategory = 'dbus'
 
     def __init__(self, coherence, tube_device, external_address):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.device = tube_device
         self.coherence = coherence
         self.external_address = external_address

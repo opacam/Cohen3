@@ -18,7 +18,7 @@ class errorCode(Exception):
         self.status = status
 
 
-class UPnPPublisher(resource.Resource, log.Loggable):
+class UPnPPublisher(resource.Resource, log.LogAble):
     """ Based upon twisted.web.soap.SOAPPublisher and
         extracted to remove the SOAPpy dependency
 

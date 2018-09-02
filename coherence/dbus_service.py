@@ -46,12 +46,12 @@ def un_namespace(text):
     return text
 
 
-class DBusCDSService(dbus.service.Object, log.Loggable):
+class DBusCDSService(dbus.service.Object, log.LogAble):
     logCategory = 'dbus'
     NOT_FOR_THE_TUBES = True
 
     def __init__(self, service, dbus_device, bus):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.service = service
         self.dbus_device = dbus_device
 
@@ -483,12 +483,12 @@ class DBusCDSService(dbus.service.Object, log.Loggable):
         return ''
 
 
-class DBusService(dbus.service.Object, log.Loggable):
+class DBusService(dbus.service.Object, log.LogAble):
     logCategory = 'dbus'
     SUPPORTS_MULTIPLE_CONNECTIONS = True
 
     def __init__(self, service, dbus_device, bus):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.service = service
         self.dbus_device = dbus_device
 
@@ -722,12 +722,12 @@ class DBusService(dbus.service.Object, log.Loggable):
             data, signature='sv', variant_level=3)
 
 
-class DBusDevice(dbus.service.Object, log.Loggable):
+class DBusDevice(dbus.service.Object, log.LogAble):
     logCategory = 'dbus'
     SUPPORTS_MULTIPLE_CONNECTIONS = True
 
     def __init__(self, device, bus):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         if device is not None:
             self.uuid = device.get_id()[5:]
             self.id = self.uuid.replace('-', '')
@@ -823,12 +823,12 @@ class DBusDevice(dbus.service.Object, log.Loggable):
         return dbus.Array(self.device.icons, signature='av', variant_level=2)
 
 
-class DBusPontoon(dbus.service.Object, log.Loggable):
+class DBusPontoon(dbus.service.Object, log.LogAble):
     logCategory = 'dbus'
     SUPPORTS_MULTIPLE_CONNECTIONS = True
 
     def __init__(self, controlpoint, bus=None):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.bus = bus or dbus.SessionBus()
         try:
             bus_name = dbus.service.BusName(BUS_NAME, self.bus)

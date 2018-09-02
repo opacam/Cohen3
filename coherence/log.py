@@ -142,7 +142,7 @@ class ColoredLogger(logging.Logger):
 logging.setLoggerClass(ColoredLogger)
 
 
-class Loggable(object):
+class LogAble(object):
     """
     Base class for objects that want to be able to log messages with
     different level of severity.  The levels are, in order from least

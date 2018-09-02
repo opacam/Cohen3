@@ -20,11 +20,11 @@ SSDP_ADDR = '239.255.255.250'
 from coherence import log
 
 
-class MSearch(DatagramProtocol, log.Loggable):
+class MSearch(DatagramProtocol, log.LogAble):
     logCategory = 'msearch'
 
     def __init__(self, ssdp_server, test=False):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.ssdp_server = ssdp_server
         if test == False:
             self.port = reactor.listenUDP(0, self)

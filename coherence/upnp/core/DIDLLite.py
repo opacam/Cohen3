@@ -382,7 +382,7 @@ class PlayContainerResource(Resource):
             self.protocolInfo = 'http-get:*:*:*'
 
 
-class Object(log.Loggable):
+class Object(log.LogAble):
     """The root class of the entire content directory class heirachy."""
 
     logCategory = 'didllite'
@@ -409,7 +409,7 @@ class Object(log.Loggable):
 
     def __init__(self, id=None, parentID=None, title=None, restricted=False,
                  creator=None):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.id = id
         self.parentID = parentID
         self.title = title
@@ -997,14 +997,14 @@ class StorageFolder(Container):
     upnp_class = Container.upnp_class + '.storageFolder'
 
 
-class DIDLElement(log.Loggable):
+class DIDLElement(log.LogAble):
     logCategory = 'didllite'
 
     def __init__(self, upnp_client='',
                  parent_container=None,
                  requested_id=None,
                  transcoding=False):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
 
         self.element = etree.Element(
             'DIDL-Lite',

@@ -42,11 +42,11 @@ class Argument:
                 'related_state_variable': self.state_variable}
 
 
-class Action(log.Loggable):
+class Action(log.LogAble):
     logCategory = 'action'
 
     def __init__(self, service, name, implementation, arguments_list):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.service = service
         self.name = name
         self.implementation = implementation

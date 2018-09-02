@@ -51,11 +51,11 @@ class DeviceQuery(object):
             self.fire(device)
 
 
-class ControlPoint(log.Loggable):
+class ControlPoint(log.LogAble):
     logCategory = 'controlpoint'
 
     def __init__(self, coherence, auto_client=None):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
 
         if not auto_client:
             auto_client = ['MediaServer', 'MediaRenderer']

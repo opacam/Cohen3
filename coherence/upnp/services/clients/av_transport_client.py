@@ -6,11 +6,11 @@
 from coherence import log
 
 
-class AVTransportClient(log.Loggable):
+class AVTransportClient(log.LogAble):
     logCategory = 'avtransportclient'
 
     def __init__(self, service):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.service = service
         self.namespace = service.get_type()
         self.url = service.get_control_url()

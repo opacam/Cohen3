@@ -10,7 +10,7 @@ from coherence.upnp.core import soap_lite
 from coherence.upnp.core.utils import getPage
 
 
-class SOAPProxy(log.Loggable):
+class SOAPProxy(log.LogAble):
     """ A Proxy for making remote SOAP calls.
 
         Based upon twisted.web.soap.Proxy and
@@ -27,7 +27,7 @@ class SOAPProxy(log.Loggable):
 
     def __init__(self, url, namespace=None, envelope_attrib=None, header=None,
                  soapaction=None):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         if not isinstance(url, bytes):
             self.warning('SOAPProxy.__init__: '
                          'url is not string bytes...modifying')

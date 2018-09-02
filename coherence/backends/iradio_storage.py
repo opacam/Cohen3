@@ -125,14 +125,14 @@ useless_genres = [
 ]
 
 
-class PlaylistStreamProxy(utils.ReverseProxyUriResource, log.Loggable):
+class PlaylistStreamProxy(utils.ReverseProxyUriResource, log.LogAble):
     """ proxies audio streams published as M3U playlists (typically the case for shoutcast streams) """
     logCategory = 'PlaylistStreamProxy'
 
     stream_url = None
 
     def __init__(self, uri):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.stream_url = None
         utils.ReverseProxyUriResource.__init__(self, uri)
 

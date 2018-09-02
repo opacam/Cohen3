@@ -18,11 +18,11 @@ from . import xml_constants
 ns = xml_constants.UPNP_DEVICE_NS
 
 
-class Device(log.Loggable):
+class Device(log.LogAble):
     logCategory = 'device'
 
     def __init__(self, parent=None):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.parent = parent
         self.services = []
         # self.uid = self.usn[:-len(self.st)-2]

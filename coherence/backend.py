@@ -16,7 +16,7 @@ from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.utils import getPage
 
 
-class Backend(log.Loggable, Plugin):
+class Backend(log.LogAble, Plugin):
     """ the base class for all backends
 
         if there are any UPnP service actions, that can't
@@ -48,7 +48,7 @@ class Backend(log.Loggable, Plugin):
             start up the backend
             after that's done, tell Coherence about it
         """
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         Plugin.__init__(self)
 
         """ this has to be done in the actual backend, maybe it has
@@ -183,7 +183,7 @@ class BackendStore(Backend):
         return None
 
 
-class BackendItem(log.Loggable):
+class BackendItem(log.LogAble):
     """ the base class for all MediaServer backend items
     """
 
@@ -209,7 +209,7 @@ class BackendItem(log.Loggable):
             res.size = size
             self.item.res.append(res)
         """
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.name = 'my_name'  # the basename of a file, the album title,
         # the artists name,...
         # is expected to be unicode

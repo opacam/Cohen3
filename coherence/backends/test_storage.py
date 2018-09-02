@@ -124,12 +124,12 @@ class ExternalProcessProtocol(protocol.ProcessProtocol):
         self.caller.write_data('')
 
 
-class ExternalProcessPipeline(resource.Resource, log.Loggable):
+class ExternalProcessPipeline(resource.Resource, log.LogAble):
     logCategory = 'externalprocess'
     addSlash = True
 
     def __init__(self, pipeline, mimetype):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         resource.Resource.__init__(self)
         self.uri = pipeline
         self.mimetype = mimetype
@@ -143,12 +143,12 @@ class ExternalProcessPipeline(resource.Resource, log.Loggable):
         return server.NOT_DONE_YET
 
 
-class ExternalProcessProducer(log.Loggable):
+class ExternalProcessProducer(log.LogAble):
     logCategory = 'externalprocess'
     addSlash = True
 
     def __init__(self, pipeline, request):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.pipeline = pipeline
         self.request = request
         self.process = None
