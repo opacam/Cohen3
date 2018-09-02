@@ -2,6 +2,7 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2013, Hartmut Goebel <h.goebel@crazy-compilers.com>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
 import io
 import logging
