@@ -9,7 +9,15 @@ import os
 import sys
 import traceback
 
-loggers = {}
+# If you want to debug cohen,
+# set the below variable to: logging.DEBUG
+DEFAULT_COHEN_LOG_LEVEL = logging.WARN
+
+LOG_FORMAT = ("[%(levelname)-18s][$BOLD%(name)-15s$RESET]  "
+              "%(message)s    ($BOLD%(filename)s$RESET:%(lineno)d)")
+
+ENV_VAR_NAME = 'COHEN_DEBUG'
+
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 
 # The background is set with 40 plus the number of the color,
@@ -19,6 +27,41 @@ BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 RESET_SEQ = "\033[0m"
 COLOR_SEQ = "\033[1;%dm"
 BOLD_SEQ = "\033[1m"
+
+COLORS = {
+    'WARNING': YELLOW,
+    'INFO': WHITE,
+    'DEBUG': BLUE,
+    'CRITICAL': YELLOW,
+    'ERROR': RED
+}
+
+# This is taken from std.-module logging, see Logger.findCaller below.
+# _srcfile is used when walking the stack to check when we've got the first
+# caller stack frame.
+#
+if hasattr(sys, 'frozen'):  # support for py2exe
+    _srcfile = "coherence%slog%s" % (os.sep, __file__[-4:])
+elif __file__[-4:].lower() in ['.pyc', '.pyo']:
+    _srcfile = __file__[:-4] + '.py'
+else:
+    _srcfile = __file__
+_srcfile = os.path.normcase(_srcfile)
+_srcfiles = (_srcfile, logging._srcfile)
+
+loggers = {}
+
+
+def get_main_log_level():
+    global loggers
+    if ENV_VAR_NAME in os.environ:
+        return os.environ[ENV_VAR_NAME]
+    log_root = loggers.get('coherence', None)
+    if log_root is None:
+        log_level = DEFAULT_COHEN_LOG_LEVEL
+    else:
+        log_level = log_root.level
+    return log_level
 
 
 def formatter_message(message, use_color=True):
@@ -31,15 +74,6 @@ def formatter_message(message, use_color=True):
             "$RESET", "").replace(
             "$BOLD", "")
     return message
-
-
-COLORS = {
-    'WARNING': YELLOW,
-    'INFO': WHITE,
-    'DEBUG': BLUE,
-    'CRITICAL': YELLOW,
-    'ERROR': RED
-}
 
 
 class ColoredFormatter(logging.Formatter):
@@ -56,33 +90,12 @@ class ColoredFormatter(logging.Formatter):
         return logging.Formatter.format(self, record)
 
 
-# LOG_FORMAT = '%(asctime)s %(levelname)s  %(name)s: %(message)s  (%(filename)s:%(lineno)s)'
-# LOG_FORMAT = ('[%(levelname)-10s] [ %(name)-14s %(lineno)-5d] %(message)s')
-LOG_FORMAT = ("[%(levelname)-18s][$BOLD%(name)-15s$RESET]  "
-              "%(message)s    ($BOLD%(filename)s$RESET:%(lineno)d)")
-
-ENV_VAR_NAME = 'COHEN_DEBUG'
-
-# This is taken from std.-module logging, see Logger.findCaller below.
-# _srcfile is used when walking the stack to check when we've got the first
-# caller stack frame.
-#
-if hasattr(sys, 'frozen'):  # support for py2exe
-    _srcfile = "coherence%slog%s" % (os.sep, __file__[-4:])
-elif __file__[-4:].lower() in ['.pyc', '.pyo']:
-    _srcfile = __file__[:-4] + '.py'
-else:
-    _srcfile = __file__
-_srcfile = os.path.normcase(_srcfile)
-_srcfiles = (_srcfile, logging._srcfile)
-
-
 class ColoredLogger(logging.Logger):
     FORMAT = LOG_FORMAT
     COLOR_FORMAT = formatter_message(FORMAT, True)
 
     def __init__(self, name):
-        logging.Logger.__init__(self, name, logging.DEBUG)
+        logging.Logger.__init__(self, name, get_main_log_level())
 
         color_formatter = ColoredFormatter(self.COLOR_FORMAT)
 
@@ -95,8 +108,6 @@ class ColoredLogger(logging.Logger):
         # print(self.handlers)
         return
 
-    # class Logger(ColoredLogger):
-    #
     def findCaller(self, stack_info=False, use_color=True):
         """
         Find the stack frame of the caller so that we can note the source
@@ -192,6 +203,7 @@ def getLogger(logCategory):
         log = loggers.get(logCategory)
     else:
         log = logging.getLogger(logCategory)
+    log.setLevel(get_main_log_level())
     log.propagate = False
     return log
 
@@ -199,20 +211,17 @@ def getLogger(logCategory):
 def init(logfilename=None, loglevel=logging.WARN):
     global loggers
     if loggers.get('coherence'):
-        return loggers.get('coherence')
+        log = loggers.get('coherence')
+        log.setLevel(get_main_log_level())
+        return log
     else:
-        logger = logging.getLogger()
-        logger.propagate = False
         logging.addLevelName(100, 'NONE')
-
         logging.basicConfig(
             filename=logfilename,
             level=loglevel,
             format=LOG_FORMAT)
 
-        if ENV_VAR_NAME in os.environ:
-            logger.setLevel(os.environ[ENV_VAR_NAME])
-        else:
-            logger.setLevel(loglevel)
+        logger = logging.getLogger()
+        logger.propagate = False
         loggers['coherence'] = logger
         logger.debug('Added logger with logCategory: {}'.format('coherence'))
