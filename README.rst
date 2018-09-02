@@ -14,13 +14,15 @@ Simple DLNA/UPnP Media Server
 
 Overview
 --------
-Cohen3 is a DLNA/UPnP Media Server written in Python (v3),
-providing several UPnP MediaServers and MediaRenderers
-to make simple publishing and streaming different types of media content to your network.
+Cohen3 Framework is a DLNA/UPnP Media Server for Python 3, based on the python 2
+version named `Cohen <https://github.com/unintended/Cohen>`_. Provides several
+UPnP MediaServers and MediaRenderers to make simple publishing and streaming
+different types of media content to your network.
 
 Cohen3 is actually a highly simplified and refreshed version of
-`Coherence Framework <https://github.com/coherence-project/Coherence>`_ project by `Frank Scholz <mailto:dev@coherence-project.org>`_
-which looks like no longer supported.
+`Coherence Framework <https://github.com/coherence-project/Coherence>`_
+project by `Frank Scholz <mailto:dev@coherence-project.org>`_ which looks like
+no longer supported.
 
 - Documentation: https://cohen3.readthedocs.org/
 - GitHub: https://github.com/opacam/Cohen3
@@ -32,13 +34,14 @@ NOTE: All the dependencies of the setup.py file are the basic dependencies in
 order to run a media server. Should be mentioned that some of the backends
 needs more dependencies and some of them may not work as expected because there
 aren't tested yet. Here are some of them listed:
-    - youtube: gdata (pip install gdata)
-    - picassa storage: gdata (pip install gdata)
+
+    - youtube: gdata (pip install git+https://github.com/dvska/gdata-python3#egg=gdata)
+    - picassa storage: gdata (pip install git+https://github.com/dvska/gdata-python3#egg=gdata)
     - tube service: dbus-python (pip install dbus-python)
     - dvbd storage: dbus-python (pip install dbus-python)
     - audio cd storage: PyCDDB and discid (pip install PyCDDB and pip install discid)
     - media db storage: axiom epsilon
-    - module: coherence.web.ui modile depens on Nevow (pip install Nevow)
+    - module: coherence.web.ui module depends on Nevow (pip install Nevow)
 
 Features
 --------
