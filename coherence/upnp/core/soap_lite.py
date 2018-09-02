@@ -10,12 +10,12 @@
 
     inspired by ElementSOAP.py
 """
-import logging
 
 from lxml import etree
 from twisted.python.util import OrderedDict
 
 from coherence.upnp.core.xml_constants import ELEMENT_TYPE
+from coherence import log
 
 NS_SOAP_ENV = "http://schemas.xmlsoap.org/soap/envelope/"
 NS_SOAP_ENC = "http://schemas.xmlsoap.org/soap/encoding/"
@@ -47,7 +47,7 @@ UPNPERRORS = {
     611: 'Invalid Control URL',
     612: 'No Such Session', }
 
-logger = logging.getLogger('soap_lite')
+logger = log.getLogger('soap_lite')
 
 
 def build_soap_error(status,
