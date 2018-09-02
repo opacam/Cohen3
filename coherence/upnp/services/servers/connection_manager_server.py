@@ -20,10 +20,13 @@ class ConnectionManagerControl(service.ServiceControl, UPnPPublisher):
 
     def __init__(self, server):
         service.ServiceControl.__init__(self)
+        # self.debug('ConnectionManagerControl.__init__: {}'.format(server))
         UPnPPublisher.__init__(self)
         self.service = server
         self.variables = server.get_variables()
         self.actions = server.get_actions()
+        # self.debug('\t- variables: {}'.format(self.variables))
+        # self.debug('\t- actions: {}'.format(self.actions))
 
 
 class ConnectionManagerServer(service.ServiceServer, resource.Resource):
@@ -178,6 +181,8 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
             return 0
 
     def listchilds(self, uri):
+        if isinstance(uri, bytes):
+            uri = uri.decode('utf-8')
         cl = ''
         for c in self.children:
             cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)

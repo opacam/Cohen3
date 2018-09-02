@@ -291,7 +291,8 @@ class Device(log.Loggable):
                     i['height'] = icon.find('./{%s}height' % ns).text
                     i['depth'] = icon.find('./{%s}depth' % ns).text
                     i['realurl'] = icon.find('./{%s}url' % ns).text
-                    i['url'] = self.make_fullyqualified(i['realurl'])
+                    i['url'] = self.make_fullyqualified(
+                        i['realurl']).decode('utf-8')
                     self.icons.append(i)
                     self.debug('adding icon {} for {}'.format(
                         i, self.friendly_name))
@@ -400,8 +401,8 @@ class Device(log.Loggable):
                 self.debug(traceback.format_exc())
 
         try:
-            r.append(('Location', (str(self.get_location()),
-                                   str(self.get_location()))))
+            r.append(('Location', (self.get_location(),
+                                   self.get_location())))
         except:
             pass
         try:
@@ -520,13 +521,15 @@ class RootDevice(Device):
         return self.st
 
     def get_location(self):
-        return self.location
+        return self.location if isinstance(self.location, bytes) else \
+            self.location.encode('ascii') if self.location else None
 
     def get_upnp_version(self):
         return self.upnp_version
 
     def get_urlbase(self):
-        return self.urlbase
+        return self.urlbase if isinstance(self.urlbase, bytes) else \
+            self.urlbase.encode('ascii') if self.urlbase else None
 
     def get_host(self):
         return self.host
@@ -577,6 +580,7 @@ class RootDevice(Device):
 
         def gotPage(x):
             self.debug("got device description from %r", self.location)
+            self.debug("data is %r", x)
             data, headers = x
             xml_data = None
             try:
@@ -604,7 +608,7 @@ class RootDevice(Device):
                 d = tree.find('./{%s}device' % ns)
                 if d is not None:
                     self.parse_device(d)  # root device
-            self.debug("device parsed succesfully %r", self.location)
+            self.debug("device parsed successfully %r", self.location)
 
         def gotError(failure, url):
             self.warning("error getting device description from %r", url)
@@ -618,14 +622,23 @@ class RootDevice(Device):
             self.error('Error on parsing device description: {}'.format(e))
 
     def make_fullyqualified(self, url):
-        if url.startswith('http://'):
+        '''Be aware that this function returns a byte string'''
+        self.info('make_fullyqualified: {}  [{}]'.format(url, type(url)))
+        if isinstance(url, str):
+            url = url.encode('ascii')
+        if url.startswith(b'http://'):
             return url
         from urllib.parse import urljoin
         base = self.get_urlbase()
+        if isinstance(base, str):
+            base = base.encode('ascii')
         if base != None:
-            if base[-1] != '/':
-                base += '/'
+            if base[-1] != b'/':
+                base += b'/'
             r = urljoin(base, url)
         else:
-            r = urljoin(self.get_location(), url)
+            loc = self.get_location()
+            if isinstance(loc, str):
+                loc = loc.encode('ascii')
+            r = urljoin(loc, url)
         return r

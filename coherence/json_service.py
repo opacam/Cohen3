@@ -30,19 +30,19 @@ class JsonInterface(resource.Resource, log.Loggable):
         return d
 
     def getChildWithDefault(self, path, request):
-        self.info('getChildWithDefault, %s, %s, %s %s %r', request.method, path,
+        self.info('getChildWithDefault, %r, %r, %r %r %r', request.method, path,
                   request.uri, request.client, request.args)
         # return self.do_the_render(request)
         d = defer.maybeDeferred(self.do_the_render, request)
         return d
 
     def do_the_render(self, request):
-        self.warning('do_the_render, %s, %s, %s %r %s', request.method,
+        self.warning('do_the_render, %r, %r, %r %r %r', request.method,
                      request.path, request.uri, request.args, request.client)
         msg = "Houston, we've got a problem"
         path = request.path
         if isinstance(path, bytes):
-            path = path.encode('utf-8')
+            path = path.decode('utf-8')
         path = request.path.split('/')
         path = path[2:]
         self.warning('path %r', path)

@@ -39,14 +39,15 @@ class UPnPPublisher(resource.Resource, log.Loggable):
             request.setResponseCode(500)
 
         if self.encoding is not None:
-            mimeType = 'text/xml; charset="%s"' % self.encoding
+            mimeType = b'text/xml; charset="%r"' % self.encoding
         else:
-            mimeType = "text/xml"
-        request.setHeader("Content-type", mimeType)
-        request.setHeader("Content-length", str(len(response)))
-        request.setHeader("EXT", '')
-        request.setHeader("SERVER", SERVER_ID)
-        request.write(response)
+            mimeType = b"text/xml"
+        request.setHeader(b"Content-type", mimeType)
+        request.setHeader(b"Content-length", len(response))
+        request.setHeader(b"EXT", b'')
+        request.setHeader(b"SERVER", SERVER_ID.encode('ascii'))
+        r = response if isinstance(response, bytes) else response.encode('ascii')
+        request.write(r)
         request.finish()
 
     def _methodNotFound(self, request, methodName):
@@ -117,7 +118,7 @@ class UPnPPublisher(resource.Resource, log.Loggable):
         # methodName, args, kwargs, ns = p._name, p._aslist, p._asdict, p._ns
 
         try:
-            headers['content-type'].index('text/xml')
+            headers[b'content-type'].index(b'text/xml')
         except:
             self._gotError(failure.Failure(errorCode(415)), request, methodName)
             return server.NOT_DONE_YET
@@ -132,18 +133,18 @@ class UPnPPublisher(resource.Resource, log.Loggable):
             return server.NOT_DONE_YET
         else:
             keywords = {'soap_methodName': methodName}
-            if ('user-agent' in headers and
-                    headers['user-agent'].find('Xbox/') == 0):
+            if (b'user-agent' in headers and
+                    headers[b'user-agent'].find(b'Xbox/') == 0):
                 keywords['X_UPnPClient'] = 'XBox'
             # if(headers.has_key('user-agent') and
             #        headers['user-agent'].startswith("""Mozilla/4.0 (compatible; UPnP/1.0; Windows""")):
             #    keywords['X_UPnPClient'] = 'XBox'
-            if ('x-av-client-info' in headers and
-                    headers['x-av-client-info'].find('"PLAYSTATION3') > 0):
+            if (b'x-av-client-info' in headers and
+                    headers[b'x-av-client-info'].find(b'"PLAYSTATION3') > 0):
                 keywords['X_UPnPClient'] = 'PLAYSTATION3'
-            if ('user-agent' in headers and
-                    headers['user-agent'].find(
-                        'Philips-Software-WebClient/4.32') == 0):
+            if (b'user-agent' in headers and
+                    headers[b'user-agent'].find(
+                        b'Philips-Software-WebClient/4.32') == 0):
                 keywords['X_UPnPClient'] = 'Philips-TV'
             for k, v in list(kwargs.items()):
                 keywords[str(k)] = v

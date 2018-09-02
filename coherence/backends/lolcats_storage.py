@@ -217,8 +217,9 @@ class LolcatsStore(BackendStore):
         print("asked for", id, type(id))
         # what ever we are asked for, we want to return the container only
         if isinstance(id, str):
-            id = id.split('@', 1)
-            id = id[0]
+            id = id.split('@', 1)[0]
+        elif isinstance(id, bytes):
+            id = id.decode('utf-8').split('@', 1)[0]
         if int(id) == self.ROOT_ID:
             return self.container
         return self.images.get(int(id), None)

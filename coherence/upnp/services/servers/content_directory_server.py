@@ -40,13 +40,15 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                                        self.device.version, backend)
 
         self.control = ContentDirectoryControl(self)
-        self.putChild('scpd.xml', service.scpdXML(self, self.control))
-        self.putChild('control', self.control)
+        self.putChild(b'scpd.xml', service.scpdXML(self, self.control))
+        self.putChild(b'control', self.control)
 
         self.set_variable(0, 'SystemUpdateID', 0)
         self.set_variable(0, 'ContainerUpdateIDs', '')
 
     def listchilds(self, uri):
+        if isinstance(uri, bytes):
+            uri = uri.decode('utf-8')
         cl = ''
         for c in self.children:
             cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)
@@ -219,6 +221,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
         self.info("upnp_Browse request %r %r %r %r", ObjectID, BrowseFlag,
                   StartingIndex, RequestedCount)
+        # self.debug('\t- kwargs: {}'.format(kwargs))
 
         didl = DIDLElement(upnp_client=kwargs.get('X_UPnPClient', ''),
                            requested_id=requested_id,

@@ -34,9 +34,9 @@ pyOpenSSL = "==18.0.0"
 Twisted = "==18.7.0"
 pycairo = "*"
 pygobject = "*"
-dbus-python = "*"
 treq = "*"
 gdata = {git = "https://github.com/dvska/gdata-python3"}
+dbus-python = "*"
 
 [dev-packages]
 pipenv = "==2018.7.1"

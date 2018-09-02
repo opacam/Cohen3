@@ -28,8 +28,8 @@ class DeviceHttpRoot(resource.Resource, log.Loggable):
         self.info('DeviceHttpRoot %s getChildWithDefault %s %s %s',
                   self.server.device_type, path, request.uri, request.client)
         self.info(request.getAllHeaders())
-        if isinstance(path, bytes):
-            path = path.decode('utf-8')
+        if not isinstance(path, bytes):
+            path = path.encode('ascii')
         if path in self.children:
             return self.children[path]
         if request.uri == b'/':
@@ -38,17 +38,19 @@ class DeviceHttpRoot(resource.Resource, log.Loggable):
 
     def getChild(self, name, request):
         self.info('DeviceHttpRoot %s getChild %s', name, request)
-        if isinstance(name, bytes):
-            name = name.decode('utf-8')
+        if not isinstance(name, bytes):
+            name = name.encode('ascii')
         ch = None
         if ch is None:
-            p = util.sibpath(__file__, name)
+            p = util.sibpath(__file__.encode('ascii'), name)
             if os.path.exists(p):
                 ch = static.File(p)
         self.info('DeviceHttpRoot ch  %s', ch)
         return ch
 
     def listchilds(self, uri):
+        if isinstance(uri, bytes):
+            uri = uri.decode('utf-8')
         cl = ''
         for c in self.children:
             cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)
@@ -56,9 +58,9 @@ class DeviceHttpRoot(resource.Resource, log.Loggable):
 
     def render(self, request):
         return '<html><p>root of the %s %s</p><p><ul>%s</ul></p></html>' % (
-        self.server.backend.name,
-        self.server.device_type,
-        self.listchilds(request.uri))
+            self.server.backend.name,
+            self.server.device_type,
+            self.listchilds(request.uri))
 
 
 # class RootDeviceXML(static.Data):

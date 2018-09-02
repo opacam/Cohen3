@@ -100,7 +100,7 @@ class MediaRenderer(log.Loggable, BasicDeviceMixin):
         version = self.version
         while version > 0:
             self.web_resource.putChild(
-                'description-%d.xml' % version,
+                b'description-%r.xml' % version,
                 RootDeviceXML(
                     self.coherence.hostname,
                     str(self.uuid),
@@ -118,25 +118,25 @@ class MediaRenderer(log.Loggable, BasicDeviceMixin):
                     dlna_caps=dlna_caps))
             version -= 1
 
-        self.web_resource.putChild('ConnectionManager',
+        self.web_resource.putChild(b'ConnectionManager',
                                    self.connection_manager_server)
-        self.web_resource.putChild('RenderingControl',
+        self.web_resource.putChild(b'RenderingControl',
                                    self.rendering_control_server)
-        self.web_resource.putChild('AVTransport', self.av_transport_server)
+        self.web_resource.putChild(b'AVTransport', self.av_transport_server)
 
         for icon in self.icons:
             if 'url' in icon:
                 if icon['url'].startswith('file://'):
                     if os.path.exists(icon['url'][7:]):
                         self.web_resource.putChild(
-                            os.path.basename(icon['url']),
+                            os.path.basename(icon['url']).encode('ascii'),
                             StaticFile(icon['url'][7:],
                                        defaultType=icon['mimetype']))
                 elif icon['url'] == '.face':
                     face_path = os.path.abspath(
                         os.path.join(os.path.expanduser('~'), ".face"))
                     if os.path.exists(face_path):
-                        self.web_resource.putChild('face-icon.png',
+                        self.web_resource.putChild(b'face-icon.png',
                                                    StaticFile(face_path,
                                                               defaultType=icon[
                                                                   'mimetype']))
@@ -149,7 +149,7 @@ class MediaRenderer(log.Loggable, BasicDeviceMixin):
                                          'device-icons', icon['url'])))
                     if os.path.exists(icon_path):
                         self.web_resource.putChild(
-                            icon['url'],
+                            icon['url'].encode('ascii'),
                             StaticFile(icon_path,
                                        defaultType=icon['mimetype']))
 

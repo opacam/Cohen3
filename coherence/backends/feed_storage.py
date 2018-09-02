@@ -158,8 +158,9 @@ class FeedStore(BackendStore):
     def get_by_id(self, id):
         """returns the item according to the DIDLite id"""
         if isinstance(id, str):
-            id = id.split('@', 1)
-            id = id[0]
+            id = id.split('@', 1)[0]
+        elif isinstance(id, bytes):
+            id = id.decode('utf-8').split('@', 1)[0]
         try:
             return self.store[int(id)]
         except (ValueError, KeyError):

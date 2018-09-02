@@ -274,10 +274,10 @@
         },
         "pygobject": {
             "hashes": [
-                "sha256:250fb669b6ac64eba034cc4404fcbcc993717b1f77c29dff29f8c9202da20d55"
+                "sha256:c5c888068b96d55aa8efcbf1253fe824c74462169d80c0333967e295aabbee5e"
             ],
             "index": "pypi",
-            "version": "==3.28.3"
+            "version": "==3.30.0"
         },
         "pyhamcrest": {
             "hashes": [

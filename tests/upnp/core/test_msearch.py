@@ -96,4 +96,4 @@ class TestMSearch(unittest.TestCase):
         recieved = data.splitlines(True)
         self.assertEqual(
             sorted(recieved),
-            sorted([str(i).encode('ascii') for i in expected]))
+            sorted([i.encode('ascii') for i in expected]))

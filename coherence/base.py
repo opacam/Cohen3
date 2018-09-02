@@ -70,6 +70,8 @@ class SimpleRoot(resource.Resource, log.Loggable):
                 'text/html')
 
     def listchilds(self, uri):
+        if isinstance(uri, bytes):
+            uri = uri.decode('utf-8')
         self.info('listchilds %s', uri)
         if uri[-1] != '/':
             uri += '/'
@@ -644,7 +646,7 @@ class Coherence(log.Loggable):
         return [d for d in self.devices if d.manifestation == 'remote']
 
     def create_device(self, device_type, infos):
-        self.info("creating %s %s", infos['ST'], infos['USN'])
+        self.info("creating %r %r", infos['ST'], infos['USN'])
         if infos['ST'] == 'upnp:rootdevice':
             self.info('creating upnp:rootdevice  {}'.format(infos['USN']))
             root = RootDevice(infos)

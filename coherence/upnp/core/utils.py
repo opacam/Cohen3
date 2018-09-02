@@ -264,6 +264,8 @@ class Request(server.Request):
             self.postpath = list(i.encode('ascii') for i in raw_p)
         try:
             def deferred_rendering(r):
+                if isinstance(r, str):
+                    r = r.encode('ascii')
                 self.render(r)
 
             resrc = self.site.getResourceFor(self)
@@ -277,6 +279,8 @@ class Request(server.Request):
                 resrc.addCallback(deferred_rendering)
                 resrc.addErrback(self.processingFailed)
             else:
+                if isinstance(resrc, str):
+                    resrc = resrc.encode('ascii')
                 self.render(resrc)
 
         except Exception as e:
@@ -470,7 +474,7 @@ def getPage(url, contextFactory=None, *args, **kwargs):
 
     url_bytes = url
     if not isinstance(url, bytes):
-        url_bytes = bytes(url, encoding='utf-8')
+        url_bytes = url.encode('ascii')
     if args is None:
         args = []
     if kwargs is None:
@@ -480,14 +484,25 @@ def getPage(url, contextFactory=None, *args, **kwargs):
         kwargs['agent'] = kwargs['headers']['user-agent']
     elif not 'agent' in kwargs:
         kwargs['agent'] = "Coherence PageGetter"
+    new_kwargs = {}
+    for k, v in kwargs.items():
+        if k == 'headers':
+            new_kwargs[k] = {}
+            for kh, vh in kwargs['headers'].items():
+                h_key = kh if isinstance(kh, bytes) else kh.encode('ascii')
+                h_val = vh if isinstance(kh, bytes) else vh.encode('ascii')
+                new_kwargs['headers'][h_key] = h_val
+        else:
+            new_kwargs[k] = v
     logger.info('getPage [url]: {} [type: {}]'.format(url, type(url)))
     logger.debug('\t->[args]: {} [type: {}]'.format(args, type(args)))
-    logger.debug('\t->[kwargs]: {} [type: {}]'.format(kwargs, type(kwargs)))
+    logger.debug('\t->[kwargs]: {}'.format(kwargs))
+    logger.debug('\t->[new_kwargs]: {}]'.format(new_kwargs))
     return client._makeGetterFactory(
         url_bytes,
         HeaderAwareHTTPClientFactory,
         contextFactory=contextFactory,
-        *args, **kwargs).deferred
+        *args, **new_kwargs).deferred
 
 
 def downloadPage(url, file, contextFactory=None, *args, **kwargs):
@@ -498,12 +513,31 @@ def downloadPage(url, file, contextFactory=None, *args, **kwargs):
     See twisted.web.client.HTTPDownloader to see what extra args can
     be passed.
     """
+    url_bytes = url
+    if not isinstance(url, bytes):
+        url_bytes = url.encode('ascii')
+
     if 'headers' in kwargs and 'user-agent' in kwargs['headers']:
         kwargs['agent'] = kwargs['headers']['user-agent']
     elif not 'agent' in kwargs:
         kwargs['agent'] = "Coherence PageGetter"
-    return client.downloadPage(url, file, contextFactory=contextFactory,
-                               *args, **kwargs)
+    new_kwargs = {}
+    for k, v in kwargs.items():
+        if k == 'headers':
+            new_kwargs[k] = {}
+            for kh, vh in kwargs['headers'].items():
+                h_key = kh if isinstance(kh, bytes) else kh.encode('ascii')
+                h_val = vh if isinstance(kh, bytes) else vh.encode('ascii')
+                new_kwargs['headers'][h_key] = h_val
+        else:
+            new_kwargs[k] = v
+    logger.info('downloadPage [url]: {} [type: {}]'.format(url, type(url)))
+    logger.debug('\t->[args]: {} [type: {}]'.format(args, type(args)))
+    logger.debug('\t->[kwargs]: {}'.format(kwargs))
+    logger.debug('\t->[new_kwargs]: {}]'.format(new_kwargs))
+    return client.downloadPage(
+        url_bytes, file, contextFactory=contextFactory,
+        *args, **new_kwargs)
 
 
 # StaticFile used to be a patched version of static.File. The later
@@ -557,12 +591,16 @@ class BufferFile(static.File):
         # print fsize
 
         if size == int(self.getFileSize()):
-            request.setHeader('accept-ranges', 'bytes')
+            request.setHeader(b'accept-ranges', b'bytes')
 
         if self.type:
-            request.setHeader('content-type', self.type)
+            request.setHeader(
+                b'content-type', self.type if isinstance(
+                    self.type, bytes) else self.type.encode('ascii'))
         if self.encoding:
-            request.setHeader('content-encoding', self.encoding)
+            request.setHeader(
+                b'content-encoding', self.encoding if isinstance(
+                    self.encoding, bytes) else self.encoding.encode('ascii'))
 
         try:
             f = self.openForReading()
@@ -624,16 +662,16 @@ class BufferFile(static.File):
                 trans = False
             else:
                 request.setResponseCode(http.PARTIAL_CONTENT)
-                request.setHeader('content-range', "bytes %s-%s/%s " % (
-                    str(start), str(end), str(tsize)))
+                request.setHeader(b'content-range', ("bytes %s-%s/%s " % (
+                    str(start), str(end), str(tsize))).encode('ascii'))
                 # print "StaticFile", start, end, tsize
 
         request.setHeader('content-length', str(fsize))
 
-        if request.method == 'HEAD' or trans == False:
+        if request.method == b'HEAD' or trans is False:
             # pretend we're a HEAD request, so content-length
             # won't be overwritten.
-            request.method = 'HEAD'
+            request.method = b'HEAD'
             return ''
         # print "StaticFile out", request.headers, request.code
 

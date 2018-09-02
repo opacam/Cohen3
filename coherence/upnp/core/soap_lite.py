@@ -105,7 +105,7 @@ def build_soap_call(method, arguments, ns=None,
                 if arg_type == 'int' or arg_type == 'float':
                     arg_val = str(arg_val)
                 if arg_type == 'bytes':
-                    arg_val = str(arg_val)
+                    arg_val = arg_val.decode('utf-8')
                 if arg_type == 'boolean':
                     arg_val = '1' if arg_val else '0'
                 e = etree.SubElement(re, arg_name)

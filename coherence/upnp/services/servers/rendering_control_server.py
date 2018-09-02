@@ -36,6 +36,8 @@ class RenderingControlServer(service.ServiceServer, resource.Resource):
         self.putChild(self.control_url, self.control)
 
     def listchilds(self, uri):
+        if isinstance(uri, bytes):
+            uri = uri.decode('utf-8')
         cl = ''
         for c in self.children:
             cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)

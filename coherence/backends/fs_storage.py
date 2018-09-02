@@ -637,8 +637,9 @@ class FSStore(BackendStore):
         # print "get_by_id", id, type(id)
         # we have referenced ids here when we are in WMC mapping mode
         if isinstance(id, str):
-            id = id.split('@', 1)
-            id = id[0]
+            id = id.split('@', 1)[0]
+        elif isinstance(id, bytes):
+            id = id.decode('utf-8').split('@', 1)[0]
         elif isinstance(id, int):
             id = str(id)
         # try:

@@ -566,7 +566,8 @@ class YouTubeStore(AbstractBackendStore):
 
         def gotFeed(feed):
             if feed is None:
-                self.warning("Unable to retrieve playlist items %s", feed_uri)
+                self.warning("Unable to retrieve playlist items for feed %s",
+                             feed)
                 return
             for entry in feed.entry:
                 self.appendVideoEntry(entry, parent)

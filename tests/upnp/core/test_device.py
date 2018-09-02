@@ -85,6 +85,8 @@ def fakeGetPageURL(url):
     Example:
       http://1.2.3.4/a/b/c/some.xml -> <module-dir>/some.xml
     """
+    if isinstance(url, bytes):
+        url = url.decode('utf-8')
     path = urllib.parse.urlparse(url).path
     path = posixpath.normpath(path)
     words = path.split('/')
@@ -238,7 +240,7 @@ class RootDeviceDescriptionNotFound(unittest.TestCase):
         dev = self.rootdevice
         self.assertEqual(dev.get_usn(), "RootDevice's USN")
         self.assertEqual(dev.get_st(), "RootDevice's ST")
-        self.assertEqual(dev.get_location(), "RootDevice's Location")
+        self.assertEqual(dev.get_location(), b"RootDevice's Location")
         # :fixme: should behave like a normal Device (or normal Device
         # should raise, too)
         self.assertRaises(AttributeError, dev.get_upnp_version)
@@ -283,8 +285,8 @@ class RootDeviceDescriptionNotFound(unittest.TestCase):
         # description has not yet been parsed.
         self.assertEqual(dev.as_tuples(),
                          [('Location',
-                           ("RootDevice's Location",
-                            "RootDevice's Location")),
+                           (b"RootDevice\'s Location",
+                            b"RootDevice\'s Location")),
                           # :fixme: should behave like a normal
                           # Device, see test_rootdevice_init  above
                           # ('URL base', "RootDevice's URL base"),
@@ -396,7 +398,7 @@ class RootDeviceWithDescription(unittest.TestCase):
                          ('uuid:12345678-ABCE-klmn-RSTU-987654321098::'
                           'upnp:rootdevice'))
         self.assertEqual(dev.get_st(), 'upnp:rootdevice')
-        self.assertEqual(dev.get_location(), self._location_url)
+        self.assertEqual(dev.get_location(), self._location_url.encode('ascii'))
         self.assertEqual(dev.get_upnp_version(), '1.0')
         # device-description-1.xml does not contain a URL base
         self.assertEqual(dev.get_urlbase(), None)
@@ -420,7 +422,7 @@ class RootDeviceWithDescription(unittest.TestCase):
         self.assertEqual(dev.get_device_type_version(), '1')
         self.assertEqual(dev.get_client(), None)
         self.assertEqual(dev.get_presentation_url(),
-                         'http://192.168.123.123:9000')
+                         b'http://192.168.123.123:9000')
 
         # services are tested more in detail below
         self.assertEqual(len(dev.get_services()), 3)
@@ -495,7 +497,7 @@ class RootDeviceWithDescription(unittest.TestCase):
         as_tuples = [e for e in as_tuples if e[0] != 'Icon']
 
         self.assertEqual(as_tuples, [
-            ('Location', (self._location_url, self._location_url)),
+            ('Location', (self._location_url.encode('ascii'), self._location_url.encode('ascii'))),
             # device-description-1.xml does not contain a URL base
             # ('URL base', self.__getURL('')),
             ('UDN', 'uuid:12345678-ABCE-KLMN-rstu-987654321098'),
@@ -516,7 +518,7 @@ class RootDeviceWithDescription(unittest.TestCase):
             ('Serial Number', '00:04:20:12:34:56'),
             # device-description-1.xml does not contain a UPC
             ('Presentation URL',
-             ('http://192.168.123.123:9000', 'http://192.168.123.123:9000')),
+             ('http://192.168.123.123:9000', b'http://192.168.123.123:9000')),
         ])
 
         self.assertEqual(len(icons), 4)
@@ -524,26 +526,26 @@ class RootDeviceWithDescription(unittest.TestCase):
                          ('Icon',
                           ('/html/images/Players/baby_120x120.png',
                            self.__getURL(
-                               'html/images/Players/baby_120x120.png'),
+                               'html/images/Players/baby_120x120.png').encode('ascii'),
                            {'Width': '120', 'Height': '120', 'Depth': '24',
                             'Mimetype': 'image/png'})))
         self.assertEqual(icons[1],
                          ('Icon',
                           ('/html/images/Players/baby_48x48.png',
-                           self.__getURL('html/images/Players/baby_48x48.png'),
+                           self.__getURL('html/images/Players/baby_48x48.png').encode('ascii'),
                            {'Width': '48', 'Height': '48', 'Depth': '24',
                             'Mimetype': 'image/png'})))
         self.assertEqual(icons[2],
                          ('Icon',
                           ('/html/images/Players/baby_120x120.jpg',
                            self.__getURL(
-                               'html/images/Players/baby_120x120.jpg'),
+                               'html/images/Players/baby_120x120.jpg').encode('ascii'),
                            {'Width': '120', 'Height': '120', 'Depth': '24',
                             'Mimetype': 'image/jpeg'})))
         self.assertEqual(icons[3],
                          ('Icon',
                           ('/html/images/Players/baby_48x48.jpg',
-                           self.__getURL('html/images/Players/baby_48x48.jpg'),
+                           self.__getURL('html/images/Players/baby_48x48.jpg').encode('ascii'),
                            {'Width': '48', 'Height': '48', 'Depth': '24',
                             'Mimetype': 'image/jpeg'})))
 
@@ -591,19 +593,19 @@ class RootDeviceWithDescription(unittest.TestCase):
             self.assertEqual(service.get_id(),
                              'urn:upnp-org:serviceId:%s' % type)
             self.assertEqual(service.get_control_url(),
-                             'http://127.0.0.1/plugins/UPnP/'
+                             ('http://127.0.0.1/plugins/UPnP/'
                              'MediaRenderer/%s/control' % type +
-                             '?player=00%3A04%3A20%3A12%3A34%3A56')
+                             '?player=00%3A04%3A20%3A12%3A34%3A56').encode('ascii'))
             self.assertEqual(service.get_event_sub_url(),
-                             'http://192.168.123.123:40872/plugins/UPnP/'
+                             ('http://192.168.123.123:40872/plugins/UPnP/'
                              'MediaRenderer/%s/eventsub' % type +
-                             '?player=00%3A04%3A20%3A12%3A34%3A56')
+                             '?player=00%3A04%3A20%3A12%3A34%3A56').encode('ascii'))
             # :fixme: this crashes as this test-case does not have a
             # presentation_url. Need to fix Service.get_presentation_url()
             # self.assertEqual(service.get_presentation_url(), '')
             self.assertEqual(service.get_scpd_url(),
-                             'http://127.0.0.1'
-                             '/plugins/UPnP/MediaRenderer/%s-1.xml' % type)
+                             ('http://127.0.0.1'
+                             '/plugins/UPnP/MediaRenderer/%s-1.xml' % type).encode('ascii'))
             self.assertIs(service.device, dev)
 
         dev = self.rootdevice
@@ -652,9 +654,9 @@ class RootDeviceWithDescription(unittest.TestCase):
         # make_fullyqualified and implement proper test-cases.
         dev = self.rootdevice
         self.assertEqual(dev.make_fullyqualified(''),
-                         self.__getURL('device-description-1.xml'))
+                         self.__getURL('device-description-1.xml').encode('ascii'))
         self.assertEqual(dev.make_fullyqualified('test-test.html'),
-                         self.__getURL('test-test.html'))
+                         self.__getURL('test-test.html').encode('ascii'))
 
     def test_get_markup_name(self):
         dev = self.rootdevice
