@@ -197,12 +197,11 @@ class Loggable(object):
     msg = info
 
 
-def getLogger(logCategory):
+def get_logger(log_category):
     global loggers
-    if loggers.get(logCategory):
-        log = loggers.get(logCategory)
-    else:
-        log = logging.getLogger(logCategory)
+    log = loggers.get(log_category, None)
+    if log is None:
+        log = logging.getLogger(log_category)
     log.setLevel(get_main_log_level())
     log.propagate = False
     return log

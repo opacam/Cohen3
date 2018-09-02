@@ -15,7 +15,7 @@ from twisted.web import proxy, resource, server
 from coherence import SERVER_ID
 from coherence import log
 
-logger = log.getLogger('utils')
+logger = log.get_logger('utils')
 
 try:
     from twisted.protocols._c_urlarg import unquote
