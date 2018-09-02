@@ -13,11 +13,11 @@ from coherence.upnp.services.clients.wan_ppp_connection_client import \
     WANPPPConnectionClient
 
 
-class WANConnectionDeviceClient(log.Loggable):
+class WANConnectionDeviceClient(log.LogAble):
     logCategory = 'igd_client'
 
     def __init__(self, device):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.device = device
         self.device_type = self.device.get_friendly_device_type()
         self.version = int(self.device.get_device_type_version())

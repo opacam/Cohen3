@@ -105,12 +105,12 @@ class ProxyImage(ReverseProxyResource):
         ReverseProxyResource.__init__(self, host, port, path)
 
 
-class FlickrItem(log.Loggable):
+class FlickrItem(log.LogAble):
     logCategory = 'flickr_storage'
 
     def __init__(self, id, obj, parent, mimetype, urlbase, UPnPClass,
                  store=None, update=False, proxy=False):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.id = id
         self.real_url = None
         self.obj = obj

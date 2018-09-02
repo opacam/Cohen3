@@ -297,10 +297,10 @@ class Site(server.Site):
         # http._logDateTimeStart()
 
 
-class ProxyClient(proxy.ProxyClient, log.Loggable):
+class ProxyClient(proxy.ProxyClient, log.LogAble):
 
     def __init__(self, command, rest, version, headers, data, father):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         # headers["connection"] = "close"
         self.send_data = 0
         proxy.ProxyClient.__init__(self, command, rest, version,

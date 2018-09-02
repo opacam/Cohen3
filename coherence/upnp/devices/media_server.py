@@ -39,12 +39,12 @@ ATTACHMENT_REQUEST_INDICATOR = re.compile(b".*?attachment=.*$")
 TRANSCODED_REQUEST_INDICATOR = re.compile(b".*/transcoded/.*$")
 
 
-class MSRoot(resource.Resource, log.Loggable):
+class MSRoot(resource.Resource, log.LogAble):
     logCategory = 'mediaserver'
 
     def __init__(self, server, store):
         resource.Resource.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.server = server
         self.store = store
 
@@ -640,7 +640,7 @@ class RootDeviceXML(static.Data):
         static.Data.__init__(self, self.xml, 'text/xml')
 
 
-class MediaServer(log.Loggable, BasicDeviceMixin):
+class MediaServer(log.LogAble, BasicDeviceMixin):
     logCategory = 'mediaserver'
 
     device_type = 'MediaServer'
@@ -649,7 +649,7 @@ class MediaServer(log.Loggable, BasicDeviceMixin):
 
     def __init__(self, coherence, backend, **kwargs):
         BasicDeviceMixin.__init__(self, coherence, backend, **kwargs)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
 
     def fire(self, backend, **kwargs):
 

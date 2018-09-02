@@ -38,12 +38,12 @@ def unsubscribe(service):
     subscribers.pop(service.get_sid(), None)
 
 
-class Service(log.Loggable):
+class Service(log.LogAble):
     logCategory = 'service_client'
 
     def __init__(self, service_type, service_id, location, control_url,
                  event_sub_url, presentation_url, scpd_url, device):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.debug('Service.__init__: ...')
 
         self.service_type = service_type
@@ -466,11 +466,11 @@ moderated_variables = \
      }
 
 
-class ServiceServer(log.Loggable):
+class ServiceServer(log.LogAble):
     logCategory = 'service_server'
 
     def __init__(self, id, version, backend):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.id = id
         self.version = version
         self.backend = backend
@@ -1027,11 +1027,11 @@ class ServiceServer(log.Loggable):
                     v.dependant_variable)
 
 
-class scpdXML(static.Data, log.Loggable):
+class scpdXML(static.Data, log.LogAble):
     logCategory = 'service_scpdxml'
 
     def __init__(self, server, control=None):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.debug('scpdXML.__init: {}  [{}]'.format(server, control))
         self.service_server = server
         self.control = control
@@ -1095,7 +1095,7 @@ class scpdXML(static.Data, log.Loggable):
 from twisted.python.util import OrderedDict
 
 
-class ServiceControl(log.Loggable):
+class ServiceControl(log.LogAble):
 
     def get_action_results(self, result, action, instance):
         """ check for out arguments

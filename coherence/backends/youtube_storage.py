@@ -26,7 +26,7 @@ MPEG4_MIMETYPE = 'video/mp4'
 MPEG4_EXTENSION = 'mp4'
 
 
-class TestVideoProxy(ReverseProxyUriResource, log.Loggable):
+class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
     logCategory = 'internetVideoProxy'
 
     def __init__(self, uri, id,
@@ -37,7 +37,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.Loggable):
                  fct=None, **kwargs):
 
         ReverseProxyUriResource.__init__(self, uri)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
 
         self.id = id
         if isinstance(self.id, int):

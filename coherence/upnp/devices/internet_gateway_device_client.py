@@ -10,11 +10,11 @@ from coherence import log
 from coherence.upnp.devices.wan_device_client import WANDeviceClient
 
 
-class InternetGatewayDeviceClient(log.Loggable):
+class InternetGatewayDeviceClient(log.LogAble):
     logCategory = 'igd_client'
 
     def __init__(self, device):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.device = device
         self.device_type = self.device.get_friendly_device_type()
         self.version = int(self.device.get_device_type_version())

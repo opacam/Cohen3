@@ -34,7 +34,7 @@ from twisted.web.static import NoRangeStaticProducer
 
 from coherence.backend import AbstractBackendStore, Container, BackendItem, \
     LazyContainer
-from coherence.log import Loggable
+from coherence.log import LogAble
 from coherence.upnp.core import utils, DIDLLite
 
 MPEG_MIME = 'video/mpeg'
@@ -42,12 +42,12 @@ MPEG_MIME = 'video/mpeg'
 TWITCH_API_URL = 'https://api.twitch.tv/kraken'
 
 
-class LiveStreamerProxyResource(Resource, Loggable):
+class LiveStreamerProxyResource(Resource, LogAble):
     logCategory = 'twitch_store'
 
     def __init__(self, url, stream_id, content_type=MPEG_MIME):
         Resource.__init__(self)
-        Loggable.__init__(self)
+        LogAble.__init__(self)
         self.url = url
         self.stream_id = stream_id
         self.content_type = content_type

@@ -34,13 +34,13 @@ except ImportError:
     pkg_resources = None
 
 
-class SimpleRoot(resource.Resource, log.Loggable):
+class SimpleRoot(resource.Resource, log.LogAble):
     addSlash = True
     logCategory = 'coherence'
 
     def __init__(self, coherence):
         resource.Resource.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.coherence = coherence
 
     def getChild(self, name, request):
@@ -98,11 +98,11 @@ class SimpleRoot(resource.Resource, log.Loggable):
         return result
 
 
-class WebServer(log.Loggable):
+class WebServer(log.LogAble):
     logCategory = 'webserver'
 
     def __init__(self, ui, port, coherence):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.site = Site(SimpleRoot(coherence))
         self.port = reactor.listenTCP(port, self.site)
 
@@ -111,7 +111,7 @@ class WebServer(log.Loggable):
         self.warning("WebServer on port %r ready", coherence.web_server_port)
 
 
-class Plugins(log.Loggable):
+class Plugins(log.LogAble):
     logCategory = 'plugins'
     __instance = None  # Singleton
 
@@ -135,7 +135,7 @@ class Plugins(log.Loggable):
             return
         self.__initialized = True
 
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         if not isinstance(ids, (list, tuple)):
             ids = (ids,)
         if pkg_resources:
@@ -194,7 +194,7 @@ class Plugins(log.Loggable):
             self._plugins[cls.__name__.split('.')[-1]] = cls
 
 
-class Coherence(log.Loggable):
+class Coherence(log.LogAble):
     __instance = None  # Singleton
     logCategory = 'coherence'
 
@@ -214,7 +214,7 @@ class Coherence(log.Loggable):
         self.__initialized = True
 
         # supers
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
 
         self.config = config or {}
 

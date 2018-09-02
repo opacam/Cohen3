@@ -41,7 +41,7 @@ class InternalTranscoder(object):
     """
 
 
-class FakeTransformer(Gst.Element, log.Loggable):
+class FakeTransformer(Gst.Element, log.LogAble):
     logCategory = 'faker_datasink'
 
     _sinkpadtemplate = Gst.PadTemplate.new("sinkpadtemplate",
@@ -56,7 +56,7 @@ class FakeTransformer(Gst.Element, log.Loggable):
 
     def __init__(self, destination=None, request=None):
         Gst.Element.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.sinkpad = Gst.Pad(self._sinkpadtemplate, "sink")
         self.srcpad = Gst.Pad(self._srcpadtemplate, "src")
         self.add_pad(self.sinkpad)
@@ -104,7 +104,7 @@ class FakeTransformer(Gst.Element, log.Loggable):
 GObject.type_register(FakeTransformer)
 
 
-class DataSink(Gst.Element, log.Loggable):
+class DataSink(Gst.Element, log.LogAble):
     logCategory = 'transcoder_datasink'
 
     _sinkpadtemplate = Gst.PadTemplate.new("sinkpadtemplate",
@@ -114,7 +114,7 @@ class DataSink(Gst.Element, log.Loggable):
 
     def __init__(self, destination=None, request=None):
         Gst.Element.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.sinkpad = Gst.Pad(self._sinkpadtemplate, "sink")
         self.add_pad(self.sinkpad)
 
@@ -168,7 +168,7 @@ class DataSink(Gst.Element, log.Loggable):
 GObject.type_register(DataSink)
 
 
-class GStreamerPipeline(resource.Resource, log.Loggable):
+class GStreamerPipeline(resource.Resource, log.LogAble):
     logCategory = 'gstreamer'
     addSlash = True
 
@@ -181,7 +181,7 @@ class GStreamerPipeline(resource.Resource, log.Loggable):
         self.streamheader = None
         self.parse_pipeline()
         resource.Resource.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
 
     def parse_pipeline(self):
         self.pipeline = Gst.parse_launch(self.pipeline_description)
@@ -302,7 +302,7 @@ class GStreamerPipeline(resource.Resource, log.Loggable):
         self.streamheader = None
 
 
-class BaseTranscoder(resource.Resource, log.Loggable):
+class BaseTranscoder(resource.Resource, log.LogAble):
     logCategory = 'transcoder'
     addSlash = True
 
@@ -312,7 +312,7 @@ class BaseTranscoder(resource.Resource, log.Loggable):
         self.uri = uri
         self.destination = destination
         resource.Resource.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.info('uri %s %r', uri, type(uri))
 
     def getChild(self, name, request):
@@ -619,14 +619,14 @@ class ExternalProcessProducer(object):
         self.request = None
 
 
-class ExternalProcessPipeline(resource.Resource, log.Loggable):
+class ExternalProcessPipeline(resource.Resource, log.LogAble):
     logCategory = 'externalprocess'
     addSlash = False
 
     def __init__(self, uri):
         self.uri = uri
         resource.Resource.__init__(self)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
 
     def getChildWithDefault(self, path, request):
         return self
@@ -653,7 +653,7 @@ def transcoder_class_wrapper(klass, content_type, pipeline):
     return create_object
 
 
-class TranscoderManager(log.Loggable):
+class TranscoderManager(log.LogAble):
     """ singleton class which holds information
         about all available transcoders
 
@@ -703,7 +703,7 @@ class TranscoderManager(log.Loggable):
             with the main coherence class passed as an argument,
             so we have access to the config
         """
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.transcoders = {}
         for transcoder in InternalTranscoder.__subclasses__():
             self.transcoders[get_transcoder_name(transcoder)] = transcoder

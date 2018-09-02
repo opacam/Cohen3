@@ -29,14 +29,14 @@ from coherence.extern.simple_plugin import Plugin
 from coherence import log
 
 
-class Player(log.Loggable):
+class Player(log.LogAble):
     logCategory = 'gstreamer_player'
     max_playbin_volume = 1.
 
     def __init__(self, default_mimetype='audio/mpeg', audio_sink_name=None,
                  video_sink_name=None, audio_sink_options=None,
                  video_sink_options=None):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.audio_sink_name = audio_sink_name or "autoaudiosink"
         self.video_sink_name = video_sink_name or "autovideosink"
         self.audio_sink_options = audio_sink_options or {}
@@ -450,7 +450,7 @@ class Player(log.Loggable):
                 self.update()
 
 
-class GStreamerPlayer(log.Loggable, Plugin):
+class GStreamerPlayer(log.LogAble, Plugin):
     """ a backend with a GStreamer based audio player
 
         needs gnomevfssrc from gst-plugins-base
@@ -476,7 +476,7 @@ class GStreamerPlayer(log.Loggable, Plugin):
     vendor_range_defaults = {'RenderingControl': {'Volume': {'maximum': 100}}}
 
     def __init__(self, device, **kwargs):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         if (device.coherence.config.get('use_dbus', 'no') != 'yes' and
                 device.coherence.config.get('glib', 'no') != 'yes'):
             raise Exception(

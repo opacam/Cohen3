@@ -23,13 +23,13 @@ SHOUTCAST_TUNEIN_URL = 'http://www.shoutcast.com/sbin/tunein-tvstation.pls?id=%s
 VIDEO_MIMETYPE = 'video/x-nsv'
 
 
-class ProxyStream(utils.ReverseProxyUriResource, log.Loggable):
+class ProxyStream(utils.ReverseProxyUriResource, log.LogAble):
     logCategory = 'itv'
 
     stream_url = None
 
     def __init__(self, uri):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.stream_url = None
         utils.ReverseProxyUriResource.__init__(self, uri)
 

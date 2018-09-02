@@ -16,11 +16,11 @@ from coherence.upnp.core.DIDLLite import classChooser, Container, Resource
 from coherence.upnp.core.soap_service import errorCode
 
 
-class BzClient(LineReceiver, log.Loggable):
+class BzClient(LineReceiver, log.LogAble):
     logCategory = 'buzztard_client'
 
     def __init__(self, *args, **kwargs):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
 
     def connectionMade(self):
         self.info("connected to Buzztard")
@@ -43,12 +43,12 @@ class BzClient(LineReceiver, log.Loggable):
             louie.send('Buzztard.Response.browse', None, line)
 
 
-class BzFactory(protocol.ClientFactory, log.Loggable):
+class BzFactory(protocol.ClientFactory, log.LogAble):
     logCategory = 'buzztard_factory'
     protocol = BzClient
 
     def __init__(self, backend):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.backend = backend
 
     def clientConnectionFailed(self, connector, reason):
@@ -83,13 +83,13 @@ class BzFactory(protocol.ClientFactory, log.Loggable):
         self.sendMessage('browse')
 
 
-class BzConnection(log.Loggable):
+class BzConnection(log.LogAble):
     """ a singleton class
     """
     logCategory = 'buzztard_connection'
 
     def __init__(self, *args, **kwargs):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
 
     def __new__(cls, *args, **kwargs):
         cls.debug("BzConnection __new__")
@@ -106,15 +106,15 @@ class BzConnection(log.Loggable):
             return obj
 
     def __init__(self, backend=None, host='localhost', port=7654):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.debug("BzConnection __init__")
 
 
-class BuzztardItem(log.Loggable):
+class BuzztardItem(log.LogAble):
     logCategory = 'buzztard_item'
 
     def __init__(self, id, name, parent, mimetype, urlbase, host, update=False):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.id = id
         self.name = name
         self.mimetype = mimetype
@@ -227,12 +227,12 @@ class BuzztardItem(log.Loggable):
             self.child_count) + ' @ ' + self.url
 
 
-class BuzztardStore(log.Loggable, Plugin):
+class BuzztardStore(log.LogAble, Plugin):
     logCategory = 'buzztard_store'
     implements = ['MediaServer']
 
     def __init__(self, server, **kwargs):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.next_id = 1000
         self.config = kwargs
         self.name = kwargs.get('name', 'Buzztard')
@@ -351,7 +351,7 @@ class BuzztardStore(log.Loggable, Plugin):
         self.buzztard.connection.browse()
 
 
-class BuzztardPlayer(log.Loggable):
+class BuzztardPlayer(log.LogAble):
     logCategory = 'buzztard_player'
     implements = ['MediaRenderer']
     vendor_value_defaults = {
@@ -359,7 +359,7 @@ class BuzztardPlayer(log.Loggable):
     vendor_range_defaults = {'RenderingControl': {'Volume': {'maximum': 100}}}
 
     def __init__(self, device, **kwargs):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.name = kwargs.get('name', 'Buzztard MediaRenderer')
         self.host = kwargs.get('host', '127.0.0.1')
         self.port = int(kwargs.get('port', 7654))

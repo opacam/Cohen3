@@ -30,7 +30,7 @@ from coherence.upnp.core import utils
 from coherence.upnp.core.DIDLLite import classChooser, Container, Resource
 
 
-class LastFMUser(log.Loggable):
+class LastFMUser(log.LogAble):
     logCategory = 'lastFM_user'
 
     user = None
@@ -43,7 +43,7 @@ class LastFMUser(log.Loggable):
     tracks = []
 
     def __init__(self, user, passwd):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         if user is None:
             self.warn("No User", )
         if passwd is None:
@@ -152,11 +152,11 @@ class LastFMUser(log.Loggable):
         self.get_tracks()
 
 
-class LFMProxyStream(utils.ReverseProxyResource, log.Loggable):
+class LFMProxyStream(utils.ReverseProxyResource, log.LogAble):
     logCategory = 'lastFM_stream'
 
     def __init__(self, uri, parent):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.uri = uri
         self.parent = parent
         _, host_port, path, _, _ = urlsplit(uri)
@@ -180,12 +180,12 @@ class LFMProxyStream(utils.ReverseProxyResource, log.Loggable):
         return utils.ReverseProxyResource.render(self, request)
 
 
-class LastFMItem(log.Loggable):
+class LastFMItem(log.LogAble):
     logCategory = 'LastFM_item'
 
     def __init__(self, id, obj, parent, mimetype, urlbase, UPnPClass,
                  update=False):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
         self.id = id
 
         self.name = obj.get('name')
@@ -297,13 +297,13 @@ class LastFMItem(log.Loggable):
         return 'id: ' + str(self.id) + ' @ ' + self.url + ' ' + self.name
 
 
-class LastFMStore(log.Loggable, Plugin):
+class LastFMStore(log.LogAble, Plugin):
     logCategory = 'lastFM_store'
 
     implements = ['MediaServer']
 
     def __init__(self, server, **kwargs):
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
 
         self.next_id = 1000
         self.config = kwargs

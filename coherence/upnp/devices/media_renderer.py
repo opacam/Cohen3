@@ -23,13 +23,13 @@ class HttpRoot(DeviceHttpRoot):
     logCategory = 'mediarenderer'
 
 
-class MediaRenderer(log.Loggable, BasicDeviceMixin):
+class MediaRenderer(log.LogAble, BasicDeviceMixin):
     logCategory = 'mediarenderer'
     device_type = 'MediaRenderer'
 
     def __init__(self, coherence, backend, **kwargs):
         BasicDeviceMixin.__init__(self, coherence, backend, **kwargs)
-        log.Loggable.__init__(self)
+        log.LogAble.__init__(self)
 
     def fire(self, backend, **kwargs):
 

@@ -27,7 +27,7 @@ from twisted.internet import defer, task
 import coherence.extern.louie as louie
 from coherence.backend import BackendItem, BackendStore
 from coherence.extern import db_row
-from coherence.log import Loggable
+from coherence.log import LogAble
 from coherence.upnp.core import DIDLLite
 
 # fallback on pysqlite2.dbapi2
@@ -69,7 +69,7 @@ def get_cover_path(artist_name, album_title):
                                                  _escape_part(album_title)))
 
 
-class SQLiteDB(Loggable):
+class SQLiteDB(LogAble):
     """
     Python DB API 2.0 backend support.
     """
@@ -78,7 +78,7 @@ class SQLiteDB(Loggable):
     def __init__(self, database):
         """ Connect to a db backend hosting the given database.
         """
-        Loggable.__init__(self)
+        LogAble.__init__(self)
         self._params = {'database': database, 'check_same_thread': True}
         self.connect()
 
@@ -573,11 +573,11 @@ class Video(BaseTrack):
         return item
 
 
-class BansheeDB(Loggable):
+class BansheeDB(LogAble):
     logCategory = "banshee_db"
 
     def __init__(self, path=None):
-        Loggable.__init__(self)
+        LogAble.__init__(self)
         self._local_music_library_id = None
         self._local_video_library_id = None
         default_db_path = os.path.expanduser("~/.config/banshee-1/banshee.db")
