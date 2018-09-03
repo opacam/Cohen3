@@ -1,10 +1,12 @@
 # -*- test-case-name: axiom.test -*-
-from coherence.extern.twisted.axiom._version import __version__
+from _version import __version__
 from twisted.python import versions
 
 
 def asTwistedVersion(packageName, versionString):
-    return versions.Version(packageName, *list(map(int, versionString.split("."))))
+    # print(*list(map(int, versionString.split('+', 1)[0].split("."))))
+    return versions.Version(
+        packageName, *list(map(int, versionString.split('+', 1)[0].split("."))))
 
 
 version = asTwistedVersion("axiom", __version__)
