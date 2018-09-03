@@ -61,8 +61,7 @@ docs_require = [
 
 test_require = \
     audio_store_require + \
-    youtube_store_require + \
-    gstreamer_player_require
+    youtube_store_require
 
 dev_require = \
     test_require + \
