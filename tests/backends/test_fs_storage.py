@@ -125,6 +125,6 @@ class TestFSStorage(unittest.TestCase):
         self.assertEqual(content.get_name(), 'my content')
         self.assertIs(root.get_children(0, 0)[0], content)
         self.assertEqual(self.storage.get_by_id('1002').get_name(),
-                         'audio')
+                         'images')
         self.assertEqual(self.storage.get_by_id('1005').get_name(),
                          'album-2')
