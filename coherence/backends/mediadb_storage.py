@@ -46,8 +46,8 @@ import shutil
 import string
 from urllib.parse import urlsplit
 
-from axiom import store, item, attributes
-from epsilon.extime import Time
+from coherence.extern.twisted.axiom import store, item, attributes
+from coherence.extern.twisted.epsilon.extime import Time
 from twisted.internet import defer
 
 import coherence.extern.louie as louie
