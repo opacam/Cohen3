@@ -1,14 +1,13 @@
 language: python
 python:
-- '3.5'
+  - '3.7-dev'
 install:
-- pip install .
-script: nosetests
-deploy:
-  provider: pypi
-  user: opacam
-  password:
-    secure:
-  on:
-    tags: true
-    repo: opacam/Cohen3
+  - pip install .
+  - pip install --upgrade setuptools
+  - pip install --upgrade cython
+  - python setup.py install
+script:
+  - nosetests
+
+
+
