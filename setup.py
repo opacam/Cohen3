@@ -24,7 +24,6 @@ deps = [
     'lxml',
     'python-dateutil',
     'pyopenssl',
-    'gdata',
     'Nevow'
 ]
 if sys.platform in ('win32', 'sunos5'):
@@ -101,5 +100,7 @@ setup(name='Cohen3',
           'misc': ['device-icons/*.png'],
       },
       install_requires=deps,
+      dependency_links=[
+        "git+git://github.com/dvska/gdata-python3@master#egg=gdata"],
       entry_points=entry_points
       )
