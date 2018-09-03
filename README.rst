@@ -8,8 +8,8 @@ Simple DLNA/UPnP Media Server
 .. image:: http://img.shields.io/pypi/dm/Cohen3.svg?style=flat-square
     :target: https://pypi.python.org/pypi/Cohen3
 
-.. image:: http://img.shields.io/travis/opacam/Cohen3.svg?style=flat-square
-    :target: http://travis-ci.org/opacam/Cohen3
+.. image:: https://travis-ci.com/opacam/Cohen3.svg?branch=master
+    :target: https://travis-ci.com/opacam/Cohen3
 
 
 Overview
