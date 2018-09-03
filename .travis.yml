@@ -11,9 +11,14 @@ install:
   - pip install --upgrade cython
   - pip install -e git+https://github.com/fishstiqz/pycdb@master#egg=pycdb --no-dependencies
   - pip install -e git+https://github.com/JonnyJD/python-discid@master#egg=discid --no-dependencies
+  - pip install python-coveralls
+  - pip install coverage
+  - pip install pep8
+  - pip install pylint
   - pip install -e .[test]
 script:
-  - nosetests
-
-
-
+  - pep8 coherence
+  - pylint -E coherence
+  - nosetests --with-coverage --cover-erase --cover-package=coherence --cover-html
+after_success:
+  - coveralls
