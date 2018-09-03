@@ -42,6 +42,8 @@ dbus-python = "*"
 pipenv = "==2018.7.1"
 virtualenv = "==16.0.0"
 virtualenv-clone = "==0.3.0"
+pycdb = {ref = "master", git = "https://github.com/fishstiqz/pycdb"}
+discid = {ref = "master", git = "https://github.com/JonnyJD/python-discid"}
 
 [requires]
 python_version = "3.7"

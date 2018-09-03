@@ -6,8 +6,8 @@ from setuptools import setup, find_packages
 
 from coherence import __version__
 
-if sys.version_info[:3] < (3, 5, 0):
-    raise NotImplemented('Python 3.5+ required, bye-bye')
+if sys.version_info[:3] < (3, 6, 0):
+    raise NotImplemented('Python 3.6+ required, bye-bye')
 
 packages = find_packages()
 
@@ -28,6 +28,46 @@ deps = [
 ]
 if sys.platform in ('win32', 'sunos5'):
     deps.append('Netifaces >= 0.4')
+
+# Optional dependencies
+audio_store_require = [
+    'pycdb',
+    'discid',
+]
+
+picasa_store_require = [
+    'gdata'
+]
+
+youtube_store_require = [
+    'gdata'
+]
+
+gstreamer_player_require = [
+    'pygobject>= 3.30.0',
+    'pycairo>=1.17.1'
+]
+
+dbus_require = [
+    'dbus-python',
+]
+
+docs_require = [
+    'recommonmark>=0.4.0',
+    'Sphinx>=1.3.5',
+    'sphinxcontrib-napoleon>=0.4.4',
+    'sphinx-rtd-theme>=0.1.9',
+]
+
+test_require = \
+    audio_store_require + \
+    youtube_store_require + \
+    gstreamer_player_require
+
+dev_require = \
+    test_require + \
+    youtube_store_require + \
+    gstreamer_player_require
 
 entry_points = """
     [coherence.plugins.backend.media_server]
@@ -83,13 +123,13 @@ setup(name='Cohen3',
       scripts=['bin/cohen3'],
       url='https://github.com/opacam/Cohen3',
       keywords=['UPnP', 'DLNA', 'multimedia', 'gstreamer'],
-      classifiers=['Development Status :: 5 - Production/Stable',
+      classifiers=['Development Status :: 4 - Beta',
                    'Environment :: Console',
                    'Environment :: Web Environment',
                    'License :: OSI Approved :: MIT License',
                    'Operating System :: OS Independent',
-                   'Programming Language :: Python :: 3',
-                   'Programming Language :: Python :: 3.5',
+                   'Programming Language :: Python :: 3.6',
+                   'Programming Language :: Python :: 3.7',
                    'Topic :: Internet :: WWW/HTTP',
                    'Topic :: Multimedia :: Sound/Audio',
                    'Topic :: Multimedia :: Video',
@@ -100,7 +140,20 @@ setup(name='Cohen3',
           'misc': ['device-icons/*.png'],
       },
       install_requires=deps,
+      extras_require={
+          'test': test_require,
+          'dev': dev_require,
+          'docs': docs_require,
+          'dbus': dbus_require,
+          'audio': audio_store_require,
+          'gstreamer': gstreamer_player_require,
+          'picasa': picasa_store_require,
+          'youtube': youtube_store_require,
+      },
       dependency_links=[
-        "git+git://github.com/dvska/gdata-python3@master#egg=gdata"],
+          'git+git://github.com/dvska/gdata-python3@master#egg=gdata',
+          'git+git://github.com/fishstiqz/pycdb@master#egg=pycdb',
+          'git+git://github.com/JonnyJD/python-discid@master#egg=discid',
+      ],
       entry_points=entry_points
       )

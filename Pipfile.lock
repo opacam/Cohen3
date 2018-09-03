@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "136d56b6965712e61e4f5d50bf8ba2b73914a8a05b1aa46141211a7943bc5588"
+            "sha256": "534ee318c5d635019bc14be786647f5edf57d902ecdcd6fb4b90cc6f26d0e29a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -384,6 +384,10 @@
             "index": "pypi",
             "version": "==2018.4.16"
         },
+        "discid": {
+            "git": "https://github.com/JonnyJD/python-discid",
+            "ref": "9a5993c1a4d5b7db4366d999a1fd3c9eaa672e29"
+        },
         "pipenv": {
             "hashes": [
                 "sha256:6ecf60c66187c6ca25a2dcd095036aba07539354a5011d94805fbfc5932582b0",
@@ -392,6 +396,10 @@
             ],
             "index": "pypi",
             "version": "==2018.7.1"
+        },
+        "pycdb": {
+            "git": "https://github.com/fishstiqz/pycdb",
+            "ref": "f2b952918f2e32c752dee938ab829396f0de99f4"
         },
         "virtualenv": {
             "hashes": [
