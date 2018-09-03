@@ -10,12 +10,13 @@ try:
                          tc.ThumbTranscoder]
 except ImportError as ie:
     tc = None
-    print('Error importing Coherence transcoder: {}'.format(ie))
+    tc_msg = 'Error importing Coherence transcoder: {}'.format(ie)
+    print(tc_msg)
 
 
 class TranscoderTestMixin(object):
-    if not tc:
-        skip = ie
+    if tc is None:
+        skip = tc_msg
 
     def setUp(self):
         self.manager = tc.TranscoderManager()

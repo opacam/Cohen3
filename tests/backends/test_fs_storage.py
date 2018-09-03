@@ -51,9 +51,9 @@ class TestFSStorageWithMultiContentAssumptions(unittest.TestCase):
 
     def setUp(self):
         f = self.tmp_content = FilePath(self.mktemp())
-        audio = f.child('audio');
+        audio = f.child('audio')
         audio.makedirs()
-        video = f.child('video');
+        video = f.child('video')
         video.makedirs()
         self.storage = fs_storage.FSStore(None, name='my media',
                                           content=[audio.path, video.path],
@@ -90,11 +90,11 @@ class TestFSStorage(unittest.TestCase):
     def setUp(self):
         self.tmp_content = FilePath(self.mktemp())
         f = self.tmp_content.child('my content')
-        audio = f.child('audio');
+        audio = f.child('audio')
         audio.makedirs()
-        video = f.child('video');
+        video = f.child('video')
         video.makedirs()
-        images = f.child('images');
+        images = f.child('images')
         images.makedirs()
         album = audio.child('album-1')
         album.makedirs()
