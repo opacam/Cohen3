@@ -30,22 +30,10 @@ no longer supported.
 - PyPI: https://pypi.python.org/pypi/cohen3
 - Free software: MIT licence
 
-NOTE: All the dependencies of the setup.py file are the basic dependencies in
-order to run a media server. Should be mentioned that some of the backends
-needs more dependencies and some of them may not work as expected because there
-aren't tested yet. Here are some of them listed:
-
-    - youtube: gdata (pip install git+https://github.com/dvska/gdata-python3#egg=gdata)
-    - picassa storage: gdata (pip install git+https://github.com/dvska/gdata-python3#egg=gdata)
-    - tube service: dbus-python (pip install dbus-python)
-    - dvbd storage: dbus-python (pip install dbus-python)
-    - audio cd storage: PyCDDB and discid (pip install PyCDDB and pip install discid)
-    - media db storage: axiom epsilon
-    - module: coherence.web.ui module depends on Nevow (pip install Nevow)
-
 Features
 --------
 Cohen3 is known to work with various clients
+
     - Sony Playstation 3/4
     - XBox360/One
     - Denon AV Receivers
@@ -54,11 +42,23 @@ Cohen3 is known to work with various clients
     - Sony Bravia TVs
 
 And provides a lot of backends to fulfil your media streaming needs
+
     - Local file storage
     - YouTube
     - Twitch.tv
     - and much more...
 
+Project Status
+--------------
+Right now this project is in development mode...there is more work to do
+in order to recover the expected behaviour, but right now the basic functionality
+of the project (Create a DLNA/UpnP client or a server with the FSStore plugin)
+seems to work in our tests.
+
+NOTE: All the dependencies of the setup.py file are the basic dependencies in
+order to run a media server. Should be mentioned that some of the backends
+needs more dependencies and some of them may not work as expected because there
+aren't tested yet, see the install instructions section for more information.
 
 Installation from source
 ------------------------
@@ -71,6 +71,21 @@ the files with::
 This will copy the Python module files into your local Python package
 folder and the cohen executable to ``/usr/local/bin/cohen3``.
 
+If you want to install Cohen3 with extra dependencies you must do the steps above
+and moreover install pip then you can run the following command
+(instead of the mentioned above) for installing the development dependencies::
+
+  $ sudo pip install -e .[dev]
+
+Note:  The supported install modes are:
+
+    - dev: all the dependencies will be installed except docs
+    - test: used by travis builds (omits dbus and docs)
+    - docs: install build dependencies to generate docs
+    - dbus: install dependencies needed by tube service or dvbd storage
+    - gstreamer: needed if you use GStreamerPlayer
+    - picasa: needed by the picasa storage
+    - youtube: needed by the youtube backend
 
 Quickstart
 ----------
@@ -86,10 +101,8 @@ The config file can be placed anywhere, cohen looks by default for
 
   $ cohen3 -c /path/to/config/file
 
-
-
 Contributing
 ------------
 Report bugs at https://github.com/opacam/Cohen3/issues
 
-Feel free to fetch the repo and send your pull requests!
+Feel free to fetch the repo and send your `pull requests! <https://github.com/opacam/Cohen3/pulls>`_
