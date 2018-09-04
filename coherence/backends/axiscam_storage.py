@@ -30,7 +30,7 @@ class AxisCamItem(BackendItem):
         if parent:
             parent.add_child(self, update=update)
 
-        if parent == None:
+        if parent is None:
             parent_id = -1
         else:
             parent_id = parent.get_id()
@@ -69,7 +69,7 @@ class AxisCamItem(BackendItem):
         self.children.append(child)
         if isinstance(self.item, Container):
             self.item.childCount += 1
-        if update == True:
+        if update:
             self.update_id += 1
 
     def remove_child(self, child):

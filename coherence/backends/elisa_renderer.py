@@ -87,7 +87,7 @@ class ElisaPlayer(log.LogAble, Plugin):
 
         def got_result(result):
             self.info("poll_player %r", result)
-            if self.server != None:
+            if self.server is not None:
                 connection_id = self.server.connection_manager_server.lookup_avt_id(
                     self.current_connection_id)
             if result in ('STOPPED', 'READY'):
@@ -102,7 +102,7 @@ class ElisaPlayer(log.LogAble, Plugin):
 
             if self.state != transport_state:
                 self.state = transport_state
-                if self.server != None:
+                if self.server is not None:
                     self.server.av_transport_server.set_variable(connection_id,
                                                                  'TransportState',
                                                                  transport_state)
@@ -113,7 +113,7 @@ class ElisaPlayer(log.LogAble, Plugin):
         def got_result(result):
             self.info("query_position %s", result)
             position, duration = result
-            if self.server != None:
+            if self.server is not None:
                 connection_id = self.server.connection_manager_server.lookup_avt_id(
                     self.current_connection_id)
                 self.server.av_transport_server.set_variable(connection_id,
@@ -122,7 +122,7 @@ class ElisaPlayer(log.LogAble, Plugin):
             if position is not None:
                 m, s = divmod(position / 1000000000, 60)
                 h, m = divmod(m, 60)
-                if self.server != None:
+                if self.server is not None:
                     self.server.av_transport_server.set_variable(connection_id,
                                                                  'RelativeTimePosition',
                                                                  '%02d:%02d:%02d' % (
@@ -136,7 +136,7 @@ class ElisaPlayer(log.LogAble, Plugin):
                 m, s = divmod(duration / 1000000000, 60)
                 h, m = divmod(m, 60)
 
-                if self.server != None:
+                if self.server is not None:
                     self.server.av_transport_server.set_variable(connection_id,
                                                                  'CurrentTrackDuration',
                                                                  '%02d:%02d:%02d' % (
@@ -155,7 +155,7 @@ class ElisaPlayer(log.LogAble, Plugin):
                                 h, m, s)
                         self.metadata = elt.toString()
 
-                        if self.server != None:
+                        if self.server is not None:
                             self.server.av_transport_server.set_variable(
                                 connection_id, 'AVTransportURIMetaData',
                                 self.metadata)

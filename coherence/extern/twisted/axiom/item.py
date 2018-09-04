@@ -611,7 +611,7 @@ class Item(Empowered, slotmachine._Strict, metaclass=MetaItem):
         for k, v in kw.items():
             setattr(self, k, v)
 
-        if tostore != None:
+        if tostore is not None:
             if to__justUpgraded:
 
                 # we can't just set the store, because that allocates an ID.

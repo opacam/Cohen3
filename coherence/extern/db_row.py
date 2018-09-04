@@ -134,6 +134,6 @@ class DBRow(object):
 
     def __eq__(self, other):
         ## Error if other is not set
-        if other == None:
+        if other is None:
             return False
         return self.fields == other.fields

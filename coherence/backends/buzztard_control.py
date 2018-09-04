@@ -123,7 +123,7 @@ class BuzztardItem(log.LogAble):
         if parent:
             parent.add_child(self, update=update)
 
-        if parent == None:
+        if parent is None:
             parent_id = -1
         else:
             parent_id = parent.get_id()
@@ -171,7 +171,7 @@ class BuzztardItem(log.LogAble):
         self.child_count += 1
         if isinstance(self.item, Container):
             self.item.childCount += 1
-        if update == True:
+        if update:
             self.update_id += 1
 
     def remove_child(self, child):
@@ -218,7 +218,7 @@ class BuzztardItem(log.LogAble):
         return self.item.toString()
 
     def __repr__(self):
-        if self.parent == None:
+        if self.parent is None:
             parent = 'root'
         else:
             parent = str(self.parent.get_id())
@@ -390,12 +390,12 @@ class BuzztardPlayer(log.LogAble):
             transport_state = 'STOPPED'
         if infos[0] == 'paused':
             transport_state = 'PAUSED_PLAYBACK'
-        if self.server != None:
+        if self.server is not None:
             connection_id = self.server.connection_manager_server.lookup_avt_id(
                 self.current_connection_id)
         if self.state != transport_state:
             self.state = transport_state
-            if self.server != None:
+            if self.server is not None:
                 self.server.av_transport_server.set_variable(connection_id,
                                                              'TransportState',
                                                              transport_state)
@@ -403,7 +403,7 @@ class BuzztardPlayer(log.LogAble):
         label = infos[1]
         position = infos[2].split('.')[0]
         duration = infos[3].split('.')[0]
-        if self.server != None:
+        if self.server is not None:
             self.server.av_transport_server.set_variable(connection_id,
                                                          'CurrentTrack', 0)
             self.server.av_transport_server.set_variable(connection_id,

@@ -167,9 +167,9 @@ class Service(log.LogAble):
             self.renew_subscription_call.cancel()
         except:
             pass
-        if self.event_connection != None:
+        if self.event_connection is not None:
             self.event_connection.teardown()
-        if self.subscription_id != None:
+        if self.subscription_id is not None:
             self.unsubscribe()
         for name, action in list(self._actions.items()):
             self.debug("remove %s %s", name, action)
@@ -551,7 +551,7 @@ class ServiceServer(log.LogAble):
     def new_subscriber(self, subscriber):
         notify = []
         for vdict in list(self._variables.values()):
-            notify += [v for v in list(vdict.values()) if v.send_events == True]
+            notify += [v for v in list(vdict.values()) if v.send_events]
 
         self.info("new_subscriber %s %s", subscriber, notify)
         if len(notify) <= 0:
@@ -727,7 +727,7 @@ class ServiceServer(log.LogAble):
         for v in variables:
             # print self._variables[0][v].name, self._variables[0][v].updated
             for vdict in list(self._variables.values()):
-                if vdict[v].updated == True:
+                if vdict[v].updated:
                     vdict[v].updated = False
                     notify.append(vdict[v])
         self.propagate_notification(notify)
@@ -746,7 +746,7 @@ class ServiceServer(log.LogAble):
         self.set_variable(0, 'CurrentConnectionIDs', '0')
 
     def get_scpdXML(self):
-        if not hasattr(self, 'scpdXML') or self.scpdXML == None:
+        if not hasattr(self, 'scpdXML') or self.scpdXML is None:
             self.scpdXML = scpdXML(self)
             self.scpdXML = self.scpdXML.build_xml()
         return self.scpdXML
@@ -787,7 +787,7 @@ class ServiceServer(log.LogAble):
         new_variable = variable.StateVariable(self, name, implementation,
                                               instance, send_events,
                                               data_type, allowed_values)
-        if default_value == None:
+        if default_value is None:
             new_variable.default_value = ''
         else:
             new_variable.default_value = new_variable.old_value = new_variable.value = default_value
@@ -971,7 +971,7 @@ class ServiceServer(log.LogAble):
                         never_evented)
 
             allowed_value_list = var_node.find('allowedValueList')
-            if allowed_value_list != None:
+            if allowed_value_list is not None:
                 vendor_values = allowed_value_list.attrib.get(
                     '{urn:schemas-beebits-net:service-1-0}X_withVendorDefines',
                     None)
@@ -995,18 +995,18 @@ class ServiceServer(log.LogAble):
                 range = {}
                 for e in list(allowed_value_range):
                     range[e.tag] = e.text
-                    if vendor_values != None:
+                    if vendor_values is not None:
                         if service_range_defaults:
                             variable_range_defaults = service_range_defaults.get(
                                 name)
-                            if (variable_range_defaults != None and
-                                    variable_range_defaults.get(e.tag) != None):
+                            if (variable_range_defaults is not None and
+                                    variable_range_defaults.get(e.tag) is not None):
                                 self.info("overwriting %s attribute %s with %s",
                                           name,
                                           e.tag,
                                           str(variable_range_defaults[e.tag]))
                                 range[e.tag] = variable_range_defaults[e.tag]
-                            elif e.text == None:
+                            elif e.text is None:
                                 self.info(
                                     "missing vendor definition for %s, attribute %s",
                                     name, e.tag)
@@ -1183,7 +1183,7 @@ class ServiceControl(log.LogAble):
             result = {}
             callback = action.get_callback()
             # self.debug('callit callback', callback)
-            if callback != None:
+            if callback is not None:
                 return callback(**kwargs)
             return result
 

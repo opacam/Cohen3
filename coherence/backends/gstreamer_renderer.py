@@ -260,7 +260,7 @@ class Player(log.LogAble):
         if t == Gst.Message.ERROR:
             err, debug = message.parse_error()
             self.warning("Gstreamer error: %s,%r", err.message, debug)
-            if self.playing == True:
+            if self.playing:
                 self.seek('-0')
             # self.player.set_state(Gst.State.READY)
         elif t == Gst.Message.TAG:
@@ -270,7 +270,8 @@ class Player(log.LogAble):
         elif t == Gst.Message.STATE_CHANGED:
             if message.src == self.player:
                 old, new, pending = message.parse_state_changed()
-                # print "player (%s) state_change:" %(message.src.get_path_string()), old, new, pending
+                # print("player (%s) state_change:" % (
+                #     message.src.get_path_string()), old, new, pending)
                 if new == Gst.State.PLAYING:
                     self.playing = True
                     self.update_LC.start(1, False)
@@ -300,7 +301,7 @@ class Player(log.LogAble):
             position = 0
         # print position
 
-        if self.duration == None:
+        if self.duration is None:
             try:
                 self.duration, format = self.player.query_duration(
                     Gst.Format.TIME)
@@ -361,7 +362,7 @@ class Player(log.LogAble):
         self.debug("play --> %r %r", uri, mimetype)
 
         if self.player.get_name() != 'player':
-            if self.player_clean == False:
+            if not self.player_clean:
                 # print "rebuild pipeline"
                 self.player.set_state(Gst.State.NULL)
 
@@ -523,7 +524,8 @@ class GStreamerPlayer(log.LogAble, Plugin):
             state = 'paused'
             av_transport.set_variable(conn_id, 'TransportState',
                                       'PAUSED_PLAYBACK')
-        elif self.playcontainer != None and message == Gst.Message.EOS and \
+        elif self.playcontainer is not None and \
+                message == Gst.Message.EOS and \
                 self.playcontainer[0] + 1 < len(self.playcontainer[2]):
             state = 'transitioning'
             av_transport.set_variable(conn_id, 'TransportState',
@@ -592,9 +594,9 @@ class GStreamerPlayer(log.LogAble, Plugin):
 
         if 'raw' in position:
 
-            if self.duration == None and 'duration' in position['raw']:
+            if self.duration is None and 'duration' in position['raw']:
                 self.duration = int(position['raw']['duration'])
-                if self.metadata != None and len(self.metadata) > 0:
+                if self.metadata is not None and len(self.metadata) > 0:
                     # FIXME: duration breaks client parsing MetaData?
                     elt = DIDLLite.DIDLElement.fromString(self.metadata)
                     for item in elt:
@@ -605,7 +607,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
 
                     self.metadata = elt.toString()
                     # print self.metadata
-                    if self.server != None:
+                    if self.server is not None:
                         av_transport.set_variable(conn_id,
                                                   'AVTransportURIMetaData',
                                                   self.metadata)
@@ -670,7 +672,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
         self.mimetype = mimetype
         self.tags = {}
 
-        if self.playcontainer == None:
+        if self.playcontainer is None:
             self.server.av_transport_server.set_variable(connection_id,
                                                          'AVTransportURI', uri)
             self.server.av_transport_server.set_variable(connection_id,
@@ -709,7 +711,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
                 'NextAVTransportURI').value) > 0:
             transport_actions.add('NEXT')
 
-        if self.playcontainer != None:
+        if self.playcontainer is not None:
             if len(self.playcontainer[2]) - (self.playcontainer[0] + 1) > 0:
                 transport_actions.add('NEXT')
             if self.playcontainer[0] > 0:
@@ -726,7 +728,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
 
     def status(self, position):
         uri = self.player.get_uri()
-        if uri == None:
+        if uri is None:
             return {'state': 'idle', 'uri': ''}
         else:
             r = {'uri': str(uri),
@@ -760,7 +762,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
 
     def stop(self, silent=False):
         self.info('Stopping: %r', self.player.get_uri())
-        if self.player.get_uri() == None:
+        if self.player.get_uri() is None:
             return
         if self.player.get_state()[1] in [Gst.State.PLAYING, Gst.State.PAUSED]:
             self.player.stop()
@@ -772,7 +774,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
 
     def play(self):
         self.info("Playing: %r", self.player.get_uri())
-        if self.player.get_uri() == None:
+        if self.player.get_uri() is None:
             return
         self.player.play()
         self.server.av_transport_server.set_variable(
@@ -789,7 +791,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
 
     def seek(self, location, old_state):
         self.player.seek(location)
-        if old_state != None:
+        if old_state is not None:
             self.server.av_transport_server.set_variable(0, 'TransportState',
                                                          old_state)
 
@@ -1031,7 +1033,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
             seconds = int(h) * 3600 + int(m) * 60 + int(s)
             self.seek(sign + str(seconds), old_state)
         if Unit in ['TRACK_NR']:
-            if self.playcontainer == None:
+            if self.playcontainer is None:
                 NextURI = self.server.av_transport_server.get_variable(
                     'NextAVTransportURI', InstanceID).value
                 if NextURI != '':
@@ -1110,7 +1112,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
         self.server.av_transport_server.set_variable(current_connection_id,
                                                      'NextAVTransportURIMetaData',
                                                      NextMetaData)
-        if len(NextURI) == 0 and self.playcontainer == None:
+        if len(NextURI) == 0 and self.playcontainer is None:
             transport_actions = self.server.av_transport_server.get_variable(
                 'CurrentTransportActions').value
             transport_actions = set(transport_actions.split(','))

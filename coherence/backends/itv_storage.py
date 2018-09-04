@@ -113,7 +113,7 @@ class Container(BackendItem):
         self.sorted = False
 
     def get_children(self, start=0, end=0):
-        if self.sorted == False:
+        if not self.sorted:
             def childs_sort(x, y):
                 r = cmp_to_key(x.name, y.name)
                 return r
@@ -162,7 +162,7 @@ class ITVItem(BackendItem):
         self.location = ProxyStream(self.stream_url)
 
     def get_item(self):
-        if self.item == None:
+        if self.item is None:
             self.item = DIDLLite.VideoItem(self.id, self.parent.id, self.name)
             self.item.description = self.description
             self.item.date = self.date
@@ -296,7 +296,7 @@ class ITVStore(BackendStore):
                     genres.append(genre)
 
                 sameStation = stations.get(name)
-                if sameStation == None or bitrate > sameStation['bitrate']:
+                if sameStation is None or bitrate > sameStation['bitrate']:
                     station = {'name': name,
                                'station_id': station_id,
                                'mimetype': mimetype,

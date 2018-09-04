@@ -182,7 +182,7 @@ class Event(dict, log.LogAble):
         log.LogAble.__init__(self)
         self._sid = sid
         self.raw = raw
-        if elements != None:
+        if elements is not None:
             self.from_elements(elements)
 
     def get_sid(self):
@@ -202,7 +202,7 @@ class Event(dict, log.LogAble):
             tag = var.tag
             idx = tag.find('}') + 1
             value = var.text
-            if value == None:
+            if value is None:
                 value = ''
             self.update({tag[idx:]: value})
 

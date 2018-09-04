@@ -165,7 +165,7 @@ class DeviceHttpRoot(resource.Resource, log.LogAble):
 #                         from pkg_resources import resource_filename
 #                         icon_path = os.path.abspath(resource_filename(__name__, os.path.join('..', '..', '..', 'misc', 'device-icons', icon['url'])))
 #
-#                 if os.path.exists(icon_path) == True:
+#                 if os.path.exists(icon_path):
 #                     i = ET.SubElement(e, 'icon')
 #                     for k, v in icon.items():
 #                         if k == 'url':
@@ -309,7 +309,7 @@ class BasicDeviceMixin(object):
 
     def unregister(self):
 
-        if self.backend != None and hasattr(self.backend, 'release'):
+        if self.backend is not None and hasattr(self.backend, 'release'):
             self.backend.release()
 
         if not hasattr(self, '_services'):
@@ -324,7 +324,7 @@ class BasicDeviceMixin(object):
             except:
                 pass
             if hasattr(service, 'check_moderated_loop') and \
-                    service.check_moderated_loop != None:
+                    service.check_moderated_loop is not None:
                 try:
                     service.check_moderated_loop.stop()
                 except:
