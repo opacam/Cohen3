@@ -34,7 +34,7 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
 
     def __init__(self, device, backend=None):
         self.device = device
-        if backend == None:
+        if backend is None:
             backend = self.device.backend
         resource.Resource.__init__(self)
         service.ServiceServer.__init__(self, 'ConnectionManager',
@@ -162,7 +162,7 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
                         if variable.last_time_touched + 300 >= now:
                             rcs_active = True
                             break
-            if (avt_active == False and rcs_active == False):
+            if not avt_active and not rcs_active:
                 self.remove_connection(id)
 
     def lookup_connection(self, id):
@@ -217,15 +217,17 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
                 return False
 
             for w in without_dlna_tags:
-                if with_some_tag_already_there(w) == False:
-                    protocol, network, content_format, additional_info = w.split(
-                        ':')
+                if not with_some_tag_already_there(w):
+                    protocol, network, content_format, additional_info = \
+                        w.split(':')
                     if variable_name == 'SinkProtocolInfo':
-                        value.append(':'.join((
-                                              protocol, network, content_format,
-                                              build_dlna_additional_info(
-                                                  content_format,
-                                                  does_playcontainer=self.does_playcontainer))))
+                        value.append(
+                            ':'.join(
+                                (protocol, network, content_format,
+                                 build_dlna_additional_info(
+                                     content_format,
+                                     does_playcontainer=self.does_playcontainer
+                                 ))))
                     else:
                         value.append(':'.join((
                                               protocol, network, content_format,
@@ -315,7 +317,7 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
             or send a 706 if there isn't such a ConnectionID
         """
         connection = self.lookup_connection(ConnectionID)
-        if connection == None:
+        if connection is None:
             return failure.Failure(errorCode(706))
         else:
             return {'AVTransportID': connection['AVTransportID'],

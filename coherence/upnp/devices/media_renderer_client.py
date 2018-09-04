@@ -85,33 +85,33 @@ class MediaRendererClient(log.LogAble):
 
     def remove(self):
         self.info("removal of MediaRendererClient started")
-        if self.rendering_control != None:
+        if self.rendering_control is not None:
             self.rendering_control.remove()
-        if self.connection_manager != None:
+        if self.connection_manager is not None:
             self.connection_manager.remove()
-        if self.av_transport != None:
+        if self.av_transport is not None:
             self.av_transport.remove()
         # del self
 
     def service_notified(self, service):
         self.info("Service %r sent notification", service)
-        if self.detection_completed == True:
+        if self.detection_completed:
             return
-        if self.rendering_control != None:
+        if self.rendering_control is not None:
             if not hasattr(self.rendering_control.service, 'last_time_updated'):
                 return
-            if self.rendering_control.service.last_time_updated == None:
+            if self.rendering_control.service.last_time_updated is None:
                 return
-        if self.connection_manager != None:
+        if self.connection_manager is not None:
             if not hasattr(self.connection_manager.service,
                            'last_time_updated'):
                 return
-            if self.connection_manager.service.last_time_updated == None:
+            if self.connection_manager.service.last_time_updated is None:
                 return
-        if self.av_transport != None:
+        if self.av_transport is not None:
             if not hasattr(self.av_transport.service, 'last_time_updated'):
                 return
-            if self.av_transport.service.last_time_updated == None:
+            if self.av_transport.service.last_time_updated is None:
                 return
         self.detection_completed = True
         louie.send('Coherence.UPnP.DeviceClient.detection_completed', None,

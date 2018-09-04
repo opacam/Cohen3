@@ -43,12 +43,12 @@ class Container(BackendItem):
         self.item = container_class(id, parent_id, self.name)
         self.item.childCount = 0
         self.update_id = 0
-        if children_callback != None:
+        if children_callback is not None:
             self.children = children_callback
         else:
             self.children = util.OrderedDict()
 
-        if store != None:
+        if store is not None:
             self.get_url = lambda: store.urlbase + str(self.id)
 
     def add_child(self, child):
@@ -56,7 +56,7 @@ class Container(BackendItem):
         if isinstance(child.id, str):
             _, id = child.id.split('.')
         self.children[id] = child
-        if self.item.childCount != None:
+        if self.item.childCount is not None:
             self.item.childCount += 1
 
     def get_children(self, start=0, end=0):
@@ -77,7 +77,7 @@ class Container(BackendItem):
             self.item.childCount = 0
 
     def get_child_count(self):
-        if self.item.childCount != None:
+        if self.item.childCount is not None:
             return self.item.childCount
 
         if callable(self.children):
@@ -400,7 +400,7 @@ class DVBDStore(BackendStore):
             # print 'process_details', results
             for result, recording in results:
                 # print result, recording['name']
-                if result == True:
+                if result:
                     # print "add", recording['id'], recording['name'], recording['path'], recording['date'], recording['duration']
                     video_item = Recording(self,
                                            recording['id'],
@@ -533,7 +533,7 @@ class DVBDStore(BackendStore):
             channels = {}
             for result, channel in results:
                 # print channel
-                if result == True:
+                if result:
                     name = str(channel['name'], errors='ignore')
                     # print "add", name, channel['url']
                     video_item = Channel(self,
@@ -653,12 +653,12 @@ class DVBDStore(BackendStore):
         ObjectID = kwargs['ObjectID']
 
         item = self.get_by_id(ObjectID)
-        if item == None:
+        if item is None:
             return failure.Failure(errorCode(701))
 
         def handle_success(deleted):
             print('deleted', deleted, kwargs['ObjectID'])
-            if deleted == False:
+            if not deleted:
                 return failure.Failure(errorCode(715))
             return {}
 

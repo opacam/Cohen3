@@ -115,7 +115,7 @@ class DBusCDSService(dbus.service.Object, log.LogAble):
         if not self.service:
             return
         notify = [v for v in list(self.service._variables[0].values()) if
-                  v.send_events == True]
+                  v.send_events is True]
         if len(notify) == 0:
             return
         data = {}
@@ -127,8 +127,8 @@ class DBusCDSService(dbus.service.Object, log.LogAble):
                     for variable in list(vdict.values()):
                         if (variable.name != 'LastChange' and
                                 variable.name[0:11] != 'A_ARG_TYPE_' and
-                                variable.never_evented == False):
-                            if hasattr(variable, 'dbus_updated') == False:
+                                variable.never_evented is False):
+                            if not hasattr(variable, 'dbus_updated'):
                                 variable.dbus_updated = None
                     if len(v) > 0:
                         lc[str(instance)] = v
@@ -477,7 +477,7 @@ class DBusCDSService(dbus.service.Object, log.LogAble):
     def callAction(self, name, arguments):
 
         action = self.service.get_action(name)
-        if action != None:
+        if action is not None:
             d = action.call(**arguments)
             return d
         return ''
@@ -625,30 +625,31 @@ class DBusService(dbus.service.Object, log.LogAble):
               self.tube)
 
         def reply(data, name, connection):
-            if hasattr(connection, '_tube') == True:
+            if hasattr(connection, '_tube'):
                 if name == 'Browse':
                     didl = DIDLLite.DIDLElement.fromString(data['Result'])
                     changed = False
                     for item in didl.getItems():
                         new_res = DIDLLite.Resources()
                         for res in item.res:
-                            remote_protocol, remote_network, remote_content_format, _ = res.protocolInfo.split(
-                                ':')
-                            if remote_protocol == 'http-get' and remote_network == '*':
-                                quoted_url = 'mirabeau' + '/' + urllib.parse.quote_plus(
-                                    res.data)
+                            remote_protocol, remote_network, \
+                            remote_content_format, _ = \
+                                res.protocolInfo.split(':')
+                            if remote_protocol == 'http-get' and \
+                                    remote_network == '*':
+                                quoted_url = 'mirabeau' + '/' + \
+                                             urllib.parse.quote_plus(res.data)
                                 print("modifying", res.data)
-                                host_port = ':'.join((
-                                                     self.service.device.client.coherence.mirabeau._external_address,
-                                                     str(
-                                                         self.service.device.client.coherence.mirabeau._external_port)))
+                                host_port = \
+                                    ':'.join((self.service.device.client.coherence.mirabeau._external_address,
+                                              str(self.service.device.client.coherence.mirabeau._external_port)))
                                 res.data = urllib.parse.urlunsplit(
                                     ('http', host_port, quoted_url, "", ""))
                                 print("--->", res.data)
                                 new_res.append(res)
                                 changed = True
                         item.res = new_res
-                    if changed == True:
+                    if changed:
                         didl.rebuild()
                         ### FIXME this is not the proper way to do it
                         data['Result'] = didl.toString().replace('<ns0:',
@@ -693,7 +694,7 @@ class DBusService(dbus.service.Object, log.LogAble):
         notify = []
         if self.service:
             notify = [v for v in list(self.service._variables[0].values()) if
-                      v.send_events == True]
+                      v.send_events]
         if len(notify) == 0:
             return
         data = {}
@@ -705,8 +706,8 @@ class DBusService(dbus.service.Object, log.LogAble):
                     for variable in list(vdict.values()):
                         if (variable.name != 'LastChange' and
                                 variable.name[0:11] != 'A_ARG_TYPE_' and
-                                variable.never_evented == False):
-                            if hasattr(variable, 'dbus_updated') == False:
+                                variable.never_evented is False):
+                            if not hasattr(variable, 'dbus_updated'):
                                 variable.dbus_updated = None
                             # if variable.dbus_updated != variable.last_touched:
                             #    v[unicode(variable.name)] = unicode(variable.value)
@@ -779,7 +780,7 @@ class DBusDevice(dbus.service.Object, log.LogAble):
     @dbus.service.method(DEVICE_IFACE, in_signature='', out_signature='v')
     def get_info(self):
         services = [x.path for x in self.services
-                    if getattr(x, "NOT_FOR_THE_TUBES", False) == False]
+                    if not getattr(x, "NOT_FOR_THE_TUBES", False)]
         r = {'path': self.path(),
              'device_type': self.device.get_device_type(),
              'friendly_name': self.device.get_friendly_name(),
@@ -980,7 +981,7 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
             self.warning("no backend with the uuid %r found", uuid)
             return ""
         function = getattr(plugin.backend, method, None)
-        if function == None:
+        if function is None:
             return ""
         kwargs = {}
         for k, v in arguments.items():
@@ -993,7 +994,7 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
     def create_object(self, device_id, container_id, arguments, dbus_async_cb,
                       dbus_async_err_cb):
         device = self.controlpoint.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             new_arguments = {}
             for k, v in list(arguments.items()):
@@ -1013,7 +1014,7 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
     def import_resource(self, device_id, source_uri, destination_uri,
                         dbus_async_cb, dbus_async_err_cb):
         device = self.controlpoint.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
 
             def reply(data):

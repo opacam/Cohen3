@@ -26,7 +26,7 @@ class ScheduledRecordingServer(service.ServiceServer, resource.Resource):
 
     def __init__(self, device, backend=None):
         self.device = device
-        if backend == None:
+        if backend is None:
             backend = self.device.backend
         resource.Resource.__init__(self)
         self.version = 1

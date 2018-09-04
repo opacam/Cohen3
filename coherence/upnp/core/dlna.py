@@ -12,7 +12,7 @@ def AudioItem(func):
     def add(*args, **kwargs):
         result = func(*args, **kwargs)
         e = result.find('upnp:albumArtURI')
-        if e != None:
+        if e is not None:
             e.attrib['dlna:profileID'] = 'JPEG_TN'
         return result
 

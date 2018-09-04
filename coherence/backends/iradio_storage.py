@@ -209,7 +209,7 @@ class IRadioItem(BackendItem):
         return
 
     def get_item(self):
-        if self.item == None:
+        if self.item is None:
             upnp_id = self.get_id()
             upnp_parent_id = self.parent.get_id()
             self.item = DIDLLite.AudioBroadcast(upnp_id, upnp_parent_id,
@@ -333,7 +333,7 @@ class IRadioStore(AbstractBackendStore):
                       genre)
             result = utils.parse_xml(result, encoding='utf-8')
             tunein = result.find('tunein')
-            if tunein != None:
+            if tunein is not None:
                 tunein = tunein.get('base', '/sbin/tunein-station.pls')
             prot, host_port, path, _, _ = urlsplit(self.shoutcast_ws_url)
             tunein = prot + '://' + host_port + tunein
@@ -351,7 +351,7 @@ class IRadioStore(AbstractBackendStore):
                 url = '%s?id=%s' % (tunein, stationResult.get('id'))
 
                 sameStation = stations.get(lower_name)
-                if sameStation == None or bitrate > sameStation['bitrate']:
+                if sameStation is None or bitrate > sameStation['bitrate']:
                     station = {'name': name,
                                'station_id': station_id,
                                'mimetype': mimetype,

@@ -171,7 +171,7 @@ class CoverGetter(object):
                     s = s.decode('utf-8').encode('ascii', 'ignore')
             return s
 
-        if asin != None:
+        if asin is not None:
             query = aws_asin_query + '&ItemId=%s' % urllib.parse.quote(asin)
         elif (artist is not None or title is not None):
             query = aws_artist_query
@@ -212,7 +212,7 @@ class CoverGetter(object):
                 print(
                     "we need the Python Imaging Library to do image conversion")
 
-        if self.filename == None:
+        if self.filename is None:
             data = result
         else:
             data = self.filename

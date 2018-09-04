@@ -547,19 +547,19 @@ class RootDevice(Device):
     def device_detect(self, *args, **kwargs):
         self.debug("device_detect %r", kwargs)
         self.debug("root_detection_completed %r", self.root_detection_completed)
-        if self.root_detection_completed == True:
+        if self.root_detection_completed:
             return
         # our self is not complete yet
 
         self.debug("detection_completed %r", self.detection_completed)
-        if self.detection_completed == False:
+        if not self.detection_completed:
             return
 
         # now check child devices.
         self.debug("self.devices %r", self.devices)
         for d in self.devices:
             self.debug("check device %r %r", d.detection_completed, d)
-            if d.detection_completed == False:
+            if not d.detection_completed:
                 return
         # now must be done, so notify root done
         self.root_detection_completed = True
@@ -632,7 +632,7 @@ class RootDevice(Device):
         base = self.get_urlbase()
         if isinstance(base, str):
             base = base.encode('ascii')
-        if base != None:
+        if base is not None:
             if base[-1] != b'/':
                 base += b'/'
             r = urljoin(base, url)
