@@ -36,9 +36,11 @@ class ModalMethod(object):
             func = self.methods[mode]
         except KeyError:
             raise AttributeError(
-                "Method %r missing from mode %r on %r" % (self.name, mode, instance))
+                "Method %r missing from mode %r on %r" % (
+                self.name, mode, instance))
 
         return new.instancemethod(func, instance, owner)
+
 
 class mode(object):
     """
@@ -62,6 +64,7 @@ class mode(object):
         The mode has just been entered.
         """
 
+
 def _getInheritedAttribute(classname, attrname, bases, attrs):
     try:
         return attrs[attrname]
@@ -79,7 +82,6 @@ def _getInheritedAttribute(classname, attrname, bases, attrs):
                              attrname))
 
 
-
 class ModalType(type):
     """Metaclass for defining modal classes.
 
@@ -91,9 +93,14 @@ class ModalType(type):
     @type initialMode: C{str} (for now)
     @ivar initialMode: The mode in which instances will start.
     """
+
     def __new__(cls, name, bases, attrs):
-        modeAttribute = _getInheritedAttribute(name, 'modeAttribute', bases, attrs)
-        initialMode = attrs['initialMode'] = _getInheritedAttribute(name, 'initialMode', bases, attrs)
+        modeAttribute = _getInheritedAttribute(name, 'modeAttribute', bases,
+                                               attrs)
+        initialMode = attrs['initialMode'] = _getInheritedAttribute(name,
+                                                                    'initialMode',
+                                                                    bases,
+                                                                    attrs)
 
         # Dict mapping names of methods to another dict.  The inner
         # dict maps names of modes to implementations of that method
@@ -109,18 +116,20 @@ class ModalType(type):
             keepAttrs[k] = v
 
         for (methName, methDefs) in implementations.items():
-            keepAttrs[methName] = ModalMethod(methName, methDefs, modeAttribute)
+            keepAttrs[methName] = ModalMethod(methName, methDefs,
+                                              modeAttribute)
 
         return super(ModalType, cls).__new__(cls, name, bases, keepAttrs)
 
-class Modal(object, metaclass=ModalType):
 
+class Modal(object, metaclass=ModalType):
     modeAttribute = 'mode'
     initialMode = 'nil'
 
     class nil(mode):
         def __enter__(self):
             pass
+
         def __exit__(self):
             pass
 
@@ -128,4 +137,3 @@ class Modal(object, metaclass=ModalType):
         self.__exit__()
         self.mode = stateName
         self.__enter__()
-

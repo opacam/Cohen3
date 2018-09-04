@@ -1,8 +1,10 @@
 # -*- test-case-name: epsilon.test.test_setuphelper -*-
 
 # For great justice, take off every zig.
-import sys, os, pprint, traceback
-
+import os
+import pprint
+import sys
+import traceback
 from distutils.core import setup
 
 
@@ -33,7 +35,8 @@ def _regeneratePluginCache(pluginPackages):
 
 def regeneratePluginCache(dist, pluginPackages):
     if 'install' in dist.commands:
-        sys.path.insert(0, os.path.abspath(dist.command_obj['install'].install_lib))
+        sys.path.insert(0, os.path.abspath(
+            dist.command_obj['install'].install_lib))
         _regeneratePluginCache(pluginPackages)
 
 
@@ -64,13 +67,15 @@ def autosetup(**kw):
             for filename in filenames:
                 if filename == 'dropin.cache':
                     continue
-                if (os.path.splitext(filename)[1] not in ('.py', '.pyc', '.pyo')
-                    or '__init__.py' not in filenames):
-                    D.append(os.path.join(dirpath[len(package)+1:], filename))
+                if (os.path.splitext(filename)[1] not in (
+                '.py', '.pyc', '.pyo')
+                        or '__init__.py' not in filenames):
+                    D.append(
+                        os.path.join(dirpath[len(package) + 1:], filename))
     autoresult = {
         'packages': packages,
         'package_data': datafiles,
-        }
+    }
     print('Automatically determined setup() args:')
     pprint.pprint(autoresult, indent=4)
     assert 'packages' not in kw

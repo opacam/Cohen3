@@ -8,10 +8,11 @@ from twisted.python.failure import Failure
 from twisted.python.log import msg
 from twisted.python.reflect import qual
 
-from coherence.extern.twisted.axiom.errors import NoUpgradePathAvailable, UpgraderRecursion
 from coherence.extern.twisted.axiom.errors import ItemUpgradeError
-from coherence.extern.twisted.axiom.item import _legacyTypes, _typeNameToMostRecentClass
-
+from coherence.extern.twisted.axiom.errors import NoUpgradePathAvailable, \
+    UpgraderRecursion
+from coherence.extern.twisted.axiom.item import _legacyTypes, \
+    _typeNameToMostRecentClass
 
 _upgradeRegistry = {}
 
@@ -74,19 +75,19 @@ class _StoreUpgrade(object):
             while upgver < currentType.schemaVersion:
                 # Do we have enough of the schema present to upgrade?
                 if ((typeInQuestion, upgver)
-                    not in _upgradeRegistry):
+                        not in _upgradeRegistry):
                     cantUpgradeErrors.append(
                         "No upgrader present for %s (%s) from %d to %d" % (
                             typeInQuestion, qual(currentType), upgver,
                             upgver + 1))
 
                 # Is there a type available for each upgrader version?
-                if upgver+1 != currentType.schemaVersion:
-                    if (typeInQuestion, upgver+1) not in _legacyTypes:
+                if upgver + 1 != currentType.schemaVersion:
+                    if (typeInQuestion, upgver + 1) not in _legacyTypes:
                         cantUpgradeErrors.append(
                             "Type schema required for upgrade missing:"
                             " %s version %d" % (
-                                typeInQuestion, upgver+1))
+                                typeInQuestion, upgver + 1))
                 upgver += 1
 
             if cantUpgradeErrors:
@@ -164,7 +165,8 @@ class _StoreUpgrade(object):
                 if not upgradedAnything:
                     self._oldTypesRemaining.pop(0)
                     if didAny:
-                        msg("%s finished upgrading %s" % (store.dbdir.path, qual(t0)))
+                        msg("%s finished upgrading %s" % (
+                        store.dbdir.path, qual(t0)))
                     continue
                 elif not didAny:
                     didAny = True
@@ -196,7 +198,8 @@ def registerUpgrader(upgrader, typeName, oldVersion, newVersion):
     _upgradeRegistry[typeName, oldVersion] = upgrader
 
 
-def registerAttributeCopyingUpgrader(itemType, fromVersion, toVersion, postCopy=None):
+def registerAttributeCopyingUpgrader(itemType, fromVersion, toVersion,
+                                     postCopy=None):
     """
     Register an upgrader for C{itemType}, from C{fromVersion} to C{toVersion},
     which will copy all attributes from the legacy item to the new item.  If
@@ -206,6 +209,7 @@ def registerAttributeCopyingUpgrader(itemType, fromVersion, toVersion, postCopy=
     @param postCopy: a callable of one argument
     @return: None
     """
+
     def upgrader(old):
         newitem = old.upgradeVersion(itemType.typeName, fromVersion, toVersion,
                                      **dict((str(name), getattr(old, name))
@@ -213,6 +217,7 @@ def registerAttributeCopyingUpgrader(itemType, fromVersion, toVersion, postCopy=
         if postCopy is not None:
             postCopy(newitem)
         return newitem
+
     registerUpgrader(upgrader, itemType.typeName, fromVersion, toVersion)
 
 
@@ -224,11 +229,13 @@ def registerDeletionUpgrader(itemType, fromVersion, toVersion):
     @param itemType: L{axiom.item.Item} subclass
     @return: None
     """
+
     # XXX This should actually do something more special so that a new table is
     # not created and such.
     def upgrader(old):
         old.deleteFromStore()
         return None
+
     registerUpgrader(upgrader, itemType.typeName, fromVersion, toVersion)
 
 

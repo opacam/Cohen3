@@ -1,6 +1,4 @@
-
 import sys
-import readline # Imported for its side-effects
 import traceback
 from pprint import pprint
 

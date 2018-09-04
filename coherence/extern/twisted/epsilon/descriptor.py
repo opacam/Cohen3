@@ -129,16 +129,19 @@ def requiredAttribute(requiredAttributeName):
         ... 7
         >>>
     """
+
     class RequiredAttribute(attribute):
         def get(self):
             if requiredAttributeName not in self.__dict__:
                 raise AttributeError(
                     ('Required attribute %r has not been changed'
                      ' from its default value on %r' % (
-                            requiredAttributeName, self)))
+                         requiredAttributeName, self)))
             return self.__dict__[requiredAttributeName]
+
         def set(self, value):
             self.__dict__[requiredAttributeName] = value
+
     return RequiredAttribute
 
 

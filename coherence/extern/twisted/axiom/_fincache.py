@@ -1,9 +1,10 @@
-from weakref import ref
 from traceback import print_exc
+from weakref import ref
 
 from twisted.python import log
 
 from coherence.extern.twisted.axiom import iaxiom
+
 
 class CacheFault(KeyError):
     """
@@ -11,12 +12,10 @@ class CacheFault(KeyError):
     """
 
 
-
 class CacheInconsistency(RuntimeError):
     """
     A key being cached is already present in the cache.
     """
-
 
 
 def logErrorNoMatterWhat():
@@ -33,7 +32,6 @@ def logErrorNoMatterWhat():
             # Nothing can be done.  We can't get an emergency log file to write
             # to.  Don't bother.
             return
-
 
 
 def createCacheRemoveCallback(cacheRef, key, finalizer):
@@ -54,6 +52,7 @@ def createCacheRemoveCallback(cacheRef, key, finalizer):
     @param finalizer: A user-provided callable that will be called when the
         weakref callback runs.
     """
+
     def remove(reference):
         # Weakref callbacks cannot raise exceptions or DOOM ensues
         try:
@@ -68,8 +67,8 @@ def createCacheRemoveCallback(cacheRef, key, finalizer):
                         del cache.data[key]
         except:
             logErrorNoMatterWhat()
-    return remove
 
+    return remove
 
 
 class FinalizingCache:
@@ -81,10 +80,10 @@ class FinalizingCache:
     @type data: L{dict}
     @ivar data: The cached values.
     """
+
     def __init__(self, _ref=ref):
         self.data = {}
         self._ref = _ref
-
 
     def cache(self, key, value):
         """
@@ -113,7 +112,6 @@ class FinalizingCache:
         self.data[key] = self._ref(value, callback)
         return value
 
-
     def uncache(self, key, value):
         """
         Remove a key from the cache.
@@ -135,7 +133,6 @@ class FinalizingCache:
             # CacheFault (a KeyError subclass) which we also ignore. See the
             # comment in get() for an explanation of why this might happen.
             pass
-
 
     def get(self, key):
         """
@@ -161,4 +158,3 @@ class FinalizingCache:
                 "FinalizingCache has %r but its value is no more." % (key,))
         log.msg(interface=iaxiom.IStatEvent, stat_cache_hits=1, key=key)
         return o
-

@@ -1,4 +1,3 @@
-
 from zope.interface import Interface, Attribute
 
 
@@ -65,7 +64,6 @@ class IAxiomaticCommand(Interface):
     """)
 
 
-
 class IBeneficiary(Interface):
     """
     Interface to adapt to when looking for an appropriate application-level
@@ -103,6 +101,7 @@ class IScheduler(Interface):
     assume that it is if your application needs to schedule timed events or
     queue tasks.
     """
+
     def schedule(runnable, when):
         """
         @param runnable: any Item with a 'run' method.
@@ -111,7 +110,6 @@ class IScheduler(Interface):
         method will be called.  See extime.Time's documentation for more
         details.
         """
-
 
 
 class IQuery(Interface):
@@ -161,7 +159,6 @@ class IQuery(Interface):
 
         @return: an L{IQuery} provider with the new limit.
         """
-
 
 
 class IColumn(Interface):
@@ -216,7 +213,6 @@ class IOrdering(Interface):
         Return a list of two-tuples of IColumn providers and either C{'ASC'} or
         C{'DESC'} defining this ordering.
         """
-
 
 
 class IComparison(Interface):
@@ -276,6 +272,8 @@ class IReliableListener(Interface):
 
 
 LOCAL, REMOTE = list(range(2))
+
+
 class IBatchProcessor(Interface):
     def addReliableListener(listener, style=LOCAL):
         """
@@ -301,7 +299,6 @@ class IBatchProcessor(Interface):
         Return an iterable of the listeners which have been added to
         this batch processor.
         """
-
 
 
 class IBatchService(Interface):

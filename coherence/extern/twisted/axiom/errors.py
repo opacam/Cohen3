@@ -11,6 +11,7 @@ class TimeoutError(Exception):
     @ivar timeout: The timeout, in seconds, which was exceeded.
     @ivar underlying: The backend exception which signaled this, or None.
     """
+
     def __init__(self, statement, timeout, underlying):
         Exception.__init__(self, statement, timeout, underlying)
         self.statement = statement
@@ -59,6 +60,7 @@ class SQLError(RuntimeError):
     """
     Axiom internally generated some bad SQL.
     """
+
     def __init__(self, sql, args, underlying):
         RuntimeError.__init__(self, sql, args, underlying)
         self.sql, self.args, self.underlying = self.args
@@ -163,6 +165,7 @@ class ItemUpgradeError(RuntimeError):
     @ivar oldType: The type of the item being upgraded
     @ivar newType: The type the item should've been upgraded to
     """
+
     def __init__(self, originalFailure, storeID, oldType, newType):
         RuntimeError.__init__(self, originalFailure, storeID, oldType, newType)
         self.originalFailure = originalFailure

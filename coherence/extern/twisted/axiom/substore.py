@@ -1,20 +1,16 @@
 # -*- test-case-name: axiom.test.test_substore -*-
 
+from twisted.application import service
 from zope.interface import implements
 
-from twisted.application import service
-
-from coherence.extern.twisted.axiom.iaxiom import IPowerupIndirector
-
-from coherence.extern.twisted.axiom.store import Store
-from coherence.extern.twisted.axiom.item import Item
 from coherence.extern.twisted.axiom.attributes import path, inmemory, reference
-
+from coherence.extern.twisted.axiom.iaxiom import IPowerupIndirector
+from coherence.extern.twisted.axiom.item import Item
+from coherence.extern.twisted.axiom.store import Store
 from coherence.extern.twisted.axiom.upgrade import registerUpgrader
 
 
 class SubStore(Item):
-
     schemaVersion = 1
     typeName = 'substore'
 
@@ -51,8 +47,8 @@ class SubStore(Item):
             return self.substore
         else:
             s = self.substore = self.createStore(debug)
-            s._openSubStore = self # don't fall out of cache as long as the
-                                   # store is alive!
+            s._openSubStore = self  # don't fall out of cache as long as the
+            # store is alive!
             return s
 
     def createStore(self, debug):
@@ -60,13 +56,13 @@ class SubStore(Item):
         Create the actual Store this Substore represents.
         """
         if self.storepath is None:
-            self.store._memorySubstores.append(self) # don't fall out of cache
+            self.store._memorySubstores.append(self)  # don't fall out of cache
             if self.store.filesdir is None:
                 filesdir = None
             else:
                 filesdir = (self.store.filesdir.child("_substore_files")
-                                               .child(str(self.storeID))
-                                               .path)
+                            .child(str(self.storeID))
+                            .path)
             return Store(parent=self.store,
                          filesdir=filesdir,
                          idInParent=self.storeID,
@@ -116,4 +112,5 @@ def eliminateSubStoreStartupService(subservice):
     return None
 
 
-registerUpgrader(eliminateSubStoreStartupService, SubStoreStartupService.typeName, 1, 2)
+registerUpgrader(eliminateSubStoreStartupService,
+                 SubStoreStartupService.typeName, 1, 2)
