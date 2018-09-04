@@ -1,9 +1,10 @@
 """
 Fix from Twisted r20480.
 """
-from twisted.internet.task import Clock
-from twisted.internet import base
 from functools import cmp_to_key
+
+from twisted.internet import base
+from twisted.internet.task import Clock
 
 
 def callLater(self, when, what, *a, **kw):
@@ -33,6 +34,7 @@ def clockIsBroken():
         return True
     else:
         return False
+
 
 def install():
     """

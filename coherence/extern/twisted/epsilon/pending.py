@@ -1,4 +1,3 @@
-
 from twisted.internet.defer import Deferred
 from twisted.python.failure import Failure
 

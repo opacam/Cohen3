@@ -25,21 +25,19 @@ collection by name::
 
 import warnings
 
+from twisted.application.service import IService, Service
+from twisted.internet import reactor
+from twisted.python import log, failure
 from zope.interface import implements
 
-from twisted.internet import reactor
-
-from twisted.application.service import IService, Service
-from twisted.python import log, failure
-
-from coherence.extern.twisted.epsilon.extime import Time
-
+from coherence.extern.twisted.axiom.attributes import AND, timestamp, \
+    reference, integer, inmemory, bytes
+from coherence.extern.twisted.axiom.dependency import uninstallFrom
 from coherence.extern.twisted.axiom.iaxiom import IScheduler
 from coherence.extern.twisted.axiom.item import Item, declareLegacyItem
-from coherence.extern.twisted.axiom.attributes import AND, timestamp, reference, integer, inmemory, bytes
-from coherence.extern.twisted.axiom.dependency import uninstallFrom
-from coherence.extern.twisted.axiom.upgrade import registerUpgrader
 from coherence.extern.twisted.axiom.substore import SubStore
+from coherence.extern.twisted.axiom.upgrade import registerUpgrader
+from coherence.extern.twisted.epsilon.extime import Time
 
 VERBOSE = False
 
@@ -160,19 +158,23 @@ class SchedulerMixin:
             try:
                 workBeingDone = self.store.transact(self._oneTick, now)
             except _WackyControlFlow as wcf:
-                self.store.transact(wcf.eventObject.handleError, now, wcf.failureObject)
+                self.store.transact(wcf.eventObject.handleError, now,
+                                    wcf.failureObject)
                 log.err(wcf.failureObject)
                 errors += 1
                 workBeingDone = True
             if workBeingDone:
                 workUnitsPerformed += 1
-        x = list(self.store.query(TimedEvent, sort=TimedEvent.time.ascending, limit=1))
+        x = list(self.store.query(TimedEvent, sort=TimedEvent.time.ascending,
+                                  limit=1))
         if x:
             self._transientSchedule(x[0].time, now)
         if errors or VERBOSE:
-            log.msg("The scheduler ran %(eventCount)s events%(errors)s." % dict(
+            log.msg(
+                "The scheduler ran %(eventCount)s events%(errors)s." % dict(
                     eventCount=workUnitsPerformed,
-                    errors=(errors and (" (with %d errors)" % (errors,))) or ''))
+                    errors=(errors and (
+                                " (with %d errors)" % (errors,))) or ''))
 
     def schedule(self, runnable, when):
         TimedEvent(store=self.store, time=when, runnable=runnable)
@@ -186,7 +188,8 @@ class SchedulerMixin:
             self._transientSchedule(toWhen, self.now())
             break
         else:
-            raise ValueError("%r is not scheduled to run at %r" % (runnable, fromWhen))
+            raise ValueError(
+                "%r is not scheduled to run at %r" % (runnable, fromWhen))
 
     def unscheduleFirst(self, runnable):
         """
@@ -195,12 +198,15 @@ class SchedulerMixin:
         If runnable is scheduled to run multiple times, only the temporally first
         is removed.
         """
-        for evt in self.store.query(TimedEvent, TimedEvent.runnable == runnable, sort=TimedEvent.time.ascending):
+        for evt in self.store.query(TimedEvent,
+                                    TimedEvent.runnable == runnable,
+                                    sort=TimedEvent.time.ascending):
             evt.deleteFromStore()
             break
 
     def unscheduleAll(self, runnable):
-        for evt in self.store.query(TimedEvent, TimedEvent.runnable == runnable):
+        for evt in self.store.query(TimedEvent,
+                                    TimedEvent.runnable == runnable):
             evt.deleteFromStore()
 
     def scheduledTimes(self, runnable):
@@ -213,7 +219,7 @@ class SchedulerMixin:
         return (event.time for event in events if not event.running)
 
 
-_EPSILON = 1e-20      # A very small amount of time.
+_EPSILON = 1e-20  # A very small amount of time.
 
 
 class _SiteScheduler(SchedulerMixin, Service, object):
@@ -354,8 +360,10 @@ class _SchedulerCompatMixin(object):
     def forwardToReal(name):
         def get(self):
             return getattr(IScheduler(self.store), name)
+
         def set(self, value):
             setattr(IScheduler(self.store), name, value)
+
         return property(get, set)
 
     now = forwardToReal("now")
@@ -380,7 +388,7 @@ class _SchedulerCompatMixin(object):
             stacklevel = 5
         warnings.warn(
             self.__class__.__name__ + " is deprecated since Axiom 0.5.32.  "
-            "Just adapt stores to IScheduler.",
+                                      "Just adapt stores to IScheduler.",
             category=PendingDeprecationWarning,
             stacklevel=stacklevel)
 

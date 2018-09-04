@@ -1,4 +1,3 @@
-
 """
 Fix from Twisted r23970
 """
@@ -6,7 +5,9 @@ Fix from Twisted r23970
 from twisted.internet.task import deferLater
 from twisted.protocols.loopback import _loopbackAsyncBody
 
-def _loopbackAsyncContinue(ignored, server, serverToClient, client, clientToServer):
+
+def _loopbackAsyncContinue(ignored, server, serverToClient, client,
+                           clientToServer):
     # Clear the Deferred from each message queue, since it has already fired
     # and cannot be used again.
     clientToServer._notificationDeferred = serverToClient._notificationDeferred = None
@@ -17,7 +18,7 @@ def _loopbackAsyncContinue(ignored, server, serverToClient, client, clientToServ
     # in that.
     from twisted.internet import reactor
     return deferLater(
-        reactor, 0,   
+        reactor, 0,
         _loopbackAsyncBody, server, serverToClient, client, clientToServer)
 
 

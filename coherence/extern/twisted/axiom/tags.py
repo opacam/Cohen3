@@ -1,8 +1,7 @@
-
-from coherence.extern.twisted.epsilon.extime import Time
-
+from coherence.extern.twisted.axiom.attributes import text, reference, integer, \
+    AND, timestamp
 from coherence.extern.twisted.axiom.item import Item
-from coherence.extern.twisted.axiom.attributes import text, reference, integer, AND, timestamp
+from coherence.extern.twisted.epsilon.extime import Time
 
 
 class Tag(Item):
@@ -49,7 +48,6 @@ class _TagName(Item):
 
 
 class Catalog(Item):
-
     typeName = 'tag_catalog'
     schemaVersion = 2
 
@@ -83,7 +81,8 @@ class Catalog(Item):
         Return an iterator of unicode strings - the unique tag names which have
         been applied objects in this catalog.
         """
-        return self.store.query(_TagName, _TagName.catalog == self).getColumn("name")
+        return self.store.query(_TagName, _TagName.catalog == self).getColumn(
+            "name")
 
     def tagsOf(self, obj):
         """
@@ -118,4 +117,5 @@ def upgradeCatalog1to2(oldCatalog):
 
 
 from coherence.extern.twisted.axiom.upgrade import registerUpgrader
+
 registerUpgrader(upgradeCatalog1to2, 'tag_catalog', 1, 2)

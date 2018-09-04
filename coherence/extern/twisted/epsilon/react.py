@@ -26,10 +26,10 @@ def react(reactor, main, argv):
     reactor.addSystemEventTrigger('before', 'shutdown', stopping.append, True)
     finished = main(reactor, *argv)
     finished.addErrback(err, "main function encountered error")
+
     def cbFinish(ignored):
         if not stopping:
             reactor.callWhenRunning(reactor.stop)
+
     finished.addCallback(cbFinish)
     reactor.run()
-
-

@@ -1,6 +1,6 @@
-
+from twisted.internet import defer
 from twisted.python import failure
-from twisted.internet import  defer
+
 
 def getResult(self):
     if isinstance(self.result, failure.Failure):
@@ -34,6 +34,7 @@ def _deferGenerator(g, deferred=None):
 
         if isinstance(result, defer.waitForDeferred):
             waiting = [True, None]
+
             # Pass vars in so they don't get changed going around the loop
             def gotResult(r, waiting=waiting, result=result):
                 result.result = r
@@ -42,13 +43,14 @@ def _deferGenerator(g, deferred=None):
                     waiting[1] = r
                 else:
                     _deferGenerator(g, deferred)
+
             result.d.addBoth(gotResult)
             if waiting[0]:
                 # Haven't called back yet, set flag so that we get reinvoked
                 # and return from the loop
                 waiting[0] = False
                 return deferred
-            result = None # waiting[1]
+            result = None  # waiting[1]
 
 
 def install():

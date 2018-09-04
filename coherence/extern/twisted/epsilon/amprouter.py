@@ -8,9 +8,8 @@ multiple L{IBoxReceiver}/I{IBoxSender} pairs over a single L{AMP} connection.
 
 from itertools import count
 
-from zope.interface import implementer
-
 from twisted.protocols.amp import IBoxReceiver, IBoxSender
+from zope.interface import implementer
 
 from coherence.extern.twisted.epsilon.structlike import record
 
@@ -61,13 +60,11 @@ class Route(record('router receiver localRouteName remoteRouteName',
         if self.router._sender is not None:
             self.start()
 
-
     def unbind(self):
         """
         Remove the association between this route and its router.
         """
         del self.router._routes[self.localRouteName]
-
 
     def start(self):
         """
@@ -75,13 +72,11 @@ class Route(record('router receiver localRouteName remoteRouteName',
         """
         self.receiver.startReceivingBoxes(self)
 
-
     def stop(self, reason):
         """
         Shut down the underlying receiver.
         """
         self.receiver.stopReceivingBoxes(reason)
-
 
     def sendBox(self, box):
         """
@@ -92,7 +87,6 @@ class Route(record('router receiver localRouteName remoteRouteName',
         if self.remoteRouteName is not None:
             box[_ROUTE] = self.remoteRouteName.encode('ascii')
         self.router._sender.sendBox(box)
-
 
     def unhandledError(self, failure):
         """
@@ -131,7 +125,6 @@ class Router:
         self._routeCounter = count()
         self._unstarted = {}
 
-
     def createRouteIdentifier(self):
         """
         Return a route identifier which is not yet associated with a route on
@@ -140,7 +133,6 @@ class Router:
         @rtype: C{unicode}
         """
         return str(next(self._routeCounter))
-
 
     def bindRoute(self, receiver, routeName=_unspecified):
         """
@@ -165,7 +157,6 @@ class Router:
         mapping[routeName] = route
         return route
 
-
     def startReceivingBoxes(self, sender):
         """
         Initialize route tracking objects.
@@ -180,7 +171,6 @@ class Router:
         self._routes = self._unstarted
         self._unstarted = None
 
-
     def ampBoxReceived(self, box):
         """
         Dispatch the given box to the L{IBoxReceiver} associated with the route
@@ -189,7 +179,6 @@ class Router:
         route = box.pop(_ROUTE, None)
         self._routes[route].receiver.ampBoxReceived(box)
 
-
     def stopReceivingBoxes(self, reason):
         """
         Stop all the L{IBoxReceiver}s which have been added to this router.
@@ -197,7 +186,6 @@ class Router:
         for routeName, route in self._routes.items():
             route.stop(reason)
         self._routes = None
-
 
 
 __all__ = ['Router', 'Route']

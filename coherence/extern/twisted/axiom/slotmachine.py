@@ -9,6 +9,7 @@ class Allowed(object):
     """
     An attribute that's allowed to be set.
     """
+
     def __init__(self, name, default=_NOSLOT):
         self.name = name
         self.default = default
@@ -20,7 +21,8 @@ class Allowed(object):
             return oself.__dict__[self.name]
         if self.default is not _NOSLOT:
             return self.default
-        raise AttributeError("%r object did not have attribute %r" %(oself.__class__.__name__, self.name))
+        raise AttributeError("%r object did not have attribute %r" % (
+        oself.__class__.__name__, self.name))
 
     def __delete__(self, oself):
         if self.name not in oself.__dict__:
@@ -107,7 +109,7 @@ class SetOnce(Attribute):
             setattr(iself, self.trueattr, value)
         else:
             raise AttributeError('%s.%s may only be set once' % (
-                    type(iself).__name__, self.name))
+                type(iself).__name__, self.name))
 
     def __get__(self, iself, type=None):
         if type is not None and iself is None:

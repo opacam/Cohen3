@@ -3,9 +3,8 @@
 """
 Epsilon interfaces.
 """
-from zope.interface import Attribute
-
 from twisted.cred.credentials import ICredentials
+from zope.interface import Attribute
 
 
 class IOneTimePad(ICredentials):

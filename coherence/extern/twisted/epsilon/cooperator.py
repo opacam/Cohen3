@@ -1,6 +1,6 @@
-
 from twisted.application.service import Service
 from twisted.internet.task import SchedulerStopped, Cooperator, coiterate
+
 
 def iterateInReactor(i, delay=None):
     """
@@ -15,6 +15,7 @@ class SchedulingService(Service):
     """
     Simple L{IService} implementation.
     """
+
     def __init__(self):
         self.coop = Cooperator(started=False)
 
@@ -26,6 +27,7 @@ class SchedulingService(Service):
 
     def stopService(self):
         self.coop.stop()
+
 
 __all__ = [
     'SchedulerStopped', 'Cooperator',
