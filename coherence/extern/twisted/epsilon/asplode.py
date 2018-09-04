@@ -1,10 +1,12 @@
-
-import sys, os
+import os
+import sys
 from datetime import date
 
+
 def status(x):
-    sys.stderr.write(x+'\n')
+    sys.stderr.write(x + '\n')
     sys.stderr.flush()
+
 
 def splode(linerator, proj, capproj):
     current = None
@@ -27,8 +29,10 @@ def splode(linerator, proj, capproj):
             current.write(line)
     current.close()
 
+
 def main(argv):
     splode(sys.stdin.readlines(), 'zoop', 'Zoop')
+
 
 if __name__ == '__main__':
     main(sys.argv)

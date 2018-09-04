@@ -88,7 +88,7 @@ def _timedeltaToSeconds(offset):
     @return: a number of seconds
     @rtype: float
     """
-    return ((offset.days * 60*60*24) +
+    return ((offset.days * 60 * 60 * 24) +
             (offset.seconds) +
             (offset.microseconds * 1e-6))
 
@@ -97,7 +97,7 @@ class FixedOffset(datetime.tzinfo):
     _zeroOffset = datetime.timedelta()
 
     def __init__(self, hours, minutes):
-        self.offset = datetime.timedelta(minutes = hours * 60 + minutes)
+        self.offset = datetime.timedelta(minutes=hours * 60 + minutes)
 
     def utcoffset(self, dt):
         return self.offset
@@ -176,12 +176,12 @@ class Time(object):
     # great, if one existed, and anyway it complicates pickling.
 
     class Precision(object):
-        MINUTES = object() 
+        MINUTES = object()
         SECONDS = object()
 
     _timeFormat = {
-            Precision.MINUTES: '%I:%M %p',
-            Precision.SECONDS: '%I:%M:%S %p'}
+        Precision.MINUTES: '%I:%M %p',
+        Precision.SECONDS: '%I:%M:%S %p'}
 
     rfc2822Weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
@@ -209,7 +209,8 @@ class Time(object):
         daysInFuture = (weekday - dtnow.weekday()) % len(klass.weekdays)
         if daysInFuture == 0:
             daysInFuture = 7
-        self = klass.fromDatetime(dtnow + datetime.timedelta(days=daysInFuture))
+        self = klass.fromDatetime(
+            dtnow + datetime.timedelta(days=daysInFuture))
         assert self.asDatetime().weekday() == weekday
         self.resolution = datetime.timedelta(days=1)
         return self
@@ -290,20 +291,20 @@ class Time(object):
             )
             \b
             """, re.IGNORECASE | re.VERBOSE),
-            _fromWeekday),
+         _fromWeekday),
         (re.compile(r"\b(today|tomorrow|yesterday)\b", re.IGNORECASE),
-            _fromTodayOrTomorrow),
+         _fromTodayOrTomorrow),
         (re.compile(r"""
             \b
             (?P<hour>\d{1,2}):(?P<minute>\d{2})
             (\s*(?P<ampm>am|pm))?
             \b
             """, re.IGNORECASE | re.VERBOSE),
-            _fromTime),
+         _fromTime),
         (re.compile(r"\b(noon|midnight)\b", re.IGNORECASE),
-            _fromNoonOrMidnight),
+         _fromNoonOrMidnight),
         (re.compile(r"\b(now)\b", re.IGNORECASE),
-            _fromNow),
+         _fromNow),
     ]
 
     _fromWeekday = classmethod(_fromWeekday)
@@ -336,7 +337,7 @@ class Time(object):
         for pattern, creator in klass.humanlyPatterns:
             match = pattern.match(humanStr)
             if not match \
-            or match.span()[1] != len(humanStr):
+                    or match.span()[1] != len(humanStr):
                 continue
             try:
                 return creator(klass, match, tzinfo, now)
@@ -434,7 +435,7 @@ class Time(object):
             for key in defaultTo1:
                 if groups[key] is None:
                     groups[key] = 1
-            groups['fractionalsec'] = float('.'+groups['fractionalsec'])
+            groups['fractionalsec'] = float('.' + groups['fractionalsec'])
             for key in defaultTo0 + defaultTo1 + ['year']:
                 groups[key] = int(groups[key])
 
@@ -463,42 +464,43 @@ class Time(object):
                 # don't forget leap years
                 ('dayofyear', 1, 366)]:
                 if not min <= groups[group] <= max:
-                    raise ValueError('%s must be in %i..%i' % (group, min, max))
+                    raise ValueError(
+                        '%s must be in %i..%i' % (group, min, max))
 
         def determineResolution():
             if match.group('fractionalsec') is not None:
                 return max(datetime.timedelta.resolution,
-                    datetime.timedelta(
-                        microseconds=1 * 10 ** -len(
-                            match.group('fractionalsec')) * 1000000))
+                           datetime.timedelta(
+                               microseconds=1 * 10 ** -len(
+                                   match.group('fractionalsec')) * 1000000))
 
             for testGroup, resolution in [
-            ('second', datetime.timedelta(seconds=1)),
-            ('minute', datetime.timedelta(minutes=1)),
-            ('hour', datetime.timedelta(hours=1)),
-            ('weekday', datetime.timedelta(days=1)),
-            ('dayofyear', datetime.timedelta(days=1)),
-            ('day', datetime.timedelta(days=1)),
-            ('week1', datetime.timedelta(weeks=1)),
-            ('week2', datetime.timedelta(weeks=1))]:
+                ('second', datetime.timedelta(seconds=1)),
+                ('minute', datetime.timedelta(minutes=1)),
+                ('hour', datetime.timedelta(hours=1)),
+                ('weekday', datetime.timedelta(days=1)),
+                ('dayofyear', datetime.timedelta(days=1)),
+                ('day', datetime.timedelta(days=1)),
+                ('week1', datetime.timedelta(weeks=1)),
+                ('week2', datetime.timedelta(weeks=1))]:
                 if match.group(testGroup) is not None:
                     return resolution
 
             if match.group('month1') is not None \
-            or match.group('month2') is not None:
+                    or match.group('month2') is not None:
                 if self._time.month == 12:
                     return datetime.timedelta(days=31)
-                nextMonth = self._time.replace(month=self._time.month+1)
+                nextMonth = self._time.replace(month=self._time.month + 1)
                 return nextMonth - self._time
             else:
-                nextYear = self._time.replace(year=self._time.year+1)
+                nextYear = self._time.replace(year=self._time.year + 1)
                 return nextYear - self._time
 
         def calculateDtime(tzinfo):
             """Calculate a datetime for the start of the addressed period."""
 
             if match.group('week1') is not None \
-            or match.group('week2') is not None:
+                    or match.group('week2') is not None:
                 if not 0 < groups['week'] <= 53:
                     raise ValueError(
                         'week must be in 1..53 (was %i)' % (groups['week'],))
@@ -512,11 +514,11 @@ class Time(object):
                     int(round(groups['fractionalsec'] * 1000000)),
                     tzinfo=tzinfo
                 )
-                dtime -= datetime.timedelta(days = dtime.weekday())
+                dtime -= datetime.timedelta(days=dtime.weekday())
                 dtime += datetime.timedelta(
-                    days = (groups['week']-1) * 7 + groups['weekday'] - 1)
+                    days=(groups['week'] - 1) * 7 + groups['weekday'] - 1)
                 if dtime.isocalendar() != (
-                    groups['year'], groups['week'], groups['weekday']):
+                        groups['year'], groups['week'], groups['weekday']):
                     # actually the problem could be an error in my logic, but
                     # nothing should cause this but requesting week 53 of a
                     # year with 52 weeks.
@@ -535,7 +537,7 @@ class Time(object):
                     int(round(groups['fractionalsec'] * 1000000)),
                     tzinfo=tzinfo
                 )
-                dtime += datetime.timedelta(days=groups['dayofyear']-1)
+                dtime += datetime.timedelta(days=groups['dayofyear'] - 1)
                 if dtime.year != groups['year']:
                     raise ValueError(
                         'year %04i has no day of year %03i' %
@@ -553,7 +555,6 @@ class Time(object):
                     int(round(groups['fractionalsec'] * 1000000)),
                     tzinfo=tzinfo
                 )
-
 
         match = klass.iso8601pattern.match(iso8601string)
         if match is None:
@@ -600,7 +601,8 @@ class Time(object):
         """
         self = klass.__new__(klass)
         if dtime.tzinfo is not None:
-            self._time = dtime.astimezone(FixedOffset(0, 0)).replace(tzinfo=None)
+            self._time = dtime.astimezone(FixedOffset(0, 0)).replace(
+                tzinfo=None)
         else:
             self._time = dtime
         self.resolution = datetime.timedelta.resolution
@@ -644,7 +646,8 @@ class Time(object):
         maybeStructTimePlus = parsedate_tz(rfc822string)
 
         if maybeStructTimePlus is None:
-            raise ValueError('could not parse RFC 2822 date %r' % (rfc822string,))
+            raise ValueError(
+                'could not parse RFC 2822 date %r' % (rfc822string,))
         structTimePlus = sanitizeStructTime(maybeStructTimePlus)
         offsetInSeconds = structTimePlus[-1]
         if offsetInSeconds is None:
@@ -684,7 +687,8 @@ class Time(object):
         if not self.isTimezoneDependent():
             return self._time.replace(tzinfo=tzinfo)
         else:
-            return self._time.replace(tzinfo=FixedOffset(0, 0)).astimezone(tzinfo)
+            return self._time.replace(tzinfo=FixedOffset(0, 0)).astimezone(
+                tzinfo)
 
     def asNaiveDatetime(self, tzinfo=None):
         """Return this time as a naive datetime.datetime instance.
@@ -785,8 +789,10 @@ class Time(object):
             ('%s%02i' % (dateSep, dtime.day), datetime.timedelta(days=1)),
             ('T', datetime.timedelta(hours=1)),
             ('%02i' % (dtime.hour,), datetime.timedelta(hours=1)),
-            ('%s%02i' % (timeSep, dtime.minute), datetime.timedelta(minutes=1)),
-            ('%s%02i' % (timeSep, dtime.second), datetime.timedelta(seconds=1)),
+            (
+            '%s%02i' % (timeSep, dtime.minute), datetime.timedelta(minutes=1)),
+            (
+            '%s%02i' % (timeSep, dtime.second), datetime.timedelta(seconds=1)),
             (microsecond, datetime.timedelta(microseconds=1)),
             (timezone, datetime.timedelta(hours=1))
         ]
@@ -832,7 +838,7 @@ class Time(object):
             timeFormat = Time._timeFormat[precision]
         except KeyError:
             raise InvalidPrecision(
-                    'Use Time.Precision.MINUTES or Time.Precision.SECONDS')
+                'Use Time.Precision.MINUTES or Time.Precision.SECONDS')
 
         if now is None:
             now = Time().asDatetime(tzinfo)
@@ -891,7 +897,7 @@ class Time(object):
         TIME IS FUN!
         """
         if self.resolution >= datetime.timedelta(days=1) \
-        and tzinfo is not None:
+                and tzinfo is not None:
             time = self._time.replace(tzinfo=tzinfo)
         else:
             time = self._time
@@ -910,7 +916,7 @@ class Time(object):
         resolution of datetime.timedelta(days=1).
         """
         day = self.__class__.fromDatetime(self.asDatetime().replace(
-                hour=0, minute=0, second=0, microsecond=0))
+            hour=0, minute=0, second=0, microsecond=0))
         day.resolution = datetime.timedelta(days=1)
         return day
 
@@ -936,7 +942,8 @@ class Time(object):
 
     def __cmp__(self, other):
         if not isinstance(other, Time):
-            raise TypeError("Cannot meaningfully compare %r with %r" % (self, other))
+            raise TypeError(
+                "Cannot meaningfully compare %r with %r" % (self, other))
         return cmp(self._time, other._time)
 
     def __eq__(self, other):

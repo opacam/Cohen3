@@ -1,17 +1,14 @@
-
 import traceback
 
-from zope.interface import implementer
-
-from twisted.persisted import styles
-from twisted.internet.interfaces import IDelayedCall
 from twisted.internet import error, base
+from twisted.internet.interfaces import IDelayedCall
+from twisted.persisted import styles
 from twisted.python import reflect
+from zope.interface import implementer
 
 
 @implementer(IDelayedCall)
 class DelayedCall(styles.Ephemeral):
-
     # enable .debug to record creator call stack, and it will be logged if
     # an exception occurs while the function is being run
     debug = False
@@ -135,7 +132,7 @@ class DelayedCall(styles.Ephemeral):
         else:
             now = self.seconds()
         L = ["<DelayedCall %s [%ss] called=%s cancelled=%s" % (
-                id(self), self.time - now, self.called, self.cancelled)]
+            id(self), self.time - now, self.called, self.cancelled)]
         if func is not None:
             L.extend((" ", func, "("))
             if self.args:
@@ -143,11 +140,14 @@ class DelayedCall(styles.Ephemeral):
                 if self.kw:
                     L.append(", ")
             if self.kw:
-                L.append(", ".join(['%s=%s' % (k, reflect.safe_repr(v)) for (k, v) in self.kw.items()]))
+                L.append(", ".join(
+                    ['%s=%s' % (k, reflect.safe_repr(v)) for (k, v) in
+                     self.kw.items()]))
             L.append(")")
 
         if self.debug:
-            L.append("\n\ntraceback at creation: \n\n%s" % ('    '.join(self.creator)))
+            L.append("\n\ntraceback at creation: \n\n%s" % (
+                '    '.join(self.creator)))
         L.append('>')
 
         return "".join(L)

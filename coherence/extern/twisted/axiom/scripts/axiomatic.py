@@ -1,16 +1,15 @@
 # -*- test-case-name: axiomatic.test.test_axiomatic -*-
-from zope.interface import alsoProvides, noLongerProvides
-
-import os
-import sys
-import glob
 import errno
+import glob
+import os
 import signal
+import sys
 
 from twisted.plugin import IPlugin, getPlugins
 from twisted.python import usage
 from twisted.python.runtime import platform
 from twisted.scripts import twistd
+from zope.interface import alsoProvides, noLongerProvides
 
 from coherence.extern.twisted.axiom.iaxiom import IAxiomaticCommand
 
@@ -21,7 +20,8 @@ class AxiomaticSubCommandMixin(object):
     def decodeCommandLine(self, cmdline):
         """Turn a byte string from the command line into a unicode string.
         """
-        codec = getattr(sys.stdin, 'encoding', None) or sys.getdefaultencoding()
+        codec = getattr(sys.stdin, 'encoding',
+                        None) or sys.getdefaultencoding()
         return str(cmdline, codec)
 
 
@@ -31,6 +31,7 @@ class _AxiomaticCommandMeta(type):
 
     This serves to make subclasses provide L{IPlugin} and L{IAxiomaticCommand}.
     """
+
     def __new__(cls, name, bases, attrs):
         newcls = type.__new__(cls, name, bases, attrs)
         alsoProvides(newcls, IPlugin, IAxiomaticCommand)
@@ -43,7 +44,8 @@ class AxiomaticSubCommand(usage.Options, AxiomaticSubCommandMixin):
     """
 
 
-class AxiomaticCommand(usage.Options, AxiomaticSubCommandMixin, metaclass=_AxiomaticCommandMeta):
+class AxiomaticCommand(usage.Options, AxiomaticSubCommandMixin,
+                       metaclass=_AxiomaticCommandMeta):
     """
     L{twisted.python.usage.Options} subclass for Axiomatic plugin commands.
 
@@ -60,9 +62,11 @@ class PIDMixin:
 
     def _sendSignal(self, signal):
         if platform.isWindows():
-            raise usage.UsageError("You can't send signals on Windows (XXX TODO)")
+            raise usage.UsageError(
+                "You can't send signals on Windows (XXX TODO)")
         dbdir = self.parent.getStoreDirectory()
-        serverpid = int(open(os.path.join(dbdir, 'run', 'axiomatic.pid')).read())
+        serverpid = int(
+            open(os.path.join(dbdir, 'run', 'axiomatic.pid')).read())
         os.kill(serverpid, signal)
         return serverpid
 
@@ -71,7 +75,9 @@ class PIDMixin:
             return self._sendSignal(signal)
         except (OSError, IOError) as e:
             if e.errno in (errno.ENOENT, errno.ESRCH):
-                raise usage.UsageError('There is no server running from the Axiom database %r.' % (self.parent.getStoreDirectory(),))
+                raise usage.UsageError(
+                    'There is no server running from the Axiom database %r.' % (
+                    self.parent.getStoreDirectory(),))
             else:
                 raise
 
@@ -85,7 +91,8 @@ class Status(usage.Options, PIDMixin):
     def postOptions(self):
         dbdir = self.parent.getStoreDirectory()
         serverpid = self.signalServer(0)
-        print('A server is running from the Axiom database %r, PID %d.' % (dbdir, serverpid))
+        print('A server is running from the Axiom database %r, PID %d.' % (
+        dbdir, serverpid))
 
 
 class Start(twistd.ServerOptions):
@@ -93,6 +100,7 @@ class Start(twistd.ServerOptions):
 
     def subCommands():
         raise AttributeError()
+
     subCommands = property(subCommands)
 
     def getArguments(self, store, args):
@@ -103,7 +111,7 @@ class Start(twistd.ServerOptions):
 
         for arg in args:
             if arg.startswith("--logfile=") or arg in (
-                "-l", "--logfile", "-n", "--nodaemon"
+                    "-l", "--logfile", "-n", "--nodaemon"
             ):
                 handleLogfile = False
             elif arg.startswith("--pidfile=") or arg == "--pidfile":
@@ -146,8 +154,10 @@ class Options(usage.Options):
         def get(self):
             yield ('start', None, Start, 'Launch the given Axiom database')
             if not platform.isWindows():
-                yield ('stop', None, Stop, 'Stop the server running from the given Axiom database')
-                yield ('status', None, Status, 'Report whether a server is running from the given Axiom database')
+                yield ('stop', None, Stop,
+                       'Stop the server running from the given Axiom database')
+                yield ('status', None, Status,
+                       'Report whether a server is running from the given Axiom database')
 
             from coherence.extern.twisted.axiom import plugins
             for plg in getPlugins(IAxiomaticCommand, plugins):
@@ -155,12 +165,15 @@ class Options(usage.Options):
                     yield (plg.name, None, plg, plg.description)
                 except AttributeError:
                     raise RuntimeError("Maldefined plugin: %r" % (plg,))
+
         return get,
+
     subCommands = property(*subCommands())
 
     optParameters = [
-        ('dbdir', 'd', None, 'Path containing axiom database to configure/create'),
-        ]
+        ('dbdir', 'd', None,
+         'Path containing axiom database to configure/create'),
+    ]
 
     optFlags = [
         ('debug', 'b', 'Enable Axiom-level debug logging')]
@@ -172,7 +185,8 @@ class Options(usage.Options):
         if yn.lower() in ('y', 'yes', ''):
             self['dbdir'] = potentialdb
         else:
-            raise usage.UsageError('Select another database with the -d option, then.')
+            raise usage.UsageError(
+                'Select another database with the -d option, then.')
 
     def getStoreDirectory(self):
         if self['dbdir'] is None:

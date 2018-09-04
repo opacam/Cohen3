@@ -1,4 +1,3 @@
-
 """
 failUnlessWarns assertion from twisted.trial in Twisted 8.0.
 """
@@ -7,7 +6,7 @@ import warnings
 
 
 def failUnlessWarns(self, category, message, filename, f,
-                   *args, **kwargs):
+                    *args, **kwargs):
     """
     Fail if the given function doesn't generate the specified warning when
     called. It calls the function, checks the warning, and forwards the
@@ -24,6 +23,7 @@ def failUnlessWarns(self, category, message, filename, f,
     @return: the result of the original function C{f}.
     """
     warningsShown = []
+
     def warnExplicit(*args):
         warningsShown.append(args)
 
@@ -56,6 +56,7 @@ def failUnlessWarns(self, category, message, filename, f,
     # self.assertEqual(lineno, xxx)
 
     return result
+
 
 def install():
     from twisted.trial.unittest import TestCase

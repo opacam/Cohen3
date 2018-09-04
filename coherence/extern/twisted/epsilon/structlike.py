@@ -15,6 +15,7 @@ class _RecursiveReprer(object):
     This object maintains state so that repr()s can tell when they are
     recursing and not do so.
     """
+
     def __init__(self):
         self.active = {}
 
@@ -62,7 +63,6 @@ def _contextualize(contextFactory, contextReceiver):
                             _contextualize, contextFactory, contextReceiver)
 
 
-
 class StructBehavior(object):
     __names__ = []
     __defaults__ = []
@@ -94,7 +94,6 @@ class StructBehavior(object):
         if kw:
             raise TypeError('Got unexpected arguments: ' + ', '.join(kw))
 
-
     def __repr__(self):
         """
         Generate a string representation.
@@ -110,7 +109,9 @@ class StructBehavior(object):
                     ', '.join(["%s=%s" %
                                (n, repr(getattr(self, n, None)))
                                for n in self.__names__]))
+
             return rr.recursiveRepr(self, _recordrepr)
+
         return _contextualize(_RecursiveReprer, doit)
 
 

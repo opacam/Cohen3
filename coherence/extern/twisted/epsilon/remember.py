@@ -36,5 +36,4 @@ class remembered(record('creationFunction')):
         return rememberme
 
 
-
 __all__ = ['remembered']

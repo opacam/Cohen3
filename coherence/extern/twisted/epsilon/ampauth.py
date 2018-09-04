@@ -8,14 +8,13 @@ L{cred<twisted.cred>}.
 
 from hashlib import sha1
 
-from zope.interface import implementer
-
-from twisted.python.randbytes import secureRandom
-from twisted.cred.error import UnauthorizedLogin
-from twisted.cred.credentials import IUsernameHashedPassword, IUsernamePassword
 from twisted.cred.checkers import ICredentialsChecker
-from twisted.protocols.amp import IBoxReceiver, String, Command, AMP
+from twisted.cred.credentials import IUsernameHashedPassword, IUsernamePassword
+from twisted.cred.error import UnauthorizedLogin
 from twisted.internet.protocol import ServerFactory
+from twisted.protocols.amp import IBoxReceiver, String, Command, AMP
+from twisted.python.randbytes import secureRandom
+from zope.interface import implementer
 
 from coherence.extern.twisted.epsilon.iepsilon import IOneTimePad
 from coherence.extern.twisted.epsilon.structlike import record
@@ -28,7 +27,6 @@ class UnhandledCredentials(Exception):
     L{login} was passed a credentials object which did not provide a recognized
     credentials interface.
     """
-
 
 
 class OTPLogin(Command):
@@ -45,7 +43,6 @@ class OTPLogin(Command):
         NotImplementedError: 'NOT_IMPLEMENTED_ERROR'}
 
 
-
 class PasswordLogin(Command):
     """
     Command to initiate a username/password-based login attempt.  The response
@@ -54,7 +51,6 @@ class PasswordLogin(Command):
     """
     arguments = [('username', String())]
     response = [('challenge', String())]
-
 
 
 def _calcResponse(challenge, nonce, password):
@@ -77,7 +73,6 @@ def _calcResponse(challenge, nonce, password):
     @return: A hash constructed from the three parameters.
     """
     return sha1('%s %s %s' % (challenge, nonce, password)).digest()
-
 
 
 class PasswordChallengeResponse(Command):
@@ -184,21 +179,21 @@ class CredReceiver(AMP):
         self.username = username
         return {'challenge': self.challenge}
 
-
     def _login(self, credentials):
         """
         Actually login to our portal with the given credentials.
         """
         d = self.portal.login(credentials, None, IBoxReceiver)
+
         def cbLoggedIn(xxx_todo_changeme):
             (interface, avatar, logout) = xxx_todo_changeme
             self.logout = logout
             self.boxReceiver = avatar
             self.boxReceiver.startReceivingBoxes(self.boxSender)
             return {}
+
         d.addCallback(cbLoggedIn)
         return d
-
 
     @PasswordChallengeResponse.responder
     def passwordChallengeResponse(self, cnonce, response):
@@ -208,14 +203,12 @@ class CredReceiver(AMP):
         return self._login(_AMPUsernamePassword(
             self.username, self.challenge, cnonce, response))
 
-
     @OTPLogin.responder
     def otpLogin(self, pad):
         """
         Verify the given pad.
         """
         return self._login(_AMPOneTimePad(pad))
-
 
     def connectionLost(self, reason):
         """
@@ -245,7 +238,6 @@ class OneTimePadChecker(record('pads')):
         raise UnauthorizedLogin('Unknown one-time pad')
 
 
-
 class CredAMPServerFactory(ServerFactory):
     """
     Server factory useful for creating L{CredReceiver} instances.
@@ -261,12 +253,10 @@ class CredAMPServerFactory(ServerFactory):
     def __init__(self, portal):
         self.portal = portal
 
-
     def buildProtocol(self, addr):
         proto = ServerFactory.buildProtocol(self, addr)
         proto.portal = self.portal
         return proto
-
 
 
 def login(client, credentials):
@@ -289,14 +279,15 @@ def login(client, credentials):
         raise UnhandledCredentials()
     d = client.callRemote(
         PasswordLogin, username=credentials.username)
+
     def cbChallenge(response):
         args = PasswordChallengeResponse.determineFrom(
             response['challenge'], credentials.password)
         d = client.callRemote(PasswordChallengeResponse, **args)
         return d.addCallback(lambda ignored: client)
+
     d.addCallback(cbChallenge)
     return d
-
 
 
 __all__ = [

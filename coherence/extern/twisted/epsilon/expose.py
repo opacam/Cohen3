@@ -98,6 +98,7 @@ class Exposer(object):
         @return: a 1-argument callable which records its input as exposed, then
         returns it.
         """
+
         def decorator(function):
             rkey = key
             if rkey is None:
@@ -109,6 +110,7 @@ class Exposer(object):
                 self._exposed[rkey] = []
             self._exposed[rkey].append(function)
             return function
+
         return decorator
 
     def get(self, obj, key):
