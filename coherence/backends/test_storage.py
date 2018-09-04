@@ -164,7 +164,7 @@ class ExternalProcessProducer(log.LogAble):
             # this .write will spin the reactor, calling .doWrite and then
             # .resumeProducing again, so be prepared for a re-entrant call
             self.request.write(data)
-        if self.request and self.ended == True:
+        if self.request and self.ended:
             print("closing")
             self.request.unregisterProducer()
             self.request.finish()
@@ -174,7 +174,7 @@ class ExternalProcessProducer(log.LogAble):
         print("resumeProducing", self.request)
         if not self.request:
             return
-        if self.process == None:
+        if self.process is None:
             argv = self.pipeline.split()
             executable = argv[0]
             argv[0] = os.path.basename(argv[0])
@@ -214,7 +214,7 @@ class Item(BackendItem):
 
     def get_item(self):
         print("get_item %r" % self.item)
-        if self.item == None:
+        if self.item is None:
             self.item = self.upnp_class(self.id, self.parent.id,
                                         self.get_name())
             self.item.description = self.description
@@ -228,7 +228,7 @@ class Item(BackendItem):
         return self.item
 
     def get_name(self):
-        if self.name == None:
+        if self.name is None:
             if isinstance(self.location, FilePath):
                 self.name = self.location.basename().decode("utf-8", "replace")
             else:
@@ -254,7 +254,7 @@ class Item(BackendItem):
 class ResourceItem(Item):
 
     def get_name(self):
-        if self.name == None:
+        if self.name is None:
             self.name = 'item'
         return self.name
 
@@ -293,7 +293,7 @@ class Container(BackendItem):
 
     def get_children(self, start=0, end=0):
         print("GET CHILDREN")
-        if self.sorted == False:
+        if not self.sorted:
             def childs_key_sort(x):
                 return x.name
 
@@ -355,12 +355,12 @@ class TestStore(BackendStore):
                 item_id = self.get_next_id()
 
                 extension = item.get('extension')
-                if extension == None:
+                if extension is None:
                     extension = ''
                 if len(extension) and extension[0] != '.':
                     extension = '.' + extension
 
-                if extension != None:
+                if extension is not None:
                     item_id = str(item_id) + extension
 
                 if type in ('file', 'url'):
@@ -429,7 +429,7 @@ class TestStore(BackendStore):
     def get_by_id(self, id):
         print("GET_BY_ID %r" % id)
         item = self.store.get(id, None)
-        if item == None:
+        if item is None:
             if int(id) == 0:
                 item = self.store[ROOT_CONTAINER_ID]
             else:

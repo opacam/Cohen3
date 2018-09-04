@@ -53,7 +53,7 @@ class LastFMUser(log.LogAble):
 
     def login(self):
 
-        if self.sessionid != None:
+        if self.sessionid is not None:
             self.warning("Session seems to be valid", )
             return
 
@@ -94,7 +94,7 @@ class LastFMUser(log.LogAble):
                                                                 None)
 
     def get_tracks(self):
-        if self.getting_tracks == True:
+        if self.getting_tracks:
             return
 
         def got_page(result):
@@ -200,7 +200,7 @@ class LastFMItem(log.LogAble):
         if parent:
             parent.add_child(self, update=update)
 
-        if parent == None:
+        if parent is None:
             parent_id = -1
         else:
             parent_id = parent.get_id()
@@ -239,13 +239,13 @@ class LastFMItem(log.LogAble):
         del self.item
 
     def add_child(self, child, update=False):
-        if self.children == None:
+        if self.children is None:
             self.children = []
         self.children.append(child)
         self.child_count += 1
         if isinstance(self.item, Container):
             self.item.childCount += 1
-        if update == True:
+        if update:
             self.update_id += 1
 
     def remove_child(self, child):

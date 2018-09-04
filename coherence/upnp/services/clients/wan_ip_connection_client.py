@@ -18,7 +18,7 @@ class WANIPConnectionClient:
         self.service.client = self
 
     def remove(self):
-        if self.service != None:
+        if self.service is not None:
             self.service.remove()
         self.service = None
         self.namespace = None

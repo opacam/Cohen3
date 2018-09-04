@@ -44,18 +44,21 @@ class RadiotimeAudioItem(BackendItem):
         return
 
     def get_item(self):
-        if self.item == None:
+        if self.item is None:
             upnp_id = self.get_id()
             upnp_parent_id = self.parent.get_id()
             self.item = DIDLLite.AudioBroadcast(upnp_id, upnp_parent_id,
                                                 self.name)
             self.item.albumArtURI = self.image
-            res = Resource(self.stream_url, 'http-get:*:%s:%s' % (self.mimetype,
-                                                                  ';'.join((
-                                                                           'DLNA.ORG_PN=MP3',
-                                                                           'DLNA.ORG_CI=0',
-                                                                           'DLNA.ORG_OP=01',
-                                                                           'DLNA.ORG_FLAGS=01700000000000000000000000000000'))))
+            res = Resource(
+                self.stream_url,
+                'http-get:*:%s:%s' % (
+                    self.mimetype,
+                    ';'.join((
+                        'DLNA.ORG_PN=MP3',
+                        'DLNA.ORG_CI=0',
+                        'DLNA.ORG_OP=01',
+                        'DLNA.ORG_FLAGS=01700000000000000000000000000000'))))
             res.size = 0  # None
             self.item.res.append(res)
         return self.item

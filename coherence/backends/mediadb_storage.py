@@ -151,7 +151,7 @@ class Container(BackendItem):
         self.store = store
         self.play_container = play_container
         self.update_id = 0
-        if children_callback != None:
+        if children_callback is not None:
             self.children = children_callback
         else:
             self.children = []
@@ -178,7 +178,7 @@ class Container(BackendItem):
     def get_item(self):
         item = DIDLLite.Container(self.id, self.parent_id, self.name)
         item.childCount = self.get_child_count()
-        if self.store and self.play_container == True:
+        if self.store and self.play_container:
             if item.childCount > 0:
                 res = DIDLLite.PlayContainerResource(self.store.server.uuid,
                                                      cid=self.get_id(),

@@ -121,7 +121,7 @@ class ContentDirectoryClient:
         starting_index = str(starting_index)
         requested_count = str(requested_count)
         action = self.service.get_action('Search')
-        if action == None:
+        if action is None:
             return None
         d = action.call(ContainerID=container_id,
                         SearchCriteria=criteria,

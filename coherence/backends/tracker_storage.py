@@ -72,13 +72,13 @@ class Container(BackendItem):
         self.item = container_class(id, parent_id, self.name)
         self.item.childCount = 0
         self.update_id = 0
-        if children_callback != None:
+        if children_callback is not None:
             self.children = children_callback
         else:
             self.children = util.OrderedDict()
         self.item.childCount = None  # self.get_child_count()
 
-        if store != None:
+        if store is not None:
             self.get_url = lambda: store.urlbase + str(self.id)
 
     def add_child(self, child):
@@ -86,7 +86,7 @@ class Container(BackendItem):
         if isinstance(child.id, str):
             _, id = child.id.split('.')
         self.children[id] = child
-        if self.item.childCount != None:
+        if self.item.childCount is not None:
             self.item.childCount += 1
 
     def get_children(self, start=0, end=0):
@@ -102,7 +102,7 @@ class Container(BackendItem):
             return children[start:end]
 
     def get_child_count(self):
-        if self.item.childCount != None:
+        if self.item.childCount is not None:
             return self.item.childCount
 
         if callable(self.children):
@@ -136,7 +136,7 @@ class Artist(BackendItem):
         self.children[id] = child
 
     def sort_children(self):
-        if self.sorted_children == None:
+        if self.sorted_children is None:
             def childs_key_sort(x):
                 return self.children[x].name
 
@@ -197,7 +197,7 @@ class Album(BackendItem):
 
     def get_children(self, start=0, end=0):
         children = []
-        if self.sorted_children != None:
+        if self.sorted_children is not None:
             for key in self.sorted_children:
                 children.append(self.children[key])
         else:
