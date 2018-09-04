@@ -362,7 +362,7 @@ class YoutubeVideoItem(BackendItem):
                                        quality=self.store.quality)
 
     def get_item(self):
-        if self.item == None:
+        if self.item is None:
             upnp_id = self.get_id()
             upnp_parent_id = self.parent.get_id()
             self.item = DIDLLite.VideoItem(upnp_id, upnp_parent_id, self.name)

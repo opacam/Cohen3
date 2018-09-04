@@ -141,7 +141,7 @@ class FSItem(BackendItem):
 
         self.store = store
 
-        if parent == None:
+        if parent is None:
             parent_id = -1
         else:
             parent_id = parent.get_id()
@@ -340,7 +340,7 @@ class FSItem(BackendItem):
             return
         # print "rebuild for", self.get_path()
         mimetype, _ = mimetypes.guess_type(self.get_path(), strict=False)
-        if mimetype == None:
+        if mimetype is None:
             return
         self.mimetype = mimetype
         # print "rebuild", self.mimetype
@@ -417,7 +417,7 @@ class FSItem(BackendItem):
         self.child_count += 1
         if isinstance(self.item, Container):
             self.item.childCount += 1
-        if update == True:
+        if update:
             self.update_id += 1
         self.sorted = False
 
@@ -432,7 +432,7 @@ class FSItem(BackendItem):
         self.sorted = False
 
     def get_children(self, start=0, request_count=0):
-        if self.sorted == False:
+        if not self.sorted:
             self.children.sort(key=_natural_key)
             self.sorted = True
         if request_count == 0:
@@ -572,7 +572,7 @@ class FSStore(BackendStore):
             self.upnp_DestroyObject = self.hidden_upnp_DestroyObject
 
         self.import_folder = kwargs.get('import_folder', None)
-        if self.import_folder != None:
+        if self.import_folder is not None:
             self.import_folder = os.path.abspath(self.import_folder)
             if not os.path.isdir(self.import_folder):
                 self.import_folder = None
@@ -583,7 +583,7 @@ class FSStore(BackendStore):
         self.update_id = 0
         if (len(self.content) > 1 or
                 utils.means_true(kwargs.get('create_root', False)) or
-                self.import_folder != None):
+                self.import_folder is not None):
             UPnPClass = classChooser('root')
             id = str(self.getnextID())
             try:
@@ -627,7 +627,7 @@ class FSStore(BackendStore):
         return str(self.__class__).split('.')[-1]
 
     def release(self):
-        if self.inotify != None:
+        if self.inotify is not None:
             self.inotify.release()
 
     def len(self):
@@ -680,7 +680,7 @@ class FSStore(BackendStore):
         self.info('get_url_by_name %r %r', parent, name)
         id = self.get_id_by_name(parent, name)
         # print 'get_url_by_name', id
-        if id == None:
+        if id is None:
             return ''
         return self.store[id].url
 
@@ -717,7 +717,7 @@ class FSStore(BackendStore):
         self.debug("walk %r", path)
         containers = []
         parent = self.append(path, parent)
-        if parent != None:
+        if parent is not None:
             containers.append(parent)
         while len(containers) > 0:
             container = containers.pop()
@@ -725,10 +725,10 @@ class FSStore(BackendStore):
                 self.debug('adding %r', container.location)
                 self.info('walk.adding: {}'.format(container.location))
                 for child in container.location.children():
-                    if ignore_file_pattern.match(child.basename()) != None:
+                    if ignore_file_pattern.match(child.basename()) is not None:
                         continue
                     new_container = self.append(child.path, container)
-                    if new_container != None:
+                    if new_container is not None:
                         containers.append(new_container)
             except UnicodeDecodeError:
                 self.warning(
@@ -738,7 +738,7 @@ class FSStore(BackendStore):
     def create(self, mimetype, path, parent):
         self.debug("create  %s %s %s %s", mimetype, path, type(path), parent)
         UPnPClass = classChooser(mimetype)
-        if UPnPClass == None:
+        if UPnPClass is None:
             return None
 
         id = self.getnextID()
@@ -774,7 +774,7 @@ class FSStore(BackendStore):
     def append(self, bytes_path, parent):
         path = str(bytes_path)
         self.debug("append  %s %s %s", path, type(path), parent)
-        if os.path.exists(path) == False:
+        if not os.path.exists(path):
             self.warning("path %r not available - ignored", path)
             return None
 
@@ -784,10 +784,10 @@ class FSStore(BackendStore):
 
         try:
             mimetype, _ = mimetypes.guess_type(path, strict=False)
-            if mimetype == None:
+            if mimetype is None:
                 if os.path.isdir(path):
                     mimetype = 'directory'
-            if mimetype == None:
+            if mimetype is None:
                 return None
 
             id = self.create(mimetype, path, parent)
@@ -842,7 +842,7 @@ class FSStore(BackendStore):
             self.info('%s was deleted, parent %r (%s)', path.path, parameter,
                       path.parent.path)
             id = self.get_id_by_name(parameter, path.path)
-            if id != None:
+            if id is not None:
                 self.remove(id)
         if (mask & IN_CREATE or mask & IN_MOVED_TO):
             if mask & IN_ISDIR:
@@ -856,7 +856,7 @@ class FSStore(BackendStore):
                     self.walk(path.path, self.get_by_id(parameter),
                               self.ignore_file_pattern)
                 else:
-                    if self.ignore_file_pattern.match(parameter) == None:
+                    if self.ignore_file_pattern.match(parameter) is None:
                         self.append(
                             str(path.path),
                             str(self.get_by_id(parameter)))
@@ -933,7 +933,7 @@ class FSStore(BackendStore):
             return failure.Failure(errorCode(718))
 
         item = self.get_by_id(id)
-        if item == None:
+        if item is None:
             return failure.Failure(errorCode(718))
 
         def gotPage(headers):
@@ -982,7 +982,7 @@ class FSStore(BackendStore):
     def upnp_CreateObject(self, *args, **kwargs):
         # print "CreateObject", kwargs
         if kwargs['ContainerID'] == 'DLNA.ORG_AnyContainer':
-            if self.import_folder != None:
+            if self.import_folder is not None:
                 ContainerID = self.import_folder_id
             else:
                 return failure.Failure(errorCode(712))
@@ -991,7 +991,7 @@ class FSStore(BackendStore):
         Elements = kwargs['Elements']
 
         parent_item = self.get_by_id(ContainerID)
-        if parent_item == None:
+        if parent_item is None:
             return failure.Failure(errorCode(710))
         if parent_item.item.restricted:
             return failure.Failure(errorCode(713))
@@ -1008,7 +1008,7 @@ class FSStore(BackendStore):
             item.parentID = ContainerID
         if (item.id != '' or
                 item.parentID != ContainerID or
-                item.restricted == True or
+                item.restricted is True or
                 item.title == ''):
             return failure.Failure(errorCode(712))
 
@@ -1060,7 +1060,7 @@ class FSStore(BackendStore):
         ObjectID = kwargs['ObjectID']
 
         item = self.get_by_id(ObjectID)
-        if item == None:
+        if item is None:
             return failure.Failure(errorCode(701))
 
         self.info("upnp_DestroyObject: {}".format(item.location))

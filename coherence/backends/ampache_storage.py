@@ -87,7 +87,7 @@ class Container(BackendItem):
         self.mimetype = 'directory'
         self.container_class = container_class
         self.update_id = 0
-        if children_callback != None:
+        if children_callback is not None:
             self.children = children_callback
         else:
             self.children = []
@@ -96,12 +96,12 @@ class Container(BackendItem):
         self.store = store
         self.play_container = play_container
 
-        if self.store != None:
+        if self.store is not None:
             self.get_url = lambda: self.store.urlbase + str(self.id)
 
     def add_child(self, child):
         self.children.append(child)
-        if self.childCount == None:
+        if self.childCount is None:
             self.childCount = 0
         self.childCount += 1
 
@@ -121,7 +121,7 @@ class Container(BackendItem):
             return children[start:end]
 
     def get_child_count(self):
-        if self.childCount == None:
+        if self.childCount is None:
             if callable(self.children):
                 self.childCount = len(self.children())
             else:
@@ -131,12 +131,14 @@ class Container(BackendItem):
     def get_item(self):
         item = self.container_class(self.id, self.parent_id, self.name)
         item.childCount = self.get_child_count()
-        # if self.store and self.play_container == True:
+        # if self.store and self.play_container:
         #    if item.childCount > 0:
         #        d = defer.maybeDeferred(self.get_children, 0, 1)
 
         #        def process_result(r,item):
-        #            res = DIDLLite.PlayContainerResource(self.store.server.uuid,cid=self.get_id(),fid=r[0].get_id())
+        #            res = DIDLLite.PlayContainerResource(
+        #                self.store.server.uuid,
+        #                cid=self.get_id(),fid=r[0].get_id())
         #            item.res.append(res)
         #            return item
 
@@ -279,7 +281,7 @@ class Artist(BackendItem):
                                         filter=self.ampache_id)
 
     def get_child_count(self):
-        if self.count_albums != None:
+        if self.count_albums is not None:
             return self.count_albums
 
         def got_childs(result):
@@ -331,7 +333,7 @@ class Genre(BackendItem):
                                         filter=self.ampache_id)
 
     def get_child_count(self):
-        if self.count_songs != None:
+        if self.count_songs is not None:
             return self.count_songs
 
         def got_childs(result):
@@ -383,7 +385,7 @@ class Tag(BackendItem):
                                         filter=self.ampache_id)
 
     def get_child_count(self):
-        if self.count_songs != None:
+        if self.count_songs is not None:
             return self.count_songs
 
         def got_childs(result):
@@ -441,14 +443,14 @@ class Track(BackendItem):
             self.mimetype = element.find('mime').text
         except:
             self.mimetype, _ = mimetypes.guess_type(self.url, strict=False)
-        if self.mimetype == None:
+        if self.mimetype is None:
             self.mimetype = "audio/mpeg"
         try:
             self.size = int(element.find('size').text)
         except:
             self.size = 0
 
-        if self.store.proxy == True:
+        if self.store.proxy:
             self.location = ProxySong(self.url)
 
     def get_children(self, start=0, request_count=0):
@@ -531,14 +533,14 @@ class Video(BackendItem):
             self.mimetype = element.find('mime').text
         except:
             self.mimetype, _ = mimetypes.guess_type(self.url, strict=False)
-        if self.mimetype == None:
+        if self.mimetype is None:
             self.mimetype = "video/avi"
         try:
             self.size = int(element.find('size').text)
         except:
             self.size = 0
 
-        if self.store.proxy == True:
+        if self.store.proxy:
             self.location = ProxySong(self.url)
 
     def get_children(self, start=0, request_count=0):
@@ -575,7 +577,7 @@ class Video(BackendItem):
         return self.title
 
     def get_url(self):
-        if self.store.proxy == True:
+        if self.store.proxy:
             return self.store.urlbase + str(self.id)
         else:
             return self.url
@@ -685,7 +687,7 @@ class AmpacheStore(BackendStore):
                     self.songs, self.artists, self.albums, self.playlists,
                     self.genres, self.tags, self.videos)
 
-                if renegotiate == False:
+                if not renegotiate:
                     self.containers = {}
                     self.containers[ROOT_CONTAINER_ID] = \
                         Container(ROOT_CONTAINER_ID, -1, self.name, store=self)
@@ -726,9 +728,9 @@ class AmpacheStore(BackendStore):
         request = ''.join((self.url,
                            '?action=handshake&auth=%s&timestamp=%d' % (
                            passphrase, timestamp)))
-        if self.user != None:
+        if self.user is not None:
             request = ''.join((request, '&user=%s' % self.user))
-        if self.api_version != None:
+        if self.api_version is not None:
             request = ''.join((request, '&version=%s' % str(self.api_version)))
         self.info("auth_request %r", request)
         d = utils.getPage(request)
@@ -822,7 +824,7 @@ class AmpacheStore(BackendStore):
         item, self.token, start)))
         if request_count > 0:
             request = ''.join((request, '&limit=%d' % request_count))
-        if filter != None:
+        if filter is not None:
             request = ''.join((request, '&filter=%s' % filter))
         self.info("ampache_query %r", request)
         d = utils.getPage(request)
@@ -977,7 +979,7 @@ class AmpacheStore(BackendStore):
 
         wmc_mapping = getattr(self, "wmc_mapping", None)
         if (kwargs.get('X_UPnPClient', '') == 'XBox' and
-                wmc_mapping != None and
+                wmc_mapping is not None and
                 ObjectID in wmc_mapping):
             """ fake a Windows Media Connect Server
             """
@@ -1021,10 +1023,10 @@ class AmpacheStore(BackendStore):
                 l = []
 
                 def process_items(result, tm):
-                    if result == None:
+                    if result is None:
                         result = []
                     for i in result:
-                        if i[0] == True:
+                        if i[0]:
                             didl.addItem(i[1])
 
                     return build_response(tm)

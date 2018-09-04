@@ -580,6 +580,6 @@ def getDomainNames(store):
     domains = set()
     domains.update(store.query(
             LoginMethod,
-            AND(LoginMethod.internal == True,
-                LoginMethod.domain != None)).getColumn("domain").distinct())
+            AND(LoginMethod.internal,
+                LoginMethod.domain is not None)).getColumn("domain").distinct())
     return sorted(domains)

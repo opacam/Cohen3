@@ -73,9 +73,10 @@ class TubeServiceControl(UPnPPublisher):
                     argument.get_state_variable()]
                 variable.update(
                     result[argument.name].decode('utf-8').encode('utf-8'))
-                # print 'update state variable contents', variable.name, variable.value, variable.send_events
-                if (
-                        variable.send_events == 'yes' and variable.moderated == False):
+                # print('update state variable contents',
+                #       variable.name, variable.value, variable.send_events)
+                if (variable.send_events == 'yes' and
+                        variable.moderated is False):
                     notify.append(variable)
 
             self.service.propagate_notification(notify)
@@ -104,7 +105,7 @@ class TubeServiceControl(UPnPPublisher):
                             new_res.append(res)
                             changed = True
                     item.res = new_res
-                if changed == True:
+                if changed:
                     didl.rebuild()
                     ordered_result[
                         argument.name] = didl.toString()  # .replace('<ns0:','<')

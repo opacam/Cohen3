@@ -32,9 +32,9 @@ class Gallery2Item(BackendItem):
         self.id = id
 
         self.name = obj.get('title')  # .encode('utf-8')
-        if self.name == None:
+        if self.name is None:
             self.name = obj.get('name')
-        if self.name == None:
+        if self.name is None:
             self.name = id
 
         self.mimetype = mimetype
@@ -45,7 +45,7 @@ class Gallery2Item(BackendItem):
         if parent:
             parent.add_child(self, update=update)
 
-        if parent == None:
+        if parent is None:
             parent_id = -1
         else:
             parent_id = parent.get_id()
@@ -59,7 +59,7 @@ class Gallery2Item(BackendItem):
         if (len(urlbase) and urlbase[-1] != '/'):
             urlbase += '/'
 
-        if parent == None:
+        if parent is None:
             self.gallery2_url = None
             self.url = urlbase + str(self.id)
         elif self.mimetype == 'directory':
@@ -83,13 +83,13 @@ class Gallery2Item(BackendItem):
         del self.item
 
     def add_child(self, child, update=False):
-        if self.children == None:
+        if self.children is None:
             self.children = []
         self.children.append(child)
         self.child_count += 1
         if isinstance(self.item, Container):
             self.item.childCount += 1
-        if update == True:
+        if update:
             self.update_id += 1
 
     def remove_child(self, child):
@@ -103,14 +103,14 @@ class Gallery2Item(BackendItem):
 
     def get_children(self, start=0, request_count=0):
         def process_items(result=None):
-            if self.children == None:
+            if self.children is None:
                 return []
             if request_count == 0:
                 return self.children[start:]
             else:
                 return self.children[start:request_count]
 
-        if (self.children == None):
+        if (self.children is None):
             d = self.store.retrieveItemsForAlbum(self.gallery2_id, self)
             d.addCallback(process_items)
             return d

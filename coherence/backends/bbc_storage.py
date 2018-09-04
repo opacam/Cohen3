@@ -34,7 +34,7 @@ class BBCItem(BackendItem):
         self.item = None
 
     def get_item(self):
-        if self.item == None:
+        if self.item is None:
             self.item = DIDLLite.AudioItem(self.id, self.parent_id, self.name)
             self.item.description = self.description
 
@@ -72,7 +72,7 @@ class Container(BackendItem):
         self.sorted = False
 
     def get_children(self, start=0, end=0):
-        if self.sorted == False:
+        if not self.sorted:
             def childs_sort(x, y):
                 r = cmp_to_key(x.name, y.name)
                 return r
@@ -189,7 +189,7 @@ class BBCStore(BackendStore):
                                 './{http://uriplay.org/elements/}uri')
                             uri = uri.attrib[
                                 '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource']
-                            if first == None:
+                            if first is None:
                                 id = self.get_next_id()
                                 self.store[id] = \
                                     Container(id, self, SERIES_CONTAINER_ID,

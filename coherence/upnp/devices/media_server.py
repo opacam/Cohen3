@@ -388,7 +388,7 @@ class MSRoot(resource.Resource, log.LogAble):
                 self.debug("error accessing items path %r", msg)
                 self.debug(traceback.format_exc())
                 return self.list_content(name, ch, request)
-            if p != None and os.path.exists(p):
+            if p is not None and os.path.exists(p):
                 self.info("accessing path %r", p)
                 self.prepare_connection(request)
                 self.prepare_headers(ch, request)
@@ -436,7 +436,7 @@ class MSRoot(resource.Resource, log.LogAble):
                     for c in r:
                         if hasattr(c, 'get_url'):
                             path = c.get_url()
-                        elif hasattr(c, 'get_path') and c.get_path != None:
+                        elif hasattr(c, 'get_path') and c.get_path is not None:
                             # path = c.get_path().encode('utf-8').encode('string_escape')
                             path = c.get_path()
                             if isinstance(path, str):

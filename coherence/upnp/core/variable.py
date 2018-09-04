@@ -38,7 +38,7 @@ class StateVariable(log.LogAble):
         self.never_evented = False
         self.data_type = data_type
         self.allowed_values = allowed_values
-        if self.allowed_values == None:
+        if self.allowed_values is None:
             self.allowed_values = []
         self.has_vendor_values = False
         self.allowed_value_range = None
@@ -64,7 +64,7 @@ class StateVariable(log.LogAble):
         r.append(('Data Type', self.data_type))
         r.append(('Default Value', self.default_value))
         r.append(('Current Value', str(self.value)))
-        if (self.allowed_values != None and len(self.allowed_values) > 0):
+        if (self.allowed_values is not None and len(self.allowed_values) > 0):
             r.append(('Allowed Values', ','.join(self.allowed_values)))
         return r
 
@@ -92,7 +92,7 @@ class StateVariable(log.LogAble):
         if not isinstance(self.service, service.Service):
             if self.name == 'ContainerUpdateIDs':
                 old_value = self.value
-                if self.updated == True:
+                if self.updated:
                     if isinstance(value, tuple):
                         v = old_value.split(',')
                         i = 0
@@ -133,7 +133,7 @@ class StateVariable(log.LogAble):
                         else:
                             v = str(v)
                         if len(self.allowed_values):
-                            if self.has_vendor_values == True:
+                            if self.has_vendor_values:
                                 new_value.append(v)
                             elif v.upper() in [x.upper() for x in
                                                self.allowed_values]:
@@ -158,7 +158,7 @@ class StateVariable(log.LogAble):
                 if type(value) != str:
                     value = str(value)
                 if len(self.allowed_values):
-                    if self.has_vendor_values == True:
+                    if self.has_vendor_values:
                         new_value = value
                     elif value.upper() in [v.upper() for v in
                                            self.allowed_values]:
@@ -198,7 +198,7 @@ class StateVariable(log.LogAble):
             pass
         else:
             self.updated = True
-            if self.service.last_change != None:
+            if self.service.last_change is not None:
                 self.service.last_change.updated = True
         self.info("variable updated %s %s", self.name, self.value)
 

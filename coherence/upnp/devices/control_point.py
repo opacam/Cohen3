@@ -231,7 +231,7 @@ class XMLRPC(xmlrpc.XMLRPC):
     def xmlrpc_mute_device(self, device_id):
         print("mute")
         device = self.control_point.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             client.rendering_control.set_mute(desired_mute=1)
             return "Ok"
@@ -240,7 +240,7 @@ class XMLRPC(xmlrpc.XMLRPC):
     def xmlrpc_unmute_device(self, device_id):
         print("unmute", device_id)
         device = self.control_point.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             client.rendering_control.set_mute(desired_mute=0)
             return "Ok"
@@ -249,7 +249,7 @@ class XMLRPC(xmlrpc.XMLRPC):
     def xmlrpc_set_volume(self, device_id, volume):
         print("set volume")
         device = self.control_point.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             client.rendering_control.set_volume(desired_volume=volume)
             return "Ok"
@@ -258,7 +258,7 @@ class XMLRPC(xmlrpc.XMLRPC):
     def xmlrpc_play(self, device_id):
         print("play")
         device = self.control_point.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             client.av_transport.play()
             return "Ok"
@@ -267,7 +267,7 @@ class XMLRPC(xmlrpc.XMLRPC):
     def xmlrpc_pause(self, device_id):
         print("pause")
         device = self.control_point.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             client.av_transport.pause()
             return "Ok"
@@ -276,7 +276,7 @@ class XMLRPC(xmlrpc.XMLRPC):
     def xmlrpc_stop(self, device_id):
         print("stop")
         device = self.control_point.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             client.av_transport.stop()
             return "Ok"
@@ -285,7 +285,7 @@ class XMLRPC(xmlrpc.XMLRPC):
     def xmlrpc_next(self, device_id):
         print("next")
         device = self.control_point.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             next(client.av_transport)
             return "Ok"
@@ -294,7 +294,7 @@ class XMLRPC(xmlrpc.XMLRPC):
     def xmlrpc_previous(self, device_id):
         print("previous")
         device = self.control_point.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             client.av_transport.previous()
             return "Ok"
@@ -303,7 +303,7 @@ class XMLRPC(xmlrpc.XMLRPC):
     def xmlrpc_set_av_transport_uri(self, device_id, uri):
         print("set_av_transport_uri")
         device = self.control_point.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             client.av_transport.set_av_transport_uri(current_uri=uri)
             return "Ok"
@@ -312,7 +312,7 @@ class XMLRPC(xmlrpc.XMLRPC):
     def xmlrpc_create_object(self, device_id, container_id, arguments):
         print("create_object", arguments)
         device = self.control_point.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             client.content_directory.create_object(container_id, arguments)
             return "Ok"
@@ -321,7 +321,7 @@ class XMLRPC(xmlrpc.XMLRPC):
     def xmlrpc_import_resource(self, device_id, source_uri, destination_uri):
         print("import_resource", source_uri, destination_uri)
         device = self.control_point.get_device_with_id(device_id)
-        if device != None:
+        if device is not None:
             client = device.get_client()
             client.content_directory.import_resource(source_uri,
                                                      destination_uri)

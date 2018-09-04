@@ -94,7 +94,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             return r
 
         def process_result(result, total=None, found_item=None):
-            if result == None:
+            if result is None:
                 result = []
 
             l = []
@@ -232,16 +232,16 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             return r
 
         def process_result(result, total=None, found_item=None):
-            if result == None:
+            if result is None:
                 result = []
             if BrowseFlag == 'BrowseDirectChildren':
                 l = []
 
                 def process_items(result, tm):
-                    if result == None:
+                    if result is None:
                         result = []
                     for i in result:
-                        if i[0] == True:
+                        if i[0]:
                             didl.addItem(i[1])
 
                     return build_response(tm)
@@ -250,7 +250,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                     d = defer.maybeDeferred(i.get_item)
                     l.append(d)
 
-                if found_item != None:
+                if found_item is not None:
                     def got_child_count(count):
                         dl = defer.DeferredList(l)
                         dl.addCallback(process_items, count)
@@ -260,7 +260,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                     d.addCallback(got_child_count)
 
                     return d
-                elif total == None:
+                elif total is None:
                     total = item.get_child_count()
 
                 dl = defer.DeferredList(l)
@@ -313,8 +313,9 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                         if int(RequestedCount) == 0:
                             items = item[StartingIndex:]
                         else:
-                            items = item[
-                                    StartingIndex:StartingIndex + RequestedCount]
+                            items = item[StartingIndex:
+                                         StartingIndex +
+                                         RequestedCount]
                         return process_result(items, total=total)
                     else:
                         if isinstance(item, defer.Deferred):

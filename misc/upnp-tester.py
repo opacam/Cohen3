@@ -137,7 +137,7 @@ class UI(basic.LineReceiver):
     def cmd_extract(self, args):
         "extract <uuid> -- download xml files from device"
         device = self.coherence.get_device_with_id(args[0])
-        if device == None:
+        if device is None:
             self.transport.write("device %s not found - aborting\n" % args[0])
         else:
             self.transport.write(str("extracting from %s @ %s\n" % (
