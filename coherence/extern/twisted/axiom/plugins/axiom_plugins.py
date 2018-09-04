@@ -4,8 +4,11 @@
 Plugins provided by Axiom for Axiom.
 """
 
+import code
 import getpass
-import code, os, traceback, sys
+import os
+import sys
+
 try:
     import readline
 except ImportError:
@@ -13,15 +16,16 @@ except ImportError:
 
 from zope.interface import directlyProvides
 
-from twisted.python import usage, filepath, log
-from twisted.python.reflect import qual
+from twisted.python import usage, filepath
 from twisted.plugin import IPlugin
 
 from coherence.extern.twisted.epsilon.hotfix import require
+
 require('twisted', 'filepath_copyTo')
 
 import coherence.extern.twisted.axiom as axiom
-from coherence.extern.twisted.axiom import store, attributes, userbase, dependency, errors
+from coherence.extern.twisted.axiom import store, attributes, userbase, \
+    dependency, errors
 from coherence.extern.twisted.axiom.substore import SubStore
 from coherence.extern.twisted.axiom.scripts import axiomatic
 from coherence.extern.twisted.axiom.listversions import ListVersions
@@ -30,7 +34,7 @@ from coherence.extern.twisted.axiom.iaxiom import IVersion
 
 directlyProvides(version, IPlugin, IVersion)
 
-#placate pyflakes
+# placate pyflakes
 ListVersions
 
 
@@ -95,7 +99,8 @@ class AxiomConsole(code.InteractiveConsole):
         value.
         """
         if not self.locals.get('autocommit', None):
-            return self.locals['db'].transact(code.InteractiveConsole.runcode, self, code)
+            return self.locals['db'].transact(code.InteractiveConsole.runcode,
+                                              self, code)
         return code.InteractiveConsole.runcode(self, code)
 
 
@@ -108,11 +113,11 @@ class Browse(axiomatic.AxiomaticCommand):
     optParameters = [
         ('history-file', 'h', '~/.axiomatic-browser-history',
          'Name of the file to which to save input history.'),
-        ]
+    ]
 
     optFlags = [
         ('debug', 'b', 'Open Store in debug mode.'),
-        ]
+    ]
 
     def postOptions(self):
         interp = code.InteractiveConsole(self.namespace(), '<axiom browser>')
@@ -134,7 +139,7 @@ class Browse(axiomatic.AxiomaticCommand):
             'db': self.store,
             'store': store,
             'autocommit': False,
-            }
+        }
         return self._ns
 
 
@@ -206,8 +211,11 @@ class Disable(axiomatic.AxiomaticSubCommand):
 
     def postOptions(self):
         for acc in self.store.query(userbase.LoginAccount,
-                                    attributes.AND(userbase.LoginAccount.username == self['username'],
-                                                   userbase.LoginAccount.domain == self['domain'])):
+                                    attributes.AND(
+                                        userbase.LoginAccount.username == self[
+                                            'username'],
+                                        userbase.LoginAccount.domain == self[
+                                            'domain'])):
             if acc.disabled:
                 raise usage.UsageError("That account is already disabled.")
             else:
@@ -242,7 +250,7 @@ class UserBaseCommand(axiomatic.AxiomaticCommand):
         ('create', None, Create, "Create a new user"),
         ('disable', None, Disable, "Disable an existing user"),
         ('list', None, List, "List users in an Axiom database"),
-        ]
+    ]
 
     def getStore(self):
         return self.parent.getStore()
@@ -252,8 +260,10 @@ class Extract(axiomatic.AxiomaticCommand):
     name = 'extract-user'
     description = 'Remove an account from the login system, moving its associated database to the filesystem.'
     optParameters = [
-        ('address', 'a', None, 'localpart@domain-format identifier of the user store to extract.'),
-        ('destination', 'd', None, 'Directory into which to extract the user store.')]
+        ('address', 'a', None,
+         'localpart@domain-format identifier of the user store to extract.'),
+        ('destination', 'd', None,
+         'Directory into which to extract the user store.')]
 
     def extractSubStore(self, localpart, domain, destinationPath):
         siteStore = self.parent.getStore()
@@ -264,9 +274,11 @@ class Extract(axiomatic.AxiomaticCommand):
         userbase.extractUserStore(la, destinationPath)
 
     def postOptions(self):
-        localpart, domain = self.decodeCommandLine(self['address']).split('@', 1)
+        localpart, domain = self.decodeCommandLine(self['address']).split('@',
+                                                                          1)
         destinationPath = filepath.FilePath(
-            self.decodeCommandLine(self['destination'])).child(localpart + '@' + domain + '.axiom')
+            self.decodeCommandLine(self['destination'])).child(
+            localpart + '@' + domain + '.axiom')
         self.extractSubStore(localpart, domain, destinationPath)
 
 
@@ -275,8 +287,9 @@ class Insert(axiomatic.AxiomaticCommand):
     description = 'Insert a user store, such as one extracted with "extract-user", into a site store and login system.'
     optParameters = [
         ('userstore', 'u', None, 'Path to user store to be inserted.')
-        ]
+    ]
 
     def postOptions(self):
         userbase.insertUserStore(self.parent.getStore(),
-                                 filepath.FilePath(self.decodeCommandLine(self['userstore'])))
+                                 filepath.FilePath(self.decodeCommandLine(
+                                     self['userstore'])))

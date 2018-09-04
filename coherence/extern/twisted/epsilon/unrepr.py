@@ -10,7 +10,7 @@ def unrepr(s):
 
 
 def getObj(s):
-    s="a="+s
+    s = "a=" + s
     return compiler.parse(s).getChildren()[1].getChildren()[0].getChildren()[1]
 
 
@@ -21,7 +21,7 @@ class UnknownType(Exception):
 class Builder:
 
     def build(self, o):
-        m = getattr(self, 'build_'+o.__class__.__name__, None)
+        m = getattr(self, 'build_' + o.__class__.__name__, None)
         if m is None:
             raise UnknownType(o.__class__.__name__)
         return m(o)
@@ -55,4 +55,4 @@ class Builder:
             raise UnknownType('Add')
         if not isinstance(imag, complex) or imag.real != 0.0:
             raise UnknownType('Add')
-        return real+imag
+        return real + imag

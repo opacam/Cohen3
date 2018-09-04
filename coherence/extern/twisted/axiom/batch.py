@@ -5,20 +5,24 @@ Utilities for performing repetitive tasks over potentially large sets
 of data over an extended period of time.
 """
 
-import weakref, datetime, os, sys
+import datetime
+import os
+import sys
+import weakref
 
+from twisted.application import service
+from twisted.internet import task, defer, reactor, error, protocol
+from twisted.python import reflect, failure, log, procutils, util, runtime
 from zope.interface import implements
 
-from twisted.python import reflect, failure, log, procutils, util, runtime
-from twisted.internet import task, defer, reactor, error, protocol
-from twisted.application import service
-
-from coherence.extern.twisted.epsilon import extime, process, cooperator, modal, juice
-
-from coherence.extern.twisted.axiom import iaxiom, errors as eaxiom, item, attributes
-from coherence.extern.twisted.axiom.scheduler import Scheduler, SubScheduler
-from coherence.extern.twisted.axiom.upgrade import registerUpgrader, registerDeletionUpgrader
+from coherence.extern.twisted.axiom import iaxiom, errors as eaxiom, item, \
+    attributes
 from coherence.extern.twisted.axiom.dependency import installOn
+from coherence.extern.twisted.axiom.scheduler import Scheduler, SubScheduler
+from coherence.extern.twisted.axiom.upgrade import registerUpgrader, \
+    registerDeletionUpgrader
+from coherence.extern.twisted.epsilon import extime, process, cooperator, \
+    modal, juice
 
 VERBOSE = False
 
@@ -32,12 +36,12 @@ class _NoWorkUnits(Exception):
     """
 
 
-
 class _ProcessingFailure(Exception):
     """
     Raised when processItem raises any exception.  This is never raised
     directly, but instances of the three subclasses are.
     """
+
     def __init__(self, reliableListener, workUnit, failure):
         Exception.__init__(self)
         self.reliableListener = reliableListener
@@ -48,7 +52,6 @@ class _ProcessingFailure(Exception):
         # cause any crazy object leaks.  See also the comment in
         # BatchProcessingService.step's except suite.
         self.failure.cleanFailure()
-
 
     def mark(self):
         """
@@ -64,7 +67,6 @@ class _ProcessingFailure(Exception):
             error=self.failure.getErrorMessage())
 
 
-
 class _ForwardProcessingFailure(_ProcessingFailure):
     """
     An error occurred in a reliable listener while processing items forward
@@ -76,16 +78,15 @@ class _ForwardProcessingFailure(_ProcessingFailure):
         self.reliableListener.forwardMark = self.workUnit.storeID
 
 
-
 class _BackwardProcessingFailure(_ProcessingFailure):
     """
     An error occurred in a reliable listener while processing items backwards
     from the mark.
     """
+
     def mark(self):
         _ProcessingFailure.mark(self)
         self.reliableListener.backwardMark = self.workUnit.storeID
-
 
 
 class _TrackedProcessingFailure(_ProcessingFailure):
@@ -93,7 +94,6 @@ class _TrackedProcessingFailure(_ProcessingFailure):
     An error occurred in a reliable listener while processing items specially
     added to the batch run.
     """
-
 
 
 class BatchProcessingError(item.Item):
@@ -112,7 +112,6 @@ class BatchProcessingError(item.Item):
     error = attributes.bytes(doc="""
     The error message which was associated with this failure.
     """)
-
 
 
 class _ReliableTracker(item.Item):
@@ -135,7 +134,6 @@ class _ReliableTracker(item.Item):
     item = attributes.reference(doc="""
     The item which this is tracking.
     """)
-
 
 
 class _ReliableListener(item.Item):
@@ -172,20 +170,19 @@ class _ReliableListener(item.Item):
 
     def __repr__(self):
         return '<ReliableListener %s %r #%r>' % ({iaxiom.REMOTE: 'remote',
-                                                  iaxiom.LOCAL: 'local'}[self.style],
+                                                  iaxiom.LOCAL: 'local'}[
+                                                     self.style],
                                                  self.listener,
                                                  self.storeID)
 
-
     def addItem(self, item):
         assert type(item) is self.processor.workUnitType, \
-               "Adding work unit of type %r to listener for type %r" % (
-            type(item), self.processor.workUnitType)
+            "Adding work unit of type %r to listener for type %r" % (
+                type(item), self.processor.workUnitType)
         if item.storeID >= self.backwardMark and item.storeID <= self.forwardMark:
             _ReliableTracker(store=self.store,
                              listener=self,
                              item=item)
-
 
     def _forwardWork(self, workUnitType):
         if VERBOSE:
@@ -195,7 +192,6 @@ class _ReliableListener(item.Item):
             workUnitType.storeID > self.forwardMark,
             sort=workUnitType.storeID.ascending,
             limit=2)
-
 
     def _backwardWork(self, workUnitType):
         if VERBOSE:
@@ -208,12 +204,10 @@ class _ReliableListener(item.Item):
             sort=workUnitType.storeID.descending,
             limit=2)
 
-
     def _extraWork(self):
         return self.store.query(_ReliableTracker,
                                 _ReliableTracker.listener == self,
                                 limit=2)
-
 
     def _doOneWork(self, workUnit, failureType):
         if VERBOSE:
@@ -226,7 +220,6 @@ class _ReliableListener(item.Item):
                 log.msg("Processing failed: %s" % (f.getErrorMessage(),))
                 log.err(f)
             raise failureType(self, workUnit, f)
-
 
     def step(self):
         first = True
@@ -262,7 +255,6 @@ class _ReliableListener(item.Item):
         return False
 
 
-
 class _BatchProcessorMixin:
 
     def step(self, style=iaxiom.LOCAL, skip=()):
@@ -270,19 +262,25 @@ class _BatchProcessorMixin:
         first = True
 
         for listener in self.store.query(_ReliableListener,
-                                         attributes.AND(_ReliableListener.processor == self,
-                                                        _ReliableListener.style == style,
-                                                        _ReliableListener.listener.notOneOf(skip)),
+                                         attributes.AND(
+                                             _ReliableListener.processor == self,
+                                             _ReliableListener.style == style,
+                                             _ReliableListener.listener.notOneOf(
+                                                 skip)),
                                          sort=_ReliableListener.lastRun.ascending):
             if not first:
                 if VERBOSE:
-                    log.msg("Found more work to do, returning True from %r.step()" % (self,))
+                    log.msg(
+                        "Found more work to do, returning True from %r.step()" % (
+                        self,))
                 return True
             listener.lastRun = now
             try:
                 if listener.step():
                     if VERBOSE:
-                        log.msg("%r.step() reported more work to do, returning True from %r.step()" % (listener, self))
+                        log.msg(
+                            "%r.step() reported more work to do, returning True from %r.step()" % (
+                            listener, self))
                     return True
             except _NoWorkUnits:
                 if VERBOSE:
@@ -290,9 +288,10 @@ class _BatchProcessorMixin:
             else:
                 first = False
         if VERBOSE:
-            log.msg("No listeners left with work, returning False from %r.step()" % (self,))
+            log.msg(
+                "No listeners left with work, returning False from %r.step()" % (
+                self,))
         return False
-
 
     def run(self):
         """
@@ -306,19 +305,19 @@ class _BatchProcessorMixin:
         """
         now = extime.Time()
         if self.step():
-            self.scheduled = now + datetime.timedelta(milliseconds=self.busyInterval)
+            self.scheduled = now + datetime.timedelta(
+                milliseconds=self.busyInterval)
         else:
             self.scheduled = None
         return self.scheduled
-
 
     def timedEventErrorHandler(self, timedEvent, failureObj):
         failureObj.trap(_ProcessingFailure)
         log.msg("Batch processing failure")
         log.err(failureObj.value.failure)
         failureObj.value.mark()
-        return extime.Time() + datetime.timedelta(milliseconds=self.busyInterval)
-
+        return extime.Time() + datetime.timedelta(
+            milliseconds=self.busyInterval)
 
     def addReliableListener(self, listener, style=iaxiom.LOCAL):
         """
@@ -335,8 +334,9 @@ class _BatchProcessorMixin:
         @return: An Item representing L{listener}'s persistent tracking state.
         """
         existing = self.store.findUnique(_ReliableListener,
-                                         attributes.AND(_ReliableListener.processor == self,
-                                                        _ReliableListener.listener == listener),
+                                         attributes.AND(
+                                             _ReliableListener.processor == self,
+                                             _ReliableListener.listener == listener),
                                          default=None)
         if existing is not None:
             return existing
@@ -362,7 +362,6 @@ class _BatchProcessorMixin:
                                  backwardMark=backwardMark,
                                  style=style)
 
-
     def removeReliableListener(self, listener):
         """
         Remove a previously added listener.
@@ -374,15 +373,14 @@ class _BatchProcessorMixin:
                          attributes.AND(BatchProcessingError.processor == self,
                                         BatchProcessingError.listener == listener)).deleteFromStore()
 
-
     def getReliableListeners(self):
         """
         Return an iterable of the listeners which have been added to
         this batch processor.
         """
-        for rellist in self.store.query(_ReliableListener, _ReliableListener.processor == self):
+        for rellist in self.store.query(_ReliableListener,
+                                        _ReliableListener.processor == self):
             yield rellist.listener
-
 
     def getFailedItems(self):
         """
@@ -390,9 +388,9 @@ class _BatchProcessorMixin:
         exception from C{processItem} and the item which was passed as
         the argument to that method.
         """
-        for failed in self.store.query(BatchProcessingError, BatchProcessingError.processor == self):
+        for failed in self.store.query(BatchProcessingError,
+                                       BatchProcessingError.processor == self):
             yield (failed.listener, failed.item)
-
 
     def itemAdded(self):
         """
@@ -422,7 +420,6 @@ class _BatchProcessorMixin:
             batchService = iaxiom.IBatchService(self.store, None)
             if batchService is not None:
                 batchService.start()
-
 
 
 def upgradeProcessor1to2(oldProcessor):
@@ -459,6 +456,7 @@ def upgradeProcessor1to2(oldProcessor):
     sch.schedule(newProcessor, newProcessor.scheduled)
     return newProcessor
 
+
 def processor(forType):
     """
     Create an Axiom Item type which is suitable to use as a batch processor for
@@ -492,7 +490,8 @@ def processor(forType):
 
             '__init__': __init__,
 
-            '__repr__': lambda self: '<Batch of %s #%d>' % (reflect.qual(self.workUnitType), self.storeID),
+            '__repr__': lambda self: '<Batch of %s #%d>' % (
+            reflect.qual(self.workUnitType), self.storeID),
 
             'schemaVersion': 2,
 
@@ -504,7 +503,7 @@ def processor(forType):
 
             # MAGIC NUMBERS AREN'T THEY WONDERFUL?
             'busyInterval': attributes.integer(doc="", default=MILLI / 10),
-            }
+        }
         _processors[forType] = processor = item.MetaItem(
             attrs['__name__'],
             (item.Item, _BatchProcessorMixin),
@@ -518,14 +517,12 @@ def processor(forType):
     return processor
 
 
-
 class ProcessUnavailable(Exception):
     """Indicates the process is not available to perform tasks.
 
     This is a transient error.  Calling code should handle it by
     arranging to do the work they planned on doing at a later time.
     """
-
 
 
 class Shutdown(juice.Command):
@@ -660,9 +657,11 @@ class ProcessController(object, metaclass=modal.ModalType):
         executable = sys.executable
         env = os.environ
 
-        twistdBinaries = procutils.which("twistd2.4") + procutils.which("twistd")
+        twistdBinaries = procutils.which("twistd2.4") + procutils.which(
+            "twistd")
         if not twistdBinaries:
-            return defer.fail(RuntimeError("Couldn't find twistd to start subprocess"))
+            return defer.fail(
+                RuntimeError("Couldn't find twistd to start subprocess"))
         twistd = twistdBinaries[0]
 
         setsid = procutils.which("setsid")
@@ -732,7 +731,6 @@ class ProcessController(object, metaclass=modal.ModalType):
             if self.onProcessTermination is not None:
                 self.onProcessTermination()
 
-
     class ready(modal.mode):
         def getProcess(self):
             return defer.succeed(self.juice)
@@ -749,7 +747,6 @@ class ProcessController(object, metaclass=modal.ModalType):
             if self.onProcessTermination is not None:
                 self.onProcessTermination()
 
-
     class stopping(modal.mode):
         def getProcess(self):
             return defer.fail(ProcessUnavailable("Shutting down"))
@@ -761,7 +758,6 @@ class ProcessController(object, metaclass=modal.ModalType):
             self.mode = 'stopped'
             self.process = self.connector = None
             self.onShutdown.callback(None)
-
 
     class waiting_ready(modal.mode):
         def getProcess(self):
@@ -781,7 +777,6 @@ class ProcessController(object, metaclass=modal.ModalType):
             _childProcTerminated(self, reason)
             if self.onProcessTermination is not None:
                 self.onProcessTermination()
-
 
 
 class JuiceConnector(protocol.ProcessProtocol):
@@ -837,7 +832,6 @@ class JuiceConnector(protocol.ProcessProtocol):
         self.controller.childProcessTerminated(status)
 
 
-
 class JuiceChild(juice.Juice):
     """
     Protocol class which runs in the child process
@@ -856,8 +850,8 @@ class JuiceChild(juice.Juice):
         log.msg("Shutdown message received, goodbye.")
         self.shutdown = True
         return {}
-    command_SHUTDOWN.command = Shutdown
 
+    command_SHUTDOWN.command = Shutdown
 
 
 class SetStore(juice.Command):
@@ -879,7 +873,6 @@ class SuspendProcessor(juice.Command):
                  ('storeid', juice.Integer())]
 
 
-
 class ResumeProcessor(juice.Command):
     """
     Cause a particular reliable listener to begin receiving notifications
@@ -888,7 +881,6 @@ class ResumeProcessor(juice.Command):
     commandName = 'Resume-Processor'
     arguments = [('storepath', juice.Path()),
                  ('storeid', juice.Integer())]
-
 
 
 class CallItemMethod(juice.Command):
@@ -917,7 +909,6 @@ class BatchProcessingControllerService(service.Service):
         self.store = store
         self.setName("Batch Processing Controller")
 
-
     def startService(self):
         service.Service.startService(self)
         tacPath = util.sibpath(__file__, "batch.tac")
@@ -935,21 +926,18 @@ class BatchProcessingControllerService(service.Service):
             logdir.child("batch.log").path,
             rundir.child("batch.pid").path)
 
-
     def _setStore(self):
-        return SetStore(storepath=self.store.dbdir).do(self.batchController.juice)
-
+        return SetStore(storepath=self.store.dbdir).do(
+            self.batchController.juice)
 
     def _restartProcess(self):
         reactor.callLater(1.0, self.batchController.getProcess)
-
 
     def stopService(self):
         service.Service.stopService(self)
         d = self.batchController.stopProcess()
         d.addErrback(lambda err: err.trap(error.ProcessDone))
         return d
-
 
     def call(self, itemMethod):
         """
@@ -964,21 +952,17 @@ class BatchProcessingControllerService(service.Service):
                            storeid=item.storeID,
                            method=method).do)
 
-
     def start(self):
         if self.batchController is not None:
             self.batchController.getProcess()
-
 
     def suspend(self, storepath, storeID):
         return self.batchController.getProcess().addCallback(
             SuspendProcessor(storepath=storepath, storeid=storeID).do)
 
-
     def resume(self, storepath, storeID):
         return self.batchController.getProcess().addCallback(
             ResumeProcessor(storepath=storepath, storeid=storeID).do)
-
 
 
 class _SubStoreBatchChannel(object):
@@ -994,22 +978,17 @@ class _SubStoreBatchChannel(object):
         self.storepath = substore.dbdir
         self.service = iaxiom.IBatchService(substore.parent)
 
-
     def call(self, itemMethod):
         return self.service.call(itemMethod)
-
 
     def start(self):
         self.service.start()
 
-
     def suspend(self, storeID):
         return self.service.suspend(self.storepath, storeID)
 
-
     def resume(self, storeID):
         return self.service.resume(self.storepath, storeID)
-
 
 
 def storeBatchServiceSpecialCase(st, pups):
@@ -1032,7 +1011,6 @@ def storeBatchServiceSpecialCase(st, pups):
         return None
 
 
-
 class BatchProcessingProtocol(JuiceChild):
     siteStore = None
 
@@ -1043,13 +1021,11 @@ class BatchProcessingProtocol(JuiceChild):
             service.cooperator = cooperator.Cooperator()
         self.service = service
 
-
     def connectionLost(self, reason):
         # In the child process, we are a server.  In the child process, we
         # don't want to keep running after we can't talk to the client anymore.
         if self.isServer:
             reactor.stop()
-
 
     def command_SET_STORE(self, storepath):
         from coherence.extern.twisted.axiom import store
@@ -1065,21 +1041,24 @@ class BatchProcessingProtocol(JuiceChild):
 
     command_SET_STORE.command = SetStore
 
-
     def command_SUSPEND_PROCESSOR(self, storepath, storeid):
-        return self.subStores[storepath.path].suspend(storeid).addCallback(lambda ign: {})
+        return self.subStores[storepath.path].suspend(storeid).addCallback(
+            lambda ign: {})
+
     command_SUSPEND_PROCESSOR.command = SuspendProcessor
 
-
     def command_RESUME_PROCESSOR(self, storepath, storeid):
-        return self.subStores[storepath.path].resume(storeid).addCallback(lambda ign: {})
+        return self.subStores[storepath.path].resume(storeid).addCallback(
+            lambda ign: {})
+
     command_RESUME_PROCESSOR.command = ResumeProcessor
 
-
     def command_CALL_ITEM_METHOD(self, storepath, storeid, method):
-        return self.subStores[storepath.path].call(storeid, method).addCallback(lambda ign: {})
-    command_CALL_ITEM_METHOD.command = CallItemMethod
+        return self.subStores[storepath.path].call(storeid,
+                                                   method).addCallback(
+            lambda ign: {})
 
+    command_CALL_ITEM_METHOD.command = CallItemMethod
 
     def _pollSubStores(self):
         from coherence.extern.twisted.axiom import store, substore
@@ -1092,7 +1071,9 @@ class BatchProcessingProtocol(JuiceChild):
                 del self.subStores[path]
 
         try:
-            paths = set([p.path for p in self.siteStore.query(substore.SubStore).getColumn("storepath")])
+            paths = set([p.path for p in
+                         self.siteStore.query(substore.SubStore).getColumn(
+                             "storepath")])
         except eaxiom.SQLError as e:
             # Generally, database is locked.
             log.msg("SubStore query failed with SQLError: %r" % (e,))
@@ -1111,47 +1092,45 @@ class BatchProcessingProtocol(JuiceChild):
                     s = store.Store(added, debug=False)
                 except eaxiom.SQLError as e:
                     # Generally, database is locked.
-                    log.msg("Opening sub-Store failed with SQLError: %r" % (e,))
+                    log.msg(
+                        "Opening sub-Store failed with SQLError: %r" % (e,))
                 except:
                     log.msg("Opening sub-Store failed with bad error:")
                     log.err()
                 else:
-                    self.subStores[added] = BatchProcessingService(s, style=iaxiom.REMOTE)
+                    self.subStores[added] = BatchProcessingService(s,
+                                                                   style=iaxiom.REMOTE)
                     self.subStores[added].setServiceParent(self.service)
                     if VERBOSE:
                         log.msg("Added SubStore " + added)
-
 
 
 class BatchProcessingService(service.Service):
     """
     Steps over the L{iaxiom.IBatchProcessor} powerups for a single L{axiom.store.Store}.
     """
+
     def __init__(self, store, style=iaxiom.LOCAL):
         self.store = store
         self.style = style
         self.suspended = []
-
 
     def suspend(self, storeID):
         item = self.store.getItemByID(storeID)
         self.suspended.append(item)
         return item.suspend()
 
-
     def resume(self, storeID):
         item = self.store.getItemByID(storeID)
         self.suspended.remove(item)
         return item.resume()
 
-
     def call(self, storeID, methodName):
-        return defer.maybeDeferred(getattr(self.store.getItemByID(storeID), methodName))
-
+        return defer.maybeDeferred(
+            getattr(self.store.getItemByID(storeID), methodName))
 
     def items(self):
         return self.store.powerupsFor(iaxiom.IBatchProcessor)
-
 
     def processWhileRunning(self):
         """
@@ -1168,13 +1147,13 @@ class BatchProcessingService(service.Service):
                 delay = 10.0
             yield task.deferLater(reactor, delay, lambda: None)
 
-
     def step(self):
         while True:
             items = list(self.items())
 
             if VERBOSE:
-                log.msg("Found %d processors for %s" % (len(items), self.store))
+                log.msg(
+                    "Found %d processors for %s" % (len(items), self.store))
 
             ran = False
             more = False
@@ -1182,11 +1161,15 @@ class BatchProcessingService(service.Service):
                 ran = True
                 item = items.pop()
                 if VERBOSE:
-                    log.msg("Stepping processor %r (suspended is %r)" % (item, self.suspended))
+                    log.msg("Stepping processor %r (suspended is %r)" % (
+                    item, self.suspended))
                 try:
-                    itemHasMore = item.store.transact(item.step, style=self.style, skip=self.suspended)
+                    itemHasMore = item.store.transact(item.step,
+                                                      style=self.style,
+                                                      skip=self.suspended)
                 except _ProcessingFailure as e:
-                    log.msg("%r failed while processing %r:" % (e.reliableListener, e.workUnit))
+                    log.msg("%r failed while processing %r:" % (
+                    e.reliableListener, e.workUnit))
                     log.err(e.failure)
                     e.mark()
 
@@ -1205,16 +1188,13 @@ class BatchProcessingService(service.Service):
             if not ran:
                 yield None, more
 
-
     def startService(self):
         service.Service.startService(self)
         self.parent.cooperator.coiterate(self.processWhileRunning())
 
-
     def stopService(self):
         service.Service.stopService(self)
         self.store.close()
-
 
 
 class BatchManholePowerup(item.Item):
@@ -1226,5 +1206,6 @@ class BatchManholePowerup(item.Item):
     schemaVersion = 2
     unused = attributes.integer(
         doc="Satisfy Axiom requirement for at least one attribute")
+
 
 registerDeletionUpgrader(BatchManholePowerup, 1, 2)

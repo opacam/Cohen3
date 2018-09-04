@@ -5,12 +5,12 @@
 Process and stdio related functionality.
 """
 
-import os, sys, imp
+import imp
+import os
+import sys
 
-from zope.interface import implementer
-
+from twisted.application.service import Service
 from twisted.internet import reactor
-from twisted.application.service import IService, Service
 from twisted.internet.stdio import StandardIO
 
 from coherence.extern.twisted.epsilon.structlike import record
@@ -42,6 +42,7 @@ def spawnProcess(processProtocol, executable, args=(), env={},
     return reactor.spawnProcess(processProtocol, executable, args,
                                 env, path, uid, gid, usePTY)
 
+
 def spawnPythonProcess(processProtocol, args=(), env={},
                        path=None, uid=None, gid=None, usePTY=0,
                        packages=()):
@@ -55,11 +56,11 @@ def spawnPythonProcess(processProtocol, args=(), env={},
                         packages)
 
 
-
 class StandardIOService(record('protocol'), Service):
     """
     Service for connecting a protocol to stdio.
     """
+
     def startService(self):
         """
         Connect C{self.protocol} to standard io.

@@ -1,4 +1,3 @@
-
 from twisted.internet import reactor
 
 
@@ -13,7 +12,6 @@ class TimeoutMixin:
 
     def callLater(self, period, func):
         return reactor.callLater(period, func)
-
 
     def resetTimeout(self):
         """Reset the timeout count down"""

@@ -1,7 +1,7 @@
 # -*- test-case-name: axiom.test.test_sequence -*-
 
-from coherence.extern.twisted.axiom.item import Item
 from coherence.extern.twisted.axiom.attributes import reference, integer, AND
+from coherence.extern.twisted.axiom.item import Item
 
 
 class _ListItem(Item):
@@ -71,11 +71,13 @@ class List(Item):
 
     def __add__(self, other):
         return list(self) + list(other)
+
     def __radd__(self, other):
         return list(other) + list(self)
 
     def __mul__(self, other):
         return list(self) * other
+
     def __rmul__(self, other):
         return other * list(self)
 
@@ -167,11 +169,11 @@ class List(Item):
         for li in self._queryListItems():
             # XXX: Well, can it?
             assert index < len(values), \
-                   '_ListItems were added during a sort (can this happen?)'
+                '_ListItems were added during a sort (can this happen?)'
             li._index = index
             li._value = values[index]
             index += 1
 
     def count(self, value):
         return self.store.count(_ListItem, AND(
-                _ListItem._container == self, _ListItem._value == value))
+            _ListItem._container == self, _ListItem._value == value))

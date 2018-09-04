@@ -32,21 +32,21 @@ aware that a user's database contains only their own data.
 
 import warnings
 
+from twisted.cred.checkers import ICredentialsChecker, ANONYMOUS
+from twisted.cred.credentials import IUsernamePassword, IUsernameHashedPassword
+from twisted.cred.portal import IRealm
+from twisted.python import log
 from zope.interface import implements, Interface
 
-from twisted.cred.portal import IRealm
-from twisted.cred.credentials import IUsernamePassword, IUsernameHashedPassword
-from twisted.cred.checkers import ICredentialsChecker, ANONYMOUS
-from twisted.python import log
-
-from coherence.extern.twisted.axiom.store import Store
-from coherence.extern.twisted.axiom.item import Item
-from coherence.extern.twisted.axiom.substore import SubStore
-from coherence.extern.twisted.axiom.attributes import text, integer, reference, boolean, AND, OR
+from coherence.extern.twisted.axiom import upgrade, iaxiom
+from coherence.extern.twisted.axiom.attributes import text, integer, reference, \
+    boolean, AND, OR
 from coherence.extern.twisted.axiom.errors import (
     BadCredentials, NoSuchUser, DuplicateUser, MissingDomainPart)
+from coherence.extern.twisted.axiom.item import Item
 from coherence.extern.twisted.axiom.scheduler import IScheduler
-from coherence.extern.twisted.axiom import upgrade, iaxiom
+from coherence.extern.twisted.axiom.store import Store
+from coherence.extern.twisted.axiom.substore import SubStore
 
 ANY_PROTOCOL = '*'
 
@@ -136,13 +136,13 @@ class LoginMethod(Item):
 
 def upgradeLoginMethod1To2(old):
     return old.upgradeVersion(
-            'login_method', 1, 2,
-            localpart=old.localpart,
-            domain=old.domain,
-            internal=old.internal,
-            protocol=old.protocol,
-            account=old.account,
-            verified=old.verified)
+        'login_method', 1, 2,
+        localpart=old.localpart,
+        domain=old.domain,
+        internal=old.internal,
+        protocol=old.protocol,
+        account=old.account,
+        verified=old.verified)
 
 
 upgrade.registerUpgrader(upgradeLoginMethod1To2, 'login_method', 1, 2)
@@ -165,12 +165,12 @@ class LoginAccount(Item):
     schemaVersion = 2
 
     password = text()
-    avatars = reference()       # reference to a thing which can be adapted to
-                                # implementations for application-level
-                                # protocols.  In general this is a reference to
-                                # a SubStore because this is optimized for
-                                # applications where per-user data is a
-                                # substantial portion of the cost.
+    avatars = reference()  # reference to a thing which can be adapted to
+    # implementations for application-level
+    # protocols.  In general this is a reference to
+    # a SubStore because this is optimized for
+    # applications where per-user data is a
+    # substantial portion of the cost.
     disabled = integer()
 
     def __conform__(self, interface):
@@ -188,6 +188,7 @@ class LoginAccount(Item):
         down into it.
         """
         ss = self.avatars.open()
+
         def _():
             oldAccounts = ss.query(LoginAccount)
             oldMethods = ss.query(LoginMethod)
@@ -195,6 +196,7 @@ class LoginAccount(Item):
                 x.deleteFromStore()
             self.cloneInto(ss, ss)
             IScheduler(ss).migrateDown()
+
         ss.transact(_)
 
     def migrateUp(self):
@@ -204,6 +206,7 @@ class LoginAccount(Item):
         site store which contains it.
         """
         siteStore = self.store.parent
+
         def _():
             # No convenience method for the following because needing to do it is
             # *rare*.  It *should* be ugly; 99% of the time if you need to do this
@@ -211,6 +214,7 @@ class LoginAccount(Item):
             siteStoreSubRef = siteStore.getItemByID(self.store.idInParent)
             self.cloneInto(siteStore, siteStoreSubRef)
             IScheduler(self.store).migrateUp()
+
         siteStore.transact(_)
 
     def cloneInto(self, newStore, avatars):
@@ -235,9 +239,11 @@ class LoginAccount(Item):
         return la
 
     def deleteLoginMethods(self):
-        self.store.query(LoginMethod, LoginMethod.account == self).deleteFromStore()
+        self.store.query(LoginMethod,
+                         LoginMethod.account == self).deleteFromStore()
 
-    def addLoginMethod(self, localpart, domain, protocol=ANY_PROTOCOL, verified=False, internal=False):
+    def addLoginMethod(self, localpart, domain, protocol=ANY_PROTOCOL,
+                       verified=False, internal=False):
         """
         Add a login method to this account, propogating up or down as necessary
         to site store or user store to maintain consistency.
@@ -280,7 +286,8 @@ def insertUserStore(siteStore, userStorePath):
     ls = siteStore.findUnique(LoginSystem)
     unattachedSubStore = Store(userStorePath)
     for lm in unattachedSubStore.query(LoginMethod,
-                                       LoginMethod.account == unattachedSubStore.findUnique(LoginAccount),
+                                       LoginMethod.account == unattachedSubStore.findUnique(
+                                           LoginAccount),
                                        sort=LoginMethod.internal.descending):
         if ls.accountByAddress(lm.localpart, lm.domain) is None:
             localpart, domain = lm.localpart, lm.domain
@@ -290,7 +297,8 @@ def insertUserStore(siteStore, userStorePath):
 
     unattachedSubStore.close()
 
-    insertLocation = siteStore.newFilePath('account', domain, localpart + '.axiom')
+    insertLocation = siteStore.newFilePath('account', domain,
+                                           localpart + '.axiom')
     insertParentLoc = insertLocation.parent()
     if not insertParentLoc.exists():
         insertParentLoc.makedirs()
@@ -304,7 +312,8 @@ def insertUserStore(siteStore, userStorePath):
     attachedStore.findUnique(LoginAccount).migrateUp()
 
 
-def extractUserStore(userAccount, extractionDestination, legacySiteAuthoritative=True):
+def extractUserStore(userAccount, extractionDestination,
+                     legacySiteAuthoritative=True):
     """
     Move the SubStore for the given user account out of the given site store
     completely.  Place the user store's database directory into the given
@@ -357,6 +366,7 @@ def extractUserStore(userAccount, extractionDestination, legacySiteAuthoritative
         userAccount.deleteLoginMethods()
         userAccount.deleteFromStore()
         av.storepath.moveTo(extractionDestination)
+
     userAccount.store.transact(_)
 
 
@@ -396,12 +406,14 @@ def upgradeLoginAccount1To2(oldAccount):
 
 
 from coherence.extern.twisted.axiom import upgrade
+
 upgrade.registerUpgrader(upgradeLoginAccount1To2, 'login', 1, 2)
 
 
 class SubStoreLoginMixin:
     def makeAvatars(self, domain, username):
-        return SubStore.createNew(self.store, ('account', domain, username + '.axiom'))
+        return SubStore.createNew(self.store,
+                                  ('account', domain, username + '.axiom'))
 
 
 class LoginBase:
@@ -421,10 +433,10 @@ class LoginBase:
         @type domain: C{unicode} without NUL
         """
         for account in self.store.query(LoginAccount,
-                                     AND(LoginMethod.domain == domain,
-                                         LoginMethod.localpart == username,
-                                         LoginAccount.disabled == 0,
-                                         LoginMethod.account == LoginAccount.storeID)):
+                                        AND(LoginMethod.domain == domain,
+                                            LoginMethod.localpart == username,
+                                            LoginAccount.disabled == 0,
+                                            LoginMethod.account == LoginAccount.storeID)):
             return account
 
     def addAccount(self, username, domain, password, avatars=None,
@@ -570,7 +582,7 @@ def getAccountNames(store, protocol=None):
     refer to the given store.
     """
     return ((meth.localpart, meth.domain) for meth
-                in getLoginMethods(store, protocol))
+            in getLoginMethods(store, protocol))
 
 
 def getDomainNames(store):
@@ -579,7 +591,7 @@ def getDomainNames(store):
     """
     domains = set()
     domains.update(store.query(
-            LoginMethod,
-            AND(LoginMethod.internal,
-                LoginMethod.domain is not None)).getColumn("domain").distinct())
+        LoginMethod,
+        AND(LoginMethod.internal,
+            LoginMethod.domain is not None)).getColumn("domain").distinct())
     return sorted(domains)

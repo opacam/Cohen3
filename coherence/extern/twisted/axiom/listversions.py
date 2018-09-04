@@ -1,8 +1,9 @@
 # -*- test-case-name: axiom.test.test_listversions -*-
 
-from zope.interface import classProvides
 from twisted import plugin
 from twisted.python import usage, versions
+from zope.interface import classProvides
+
 from coherence.extern.twisted.axiom import iaxiom, item, attributes, plugins
 from coherence.extern.twisted.axiom.scripts import axiomatic
 from coherence.extern.twisted.epsilon.extime import Time
@@ -36,10 +37,8 @@ class SystemVersion(item.Item):
         doc="When this system version set was recorded.",
         allowNone=False)
 
-
     def __repr__(self):
         return '<SystemVersion %s>' % (self.creation,)
-
 
     def longWindedRepr(self):
         """
@@ -48,8 +47,8 @@ class SystemVersion(item.Item):
         """
         return '\n\t'.join(
             [repr(self)] + [repr(sv) for sv in self.store.query(
-                        SoftwareVersion,
-                        SoftwareVersion.systemVersion == self)])
+                SoftwareVersion,
+                SoftwareVersion.systemVersion == self)])
 
 
 class SoftwareVersion(item.Item):
@@ -77,7 +76,8 @@ class SoftwareVersion(item.Item):
         Convert the version data in this item to a
         L{twisted.python.versions.Version}.
         """
-        return versions.Version(self.package, self.major, self.minor, self.micro)
+        return versions.Version(self.package, self.major, self.minor,
+                                self.micro)
 
     def __repr__(self):
         return '<SoftwareVersion %s: %s>' % (self.package, self.version)

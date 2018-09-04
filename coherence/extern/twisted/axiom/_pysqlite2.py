@@ -7,7 +7,8 @@ These provide a uniform interface on top of PySQLite2 for Axiom, particularly
 including error handling behavior and exception types.
 """
 
-import time, sys
+import sys
+import time
 
 try:
     # Prefer the third-party module, as it is easier to update, and so may
@@ -34,21 +35,20 @@ class Connection(object):
     @type closed: L{bool}
     @ivar closed: Has this cursor been closed?
     """
+
     def __init__(self, connection, timeout=None):
         self._connection = connection
         self._timeout = timeout
         self.closed = False
 
-
     def fromDatabaseName(cls, dbFilename, timeout=None, isolationLevel=None):
         return cls(dbapi2.connect(dbFilename, timeout=0,
                                   isolation_level=isolationLevel))
-    fromDatabaseName = classmethod(fromDatabaseName)
 
+    fromDatabaseName = classmethod(fromDatabaseName)
 
     def cursor(self):
         return Cursor(self, self._timeout)
-
 
     def identifySQLError(self, sql, args, e):
         """
@@ -62,14 +62,12 @@ class Connection(object):
             return errors.TableAlreadyExists(sql, args, e)
         return errors.SQLError(sql, args, e)
 
-
     def close(self):
         """
         Close the underlying connection.
         """
         self._connection.close()
         self.closed = True
-
 
 
 class Cursor(object):
@@ -79,16 +77,15 @@ class Cursor(object):
     @type closed: L{bool}
     @ivar closed: Has this cursor been closed?
     """
+
     def __init__(self, connection, timeout):
         self._connection = connection
         self._cursor = connection._connection.cursor()
         self.timeout = timeout
         self.closed = False
 
-
     def __iter__(self):
         return iter(self._cursor)
-
 
     def time(self):
         """
@@ -97,7 +94,6 @@ class Cursor(object):
         """
         return time.time()
 
-
     def sleep(self, seconds):
         """
         Block for the given number of seconds.
@@ -105,7 +101,6 @@ class Cursor(object):
         @type seconds: C{float}
         """
         time.sleep(seconds)
-
 
     def execute(self, sql, args=()):
         try:
@@ -142,7 +137,9 @@ class Cursor(object):
                                 now = self.time()
                                 if self.timeout is not None:
                                     if (now - t) > self.timeout:
-                                        raise errors.TimeoutError(sql, self.timeout, e)
+                                        raise errors.TimeoutError(sql,
+                                                                  self.timeout,
+                                                                  e)
                                 self.sleep(0.1)
                                 blockedTime = self.time() - t
                             else:
@@ -150,7 +147,8 @@ class Cursor(object):
                 finally:
                     txntime = self.time() - t
                     if txntime - blockedTime > 2.0:
-                        log.msg('Extremely long execute: %s' % (txntime - blockedTime,))
+                        log.msg('Extremely long execute: %s' % (
+                        txntime - blockedTime,))
                         log.msg(sql)
                         # import traceback; traceback.print_stack()
                     log.msg(interface=iaxiom.IStatEvent,
@@ -165,10 +163,8 @@ class Cursor(object):
                 dbapi2.OperationalError) as e:
             raise self._connection.identifySQLError(sql, args, e)
 
-
     def lastRowID(self):
         return self._cursor.lastrowid
-
 
     def close(self):
         """
@@ -186,4 +182,4 @@ __all__ = [
     'OperationalError',
     'Connection',
     'sqlite_version_info',
-    ]
+]

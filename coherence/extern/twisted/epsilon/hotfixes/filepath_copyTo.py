@@ -3,22 +3,16 @@
 # See LICENSE for details.
 
 
-
-import os
 import errno
-import base64
+import os
 import random
 from hashlib import sha1 as sha
-
-from os.path import isabs, exists, normpath, abspath, splitext
-from os.path import basename, dirname
-from os.path import join as joinpath
-from os import sep as slash
 from os import listdir, utime, stat
-from os import remove
-
+from os import sep as slash
+from os.path import basename, dirname
+from os.path import isabs, exists, normpath, abspath, splitext
+from os.path import join as joinpath
 from stat import ST_MODE, ST_MTIME, ST_ATIME, ST_CTIME, ST_SIZE
-
 from stat import S_ISREG, S_ISDIR, S_ISLNK
 
 try:
@@ -40,14 +34,17 @@ except ImportError:
     def armor(s):
         return s.encode('hex')
 
+
 class InsecurePath(Exception):
     pass
+
 
 def _secureEnoughString():
     """
     Create a pseudorandom, 16-character string for use in secure filenames.
     """
     return armor(sha.new(randomBytes(64)).digest())[:16]
+
 
 class FilePath:
     """I am a path on the filesystem that only permits 'downwards' access.
@@ -87,10 +84,12 @@ class FilePath:
     def child(self, path):
         norm = normpath(path)
         if slash in norm:
-            raise InsecurePath("%r contains one or more directory separators" % (path,))
+            raise InsecurePath(
+                "%r contains one or more directory separators" % (path,))
         newpath = abspath(joinpath(self.path, norm))
         if not newpath.startswith(self.path):
-            raise InsecurePath("%r is not a child of %s" % (newpath, self.path))
+            raise InsecurePath(
+                "%r is not a child of %s" % (newpath, self.path))
         return self.clonePath(newpath)
 
     def preauthChild(self, path):
@@ -101,7 +100,8 @@ class FilePath:
         """
         newpath = abspath(joinpath(self.path, normpath(path)))
         if not newpath.startswith(self.path):
-            raise InsecurePath("%s is not a child of %s" % (newpath, self.path))
+            raise InsecurePath(
+                "%s is not a child of %s" % (newpath, self.path))
         return self.clonePath(newpath)
 
     def childSearchPreauth(self, *paths):
@@ -136,7 +136,7 @@ class FilePath:
             if not ext and self.exists():
                 return self
             if ext == '*':
-                basedot = basename(p)+'.'
+                basedot = basename(p) + '.'
                 for fn in listdir(dirname(p)):
                     if fn.startswith(basedot):
                         return self.clonePath(joinpath(dirname(p), fn))
@@ -145,13 +145,13 @@ class FilePath:
                 return self.clonePath(p2)
 
     def siblingExtension(self, ext):
-        return self.clonePath(self.path+ext)
+        return self.clonePath(self.path + ext)
 
     def open(self, mode='r'):
         if self.alwaysCreate:
             assert 'a' not in mode, "Appending not supported when alwaysCreate == True"
             return self.create()
-        return open(self.path, mode+'b')
+        return open(self.path, mode + 'b')
 
     # stat methods below
 
@@ -265,7 +265,8 @@ class FilePath:
         pattern.
         """
         import glob
-        path = self.path[-1] == '/' and self.path + pattern or slash.join([self.path, pattern])
+        path = self.path[-1] == '/' and self.path + pattern or slash.join(
+            [self.path, pattern])
         return list(map(self.clonePath, glob.glob(path)))
 
     def basename(self):
@@ -398,13 +399,13 @@ class FilePath:
 
                 # that means it's time to copy trees of directories!
                 secsib = destination.secureSibling()
-                self.copyTo(secsib) # slow
-                secsib.moveTo(destination) # visible
+                self.copyTo(secsib)  # slow
+                secsib.moveTo(destination)  # visible
 
                 # done creating new stuff.  let's clean me up.
                 mysecsib = self.secureSibling()
-                self.moveTo(mysecsib) # visible
-                mysecsib.remove() # slow
+                self.moveTo(mysecsib)  # visible
+                mysecsib.remove()  # slow
             else:
                 raise
 

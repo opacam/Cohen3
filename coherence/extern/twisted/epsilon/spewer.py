@@ -1,13 +1,14 @@
-
-import sys
 import signal
+import sys
 import threading
 
 from twisted.application import service
-from twisted.python import reflect, log
+from twisted.python import reflect
+
 
 class CannotFindFunction(ValueError):
     pass
+
 
 class Tracer(object):
     skip = object()
@@ -56,8 +57,8 @@ def extractArgs(frame):
     co = frame.f_code
     dict = frame.f_locals
     n = co.co_argcount
-    if co.co_flags & 4: n = n+1
-    if co.co_flags & 8: n = n+1
+    if co.co_flags & 4: n = n + 1
+    if co.co_flags & 8: n = n + 1
     result = {}
     for i in range(n):
         name = co.co_varnames[i]
@@ -66,7 +67,8 @@ def extractArgs(frame):
 
 
 def formatArgs(args):
-    return ', '.join(['='.join((k, reflect.safe_repr(v))) for (k, v) in args.items()])
+    return ', '.join(
+        ['='.join((k, reflect.safe_repr(v))) for (k, v) in args.items()])
 
 
 class Spewer(Tracer):
