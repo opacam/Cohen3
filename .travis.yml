@@ -16,8 +16,8 @@ install:
   - pip install pylint
   - pip install -e .[test]
 script:
-   - pycodestyle coherence --ignore=E122,E303,E501,
+   - pycodestyle coherence --ignore=E402
    - pylint -E coherence
-  - nosetests --with-coverage --cover-erase --cover-package=coherence --cover-html
+   - nosetests --with-coverage --cover-erase --cover-package=coherence --cover-html
 after_success:
   - coveralls
