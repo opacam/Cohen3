@@ -34,9 +34,9 @@ from coherence.upnp.services.servers.media_receiver_registrar_server import \
 from coherence.upnp.services.servers.scheduled_recording_server import \
     ScheduledRecordingServer
 
-COVER_REQUEST_INDICATOR = re.compile(b".*?cover\.[A-Z|a-z]{3,4}$")
-ATTACHMENT_REQUEST_INDICATOR = re.compile(b".*?attachment=.*$")
-TRANSCODED_REQUEST_INDICATOR = re.compile(b".*/transcoded/.*$")
+COVER_REQUEST_INDICATOR = re.compile(r".*?cover\.[A-Z|a-z]{3,4}$")
+ATTACHMENT_REQUEST_INDICATOR = re.compile(r".*?attachment=.*$")
+TRANSCODED_REQUEST_INDICATOR = re.compile(r".*/transcoded/.*$")
 
 
 class MSRoot(resource.Resource, log.LogAble):
@@ -101,7 +101,8 @@ class MSRoot(resource.Resource, log.LogAble):
         except KeyError:
             request._dlna_transfermode = b'Streaming'
         if request.method in (b'GET', b'HEAD'):
-            if COVER_REQUEST_INDICATOR.match(request.uri):
+            if COVER_REQUEST_INDICATOR.match(
+                    request.uri.decode('utf-8')):
                 self.info("request cover for id %r", path)
 
                 def got_item(ch):
@@ -121,7 +122,8 @@ class MSRoot(resource.Resource, log.LogAble):
                 dfr.isLeaf = True
                 return dfr
 
-            if ATTACHMENT_REQUEST_INDICATOR.match(request.uri):
+            if ATTACHMENT_REQUEST_INDICATOR.match(
+                    request.uri.decode('utf-8')):
                 self.info("request attachment %r for id %r",
                           request.args, path)
 
@@ -175,7 +177,8 @@ class MSRoot(resource.Resource, log.LogAble):
                 return dfr
 
         if request.method in (b'GET', b'HEAD') and \
-                TRANSCODED_REQUEST_INDICATOR.match(request.uri):
+                TRANSCODED_REQUEST_INDICATOR.match(
+                    request.uri.decode('utf-8')):
             self.info("request transcoding to %r for id %r",
                       request.uri.split(b'/')[-1], path)
             if self.server.coherence.config.get('transcoding', 'no') == 'yes':

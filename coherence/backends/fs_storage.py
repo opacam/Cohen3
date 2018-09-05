@@ -590,7 +590,7 @@ class FSStore(BackendStore):
                 self.import_folder = None
 
         self.ignore_file_pattern = re.compile(
-            '|'.join(['^\..*'] + list(ignore_patterns)))
+            r'|'.join([r'^\..*'] + list(ignore_patterns)))
         parent = None
         self.update_id = 0
         if (len(self.content) > 1 or
