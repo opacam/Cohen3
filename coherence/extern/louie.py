@@ -10,17 +10,21 @@ warnings.warn(
     "extern.louie will soon be deprecated in favor of coherence.dispatcher.")
 
 
-class Any(object): pass
+class Any(object):
+    pass
 
 
-class All(object): pass
+class All(object):
+    pass
 
 
-class Anonymous(object): pass
+class Anonymous(object):
+    pass
 
 
 # fake the API
-class Dummy(object): pass
+class Dummy(object):
+    pass
 
 
 signal = Dummy()
@@ -38,7 +42,7 @@ signal.All = All
 class GlobalDispatcher(Dispatcher):
 
     def connect(self, signal, callback, *args, **kw):
-        if not signal in self.receivers:
+        if signal not in self.receivers:
             # ugly hack
             self.receivers[signal] = []
         return Dispatcher.connect(self, signal, callback, *args, **kw)

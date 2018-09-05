@@ -135,10 +135,11 @@ class BBCStore(BackendStore):
 
     def upnp_init(self):
         if self.server:
-            self.server.connection_manager_server.set_variable( \
-                0, 'SourceProtocolInfo', [
-                    'http-get:*:audio/mpeg:DLNA.ORG_PN=MP3;DLNA.ORG_OP=11;DLNA.ORG_FLAGS=01700000000000000000000000000000',
-                    'http-get:*:audio/mpeg:*'])
+            self.server.connection_manager_server.set_variable(
+                0, 'SourceProtocolInfo',
+                ['http-get:*:audio/mpeg:DLNA.ORG_PN=MP3;DLNA.ORG_OP=11'
+                 ';DLNA.ORG_FLAGS=01700000000000000000000000000000',
+                 'http-get:*:audio/mpeg:*'])
 
     def update_data(self):
 
@@ -162,7 +163,8 @@ class BBCStore(BackendStore):
                                            ROOT_CONTAINER_ID, 'Series')
         }
 
-        self.store[ROOT_CONTAINER_ID].add_child(self.store[SERIES_CONTAINER_ID])
+        self.store[ROOT_CONTAINER_ID].add_child(
+            self.store[SERIES_CONTAINER_ID])
 
         for brand in root.findall('./{http://purl.org/ontology/po/}Brand'):
             first = None
@@ -171,7 +173,8 @@ class BBCStore(BackendStore):
                 for version in episode.findall(
                         '*/{http://purl.org/ontology/po/}Version'):
                     seconds = int(version.find(
-                        './{http://uriplay.org/elements/}publishedDuration').text)
+                        './{http://uriplay.org/elements/}'
+                        'publishedDuration').text)
                     hours = seconds / 3600
                     seconds = seconds - hours * 3600
                     minutes = seconds / 60
@@ -180,41 +183,48 @@ class BBCStore(BackendStore):
                     for manifestation in version.findall(
                             './{http://uriplay.org/elements/}manifestedAs'):
                         encoding = manifestation.find(
-                            '*/{http://uriplay.org/elements/}dataContainerFormat')
+                            '*/{http://uriplay.org/elements/}'
+                            'dataContainerFormat')
                         size = manifestation.find(
                             '*/{http://uriplay.org/elements/}dataSize')
                         for location in manifestation.findall(
                                 '*/*/{http://uriplay.org/elements/}Location'):
                             uri = location.find(
                                 './{http://uriplay.org/elements/}uri')
-                            uri = uri.attrib[
-                                '{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource']
+                            uri = uri.attrib['{http://www.w3.org/1999/02/22'
+                                             '-rdf-syntax-ns#}resource']
                             if first is None:
                                 id = self.get_next_id()
                                 self.store[id] = \
-                                    Container(id, self, SERIES_CONTAINER_ID,
-                                              brand.find(
-                                                  './{http://purl.org/dc/elements/1.1/}title').text)
+                                    Container(
+                                        id, self, SERIES_CONTAINER_ID,
+                                        brand.find(
+                                            './{http://purl.org/dc/'
+                                            'elements/1.1/}title').text)
                                 self.store[SERIES_CONTAINER_ID].add_child(
                                     self.store[id])
                                 first = self.store[id]
 
                             item = BBCItem(first.id, self.get_next_id(),
                                            episode.find(
-                                               './{http://purl.org/dc/elements/1.1/}title').text,
+                                               './{http://purl.org/dc/'
+                                               'elements/1.1/}title').text,
                                            uri)
                             first.add_child(item)
                             item.mimetype = encoding.text
                             item.duration = duration
                             item.size = int(size.text) * 1024
                             item.description = episode.find(
-                                './{http://purl.org/dc/elements/1.1/}description').text
+                                './{http://purl.org/dc/'
+                                'elements/1.1/}description').text
 
         self.update_id += 1
         # if self.server:
-        #    self.server.content_directory_server.set_variable(0, 'SystemUpdateID', self.update_id)
-        #    value = (ROOT_CONTAINER_ID,self.container.update_id)
-        #    self.server.content_directory_server.set_variable(0, 'ContainerUpdateIDs', value)
+        #     self.server.content_directory_server.set_variable(
+        #         0, 'SystemUpdateID', self.update_id)
+        #     value = (ROOT_CONTAINER_ID, self.container.update_id)
+        #     self.server.content_directory_server.set_variable(
+        #         0, 'ContainerUpdateIDs', value)
 
     def queue_update(self, error_or_failure):
         reactor.callLater(self.refresh, self.update_data)

@@ -46,7 +46,8 @@ class UPnPPublisher(resource.Resource, log.LogAble):
         request.setHeader(b"Content-length", len(response))
         request.setHeader(b"EXT", b'')
         request.setHeader(b"SERVER", SERVER_ID.encode('ascii'))
-        r = response if isinstance(response, bytes) else response.encode('ascii')
+        r = response if isinstance(response, bytes) else \
+            response.encode('ascii')
         request.write(r)
         request.finish()
 
@@ -119,16 +120,19 @@ class UPnPPublisher(resource.Resource, log.LogAble):
 
         try:
             headers[b'content-type'].index(b'text/xml')
-        except:
-            self._gotError(failure.Failure(errorCode(415)), request, methodName)
+        except (KeyError, ValueError):
+            self._gotError(
+                failure.Failure(errorCode(415)),
+                request, methodName)
             return server.NOT_DONE_YET
 
         self.debug('headers: %r', headers)
 
-        function, useKeywords = self.lookupFunction(methodName)
-        # print 'function', function, 'keywords', useKeywords, 'args', args, 'kwargs', kwargs
+        l_function, use_keywords = self.lookupFunction(methodName)
+        # print('function', function, 'keywords', useKeywords,
+        #       'args', args, 'kwargs', kwargs)
 
-        if not function:
+        if not l_function:
             self._methodNotFound(request, methodName)
             return server.NOT_DONE_YET
         else:
@@ -136,9 +140,10 @@ class UPnPPublisher(resource.Resource, log.LogAble):
             if (b'user-agent' in headers and
                     headers[b'user-agent'].find(b'Xbox/') == 0):
                 keywords['X_UPnPClient'] = 'XBox'
-            # if(headers.has_key('user-agent') and
-            #        headers['user-agent'].startswith("""Mozilla/4.0 (compatible; UPnP/1.0; Windows""")):
-            #    keywords['X_UPnPClient'] = 'XBox'
+            # if headers.has_key(b'user-agent') and \
+            #         headers[b'user-agent'].startswith(
+            #             b"""Mozilla/4.0 (compatible; UPnP/1.0; Windows"""):
+            #     keywords['X_UPnPClient'] = 'XBox'
             if (b'x-av-client-info' in headers and
                     headers[b'x-av-client-info'].find(b'"PLAYSTATION3') > 0):
                 keywords['X_UPnPClient'] = 'PLAYSTATION3'
@@ -149,10 +154,10 @@ class UPnPPublisher(resource.Resource, log.LogAble):
             for k, v in list(kwargs.items()):
                 keywords[str(k)] = v
             self.info('call %s %s', methodName, keywords)
-            if hasattr(function, "useKeywords"):
-                d = defer.maybeDeferred(function, **keywords)
+            if hasattr(l_function, "useKeywords"):
+                d = defer.maybeDeferred(l_function, **keywords)
             else:
-                d = defer.maybeDeferred(function, *args, **keywords)
+                d = defer.maybeDeferred(l_function, *args, **keywords)
 
         d.addCallback(self._gotResult, request, methodName, ns)
         d.addErrback(self._gotError, request, methodName, ns)

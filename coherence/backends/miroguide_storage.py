@@ -1,7 +1,8 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
-# Coherence backend presenting the content of the MIRO Guide catalog for on-line videos
+# Coherence backend presenting the content of
+# the MIRO Guide catalog for on-line videos
 #
 # The APi is described on page:
 # https://develop.participatoryculture.org/trac/democracy/wiki/MiroGuideApi
@@ -9,6 +10,7 @@
 # Copyright 2009, Jean-Michel Sizun
 # Copyright 2009 Frank Scholz <coherence@beebits.net>
 
+import os
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -52,7 +54,8 @@ class VideoItem(BackendItem):
             if self.thumbnail_url is not None:
                 self.item.icon = self.thumbnail_url
                 self.item.albumArtURI = self.thumbnail_url
-            res = DIDLLite.Resource(self.url, 'http-get:*:%s:*' % self.mimetype)
+            res = DIDLLite.Resource(
+                self.url, 'http-get:*:%s:*' % self.mimetype)
             res.duration = self.duration
             res.size = self.size
             self.item.res.append(res)
@@ -70,33 +73,38 @@ class MiroGuideStore(AbstractBackendStore):
 
     implements = ['MediaServer']
 
-    description = ('Miro Guide',
-                   'connects to the MIRO Guide service and exposes the podcasts catalogued by the service. ',
-                   None)
+    description = (
+        'Miro Guide',
+        'connects to the MIRO Guide service and '
+        'exposes the podcasts catalogued by the service. ',
+        None)
 
-    options = [{'option': 'name', 'text': 'Server Name:', 'type': 'string',
-                'default': 'my media',
-                'help': 'the name under this MediaServer shall show up with on other UPnP clients'},
-               {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
-                'default': 2, 'enum': (2, 1),
-                'help': 'the highest UPnP version this MediaServer shall support',
-                'level': 'advance'},
-               {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
-                'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set',
-                'level': 'advance'},
-               {'option': 'language', 'text': 'Language:', 'type': 'string',
-                'default': 'English'},
-               {'option': 'refresh', 'text': 'Refresh period',
-                'type': 'string'},
-               {'option': 'proxy_mode', 'text': 'Proxy mode:', 'type': 'string',
-                'enum': ('redirect', 'proxy', 'cache', 'buffered')},
-               {'option': 'buffer_size', 'text': 'Buffering size:',
-                'type': 'int'},
-               {'option': 'cache_directory', 'text': 'Cache directory:',
-                'type': 'dir', 'group': 'Cache'},
-               {'option': 'cache_maxsize', 'text': 'Cache max size:',
-                'type': 'int', 'group': 'Cache'},
-               ]
+    options = [
+        {'option': 'name', 'text': 'Server Name:', 'type': 'string',
+         'default': 'my media',
+         'help': 'the name under this MediaServer '
+                 'shall show up with on other UPnP clients'},
+        {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
+         'default': 2, 'enum': (2, 1),
+         'help': 'the highest UPnP version this MediaServer shall support',
+         'level': 'advance'},
+        {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
+         'help': 'the unique (UPnP) identifier for this MediaServer, '
+                 'usually automatically set',
+         'level': 'advance'},
+        {'option': 'language', 'text': 'Language:', 'type': 'string',
+         'default': 'English'},
+        {'option': 'refresh', 'text': 'Refresh period',
+         'type': 'string'},
+        {'option': 'proxy_mode', 'text': 'Proxy mode:', 'type': 'string',
+         'enum': ('redirect', 'proxy', 'cache', 'buffered')},
+        {'option': 'buffer_size', 'text': 'Buffering size:',
+         'type': 'int'},
+        {'option': 'cache_directory', 'text': 'Cache directory:',
+         'type': 'dir', 'group': 'Cache'},
+        {'option': 'cache_maxsize', 'text': 'Cache max size:',
+         'type': 'int', 'group': 'Cache'},
+    ]
 
     def __init__(self, server, **kwargs):
         AbstractBackendStore.__init__(self, server, **kwargs)
@@ -113,8 +121,8 @@ class MiroGuideStore(AbstractBackendStore):
         try:
             if self.proxy_mode != 'redirect':
                 os.mkdir(self.cache_directory)
-        except:
-            pass
+        except Exception as e:
+            self.error('MiroGuideStore.__init__: %r' % e)
         self.cache_maxsize = kwargs.get('cache_maxsize', 100000000)
         self.buffer_size = kwargs.get('buffer_size', 750000)
 
@@ -128,8 +136,8 @@ class MiroGuideStore(AbstractBackendStore):
 
         self.appendLanguage("Recent Videos", self.language, rootItem,
                             sort='-age', count=15)
-        self.appendLanguage("Top Rated", self.language, rootItem, sort='rating',
-                            count=15)
+        self.appendLanguage("Top Rated", self.language, rootItem,
+                            sort='rating', count=15)
         self.appendLanguage("Most Popular", self.language, rootItem,
                             sort='-popular', count=15)
 
@@ -208,17 +216,19 @@ class MiroGuideStore(AbstractBackendStore):
         filter_value = urllib.parse.quote(filter_value.encode("utf-8"))
 
         limit = count
-        if (count == 0):
+        if count == 0:
             limit = per_page
-        uri = "https://www.miroguide.com/api/get_channels?limit=%d&offset=%d&filter=%s&filter_value=%s&sort=%s" % (
-        limit, offset, filter, filter_value, sort)
+        uri = \
+            "https://www.miroguide.com/api/get_channels?" \
+            "limit=%d&offset=%d&filter=%s&filter_value=%s&sort=%s" % (
+                limit, offset, filter, filter_value, sort)
         # print uri
         d = utils.getPage(uri)
 
         def gotChannels(result):
             if result is None:
                 print(
-                    "Unable to retrieve channel for category %s" % category_id)
+                    "Unable to retrieve channel for category %s" % filter)
                 return
             data, header = result
             channels = eval(data)
@@ -233,7 +243,7 @@ class MiroGuideStore(AbstractBackendStore):
                 website_url = channel['website_url']
                 name = channel['name']
                 self.appendChannel(name, id, parent)
-            if ((count == 0) and (len(channels) >= per_page)):
+            if (count == 0) and (len(channels) >= per_page):
                 # print "reached page limit (%d)" % len(channels)
                 parent.childrenRetrievingNeeded = True
 
@@ -254,7 +264,7 @@ class MiroGuideStore(AbstractBackendStore):
             data, header = result
             channel = eval(data)
             items = []
-            if ('item' in channel):
+            if 'item' in channel:
                 items = channel['item']
             for item in items:
                 # print "item:",item
@@ -263,7 +273,7 @@ class MiroGuideStore(AbstractBackendStore):
                 # print "description:", description
                 name = item['name']
                 thumbnail_url = None
-                if ('thumbnail_url' in channel):
+                if 'thumbnail_url' in channel:
                     # print "Thumbnail:", channel['thumbnail_url']
                     thumbnail_url = channel['thumbnail_url']
                 # size = size['size']

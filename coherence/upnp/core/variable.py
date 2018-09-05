@@ -9,10 +9,9 @@ import time
 from coherence.upnp.core import utils
 
 try:
-    # FIXME:
-    # there is some circular import, service imports variable, variable imports service
+    # FIXME:  there is some circular import,
+    # service imports variable, variable imports service
     # how is this done properly?
-    #
     from coherence.upnp.core import service
 except ImportError:
     from . import service
@@ -64,8 +63,10 @@ class StateVariable(log.LogAble):
         r.append(('Data Type', self.data_type))
         r.append(('Default Value', self.default_value))
         r.append(('Current Value', str(self.value)))
-        if (self.allowed_values is not None and len(self.allowed_values) > 0):
-            r.append(('Allowed Values', ','.join(self.allowed_values)))
+        if self.allowed_values is not None and \
+                len(self.allowed_values) > 0:
+            r.append(('Allowed Values',
+                      ','.join(self.allowed_values)))
         return r
 
     def set_default_value(self, value):
@@ -140,7 +141,8 @@ class StateVariable(log.LogAble):
                                 new_value.append(v)
                             else:
                                 self.warning(
-                                    "Variable %s update, %r value %s doesn't fit in %r",
+                                    "Variable %s update, %r value %s "
+                                    "doesn't fit in %r",
                                     self.name, self.has_vendor_values, v,
                                     self.allowed_values)
                                 new_value = 'Coherence_Value_Error'
@@ -190,7 +192,10 @@ class StateVariable(log.LogAble):
         self.value = new_value
         self.last_time_touched = time.time()
 
-        # print "UPDATED %s %r %r %r %r %r" % (self.name,self.service,isinstance( self.service, service.Service),self.instance,self.value,self._callbacks)
+        # print("UPDATED %s %r %r %r %r %r" % (
+        #     self.name, self.service,
+        #     isinstance(self.service, service.Service),
+        #     self.instance, self.value, self._callbacks))
         self.notify()
 
         if isinstance(self.service, service.Service):
@@ -213,11 +218,14 @@ class StateVariable(log.LogAble):
                   self.value)
         # if self.old_value == '':
         #    return
-        louie.send(signal='Coherence.UPnP.StateVariable.%s.changed' % self.name,
-                   sender=self.service, variable=self)
-        louie.send(signal='Coherence.UPnP.StateVariable.changed',
-                   sender=self.service, variable=self)
-        # print "CALLBACKS %s %r %r" % (self.name,self.instance,self._callbacks)
+        louie.send(
+            signal='Coherence.UPnP.StateVariable.%s.changed' % self.name,
+            sender=self.service, variable=self)
+        louie.send(
+            signal='Coherence.UPnP.StateVariable.changed',
+            sender=self.service, variable=self)
+        # print("CALLBACKS %s %r %r" % (
+        #     self.name, self.instance, self._callbacks))
         for callback in self._callbacks:
             callback(self)
 

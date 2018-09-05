@@ -71,9 +71,10 @@ class IBeneficiary(Interface):
     """
 
     def powerUp(implementor, interface):
-        """ Install a powerup on this object.  There is not necessarily any inverse
-        powerupsFor on a beneficiary, although there may be; installations may
-        be forwarded to a different implementation object, or deferred.
+        """ Install a powerup on this object.  There is not necessarily any
+        inverse powerupsFor on a beneficiary, although there may be;
+        installations may be forwarded to a different implementation object,
+        or deferred.
         """
 
 
@@ -196,8 +197,8 @@ class IColumn(Interface):
         @param row: an item that has this column.
         @type row: L{axiom.item.Item}
 
-        @return: The value of the column described by this object, for the given
-        row.
+        @return: The value of the column described by this object,
+        for the given row.
 
         @rtype: depends on the underlying type of the column.
         """
@@ -309,8 +310,8 @@ class IBatchService(Interface):
 
     def start():
         """
-        Start the remote batch process if it has not yet been started, otherwise
-        do nothing.
+        Start the remote batch process if it has not yet been started,
+        otherwise do nothing.
         """
 
     def suspend(storeID):

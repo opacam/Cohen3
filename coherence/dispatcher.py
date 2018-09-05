@@ -17,23 +17,18 @@ class Receiver(object):
         return self.callback(*args, **kw)
 
     def __repr__(self):
-        return "<Receiver %s for %s: %s (%s, %s)>" % \
-               (id(self),
-                self.signal,
-                self.callback,
-                ', '.join(
-                  ['%r' % x for x in
-                   self.arguments]
-                ),
-                ', '.join(
-                  ['%s=%s' % (x, y) for
-                   x, y in
-                   self.keywords.items()]
-                )
-                )
+        return \
+            "<Receiver %s for %s: %s (%s, %s)>" % \
+            (id(self), self.signal, self.callback,
+             ', '.join(
+                 ['%r' % x for x in self.arguments]),
+             ', '.join(
+                 ['%s=%s' % (x, y) for x, y in self.keywords.items()])
+             )
 
 
-class UnknownSignal(Exception): pass
+class UnknownSignal(Exception):
+    pass
 
 
 class Dispatcher(object):
@@ -182,9 +177,9 @@ class CustomSignalingProperty(object):
 
         The signal will be emitted with the new value given by fget.
 
-        *Note*: This means that fset might gets called with the same value twice
-        while the signal is not emitted a second time. You might want to check
-        for that in your fset.
+        *Note*: This means that fset might gets called with the same value
+        twice while the signal is not emitted a second time. You might want
+         to check for that in your fset.
         """
 
         old_value = self.fget(obj)

@@ -187,7 +187,9 @@ class WebUI(athena.LivePage, log.LogAble):
 <link rel="stylesheet" type="text/css" href="static/main.css" />
 </head>
 <body>
-<div id="coherence_header"><div class="coherence_title">Coherence</div><div nevow:render="menu"></div></div>
+<div id="coherence_header">
+<div class="coherence_title">Coherence</div>
+<div nevow:render="menu"></div></div>
 <div id="coherence_body">
 <div nevow:render="devices" />
 <div nevow:render="logging" />
@@ -222,7 +224,7 @@ class WebUI(athena.LivePage, log.LogAble):
         self.info('WebUI childFactory: %s', name)
         try:
             return self.rootObject.coherence.children[name]
-        except:
+        except IndexError:
             ch = super(WebUI, self).childFactory(ctx, name)
             if ch is None:
                 p = util.sibpath(__file__, name.decode('utf-8'))
@@ -232,14 +234,16 @@ class WebUI(athena.LivePage, log.LogAble):
             return ch
 
     def render_listmenu(self, ctx, data):
-        l = []
-        l.append(tags.div(id="t", class_="coherence_menu_item")[
-                     tags.a(href='/' + 'devices', class_="coherence_menu_link")[
-                         'Devices']])
-        l.append(tags.div(id="t", class_="coherence_menu_item")[
-                     tags.a(href='/' + 'logging', class_="coherence_menu_link")[
-                         'Logging']])
-        return ctx.tag[l]
+        ml = []
+        ml.append(
+            tags.div(id="t", class_="coherence_menu_item")[
+                tags.a(href='/' + 'devices', class_="coherence_menu_link")[
+                    'Devices']])
+        ml.append(
+            tags.div(id="t", class_="coherence_menu_item")[
+                tags.a(href='/' + 'logging', class_="coherence_menu_link")[
+                    'Logging']])
+        return ctx.tag[ml]
 
     def render_menu(self, ctx, data):
         self.info('render_menu')

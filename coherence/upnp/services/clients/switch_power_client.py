@@ -3,6 +3,7 @@
 
 # Copyright 2008, Frank Scholz <coherence@beebits.net>
 
+
 class SwitchPowerClient:
 
     def __init__(self, service):

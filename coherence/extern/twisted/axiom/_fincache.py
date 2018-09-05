@@ -22,13 +22,13 @@ def logErrorNoMatterWhat():
     try:
         log.msg("Exception in finalizer cannot be propagated")
         log.err()
-    except:
+    except Exception as e:
         try:
             emergLog = open("WEAKREF_EMERGENCY_ERROR.log", 'a')
             print_exc(file=emergLog)
             emergLog.flush()
             emergLog.close()
-        except:
+        except Exception as e:
             # Nothing can be done.  We can't get an emergency log file to write
             # to.  Don't bother.
             return
@@ -57,7 +57,7 @@ def createCacheRemoveCallback(cacheRef, key, finalizer):
         # Weakref callbacks cannot raise exceptions or DOOM ensues
         try:
             finalizer()
-        except:
+        except Exception as e1:
             logErrorNoMatterWhat()
         try:
             cache = cacheRef()
@@ -65,7 +65,7 @@ def createCacheRemoveCallback(cacheRef, key, finalizer):
                 if key in cache.data:
                     if cache.data[key] is reference:
                         del cache.data[key]
-        except:
+        except Exception as e2:
             logErrorNoMatterWhat()
 
     return remove

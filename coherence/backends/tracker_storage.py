@@ -241,9 +241,9 @@ class Track(BackendItem):
     def __init__(self, store,
                  id, parent_id,
                  file, title,
-                 artist, album, genre, \
-                 duration, \
-                 track_number, \
+                 artist, album, genre,
+                 duration,
+                 track_number,
                  size, mimetype):
         BackendItem.__init__(self)
         self.store = store
@@ -311,29 +311,32 @@ class Track(BackendItem):
         if self.bitrate > 0:
             res.bitrate = str(bitrate)
         item.res.append(res)
-        # if self.store.server.coherence.config.get('transcoding', 'no') == 'yes':
-        #    if self.mimetype in ('audio/mpeg',
-        #                         'application/ogg','audio/ogg',
-        #                         'audio/x-m4a',
-        #                         'application/x-flac'):
-        #        dlna_pn = 'DLNA.ORG_PN=LPCM'
-        #        dlna_tags = DIDLLite.simple_dlna_tags[:]
-        #        dlna_tags[1] = 'DLNA.ORG_CI=1'
-        #        #dlna_tags[2] = 'DLNA.ORG_OP=00'
-        #        new_res = DIDLLite.Resource(self.url+'?transcoded=lpcm',
-        #            'http-get:*:%s:%s' % ('audio/L16;rate=44100;channels=2', ';'.join([dlna_pn]+dlna_tags)))
-        #        new_res.size = None
-        #        if self.duration > 0:
-        #            new_res.duration = str(self.duration)
-        #        item.res.append(new_res)
-
-        #        if self.mimetype != 'audio/mpeg':
-        #            new_res = DIDLLite.Resource(self.url+'?transcoded=mp3',
-        #                'http-get:*:%s:*' % 'audio/mpeg')
-        #            new_res.size = None
-        #            if self.duration > 0:
-        #                new_res.duration = str(self.duration)
-        #            item.res.append(new_res)
+        # if self.store.server.coherence.config.get(
+        #        'transcoding', 'no') == 'yes':
+        #     if self.mimetype in ('audio/mpeg',
+        #                          'application/ogg','audio/ogg',
+        #                          'audio/x-m4a',
+        #                          'application/x-flac'):
+        #         dlna_pn = 'DLNA.ORG_PN=LPCM'
+        #         dlna_tags = DIDLLite.simple_dlna_tags[:]
+        #         dlna_tags[1] = 'DLNA.ORG_CI=1'
+        #         #dlna_tags[2] = 'DLNA.ORG_OP=00'
+        #         new_res = DIDLLite.Resource(self.url+'?transcoded=lpcm',
+        #             'http-get:*:%s:%s' % (
+        #                'audio/L16;rate=44100;channels=2', ';'.join(
+        #                    [dlna_pn]+dlna_tags)))
+        #         new_res.size = None
+        #         if self.duration > 0:
+        #             new_res.duration = str(self.duration)
+        #         item.res.append(new_res)
+        #
+        #         if self.mimetype != 'audio/mpeg':
+        #             new_res = DIDLLite.Resource(self.url+'?transcoded=mp3',
+        #                 'http-get:*:%s:*' % 'audio/mpeg')
+        #             new_res.size = None
+        #             if self.duration > 0:
+        #                 new_res.duration = str(self.duration)
+        #             item.res.append(new_res)
 
         return item
 
@@ -356,7 +359,7 @@ class Video(BackendItem):
     def __init__(self, store,
                  id, parent_id,
                  file, title,
-                 duration, \
+                 duration,
                  size, mimetype):
         BackendItem.__init__(self)
         self.store = store
@@ -430,7 +433,7 @@ class Image(BackendItem):
     def __init__(self, store,
                  id, parent_id,
                  file, title, album,
-                 date, width, height, \
+                 date, width, height,
                  size, mimetype):
         BackendItem.__init__(self)
         self.store = store
@@ -516,14 +519,14 @@ class TrackerStore(BackendStore):
 
         self.bus = dbus.SessionBus()
         tracker_object = self.bus.get_object(BUS_NAME, OBJECT_PATH)
-        self.tracker_interface = dbus.Interface(tracker_object,
-                                                'org.freedesktop.Tracker')
-        self.search_interface = dbus.Interface(tracker_object,
-                                               'org.freedesktop.Tracker.Search')
-        self.keywords_interface = dbus.Interface(tracker_object,
-                                                 'org.freedesktop.Tracker.Keywords')
-        self.metadata_interface = dbus.Interface(tracker_object,
-                                                 'org.freedesktop.Tracker.Metadata')
+        self.tracker_interface = dbus.Interface(
+            tracker_object, 'org.freedesktop.Tracker')
+        self.search_interface = dbus.Interface(
+            tracker_object, 'org.freedesktop.Tracker.Search')
+        self.keywords_interface = dbus.Interface(
+            tracker_object, 'org.freedesktop.Tracker.Keywords')
+        self.metadata_interface = dbus.Interface(
+            tracker_object, 'org.freedesktop.Tracker.Metadata')
         self.query_id = -1
 
         self.containers = {}
@@ -537,31 +540,33 @@ class TrackerStore(BackendStore):
 
         def queries_failed(r):
             error = ''
-            louie.send('Coherence.UPnP.Backend.init_failed', None, backend=self,
-                       msg=error)
+            louie.send('Coherence.UPnP.Backend.init_failed',
+                       None, backend=self, msg=error)
 
         services = kwargs.get('service', 'Music,Videos,Images')
         services = [x.strip().lower() for x in services.split(',')]
 
-        l = []
+        ml = []
         mapping = {'music': self.get_tracks,
                    'videos': self.get_videos,
                    'images': self.get_images}
         for service in services:
             try:
-                l.append(mapping[service]())
+                ml.append(mapping[service]())
             except KeyError:
                 self.warning('Wrong Tracker service definition - %r', service)
-        if len(l) > 0:
-            dl = defer.DeferredList(l)
+        if len(ml) > 0:
+            dl = defer.DeferredList(ml)
             dl.addCallback(queries_finished)
             dl.addErrback(
-                lambda x: louie.send('Coherence.UPnP.Backend.init_failed', None,
-                                     backend=self,
-                                     msg='Connection to Tracker service(s) failed!'))
+                lambda x: louie.send(
+                    'Coherence.UPnP.Backend.init_failed', None,
+                    backend=self,
+                    msg='Connection to Tracker service(s) failed!'))
         else:
-            louie.send('Coherence.UPnP.Backend.init_failed', None, backend=self,
-                       msg='No Tracker service defined!')
+            louie.send(
+                'Coherence.UPnP.Backend.init_failed', None, backend=self,
+                msg='No Tracker service defined!')
 
     def __repr__(self):
         return "TrackerStore"
@@ -575,7 +580,7 @@ class TrackerStore(BackendStore):
         if isinstance(id, str) and id.startswith('artist_all_tracks_'):
             try:
                 return self.containers[id]
-            except:
+            except KeyError:
                 return None
         item = None
         try:
@@ -609,9 +614,7 @@ class TrackerStore(BackendStore):
         def parse_videos_query_result(resultlist):
             videos = []
             for video in resultlist:
-                file, _, title, \
-                duration, \
-                size, mimetype = video
+                file, _, title, duration, size, mimetype = video
                 title = title.strip()
                 if len(title) == 0:
                     title = os.path.basename(file)
@@ -619,17 +622,17 @@ class TrackerStore(BackendStore):
                     mimetype = 'video/ogg'
                 video_item = Video(self,
                                    self.videos, VIDEO_ALL_CONTAINER_ID,
-                                   file, title, \
-                                   duration, \
+                                   file, title,
+                                   duration,
                                    size, mimetype)
                 self.videos += 1
                 videos.append(video_item)
 
-            videos = sorted(videos,
-                            key=lambda x, y: (
-                                                         x.get_name().lower() > y.get_name().lower()) -
-                                             (
-                                                         x.get_name().lower() < y.get_name().lower()))
+            videos = sorted(
+                videos,
+                key=lambda x, y:
+                (x.get_name().lower() > y.get_name().lower()) -
+                (x.get_name().lower() < y.get_name().lower()))
             for video_item in videos:
                 self.containers[VIDEO_ALL_CONTAINER_ID].add_child(video_item)
 
@@ -652,10 +655,11 @@ class TrackerStore(BackendStore):
         d = defer.Deferred()
         d.addCallback(parse_videos_query_result)
         d.addErrback(handle_error)
-        self.search_interface.Query(self.query_id, 'Videos', fields, '', '',
-                                    video_query, False, 0, -1,
-                                    reply_handler=lambda x: d.callback(x),
-                                    error_handler=lambda x: d.errback(x))
+        self.search_interface.Query(
+            self.query_id, 'Videos', fields, '', '',
+            video_query, False, 0, -1,
+            reply_handler=lambda x: d.callback(x),
+            error_handler=lambda x: d.errback(x))
         return d
 
     def get_images(self):
@@ -668,23 +672,25 @@ class TrackerStore(BackendStore):
             images = []
             for image in resultlist:
                 file, _, title, album, \
-                date, width, height, \
-                size, mimetype = image
+                    date, width, height, \
+                    size, mimetype = image
                 title = title.strip()
                 if len(title) == 0:
                     title = os.path.basename(file)
-                image_item = Image(self,
-                                   self.images, IMAGE_ALL_CONTAINER_ID,
-                                   file, title, album, \
-                                   date, width, height, \
-                                   size, mimetype)
+                image_item = Image(
+                    self,
+                    self.images, IMAGE_ALL_CONTAINER_ID,
+                    file, title, album,
+                    date, width, height,
+                    size, mimetype)
                 self.images += 1
                 images.append(image_item)
 
             images = sorted(
                 images,
-                key=lambda x, y: (x.get_name().lower() > y.get_name().lower()) -
-                                 (x.get_name().lower() < y.get_name().lower()))
+                key=lambda x, y:
+                (x.get_name().lower() > y.get_name().lower()) -
+                (x.get_name().lower() < y.get_name().lower()))
             for image_item in images:
                 self.containers[IMAGE_ALL_CONTAINER_ID].add_child(image_item)
 
@@ -708,10 +714,11 @@ class TrackerStore(BackendStore):
         d = defer.Deferred()
         d.addCallback(parse_images_query_result)
         d.addErrback(handle_error)
-        self.search_interface.Query(self.query_id, 'Images', fields, '', '',
-                                    image_query, False, 0, -1,
-                                    reply_handler=lambda x: d.callback(x),
-                                    error_handler=lambda x: d.errback(x))
+        self.search_interface.Query(
+            self.query_id, 'Images', fields, '', '',
+            image_query, False, 0, -1,
+            reply_handler=lambda x: d.callback(x),
+            error_handler=lambda x: d.errback(x))
         return d
 
     def get_tracks(self):
@@ -725,17 +732,18 @@ class TrackerStore(BackendStore):
             tracks = []
             for track in resultlist:
                 file, service, title, artist, album, genre, \
-                duration, album_track_count, \
-                track_number, codec, \
-                size, mimetype = track
+                    duration, album_track_count, \
+                    track_number, codec, \
+                    size, mimetype = track
                 if mimetype == 'video/x-vorbis+ogg':
                     mimetype = 'audio/ogg'
-                track_item = Track(self,
-                                   self.songs, AUDIO_ALL_CONTAINER_ID,
-                                   file, title, artist, album, genre, \
-                                   duration, \
-                                   track_number, \
-                                   size, mimetype)
+                track_item = Track(
+                    self,
+                    self.songs, AUDIO_ALL_CONTAINER_ID,
+                    file, title, artist, album, genre,
+                    duration,
+                    track_number,
+                    size, mimetype)
                 self.songs += 1
                 tracks.append(track_item)
 
@@ -748,7 +756,7 @@ class TrackerStore(BackendStore):
                 try:
                     album_item = albums[track_item.album]
                     album_item.add_child(track_item)
-                except:
+                except KeyError:
                     album_item = Album(self, self.albums, track_item.album,
                                        track_item.artist)
                     albums[str(track_item.album)] = album_item
@@ -758,7 +766,7 @@ class TrackerStore(BackendStore):
                     try:
                         artist_item = artists[track_item.artist]
                         artist_item.add_child(album_item)
-                    except:
+                    except KeyError:
                         artist_item = Artist(self, self.artists,
                                              track_item.artist)
                         artists[str(track_item.artist)] = artist_item
@@ -768,7 +776,8 @@ class TrackerStore(BackendStore):
             sorted_keys = list(albums.keys())
             sorted_keys.sort()
             for key in sorted_keys:
-                self.containers[AUDIO_ALBUM_CONTAINER_ID].add_child(albums[key])
+                self.containers[AUDIO_ALBUM_CONTAINER_ID].add_child(
+                    albums[key])
             sorted_keys = list(artists.keys())
             sorted_keys.sort()
             for key in sorted_keys:
@@ -839,38 +848,43 @@ class TrackerStore(BackendStore):
         d = defer.Deferred()
         d.addCallback(parse_tracks_query_result)
         d.addErrback(handle_error)
-        self.search_interface.Query(self.query_id, 'Music', fields, '', '',
-                                    tracks_query, False, 0, -1,
-                                    reply_handler=lambda x: d.callback(x),
-                                    error_handler=lambda x: d.errback(x))
+        self.search_interface.Query(
+            self.query_id, 'Music', fields, '', '',
+            tracks_query, False, 0, -1,
+            reply_handler=lambda x: d.callback(x),
+            error_handler=lambda x: d.errback(x))
         return d
 
     def upnp_init(self):
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'http-get:*:audio/mpeg:*',
-                                                                   'internal:%s:audio/mpeg:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:application/ogg:*',
-                                                                   'internal:%s:application/ogg:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:audio/ogg:*',
-                                                                   'internal:%s:audio/ogg:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:video/ogg:*',
-                                                                   'internal:%s:video/ogg:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:video/mpeg:*',
-                                                                   'internal:%s:video/mpeg:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:video/x-msvideo:*',
-                                                                   'internal:%s:video/x-msvideo:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:video/avi:*',
-                                                                   'internal:%s:video/avi:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:video/mp4:*',
-                                                                   'internal:%s:video/mp4:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:video/quicktime:*',
-                                                                   'internal:%s:video/quicktime:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:image/jpg:*',
-                                                                   'internal:%s:image/jpg:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:image/png:*',
-                                                                   'internal:%s:image/png:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:image/gif:*',
-                                                                   'internal:%s:image/gif:*' % self.server.coherence.hostname, ])
+            self.server.connection_manager_server.set_variable(
+                0,
+                'SourceProtocolInfo',
+                ['http-get:*:audio/mpeg:*',
+                 'internal:%s:audio/mpeg:*' % self.server.coherence.hostname,
+                 'http-get:*:application/ogg:*',
+                 'internal:%s:application/ogg:*' %
+                 self.server.coherence.hostname,
+                 'http-get:*:audio/ogg:*',
+                 'internal:%s:audio/ogg:*' % self.server.coherence.hostname,
+                 'http-get:*:video/ogg:*',
+                 'internal:%s:video/ogg:*' % self.server.coherence.hostname,
+                 'http-get:*:video/mpeg:*',
+                 'internal:%s:video/mpeg:*' % self.server.coherence.hostname,
+                 'http-get:*:video/x-msvideo:*',
+                 'internal:%s:video/x-msvideo:*' %
+                 self.server.coherence.hostname,
+                 'http-get:*:video/avi:*',
+                 'internal:%s:video/avi:*' % self.server.coherence.hostname,
+                 'http-get:*:video/mp4:*',
+                 'internal:%s:video/mp4:*' % self.server.coherence.hostname,
+                 'http-get:*:video/quicktime:*',
+                 'internal:%s:video/quicktime:*' %
+                 self.server.coherence.hostname,
+                 'http-get:*:image/jpg:*',
+                 'internal:%s:image/jpg:*' % self.server.coherence.hostname,
+                 'http-get:*:image/png:*',
+                 'internal:%s:image/png:*' % self.server.coherence.hostname,
+                 'http-get:*:image/gif:*',
+                 'internal:%s:image/gif:*' % self.server.coherence.hostname,
+                 ])

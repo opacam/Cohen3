@@ -20,7 +20,9 @@ Gst.init(None)
 GObject.threads_init()
 
 import os.path
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 
 from twisted.web import resource, server
 from twisted.internet import protocol
@@ -44,15 +46,17 @@ class InternalTranscoder(object):
 class FakeTransformer(Gst.Element, log.LogAble):
     logCategory = 'faker_datasink'
 
-    _sinkpadtemplate = Gst.PadTemplate.new("sinkpadtemplate",
-                                       Gst.PadDirection.SINK,
-                                       Gst.PadPresence.ALWAYS,
-                                       Gst.Caps.new_any())
+    _sinkpadtemplate = Gst.PadTemplate.new(
+        "sinkpadtemplate",
+        Gst.PadDirection.SINK,
+        Gst.PadPresence.ALWAYS,
+        Gst.Caps.new_any())
 
-    _srcpadtemplate = Gst.PadTemplate.new("srcpadtemplate",
-                                      Gst.PadDirection.SRC,
-                                      Gst.PadPresence.ALWAYS,
-                                      Gst.Caps.new_any())
+    _srcpadtemplate = Gst.PadTemplate.new(
+        "srcpadtemplate",
+        Gst.PadDirection.SRC,
+        Gst.PadPresence.ALWAYS,
+        Gst.Caps.new_any())
 
     def __init__(self, destination=None, request=None):
         Gst.Element.__init__(self)
@@ -71,8 +75,10 @@ class FakeTransformer(Gst.Element, log.LogAble):
         self.closed = False
 
     def get_fake_header(self):
-        return struct.pack(">L4s", 32, 'ftyp') + \
-               "mp42\x00\x00\x00\x00mp42mp41isomiso2"
+        return \
+            struct.pack(
+                ">L4s", 32, 'ftyp') + \
+            "mp42\x00\x00\x00\x00mp42mp41isomiso2"
 
     def chainfunc(self, pad, buffer):
         if self.proxy:
@@ -83,9 +89,9 @@ class FakeTransformer(Gst.Element, log.LogAble):
         self.buffer = self.buffer + buffer.data
         if not self.buffer_size:
             try:
-                self.buffer_size, a_type = struct.unpack(">L4s",
-                                                         self.buffer[:8])
-            except:
+                self.buffer_size, a_type = \
+                    struct.unpack(">L4s", self.buffer[:8])
+            except Exception:
                 return Gst.FlowReturn.OK
 
         if len(self.buffer) < self.buffer_size:
@@ -107,10 +113,11 @@ GObject.type_register(FakeTransformer)
 class DataSink(Gst.Element, log.LogAble):
     logCategory = 'transcoder_datasink'
 
-    _sinkpadtemplate = Gst.PadTemplate.new("sinkpadtemplate",
-                                       Gst.PadDirection.SINK,
-                                       Gst.PadPresence.ALWAYS,
-                                       Gst.Caps.new_any())
+    _sinkpadtemplate = Gst.PadTemplate.new(
+        "sinkpadtemplate",
+        Gst.PadDirection.SINK,
+        Gst.PadPresence.ALWAYS,
+        Gst.Caps.new_any())
 
     def __init__(self, destination=None, request=None):
         Gst.Element.__init__(self)
@@ -373,7 +380,8 @@ class PCMTranscoder(BaseTranscoder, InternalTranscoder):
 
         conv = self.pipeline.get_by_name('conv')
         caps = Gst.Caps(
-            "audio/x-raw-int,rate=44100,endianness=4321,channels=2,width=16,depth=16,signed=true")
+            "audio/x-raw-int,rate=44100,endianness=4321,"
+            "channels=2,width=16,depth=16,signed=true")
         # FIXME: UGLY. 'filter' is a python builtin!
         filter = Gst.ElementFactory.make("capsfilter", "filter")
         filter.set_property("caps", caps)
@@ -437,7 +445,8 @@ class MP4Transcoder(BaseTranscoder, InternalTranscoder):
     def start(self, request=None):
         self.info("start %r", request)
         self.pipeline = Gst.parse_launch(
-            "%s ! qtdemux name=d ! queue ! h264parse ! mp4mux name=mux d. ! queue ! mux." % self.uri)
+            "%s ! qtdemux name=d ! queue ! h264parse ! "
+            "mp4mux name=mux d. ! queue ! mux." % self.uri)
         mux = self.pipeline.get_by_name('mux')
         sink = DataSink(destination=self.destination, request=request)
         self.pipeline.add(sink)
@@ -454,9 +463,11 @@ class MP2TSTranscoder(BaseTranscoder, InternalTranscoder):
 
     def start(self, request=None):
         self.info("start %r", request)
-        ### FIXME mpeg2enc
+        # FIXME - mpeg2enc
         self.pipeline = Gst.parse_launch(
-            "mpegtsmux name=mux %s ! decodebin2 name=d ! queue ! ffmpegcolorspace ! mpeg2enc ! queue ! mux. d. ! queue ! audioconvert ! twolame ! queue ! mux." % self.uri)
+            "mpegtsmux name=mux %s ! decodebin2 name=d ! queue ! "
+            "ffmpegcolorspace ! mpeg2enc ! queue ! mux. d. ! "
+            "queue ! audioconvert ! twolame ! queue ! mux." % self.uri)
         enc = self.pipeline.get_by_name('mux')
         sink = DataSink(destination=self.destination, request=request)
         self.pipeline.add(sink)
@@ -476,31 +487,38 @@ class ThumbTranscoder(BaseTranscoder, InternalTranscoder):
 
     def start(self, request=None):
         self.info("start %r", request)
-        """ what we actually want here is a pipeline that calls
-            us when it knows about the size of the original image,
-            and allows us now to adjust the caps-filter with the
-            calculated values for width and height
-
-            new_width = 160
-            new_height = 160
-            if original_width > 160:
-                new_heigth = int(float(original_height) * (160.0/float(original_width)))
-                if new_height > 160:
-                    new_width = int(float(new_width) * (160.0/float(new_height)))
-            elif original_height > 160:
-                new_width = int(float(original_width) * (160.0/float(original_height)))
+        """
+        # what we actually want here is a pipeline that calls
+        # us when it knows about the size of the original image,
+        # and allows us now to adjust the caps-filter with the
+        # calculated values for width and height
+        new_width = 160
+        new_height = 160
+        if original_width > 160:
+            new_heigth = \
+                int(float(original_height) * (160.0/float(original_width)))
+            if new_height > 160:
+                new_width = \
+                    int(float(new_width) * (160.0/float(new_height)))
+        elif original_height > 160:
+            new_width = \
+                int(float(original_width) * (160.0/float(original_height)))
         """
         try:
             type = request.args['type'][0]
-        except:
+        except IndexError:
             type = 'jpeg'
         if type == 'png':
             self.pipeline = Gst.parse_launch(
-                "%s ! decodebin2 ! videoscale ! video/x-raw-yuv,width=160,height=160 ! pngenc name=enc" % self.uri)
+                "%s ! decodebin2 ! videoscale ! "
+                "video/x-raw-yuv,width=160,height=160 ! pngenc name=enc" %
+                self.uri)
             self.contentType = 'image/png'
         else:
             self.pipeline = Gst.parse_launch(
-                "%s ! decodebin2 ! videoscale ! video/x-raw-yuv,width=160,height=160 ! jpegenc name=enc" % self.uri)
+                "%s ! decodebin2 ! videoscale ! "
+                "video/x-raw-yuv,width=160,height=160 ! jpegenc name=enc" %
+                self.uri)
             self.contentType = 'image/jpeg'
         enc = self.pipeline.get_by_name('enc')
         sink = DataSink(destination=self.destination, request=request)
@@ -669,19 +687,21 @@ class TranscoderManager(log.LogAble):
 
         in the config a transcoder description has to look like this:
 
-        *** preliminary, will be extended and might even change without further notice ***
+        *** preliminary, will be extended and
+        might even change without further notice ***
 
         <transcoder>
-          <pipeline>%s ...</pipeline> <!-- we need a %s here to insert the source uri
-                                           (or can we have all the times pipelines we can prepend
-                                            with a '%s !')
-                                           and an element named mux where we can attach
-                                           our sink -->
-          <type>gstreamer</type>      <!-- could be gstreamer or process -->
-          <name>mpegts</name>
-          <target>video/mpeg</target>
-          <fourth_field>              <!-- value for the 4th field of the protocolInfo phalanx,
-                                           default is '*' -->
+            <pipeline>%s ...</pipeline> <!-- we need a %s here to insert the
+                                            source uri (or can we have all the
+                                            times pipelines we can prepend with
+                                            a '%s !') and an element named mux
+                                            where we can attach our sink -->
+            <type>gstreamer</type>      <!-- could be gstreamer or process -->
+            <name>mpegts</name>
+            <target>video/mpeg</target>
+            <fourth_field>              <!-- value for the 4th field of the
+                                            protocolInfo phalanx, default is
+                                            '*' -->
         </transcoder>
 
     """
@@ -720,7 +740,7 @@ class TranscoderManager(log.LogAble):
             for transcoder in transcoders_from_config:
                 # FIXME: is anyone checking if all keys are given ?
                 pipeline = transcoder['pipeline']
-                if not '%s' in pipeline:
+                if '%s' not in pipeline:
                     self.warning("Can't create transcoder %r:"
                                  " missing placehoder '%%s' in 'pipeline'",
                                  transcoder)

@@ -72,8 +72,10 @@ class ControlPoint(log.LogAble):
             self.check_device(device)
 
         louie.connect(self.check_device,
-                      'Coherence.UPnP.Device.detection_completed', louie.Any)
-        louie.connect(self.remove_client, 'Coherence.UPnP.Device.remove_client',
+                      'Coherence.UPnP.Device.detection_completed',
+                      louie.Any)
+        louie.connect(self.remove_client,
+                      'Coherence.UPnP.Device.remove_client',
                       louie.Any)
         louie.connect(self.completed,
                       'Coherence.UPnP.DeviceClient.detection_completed',
@@ -81,9 +83,11 @@ class ControlPoint(log.LogAble):
 
     def shutdown(self):
         louie.disconnect(self.check_device,
-                         'Coherence.UPnP.Device.detection_completed', louie.Any)
+                         'Coherence.UPnP.Device.detection_completed',
+                         louie.Any)
         louie.disconnect(self.remove_client,
-                         'Coherence.UPnP.Device.remove_client', louie.Any)
+                         'Coherence.UPnP.Device.remove_client',
+                         louie.Any)
         louie.disconnect(self.completed,
                          'Coherence.UPnP.DeviceClient.detection_completed',
                          louie.Any)
@@ -167,8 +171,8 @@ class ControlPoint(log.LogAble):
 
     def remove_client(self, udn, client):
         louie.send(
-            'Coherence.UPnP.ControlPoint.%s.removed' % client.device_type, None,
-            udn=udn)
+            'Coherence.UPnP.ControlPoint.%s.removed' % client.device_type,
+            None, udn=udn)
         self.info("removed %s %s", client.device_type,
                   client.device.get_friendly_name())
         client.remove()
@@ -219,12 +223,12 @@ class XMLRPC(xmlrpc.XMLRPC):
         print("list_devices")
         r = []
         for device in self.control_point.get_devices():
-            # print device.get_friendly_name(), device.get_service_type(), device.get_location(), device.get_id()
-            d = {}
-            d['friendly_name'] = device.get_friendly_name()
-            d['device_type'] = device.get_device_type()
-            d['location'] = str(device.get_location())
-            d['id'] = str(device.get_id())
+            # print(device.get_friendly_name(), device.get_service_type(),
+            #       device.get_location(), device.get_id())
+            d = {'friendly_name': device.get_friendly_name(),
+                 'device_type': device.get_device_type(),
+                 'location': str(device.get_location()),
+                 'id': str(device.get_id())}
             r.append(d)
         return r
 
@@ -351,7 +355,6 @@ if __name__ == '__main__':
     config['logmode'] = 'warning'
     config['serverport'] = 30020
 
-
     # ctrl = ControlPoint(Coherence(config),auto_client=[])
     # ctrl = ControlPoint(Coherence(config))
 
@@ -360,15 +363,12 @@ if __name__ == '__main__':
         for d in ctrl.get_devices():
             print(d, d.get_id())
 
-
     def the_result(r):
         print("result", r, r.get_id())
-
 
     def query_devices():
         print("query_devices")
         ctrl.add_query(DeviceQuery('host', '192.168.1.163', the_result))
-
 
     def query_devices2():
         print("query_devices with timeout")
@@ -376,10 +376,11 @@ if __name__ == '__main__':
             DeviceQuery('host', '192.168.1.163', the_result, timeout=10,
                         oneshot=False))
 
-
     # reactor.callLater(2, show_devices)
     # reactor.callLater(3, query_devices)
     # reactor.callLater(4, query_devices2)
-    # reactor.callLater(5, ctrl.add_query, DeviceQuery('friendly_name', 'Coherence Test Content', the_result, timeout=10, oneshot=False))
+    # reactor.callLater(5, ctrl.add_query, DeviceQuery(
+    #     'friendly_name', 'Coherence Test Content',
+    #     the_result, timeout=10, oneshot=False))
 
     reactor.run()

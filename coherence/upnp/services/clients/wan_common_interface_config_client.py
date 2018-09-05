@@ -3,6 +3,7 @@
 
 # Copyright 2010, Frank Scholz <dev@coherence-project.org>
 
+
 class WANCommonInterfaceConfigClient:
 
     def __init__(self, service):

@@ -27,7 +27,8 @@ class Backend(log.LogAble, Plugin):
         Like maybe upnp_Browse for the CDS Browse action.
     """
 
-    implements = []  # list the device classes here, like ['MediaServer','MediaRenderer']
+    # list the device classes below, like ['MediaServer','MediaRenderer']
+    implements = []
 
     logCategory = 'backend'
 
@@ -121,7 +122,8 @@ class BackendStore(Backend):
 
         """ and send out the signal when ready
         """
-        # louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
+        # louie.send('Coherence.UPnP.Backend.init_completed',
+        #            None, backend=self)
 
     def release(self):
         """ if anything needs to be cleaned up upon
@@ -210,16 +212,18 @@ class BackendItem(log.LogAble):
             self.item.res.append(res)
         """
         log.LogAble.__init__(self)
-        self.name = 'my_name'  # the basename of a file, the album title,
-        # the artists name,...
+
+        # the basename of a file, the album title, the artists name...
         # is expected to be unicode
+        self.name = 'my_name'
         self.item = None
         self.update_id = 0  # the update id of that item,
         # when an UPnP ContentDirectoryService Container
         # this should be incremented on every modification
 
-        self.location = None  # the filepath of our media file, or alternatively
+        # the filepath of our media file, or alternatively
         # a FilePath or a ReverseProxyResource object
+        self.location = None
 
         self.cover = None  # if we have some album art image, let's put
         # the filepath or link into here
@@ -456,7 +460,8 @@ class LazyContainer(Container):
         # Phase 1
         # let's classify the item between items to be removed,
         # to be updated or to be added
-        self.debug("Refresh pass 1:%d %d", len(new_children), len(old_children))
+        self.debug("Refresh pass 1:%d %d",
+                   len(new_children), len(old_children))
         for id, item in list(old_children.items()):
             children_to_be_removed[id] = item
         for id, item in list(new_children.items()):
@@ -483,7 +488,8 @@ class LazyContainer(Container):
             if hasattr(old_item, 'replace_by'):
                 replaced = old_item.replace_by(new_item)
             if replaced is False:
-                # print "No replacement possible: we remove and add the item again"
+                # print("No replacement possible:
+                #       we remove and add the item again")
                 self.remove_child(old_item, external_id=id, update=False)
                 self.add_child(new_item, external_id=id, update=False)
         # Add relevant items to COntainer children
@@ -511,8 +517,8 @@ class LazyContainer(Container):
         def items_retrieved(result, page, start_offset):
             if self.childrenRetrievingNeeded is True:
                 new_offset = len(self.retrieved_children)
-                return self.retrieve_children(new_offset,
-                                              page + 1)  # we try the next page
+                return self.retrieve_children(
+                    new_offset, page + 1)  # we try the next page
             return self.retrieved_children
 
         self.childrenRetrievingNeeded = False
@@ -527,11 +533,13 @@ class LazyContainer(Container):
 
         def all_items_retrieved(result):
             self.end_children_retrieval_campaign(True)
-            return super(LazyContainer, self).get_children(start, request_count)
+            return super(LazyContainer, self).get_children(
+                start, request_count)
 
         def error_while_retrieving_items(error):
             self.end_children_retrieval_campaign(False)
-            return super(LazyContainer, self).get_children(start, request_count)
+            return super(LazyContainer, self).get_children(
+                start, request_count)
 
         self.start_children_retrieval_campaign()
         if self.childrenRetriever is not None:

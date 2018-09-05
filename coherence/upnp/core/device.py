@@ -43,7 +43,7 @@ class Device(log.LogAble):
 
     def __repr__(self):
         return "embedded device %r %r, parent %r" % (
-        self.friendly_name, self.device_type, self.parent)
+            self.friendly_name, self.device_type, self.parent)
 
     # def __del__(self):
     #    #print "Device removal completed"
@@ -194,7 +194,7 @@ class Device(log.LogAble):
                     self.debug('wow, we lost an event subscription for {} {}, '
                                'maybe we need to rethink the loop time and '
                                'timeout calculation?'.format(
-                        self.friendly_name, service.get_id()))
+                                   self.friendly_name, service.get_id()))
                 if service.get_timeout() < now + 30:
                     service.renew_subscription()
 
@@ -203,11 +203,11 @@ class Device(log.LogAble):
 
     def unsubscribe_service_subscriptions(self):
         """ iterate over device's services and unsubscribe subscriptions """
-        l = []
+        sl = []
         for service in self.get_services():
             if service.get_sid() is not None:
-                l.append(service.unsubscribe())
-        dl = defer.DeferredList(l)
+                sl.append(service.unsubscribe())
+        dl = defer.DeferredList(sl)
         return dl
 
     def parse_device(self, d):
@@ -221,39 +221,39 @@ class Device(log.LogAble):
 
         try:
             self.manufacturer = d.findtext('./{%s}manufacturer' % ns)
-        except:
+        except Exception:
             pass
         try:
             self.manufacturer_url = d.findtext('./{%s}manufacturerURL' % ns)
-        except:
+        except Exception:
             pass
         try:
             self.model_name = d.findtext('./{%s}modelName' % ns)
-        except:
+        except Exception:
             pass
         try:
             self.model_description = d.findtext('./{%s}modelDescription' % ns)
-        except:
+        except Exception:
             pass
         try:
             self.model_number = d.findtext('./{%s}modelNumber' % ns)
-        except:
+        except Exception:
             pass
         try:
             self.model_url = d.findtext('./{%s}modelURL' % ns)
-        except:
+        except Exception:
             pass
         try:
             self.serial_number = d.findtext('./{%s}serialNumber' % ns)
-        except:
+        except Exception:
             pass
         try:
             self.upc = d.findtext('./{%s}UPC' % ns)
-        except:
+        except Exception:
             pass
         try:
             self.presentation_url = d.findtext('./{%s}presentationURL' % ns)
-        except:
+        except Exception:
             pass
 
         try:
@@ -264,7 +264,7 @@ class Device(log.LogAble):
                 except AttributeError:
                     self.dlna_dc = []
                     self.dlna_dc.append(dlna_doc.text)
-        except:
+        except Exception:
             pass
 
         try:
@@ -276,7 +276,7 @@ class Device(log.LogAble):
                     except AttributeError:
                         self.dlna_cap = []
                         self.dlna_cap.append(cap)
-        except:
+        except Exception:
             pass
 
         icon_list = d.find('./{%s}iconList' % ns)
@@ -296,12 +296,13 @@ class Device(log.LogAble):
                     self.icons.append(i)
                     self.debug('adding icon {} for {}'.format(
                         i, self.friendly_name))
-                except:
+                except Exception as e:
                     import traceback
                     self.debug(traceback.format_exc())
                     self.warning(
                         'device {} seems to have an invalid icon description, '
-                        'ignoring that icon'.format(self.friendly_name))
+                        'ignoring that icon [error: %r]'.format(
+                            self.friendly_name, e))
 
         serviceList = d.find('./{%s}serviceList' % ns)
         if serviceList is not None:
@@ -358,13 +359,13 @@ class Device(log.LogAble):
     def get_presentation_url(self):
         try:
             return self.make_fullyqualified(self.presentation_url)
-        except:
+        except Exception:
             return ''
 
     def get_parent_id(self):
         try:
             return self.parent.get_id()
-        except:
+        except Exception:
             return ''
 
     def make_fullyqualified(self, url):
@@ -396,80 +397,83 @@ class Device(log.LogAble):
                     v = getattr(self, attribute)
                 if v not in [None, 'None']:
                     r.append((name, v))
-            except:
+            except Exception as e:
+                self.error('Device.as_tuples: %r' % e)
                 import traceback
                 self.debug(traceback.format_exc())
 
         try:
             r.append(('Location', (self.get_location(),
                                    self.get_location())))
-        except:
+        except Exception:
             pass
         try:
             append('URL base', self.get_urlbase)
-        except:
+        except Exception:
             pass
         try:
             r.append(('UDN', self.get_id()))
-        except:
+        except Exception:
             pass
         try:
             r.append(('Type', self.device_type))
-        except:
+        except Exception:
             pass
         try:
             r.append(('UPnP Version', self.upnp_version))
-        except:
+        except Exception:
             pass
         try:
             r.append(('DLNA Device Class', ','.join(self.dlna_dc)))
-        except:
+        except Exception:
             pass
         try:
             r.append(('DLNA Device Capability', ','.join(self.dlna_cap)))
-        except:
+        except Exception:
             pass
         try:
             r.append(('Friendly Name', self.friendly_name))
-        except:
+        except Exception:
             pass
         try:
             append('Manufacturer', 'manufacturer')
-        except:
+        except Exception:
             pass
         try:
-            append('Manufacturer URL', ('manufacturer_url', 'manufacturer_url'))
-        except:
+            append('Manufacturer URL',
+                   ('manufacturer_url', 'manufacturer_url'))
+        except Exception:
             pass
         try:
             append('Model Description', 'model_description')
-        except:
+        except Exception:
             pass
         try:
             append('Model Name', 'model_name')
-        except:
+        except Exception:
             pass
         try:
             append('Model Number', 'model_number')
-        except:
+        except Exception:
             pass
         try:
             append('Model URL', ('model_url', 'model_url'))
-        except:
+        except Exception:
             pass
         try:
             append('Serial Number', 'serial_number')
-        except:
+        except Exception:
             pass
         try:
             append('UPC', 'upc')
-        except:
+        except Exception:
             pass
         try:
-            append('Presentation URL', ('presentation_url',
-                                        lambda: self.make_fullyqualified(
-                                            getattr(self, 'presentation_url'))))
-        except:
+            append('Presentation URL',
+                   ('presentation_url',
+                    lambda: self.make_fullyqualified(
+                        getattr(self, 'presentation_url'))))
+        except Exception:
             pass
 
         for icon in self.icons:
@@ -546,7 +550,8 @@ class RootDevice(Device):
 
     def device_detect(self, *args, **kwargs):
         self.debug("device_detect %r", kwargs)
-        self.debug("root_detection_completed %r", self.root_detection_completed)
+        self.debug("root_detection_completed %r",
+                   self.root_detection_completed)
         if self.root_detection_completed:
             return
         # our self is not complete yet
@@ -585,7 +590,7 @@ class RootDevice(Device):
             xml_data = None
             try:
                 xml_data = etree.fromstring(data)
-            except:
+            except Exception:
                 self.warning("Invalid device description received from %r",
                              self.location)
                 import traceback
@@ -597,11 +602,11 @@ class RootDevice(Device):
                 minor = tree.findtext('./{%s}specVersion/{%s}minor' % (ns, ns))
                 try:
                     self.upnp_version = '.'.join((major, minor))
-                except:
+                except Exception:
                     self.upnp_version = 'n/a'
                 try:
                     self.urlbase = tree.findtext('./{%s}URLBase' % ns)
-                except:
+                except Exception:
                     import traceback
                     self.debug(traceback.format_exc())
 

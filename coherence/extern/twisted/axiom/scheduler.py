@@ -3,12 +3,12 @@
 """
 Timed event scheduling for Axiom databases.
 
-With this module, applications can schedule an L{Item} to have its C{run} method
-called at a particular point in the future.  This call will happen even if the
-process which initially schedules it exits and the database is later re-opened
-by another process (of course, if the scheduled time comes and goes while no
-process is using the database, then the call will be delayed until some process
-opens the database and starts its services).
+With this module, applications can schedule an L{Item} to have its C{run}
+method called at a particular point in the future. This call will happen even
+if the process which initially schedules it exits and the database is later
+re-opened by another process (of course, if the scheduled time comes and goes
+while no process is using the database, then the call will be delayed until
+some process opens the database and starts its services).
 
 This module contains two implementations of the L{axiom.iaxiom.IScheduler}
 interface, one for site stores and one for sub-stores.  Items can only be
@@ -134,7 +134,7 @@ class SchedulerMixin:
             return False
         try:
             theEvent.invokeRunnable()
-        except:
+        except Exception as e:
             raise _WackyControlFlow(theEvent, failure.Failure())
         self.lastEventAt = now
         return True
@@ -171,10 +171,11 @@ class SchedulerMixin:
             self._transientSchedule(x[0].time, now)
         if errors or VERBOSE:
             log.msg(
-                "The scheduler ran %(eventCount)s events%(errors)s." % dict(
+                "The scheduler ran %(eventCount)s events%(errors)s." %
+                dict(
                     eventCount=workUnitsPerformed,
-                    errors=(errors and (
-                                " (with %d errors)" % (errors,))) or ''))
+                    errors=(errors and (" (with %d errors)" %
+                                        (errors,))) or ''))
 
     def schedule(self, runnable, when):
         TimedEvent(store=self.store, time=when, runnable=runnable)
@@ -195,8 +196,8 @@ class SchedulerMixin:
         """
         Remove from given item from the schedule.
 
-        If runnable is scheduled to run multiple times, only the temporally first
-        is removed.
+        If runnable is scheduled to run multiple times,
+        only the temporally first is removed.
         """
         for evt in self.store.query(TimedEvent,
                                     TimedEvent.runnable == runnable,

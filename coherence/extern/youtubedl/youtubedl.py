@@ -17,12 +17,15 @@ import string
 import sys
 import time
 import urllib
+
 from coherence.upnp.core.utils import getPage
 
 std_headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2) Gecko/20090729 Firefox/3.5.2',
+    'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.1.2)'
+                  ' Gecko/20090729 Firefox/3.5.2',
     'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
-    'Accept': 'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
+    'Accept': 'text/xml,application/xml,application/xhtml+xml,'
+              'text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
     'Accept-Language': 'en-us,en;q=0.5',
 }
 
@@ -41,8 +44,10 @@ def preferredencoding():
         if pref == '':
             return 'UTF-8'
         return pref
-    except:
-        sys.stderr.write('WARNING: problem obtaining preferred encoding. Falling back to UTF-8.\n')
+    except Exception:
+        sys.stderr.write(
+            'WARNING: problem obtaining preferred encoding. '
+            'Falling back to UTF-8.\n')
         return 'UTF-8'
 
 
@@ -147,7 +152,9 @@ class FileDownloader(object):
     _download_retcode = None
 
     def __init__(self, params):
-        """Create a FileDownloader object with the given options."""
+        """
+        Create a FileDownloader object with the given options.
+        """
         self._ies = []
         self._pps = []
         self._download_retcode = 0
@@ -155,10 +162,14 @@ class FileDownloader(object):
 
     @staticmethod
     def pmkdir(filename):
-        """Create directory components in filename. Similar to Unix "mkdir -p"."""
+        """
+        Create directory components in filename. Similar to Unix "mkdir -p".
+        """
         components = filename.split(os.sep)
-        aggregate = [os.sep.join(components[0:x]) for x in range(1, len(components))]
-        aggregate = ['%s%s' % (x, os.sep) for x in aggregate]  # Finish names with separator
+        aggregate = [os.sep.join(components[0:x]) for x in
+                     range(1, len(components))]
+        aggregate = ['%s%s' % (x, os.sep) for x in
+                     aggregate]  # Finish names with separator
         for dir in aggregate:
             if not os.path.exists(dir):
                 os.mkdir(dir)
@@ -181,7 +192,9 @@ class FileDownloader(object):
     def calc_percent(byte_counter, data_len):
         if data_len is None:
             return '---.-%'
-        return '%6s' % ('%3.1f%%' % (float(byte_counter) / float(data_len) * 100.0))
+        return \
+            '%6s' % ('%3.1f%%' %
+                     (float(byte_counter) / float(data_len) * 100.0))
 
     @staticmethod
     def calc_eta(start, now, total, current):
@@ -202,7 +215,9 @@ class FileDownloader(object):
         dif = now - start
         if bytes == 0 or dif < 0.001:  # One millisecond
             return '%10s' % '---b/s'
-        return '%10s' % ('%s/s' % FileDownloader.format_bytes(float(bytes) / dif))
+        return \
+            '%10s' % ('%s/s' % FileDownloader.format_bytes(
+                float(bytes) / dif))
 
     @staticmethod
     def best_block_size(elapsed_time, bytes):
@@ -219,7 +234,9 @@ class FileDownloader(object):
 
     @staticmethod
     def parse_bytes(bytestr):
-        """Parse a string indicating a byte quantity into a long integer."""
+        """
+        Parse a string indicating a byte quantity into a long integer.
+        """
         matchobj = re.match(r'(?i)^(\d+(?:\.\d+)?)([kMGTPEZY]?)$', bytestr)
         if matchobj is None:
             return None
@@ -229,7 +246,10 @@ class FileDownloader(object):
 
     @staticmethod
     def verify_url(url):
-        """Verify a URL is valid and data could be downloaded. Return real data URL."""
+        """
+        Verify a URL is valid and data could be downloaded.
+        Return real data URL.
+        """
         request = urllib.request.Request(url, None, std_headers)
         data = urllib.request.urlopen(request)
         data.read(1)
@@ -250,7 +270,8 @@ class FileDownloader(object):
     def to_stdout(self, message, skip_eol=False):
         """Print message to stdout if not in quiet mode."""
         if not self.params.get('quiet', False):
-            print(('%s%s' % (message, ['\n', ''][skip_eol])).encode(preferredencoding()), end=' ')
+            print(('%s%s' % (message, ['\n', ''][skip_eol])).encode(
+                preferredencoding()), end=' ')
             sys.stdout.flush()
 
     def to_stderr(self, message):
@@ -259,7 +280,7 @@ class FileDownloader(object):
 
     def fixed_template(self):
         """Checks if the output template is fixed."""
-        return (re.search(r'(?u)%\(.+?\)s', self.params['outtmpl']) is None)
+        return re.search(r'(?u)%\(.+?\)s', self.params['outtmpl']) is None
 
     def trouble(self, message=None):
         """Determine action to take when a download problem appears.
@@ -285,7 +306,8 @@ class FileDownloader(object):
             return
         speed = float(byte_counter) / elapsed
         if speed > rate_limit:
-            time.sleep((byte_counter - rate_limit * (now - start_time)) / rate_limit)
+            time.sleep(
+                (byte_counter - rate_limit * (now - start_time)) / rate_limit)
 
     def report_destination(self, filename):
         """Report destination filename."""
@@ -294,7 +316,8 @@ class FileDownloader(object):
     def report_progress(self, percent_str, data_len_str, speed_str, eta_str):
         """Report download progress."""
         self.to_stdout('\r[download] %s of %s at %s ETA %s' %
-                (percent_str, data_len_str, speed_str, eta_str), skip_eol=True)
+                       (percent_str, data_len_str, speed_str, eta_str),
+                       skip_eol=True)
 
     def report_resuming_byte(self, resume_len):
         """Report attemtp to resume at given byte."""
@@ -318,7 +341,8 @@ class FileDownloader(object):
         if self.params.get('simulate', False):
             try:
                 info_dict['url'] = self.verify_url(info_dict['url'])
-            except (OSError, IOError, urllib.error.URLError, http.client.HTTPException, socket.error) as err:
+            except (OSError, IOError, urllib.error.URLError,
+                    http.client.HTTPException, socket.error) as err:
                 raise UnavailableFormatError
 
             # Forced printings
@@ -334,7 +358,9 @@ class FileDownloader(object):
             template_dict['epoch'] = str(int(time.time()))
             filename = self.params['outtmpl'] % template_dict
         except (ValueError, KeyError) as err:
-            self.trouble('ERROR: invalid output template or system charset: %s' % str(err))
+            self.trouble(
+                'ERROR: invalid output template or system charset: %s' % str(
+                    err))
         if self.params['nooverwrites'] and os.path.exists(filename):
             self.to_stderr('WARNING: file exists: %s; skipping' % filename)
             return
@@ -349,17 +375,22 @@ class FileDownloader(object):
             success = self._do_download(filename, info_dict['url'])
         except (OSError, IOError) as err:
             raise UnavailableFormatError
-        except (urllib.error.URLError, http.client.HTTPException, socket.error) as err:
+        except (urllib.error.URLError,
+                http.client.HTTPException,
+                socket.error) as err:
             self.trouble('ERROR: unable to download video data: %s' % str(err))
             return
-        except (ContentTooShortError, ) as err:
-            self.trouble('ERROR: content too short (expected %s bytes and served %s)' % (err.expected, err.downloaded))
+        except (ContentTooShortError,) as err:
+            self.trouble(
+                'ERROR: content too short '
+                '(expected %s bytes and served %s)' % (
+                    err.expected, err.downloaded))
             return
 
         if success:
             try:
                 self.post_process(filename, info_dict)
-            except (PostProcessingError) as err:
+            except PostProcessingError as err:
                 self.trouble('ERROR: postprocessing: %s' % str(err))
                 return
 
@@ -371,7 +402,7 @@ class FileDownloader(object):
         for url in url_list:
             suitable_found = False
             for ie in self._ies:
-               # Go to next InfoExtractor if not suitable
+                # Go to next InfoExtractor if not suitable
                 if not ie.suitable(url):
                     continue
                 # Suitable InfoExtractor found
@@ -427,6 +458,7 @@ class FileDownloader(object):
             info = pp.run(info)
             if info is None:
                 break
+
 
 # _do_download REMOVED
 
@@ -485,7 +517,8 @@ class InfoExtractor(object):
 
     def to_stdout(self, message):
         """Print message to stdout if downloader is not in quiet mode."""
-        if self._downloader is None or not self._downloader.get_params().get('quiet', False):
+        if self._downloader is None or not self._downloader.get_params().get(
+                'quiet', False):
             print(message)
 
     def to_stderr(self, message):
@@ -504,12 +537,16 @@ class InfoExtractor(object):
 class YoutubeIE(InfoExtractor):
     """Information extractor for youtube.com."""
 
-    _VALID_URL = r'^((?:https://)?(?:\w+\.)?youtube\.com/(?:(?:v/)|(?:(?:watch(?:\.php)?)?\?(?:.+&)?v=)))?([0-9A-Za-z_-]+)(?(1).+)?$'
-    _LANG_URL = r'https://uk.youtube.com/?hl=en&persist_hl=1&gl=US&persist_gl=1&opt_out_ackd=1'
+    _VALID_URL = r'^((?:https://)?(?:\w+\.)?youtube\.com/(?:(?:v/)|' \
+                 r'(?:(?:watch(?:\.php)?)?\?(?:.+&)?v=)))?([0-9A-Za-z_-]+)' \
+                 r'(?(1).+)?$'
+    _LANG_URL = r'https://uk.youtube.com/?hl=en&persist_hl=1' \
+                r'&gl=US&persist_gl=1&opt_out_ackd=1'
     _LOGIN_URL = 'https://www.youtube.com/signup?next=/&gl=US&hl=en'
     _AGE_URL = 'https://www.youtube.com/verify_age?next_url=/&gl=US&hl=en'
     _NETRC_MACHINE = 'youtube'
-    _available_formats = ['22', '35', '18', '5', '17', '13', None]  # listed in order of priority for -b flag
+    # _available_formats listed in order of priority for -b flag
+    _available_formats = ['22', '35', '18', '5', '17', '13', None]
     _video_extensions = {
         '13': '3gp',
         '17': 'mp4',
@@ -519,7 +556,7 @@ class YoutubeIE(InfoExtractor):
 
     @staticmethod
     def suitable(url):
-        return (re.match(YoutubeIE._VALID_URL, url) is not None)
+        return re.match(YoutubeIE._VALID_URL, url) is not None
 
     @staticmethod
     def htmlentity_transform(matchobj):
@@ -542,7 +579,7 @@ class YoutubeIE(InfoExtractor):
             return chr(int(numstr, base))
 
         # Unknown entity in name, return its literal representation
-        return ('&%s;' % entity)
+        return '&%s;' % entity
 
     def report_lang(self):
         """Report attempt to set language."""
@@ -558,19 +595,23 @@ class YoutubeIE(InfoExtractor):
 
     def report_video_info_webpage_download(self, video_id):
         """Report attempt to download video info webpage."""
-        self._downloader.to_stdout('[youtube] %s: Downloading video info webpage' % video_id)
+        self._downloader.to_stdout(
+            '[youtube] %s: Downloading video info webpage' % video_id)
 
     def report_information_extraction(self, video_id):
         """Report attempt to extract video information."""
-        self._downloader.to_stdout('[youtube] %s: Extracting video information' % video_id)
+        self._downloader.to_stdout(
+            '[youtube] %s: Extracting video information' % video_id)
 
     def report_unavailable_format(self, video_id, format):
         """Report extracted video URL."""
-        self._downloader.to_stdout('[youtube] %s: Format %s not available' % (video_id, format))
+        self._downloader.to_stdout(
+            '[youtube] %s: Format %s not available' % (video_id, format))
 
     def report_video_url(self, video_id, video_real_url):
         """Report extracted video URL."""
-        self._downloader.to_stdout('[youtube] %s: URL: %s' % (video_id, video_real_url))
+        self._downloader.to_stdout(
+            '[youtube] %s: URL: %s' % (video_id, video_real_url))
 
     def _real_initialize(self):
 
@@ -592,9 +633,11 @@ class YoutubeIE(InfoExtractor):
                     username = info[0]
                     password = info[2]
                 else:
-                    raise netrc.NetrcParseError('No authenticators for %s' % self._NETRC_MACHINE)
+                    raise netrc.NetrcParseError(
+                        'No authenticators for %s' % self._NETRC_MACHINE)
             except (IOError, netrc.NetrcParseError) as err:
-                self._downloader.to_stderr('WARNING: parsing .netrc: %s' % str(err))
+                self._downloader.to_stderr(
+                    'WARNING: parsing .netrc: %s' % str(err))
                 return
 
         def gotAgeConfirmedPage(result):
@@ -609,15 +652,16 @@ class YoutubeIE(InfoExtractor):
 
             # Confirm age
             age_form = {
-                        'next_url': '/',
-                        'action_confirm': 'Confirm',
-                        }
+                'next_url': '/',
+                'action_confirm': 'Confirm',
+            }
             postdata = urllib.parse.urlencode(age_form)
             d = getPage(self._AGE_URL, postdata=postdata, headers=std_headers)
             d.addCallback(gotAgeConfirmedPage)
 
         def gotLoginError(error):
-            print("Unable to login to Youtube : %s:%s @ %s" % (username, password, self._LOGIN_URL))
+            print("Unable to login to Youtube : %s:%s @ %s" % (
+                username, password, self._LOGIN_URL))
             print("Error: %s" % error)
             return
 
@@ -628,14 +672,15 @@ class YoutubeIE(InfoExtractor):
                 return
             # Log in
             login_form = {
-                    'current_form': 'loginForm',
-                    'next': '/',
-                    'action_login': 'Log In',
-                    'username': username,
-                    'password': password,
+                'current_form': 'loginForm',
+                'next': '/',
+                'action_login': 'Log In',
+                'username': username,
+                'password': password,
             }
             postdata = urllib.parse.urlencode(login_form)
-            d = getPage(self._LOGIN_URL, method='POST', postdata=postdata, headers=std_headers)
+            d = getPage(self._LOGIN_URL, method='POST', postdata=postdata,
+                        headers=std_headers)
             d.addCallbacks(gotLoggedInPage, gotLoginError)
 
         def gotLanguageSetError(error):
@@ -670,7 +715,9 @@ class YoutubeIE(InfoExtractor):
         video_extension = self._video_extensions.get(format_param, 'flv')
 
         # video info
-        video_info_url = 'https://www.youtube.com/get_video_info?&video_id=%s&el=detailpage&ps=default&eurl=&gl=US&hl=en' % video_id
+        video_info_url = \
+            'https://www.youtube.com/get_video_info?&video_id=%s&' \
+            'el=detailpage&ps=default&eurl=&gl=US&hl=en' % video_id
         if format_param is not None:
             video_info_url = '%s&fmt=%s' % (video_info_url, format_param)
 
@@ -678,9 +725,10 @@ class YoutubeIE(InfoExtractor):
             video_info_webpage, headers = result
 
             # check format
-            if (format_param == '22'):
+            if format_param == '22':
                 print("Check if HD video exists...")
-                mobj = re.search(r'var isHDAvailable = true;', video_info_webpage)
+                mobj = re.search(r'var isHDAvailable = true;',
+                                 video_info_webpage)
                 if mobj is None:
                     print("No HD video -> switch back to SD")
                     format_param = '18'
@@ -690,40 +738,49 @@ class YoutubeIE(InfoExtractor):
             # "t" param
             mobj = re.search(r'(?m)&token=([^&]+)(?:&|$)', video_info_webpage)
             if mobj is None:
-            	# Attempt to see if YouTube has issued an error message
-                mobj = re.search(r'(?m)&reason=([^&]+)(?:&|$)', video_info_webpage)
+                # Attempt to see if YouTube has issued an error message
+                mobj = re.search(r'(?m)&reason=([^&]+)(?:&|$)',
+                                 video_info_webpage)
                 if mobj is None:
                     self.to_stderr('ERROR: unable to extract "t" parameter')
                     print(video_info_webpage)
                     return [None]
                 else:
                     reason = urllib.parse.unquote_plus(mobj.group(1))
-                    self.to_stderr('ERROR: YouTube said: %s' % reason.decode('utf-8'))
+                    self.to_stderr(
+                        'ERROR: YouTube said: %s' % reason.decode('utf-8'))
 
             token = urllib.parse.unquote(mobj.group(1))
-            video_real_url = 'https://www.youtube.com/get_video?video_id=%s&t=%s&eurl=&el=detailpage&ps=default&gl=US&hl=en' % (video_id, token)
+            video_real_url = \
+                'https://www.youtube.com/get_video?video_id=%s&t=%s&eurl=&' \
+                'el=detailpage&ps=default&gl=US&hl=en' % (
+                    video_id, token)
             if format_param is not None:
                 video_real_url = '%s&fmt=%s' % (video_real_url, format_param)
 
             # uploader
             mobj = re.search(r'(?m)&author=([^&]+)(?:&|$)', video_info_webpage)
             if mobj is None:
-                self._downloader.trouble('ERROR: unable to extract uploader nickname')
+                self._downloader.trouble(
+                    'ERROR: unable to extract uploader nickname')
                 return
             video_uploader = urllib.parse.unquote(mobj.group(1))
 
             # title
             mobj = re.search(r'(?m)&title=([^&]+)(?:&|$)', video_info_webpage)
             if mobj is None:
-                self._downloader.trouble('ERROR: unable to extract video title')
+                self._downloader.trouble(
+                    'ERROR: unable to extract video title')
                 return
             video_title = urllib.parse.unquote(mobj.group(1))
             video_title = video_title.decode('utf-8')
-            video_title = re.sub(r'(?u)&(.+?);', self.htmlentity_transform, video_title)
+            video_title = re.sub(r'(?u)&(.+?);', self.htmlentity_transform,
+                                 video_title)
             video_title = video_title.replace(os.sep, '%')
 
             # simplified title
-            simple_title = re.sub(r'(?u)([^%s]+)' % simple_title_chars, r'_', video_title)
+            simple_title = re.sub(r'(?u)([^%s]+)' % simple_title_chars, r'_',
+                                  video_title)
             simple_title = simple_title.strip(r'_')
 
             # Return information
@@ -734,7 +791,7 @@ class YoutubeIE(InfoExtractor):
                 'title': video_title,
                 'stitle': simple_title,
                 'ext': video_extension.decode('utf-8'),
-                }]
+            }]
 
         def gotError(error):
             print("Unable to process Youtube request: %s" % url)
@@ -750,9 +807,11 @@ class YoutubeIE(InfoExtractor):
 class MetacafeIE(InfoExtractor):
     """Information Extractor for metacafe.com."""
 
-    _VALID_URL = r'(?:https://)?(?:www\.)?metacafe\.com/watch/([^/]+)/([^/]+)/.*'
+    _VALID_URL = r'(?:https://)?(?:www\.)?metacafe\.com/' \
+                 r'watch/([^/]+)/([^/]+)/.*'
     _DISCLAIMER = 'https://www.metacafe.com/family_filter/'
-    _FILTER_POST = 'https://www.metacafe.com/f/index.php?inputType=filter&controllerGroup=user'
+    _FILTER_POST = 'https://www.metacafe.com/f/index.php?' \
+                   'inputType=filter&controllerGroup=user'
     _youtube_ie = None
 
     def __init__(self, youtube_ie, downloader=None):
@@ -761,7 +820,7 @@ class MetacafeIE(InfoExtractor):
 
     @staticmethod
     def suitable(url):
-        return (re.match(MetacafeIE._VALID_URL, url) is not None)
+        return re.match(MetacafeIE._VALID_URL, url) is not None
 
     def report_disclaimer(self):
         """Report disclaimer retrieval."""
@@ -773,11 +832,13 @@ class MetacafeIE(InfoExtractor):
 
     def report_download_webpage(self, video_id):
         """Report webpage download."""
-        self._downloader.to_stdout('[metacafe] %s: Downloading webpage' % video_id)
+        self._downloader.to_stdout(
+            '[metacafe] %s: Downloading webpage' % video_id)
 
     def report_extraction(self, video_id):
         """Report information extraction."""
-        self._downloader.to_stdout('[metacafe] %s: Extracting information' % video_id)
+        self._downloader.to_stdout(
+            '[metacafe] %s: Extracting information' % video_id)
 
     def _real_initialize(self):
         # Retrieve disclaimer
@@ -785,21 +846,29 @@ class MetacafeIE(InfoExtractor):
         try:
             self.report_disclaimer()
             disclaimer = urllib.request.urlopen(request).read()
-        except (urllib.error.URLError, http.client.HTTPException, socket.error) as err:
-            self._downloader.trouble('ERROR: unable to retrieve disclaimer: %s' % str(err))
+        except (urllib.error.URLError,
+                http.client.HTTPException,
+                socket.error) as err:
+            self._downloader.trouble(
+                'ERROR: unable to retrieve disclaimer: %s' % str(err))
             return
 
         # Confirm age
         disclaimer_form = {
             'filters': '0',
             'submit': "Continue - I'm over 18",
-            }
-        request = urllib.request.Request(self._FILTER_POST, urllib.parse.urlencode(disclaimer_form), std_headers)
+        }
+        request = urllib.request.Request(
+            self._FILTER_POST, urllib.parse.urlencode(
+                disclaimer_form), std_headers)
         try:
             self.report_age_confirmation()
             disclaimer = urllib.request.urlopen(request).read()
-        except (urllib.error.URLError, http.client.HTTPException, socket.error) as err:
-            self._downloader.trouble('ERROR: unable to confirm age: %s' % str(err))
+        except (urllib.error.URLError,
+                http.client.HTTPException,
+                socket.error) as err:
+            self._downloader.trouble(
+                'ERROR: unable to confirm age: %s' % str(err))
             return
 
     def _real_extract(self, url):
@@ -814,19 +883,24 @@ class MetacafeIE(InfoExtractor):
         # Check if video comes from YouTube
         mobj2 = re.match(r'^yt-(.*)$', video_id)
         if mobj2 is not None:
-            self._youtube_ie.extract('https://www.youtube.com/watch?v=%s' % mobj2.group(1))
+            self._youtube_ie.extract(
+                'https://www.youtube.com/watch?v=%s' % mobj2.group(1))
             return
 
         simple_title = mobj.group(2).decode('utf-8')
         video_extension = 'flv'
 
         # Retrieve video webpage to extract further information
-        request = urllib.request.Request('https://www.metacafe.com/watch/%s/' % video_id)
+        request = urllib.request.Request(
+            'https://www.metacafe.com/watch/%s/' % video_id)
         try:
             self.report_download_webpage(video_id)
             webpage = urllib.request.urlopen(request).read()
-        except (urllib.error.URLError, http.client.HTTPException, socket.error) as err:
-            self._downloader.trouble('ERROR: unable retrieve video webpage: %s' % str(err))
+        except (urllib.error.URLError,
+                http.client.HTTPException,
+                socket.error) as err:
+            self._downloader.trouble(
+                'ERROR: unable retrieve video webpage: %s' % str(err))
             return
 
         # Extract URL, uploader and title from webpage
@@ -836,13 +910,13 @@ class MetacafeIE(InfoExtractor):
             self._downloader.trouble('ERROR: unable to extract media URL')
             return
         mediaURL = urllib.parse.unquote(mobj.group(1))
-        #mobj = re.search(r'(?m)&gdaKey=(.*?)&', webpage)
-        #if mobj is None:
+        # mobj = re.search(r'(?m)&gdaKey=(.*?)&', webpage)
+        # if mobj is None:
         #    self._downloader.trouble(u'ERROR: unable to extract gdaKey')
         #    return
-        #gdaKey = mobj.group(1)
+        # gdaKey = mobj.group(1)
         #
-        #video_url = '%s?__gda__=%s' % (mediaURL, gdaKey)
+        # video_url = '%s?__gda__=%s' % (mediaURL, gdaKey)
 
         video_url = mediaURL
 
@@ -852,9 +926,11 @@ class MetacafeIE(InfoExtractor):
             return
         video_title = mobj.group(1).decode('utf-8')
 
-        mobj = re.search(r'(?ms)<li id="ChnlUsr">.*?Submitter:.*?<a .*?>(.*?)<', webpage)
+        mobj = re.search(
+            r'(?ms)<li id="ChnlUsr">.*?Submitter:.*?<a .*?>(.*?)<', webpage)
         if mobj is None:
-            self._downloader.trouble('ERROR: unable to extract uploader nickname')
+            self._downloader.trouble(
+                'ERROR: unable to extract uploader nickname')
             return
         video_uploader = mobj.group(1)
 
@@ -875,7 +951,8 @@ class MetacafeIE(InfoExtractor):
 class YoutubeSearchIE(InfoExtractor):
     """Information Extractor for YouTube search queries."""
     _VALID_QUERY = r'ytsearch(\d+|all)?:[\s\S]+'
-    _TEMPLATE_URL = 'https://www.youtube.com/results?search_query=%s&page=%s&gl=US&hl=en'
+    _TEMPLATE_URL = 'https://www.youtube.com/results?' \
+                    'search_query=%s&page=%s&gl=US&hl=en'
     _VIDEO_INDICATOR = r'href="/watch\?v=.+?"'
     _MORE_PAGES_INDICATOR = r'(?m)>\s*Next\s*</a>'
     _youtube_ie = None
@@ -887,11 +964,12 @@ class YoutubeSearchIE(InfoExtractor):
 
     @staticmethod
     def suitable(url):
-        return (re.match(YoutubeSearchIE._VALID_QUERY, url) is not None)
+        return re.match(YoutubeSearchIE._VALID_QUERY, url) is not None
 
     def report_download_page(self, query, pagenum):
         """Report attempt to download playlist page with given number."""
-        self._downloader.to_stdout('[youtube] query "%s": Downloading page %s' % (query, pagenum))
+        self._downloader.to_stdout(
+            '[youtube] query "%s": Downloading page %s' % (query, pagenum))
 
     def _real_initialize(self):
         self._youtube_ie.initialize()
@@ -899,7 +977,8 @@ class YoutubeSearchIE(InfoExtractor):
     def _real_extract(self, query):
         mobj = re.match(self._VALID_QUERY, query)
         if mobj is None:
-            self._downloader.trouble('ERROR: invalid search query "%s"' % query)
+            self._downloader.trouble(
+                'ERROR: invalid search query "%s"' % query)
             return
 
         prefix, query = query.split(':')
@@ -914,10 +993,15 @@ class YoutubeSearchIE(InfoExtractor):
             try:
                 n = int(prefix)
                 if n <= 0:
-                    self._downloader.trouble('ERROR: invalid download number %s for query "%s"' % (n, query))
+                    self._downloader.trouble(
+                        'ERROR: invalid download number %s for query "%s"' % (
+                            n, query))
                     return
                 elif n > self._max_youtube_results:
-                    self._downloader.to_stderr('WARNING: ytsearch returns max %i results (you requested %i)' % (self._max_youtube_results, n))
+                    self._downloader.to_stderr(
+                        'WARNING: ytsearch returns max %i '
+                        'results (you requested %i)' % (
+                            self._max_youtube_results, n))
                     n = self._max_youtube_results
                 self._download_n_results(query, n)
                 return
@@ -934,29 +1018,35 @@ class YoutubeSearchIE(InfoExtractor):
 
         while True:
             self.report_download_page(query, pagenum)
-            result_url = self._TEMPLATE_URL % (urllib.parse.quote_plus(query), pagenum)
+            result_url = self._TEMPLATE_URL % (
+                urllib.parse.quote_plus(query), pagenum)
             request = urllib.request.Request(result_url, None, std_headers)
             try:
                 page = urllib.request.urlopen(request).read()
-            except (urllib.error.URLError, http.client.HTTPException, socket.error) as err:
-                self._downloader.trouble('ERROR: unable to download webpage: %s' % str(err))
+            except (urllib.error.URLError, http.client.HTTPException,
+                    socket.error) as err:
+                self._downloader.trouble(
+                    'ERROR: unable to download webpage: %s' % str(err))
                 return
 
             # Extract video identifiers
             for mobj in re.finditer(self._VIDEO_INDICATOR, page):
-                video_id = page[mobj.span()[0]:mobj.span()[1]].split('=')[2][:-1]
+                video_id = \
+                    page[mobj.span()[0]:mobj.span()[1]].split('=')[2][:-1]
                 if video_id not in already_seen:
                     video_ids.append(video_id)
                     already_seen.add(video_id)
                     if len(video_ids) == n:
                         # Specified n videos reached
                         for id in video_ids:
-                            self._youtube_ie.extract('https://www.youtube.com/watch?v=%s' % id)
+                            self._youtube_ie.extract(
+                                'https://www.youtube.com/watch?v=%s' % id)
                         return
 
             if re.search(self._MORE_PAGES_INDICATOR, page) is None:
                 for id in video_ids:
-                    self._youtube_ie.extract('https://www.youtube.com/watch?v=%s' % id)
+                    self._youtube_ie.extract(
+                        'https://www.youtube.com/watch?v=%s' % id)
                 return
 
             pagenum = pagenum + 1
@@ -965,8 +1055,10 @@ class YoutubeSearchIE(InfoExtractor):
 class YoutubePlaylistIE(InfoExtractor):
     """Information Extractor for YouTube playlists."""
 
-    _VALID_URL = r'(?:https://)?(?:\w+\.)?youtube.com/(?:view_play_list|my_playlists)\?.*?p=([^&]+).*'
-    _TEMPLATE_URL = 'https://www.youtube.com/view_play_list?p=%s&page=%s&gl=US&hl=en'
+    _VALID_URL = r'(?:https://)?(?:\w+\.)?youtube.com/' \
+                 r'(?:view_play_list|my_playlists)\?.*?p=([^&]+).*'
+    _TEMPLATE_URL = 'https://www.youtube.com/view_play_list?' \
+                    'p=%s&page=%s&gl=US&hl=en'
     _VIDEO_INDICATOR = r'/watch\?v=(.+?)&'
     _MORE_PAGES_INDICATOR = r'/view_play_list?p=%s&page=%s'
     _youtube_ie = None
@@ -977,11 +1069,12 @@ class YoutubePlaylistIE(InfoExtractor):
 
     @staticmethod
     def suitable(url):
-        return (re.match(YoutubePlaylistIE._VALID_URL, url) is not None)
+        return re.match(YoutubePlaylistIE._VALID_URL, url) is not None
 
     def report_download_page(self, playlist_id, pagenum):
         """Report attempt to download playlist page with given number."""
-        self.to_stdout('[youtube] PL %s: Downloading page #%s' % (playlist_id, pagenum))
+        self.to_stdout(
+            '[youtube] PL %s: Downloading page #%s' % (playlist_id, pagenum))
 
     def _real_initialize(self):
         self._youtube_ie.initialize()
@@ -1000,11 +1093,14 @@ class YoutubePlaylistIE(InfoExtractor):
 
         while True:
             self.report_download_page(playlist_id, pagenum)
-            request = urllib.request.Request(self._TEMPLATE_URL % (playlist_id, pagenum), None, std_headers)
+            request = urllib.request.Request(
+                self._TEMPLATE_URL % (playlist_id, pagenum), None, std_headers)
             try:
                 page = urllib.request.urlopen(request).read()
-            except (urllib.error.URLError, http.client.HTTPException, socket.error) as err:
-                self._downloader.trouble('ERROR: unable to download webpage: %s' % str(err))
+            except (urllib.error.URLError, http.client.HTTPException,
+                    socket.error) as err:
+                self._downloader.trouble(
+                    'ERROR: unable to download webpage: %s' % str(err))
                 return
 
             # Extract video identifiers
@@ -1014,7 +1110,8 @@ class YoutubePlaylistIE(InfoExtractor):
                     ids_in_page.append(mobj.group(1))
             video_ids.extend(ids_in_page)
 
-            if (self._MORE_PAGES_INDICATOR % (playlist_id.upper(), pagenum + 1)) not in page:
+            if (self._MORE_PAGES_INDICATOR % (
+                    playlist_id.upper(), pagenum + 1)) not in page:
                 break
             pagenum = pagenum + 1
 
@@ -1047,7 +1144,8 @@ class PostProcessor(object):
 
     def to_stdout(self, message):
         """Print message to stdout if downloader is not in quiet mode."""
-        if self._downloader is None or not self._downloader.get_params().get('quiet', False):
+        if self._downloader is None or not self._downloader.get_params().get(
+                'quiet', False):
             print(message)
 
     def to_stderr(self, message):
@@ -1078,7 +1176,8 @@ class PostProcessor(object):
         """
         return information  # by default, do nothing
 
-### MAIN PROGRAM ###
+
+# MAIN PROGRAM
 if __name__ == '__main__':
     try:
         # Modules needed only when running the main program
@@ -1086,69 +1185,120 @@ if __name__ == '__main__':
         import optparse
 
         # General configuration
-        urllib.request.install_opener(urllib.request.build_opener(urllib.request.ProxyHandler()))
-        urllib.request.install_opener(urllib.request.build_opener(urllib.request.HTTPCookieProcessor()))
-        socket.setdefaulttimeout(300)  # 5 minutes should be enough (famous last words)
+        urllib.request.install_opener(
+            urllib.request.build_opener(urllib.request.ProxyHandler()))
+        urllib.request.install_opener(
+            urllib.request.build_opener(urllib.request.HTTPCookieProcessor()))
+        socket.setdefaulttimeout(
+            300)  # 5 minutes should be enough (famous last words)
 
         # Parse command line
         parser = optparse.OptionParser(
-                usage='Usage: %prog [options] url...',
-            	version='2009.09.13',
-                conflict_handler='resolve',
-                )
-        parser.add_option('-h', '--help',
-                action='help', help='print this help text and exit')
-        parser.add_option('-v', '--version',
-                action='version', help='print program version and exit')
-        parser.add_option('-i', '--ignore-errors',
-                action='store_true', dest='ignoreerrors', help='continue on download errors', default=False)
-        parser.add_option('-r', '--rate-limit',
-                dest='ratelimit', metavar='L', help='download rate limit (e.g. 50k or 44.6m)')
+            usage='Usage: %prog [options] url...',
+            version='2009.09.13',
+            conflict_handler='resolve',
+        )
+        parser.add_option(
+            '-h', '--help',
+            action='help', help='print this help text and exit')
+        parser.add_option(
+            '-v', '--version',
+            action='version',
+            help='print program version and exit')
+        parser.add_option(
+            '-i', '--ignore-errors',
+            action='store_true', dest='ignoreerrors',
+            help='continue on download errors', default=False)
+        parser.add_option(
+            '-r', '--rate-limit',
+            dest='ratelimit', metavar='L',
+            help='download rate limit (e.g. 50k or 44.6m)')
 
         authentication = optparse.OptionGroup(parser, 'Authentication Options')
-        authentication.add_option('-u', '--username',
-                dest='username', metavar='UN', help='account username')
-        authentication.add_option('-p', '--password',
-                dest='password', metavar='PW', help='account password')
-        authentication.add_option('-n', '--netrc',
-                action='store_true', dest='usenetrc', help='use .netrc authentication data', default=False)
+        authentication.add_option(
+            '-u', '--username',
+            dest='username', metavar='UN',
+            help='account username')
+        authentication.add_option(
+            '-p', '--password',
+            dest='password', metavar='PW',
+            help='account password')
+        authentication.add_option(
+            '-n', '--netrc',
+            action='store_true', dest='usenetrc',
+            help='use .netrc authentication data',
+            default=False)
         parser.add_option_group(authentication)
 
         video_format = optparse.OptionGroup(parser, 'Video Format Options')
-        video_format.add_option('-f', '--format',
-                action='store', dest='format', metavar='FMT', help='video format code')
-        video_format.add_option('-b', '--best-quality',
-                action='store_const', dest='format', help='download the best quality video possible', const='0')
-        video_format.add_option('-m', '--mobile-version',
-                action='store_const', dest='format', help='alias for -f 17', const='17')
-        video_format.add_option('-d', '--high-def',
-                action='store_const', dest='format', help='alias for -f 22', const='22')
+        video_format.add_option(
+            '-f', '--format',
+            action='store', dest='format', metavar='FMT',
+            help='video format code')
+        video_format.add_option(
+            '-b', '--best-quality',
+            action='store_const', dest='format',
+            help='download the best quality video possible',
+            const='0')
+        video_format.add_option(
+            '-m', '--mobile-version',
+            action='store_const', dest='format',
+            help='alias for -f 17', const='17')
+        video_format.add_option(
+            '-d', '--high-def',
+            action='store_const', dest='format',
+            help='alias for -f 22', const='22')
         parser.add_option_group(video_format)
 
-        verbosity = optparse.OptionGroup(parser, 'Verbosity / Simulation Options')
-        verbosity.add_option('-q', '--quiet',
-                action='store_true', dest='quiet', help='activates quiet mode', default=False)
-        verbosity.add_option('-s', '--simulate',
-                action='store_true', dest='simulate', help='do not download video', default=False)
-        verbosity.add_option('-g', '--get-url',
-                action='store_true', dest='geturl', help='simulate, quiet but print URL', default=False)
-        verbosity.add_option('-e', '--get-title',
-                action='store_true', dest='gettitle', help='simulate, quiet but print title', default=False)
+        verbosity = optparse.OptionGroup(
+            parser, 'Verbosity / Simulation Options')
+        verbosity.add_option(
+            '-q', '--quiet',
+            action='store_true', dest='quiet',
+            help='activates quiet mode', default=False)
+        verbosity.add_option(
+            '-s', '--simulate',
+            action='store_true', dest='simulate',
+            help='do not download video', default=False)
+        verbosity.add_option(
+            '-g', '--get-url',
+            action='store_true', dest='geturl',
+            help='simulate, quiet but print URL',
+            default=False)
+        verbosity.add_option(
+            '-e', '--get-title',
+            action='store_true', dest='gettitle',
+            help='simulate, quiet but print title',
+            default=False)
         parser.add_option_group(verbosity)
 
         filesystem = optparse.OptionGroup(parser, 'Filesystem Options')
-        filesystem.add_option('-t', '--title',
-                action='store_true', dest='usetitle', help='use title in file name', default=False)
-        filesystem.add_option('-l', '--literal',
-                action='store_true', dest='useliteral', help='use literal title in file name', default=False)
-        filesystem.add_option('-o', '--output',
-                dest='outtmpl', metavar='TPL', help='output filename template')
-        filesystem.add_option('-a', '--batch-file',
-                dest='batchfile', metavar='F', help='file containing URLs to download')
-        filesystem.add_option('-w', '--no-overwrites',
-                action='store_true', dest='nooverwrites', help='do not overwrite files', default=False)
-        filesystem.add_option('-c', '--continue',
-                action='store_true', dest='continue_dl', help='resume partially downloaded files', default=False)
+        filesystem.add_option(
+            '-t', '--title',
+            action='store_true', dest='usetitle',
+            help='use title in file name', default=False)
+        filesystem.add_option(
+            '-l', '--literal',
+            action='store_true', dest='useliteral',
+            help='use literal title in file name',
+            default=False)
+        filesystem.add_option(
+            '-o', '--output',
+            dest='outtmpl', metavar='TPL',
+            help='output filename template')
+        filesystem.add_option(
+            '-a', '--batch-file',
+            dest='batchfile', metavar='F',
+            help='file containing URLs to download')
+        filesystem.add_option(
+            '-w', '--no-overwrites',
+            action='store_true', dest='nooverwrites',
+            help='do not overwrite files', default=False)
+        filesystem.add_option(
+            '-c', '--continue',
+            action='store_true', dest='continue_dl',
+            help='resume partially downloaded files',
+            default=False)
         parser.add_option_group(filesystem)
 
         (opts, args) = parser.parse_args()
@@ -1167,16 +1317,21 @@ if __name__ == '__main__':
         # Conflicting, missing and erroneous options
         if len(all_urls) < 1:
             parser.error('you must provide at least one URL')
-        if opts.usenetrc and (opts.username is not None or opts.password is not None):
-            parser.error('using .netrc conflicts with giving username/password')
+        if opts.usenetrc and (
+                opts.username is not None or opts.password is not None):
+            parser.error(
+                'using .netrc conflicts with giving username/password')
         if opts.password is not None and opts.username is None:
             parser.error('account username missing')
         if opts.outtmpl is not None and (opts.useliteral or opts.usetitle):
-            parser.error('using output template conflicts with using title or literal title')
+            parser.error(
+                'using output template conflicts '
+                'with using title or literal title')
         if opts.usetitle and opts.useliteral:
             parser.error('using title conflicts with using literal title')
         if opts.username is not None and opts.password is None:
-            opts.password = getpass.getpass('Type account password and press return:')
+            opts.password = getpass.getpass(
+                'Type account password and press return:')
         if opts.ratelimit is not None:
             numeric_limit = FileDownloader.parse_bytes(opts.ratelimit)
             if numeric_limit is None:
@@ -1199,15 +1354,17 @@ if __name__ == '__main__':
             'forcetitle': opts.gettitle,
             'simulate': (opts.simulate or opts.geturl or opts.gettitle),
             'format': opts.format,
-            'outtmpl': ((opts.outtmpl is not None and opts.outtmpl.decode(preferredencoding()))
-                or (opts.usetitle and '%(stitle)s-%(id)s.%(ext)s')
-                or (opts.useliteral and '%(title)s-%(id)s.%(ext)s')
-                or '%(id)s.%(ext)s'),
+            'outtmpl':
+                ((opts.outtmpl is not None and opts.outtmpl.decode(
+                    preferredencoding())) or
+                 (opts.usetitle and '%(stitle)s-%(id)s.%(ext)s') or
+                 (opts.useliteral and '%(title)s-%(id)s.%(ext)s') or
+                 '%(id)s.%(ext)s'),
             'ignoreerrors': opts.ignoreerrors,
             'ratelimit': opts.ratelimit,
             'nooverwrites': opts.nooverwrites,
             'continuedl': opts.continue_dl,
-            })
+        })
         fd.add_info_extractor(youtube_search_ie)
         fd.add_info_extractor(youtube_pl_ie)
         fd.add_info_extractor(metacafe_ie)

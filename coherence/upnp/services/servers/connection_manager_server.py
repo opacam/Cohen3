@@ -79,17 +79,19 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
         rcs_id = 0
 
         if self.device.device_type == 'MediaServer':
-            self.connections[id] = {'ProtocolInfo': RemoteProtocolInfo,
-                                    'Direction': Direction,
-                                    'PeerConnectionID': PeerConnectionID,
-                                    'PeerConnectionManager': PeerConnectionManager,
-                                    'AVTransportID': avt_id,
-                                    'RcsID': rcs_id,
-                                    'Status': 'OK'}
+            self.connections[id] = \
+                {'ProtocolInfo': RemoteProtocolInfo,
+                 'Direction': Direction,
+                 'PeerConnectionID': PeerConnectionID,
+                 'PeerConnectionManager': PeerConnectionManager,
+                 'AVTransportID': avt_id,
+                 'RcsID': rcs_id,
+                 'Status': 'OK'}
 
         if self.device.device_type == 'MediaRenderer':
-            """ this is the place to instantiate AVTransport and RenderingControl
-                for this connection
+            """
+            this is the place to instantiate AVTransport and RenderingControl
+            for this connection
             """
             avt_id = self.next_avt_id
             self.next_avt_id += 1
@@ -97,13 +99,14 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
             rcs_id = self.next_rcs_id
             self.next_rcs_id += 1
             self.device.rendering_control_server.create_new_instance(rcs_id)
-            self.connections[id] = {'ProtocolInfo': RemoteProtocolInfo,
-                                    'Direction': Direction,
-                                    'PeerConnectionID': PeerConnectionID,
-                                    'PeerConnectionManager': PeerConnectionManager,
-                                    'AVTransportID': avt_id,
-                                    'RcsID': rcs_id,
-                                    'Status': 'OK'}
+            self.connections[id] = \
+                {'ProtocolInfo': RemoteProtocolInfo,
+                 'Direction': Direction,
+                 'PeerConnectionID': PeerConnectionID,
+                 'PeerConnectionManager': PeerConnectionManager,
+                 'AVTransportID': avt_id,
+                 'RcsID': rcs_id,
+                 'Status': 'OK'}
             self.backend.current_connection_id = id
 
         csv_ids = ','.join([str(x) for x in self.connections])
@@ -118,8 +121,9 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
                 self.device.rendering_control_server.remove_instance(
                     self.lookup_rcs_id(id))
                 del self.connections[id]
-            except:
-                pass
+            except Exception as e:
+                self.warning(
+                    'ConnectionManagerServer.remove_connection: %r' % e)
             self.backend.current_connection_id = None
 
         if self.device.device_type == 'MediaServer':
@@ -145,8 +149,8 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
 
             # print "remove_lingering_connections", id, avt_id, rcs_id
             if avt_id > 0:
-                avt_variables = self.device.av_transport_server.get_variables().get(
-                    avt_id)
+                avt_variables = \
+                    self.device.av_transport_server.get_variables().get(avt_id)
                 if avt_variables:
                     avt_active = False
                     for variable in list(avt_variables.values()):
@@ -154,8 +158,9 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
                             avt_active = True
                             break
             if rcs_id > 0:
-                rcs_variables = self.device.rendering_control_server.get_variables().get(
-                    rcs_id)
+                rcs_variables = \
+                    self.device.rendering_control_server.get_variables().get(
+                        rcs_id)
                 if rcs_variables:
                     rcs_active = False
                     for variable in list(rcs_variables.values()):
@@ -171,13 +176,13 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
     def lookup_avt_id(self, id):
         try:
             return self.connections[id]['AVTransportID']
-        except:
+        except (ValueError, KeyError):
             return 0
 
     def lookup_rcs_id(self, id):
         try:
             return self.connections[id]['RcsID']
-        except:
+        except (ValueError, KeyError):
             return 0
 
     def listchilds(self, uri):
@@ -189,8 +194,9 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
         return cl
 
     def render(self, request):
-        return '<html><p>root of the ConnectionManager</p><p><ul>%s</ul></p></html>' % self.listchilds(
-            request.uri)
+        return \
+            '<html><p>root of the ConnectionManager</p>' \
+            '<p><ul>%s</ul></p></html>' % self.listchilds(request.uri)
 
     def set_variable(self, instance, variable_name, value, default=False):
         if (variable_name == 'SourceProtocolInfo' or
@@ -205,11 +211,11 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
                     without_dlna_tags.append(v)
 
             def with_some_tag_already_there(protocolinfo):
-                protocol, network, content_format, additional_info = protocolinfo.split(
-                    ':')
+                protocol, network, content_format, additional_info = \
+                    protocolinfo.split(':')
                 for v in value:
-                    v_protocol, v_network, v_content_format, v_additional_info = v.split(
-                        ':')
+                    v_protocol, v_network, \
+                        v_content_format, v_additional_info = v.split(':')
                     if ((protocol, network, content_format) ==
                             (v_protocol, v_network, v_content_format) and
                             v_additional_info != '*'):
@@ -229,13 +235,14 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
                                      does_playcontainer=self.does_playcontainer
                                  ))))
                     else:
-                        value.append(':'.join((
-                                              protocol, network, content_format,
-                                              build_dlna_additional_info(
-                                                  content_format))))
+                        value.append(
+                            ':'.join(
+                                (protocol, network, content_format,
+                                 build_dlna_additional_info(
+                                     content_format))))
 
-        service.ServiceServer.set_variable(self, instance, variable_name, value,
-                                           default=default)
+        service.ServiceServer.set_variable(
+            self, instance, variable_name, value, default=default)
 
     def upnp_PrepareForConnection(self, *args, **kwargs):
         self.info('upnp_PrepareForConnection')
@@ -259,23 +266,24 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
         if self.device.device_type == 'MediaRenderer':
             local_protocol_infos = self.get_variable('SinkProtocolInfo').value
         if self.device.device_type == 'MediaServer':
-            local_protocol_infos = self.get_variable('SourceProtocolInfo').value
+            local_protocol_infos = \
+                self.get_variable('SourceProtocolInfo').value
         self.debug('ProtocalInfos: %s -- %s', RemoteProtocolInfo,
                    local_protocol_infos)
 
         try:
-            remote_protocol, remote_network, remote_content_format, _ = RemoteProtocolInfo.split(
-                ':')
-        except:
-            self.warning("unable to process RemoteProtocolInfo %s",
-                         RemoteProtocolInfo)
+            remote_protocol, remote_network, remote_content_format, _ = \
+                RemoteProtocolInfo.split(':')
+        except Exception as e:
+            self.warning("unable to process RemoteProtocolInfo %s [error: %r]",
+                         RemoteProtocolInfo, e)
             return failure.Failure(errorCode(701))
 
         for protocol_info in local_protocol_infos.split(','):
             # print remote_protocol,remote_network,remote_content_format
             # print protocol_info
-            local_protocol, local_network, local_content_format, _ = protocol_info.split(
-                ':')
+            local_protocol, local_network, local_content_format, _ = \
+                protocol_info.split(':')
             # print local_protocol,local_network,local_content_format
             if ((remote_protocol == local_protocol or
                  remote_protocol == '*' or
@@ -287,11 +295,13 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
                      remote_content_format == '*' or
                      local_content_format == '*')):
                 connection_id, avt_id, rcs_id = \
-                    self.add_connection(RemoteProtocolInfo,
-                                        Direction,
-                                        PeerConnectionID,
-                                        PeerConnectionManager)
-                return {'ConnectionID': connection_id, 'AVTransportID': avt_id,
+                    self.add_connection(
+                        RemoteProtocolInfo,
+                        Direction,
+                        PeerConnectionID,
+                        PeerConnectionManager)
+                return {'ConnectionID': connection_id,
+                        'AVTransportID': avt_id,
                         'RcsID': rcs_id}
 
         return failure.Failure(errorCode(701))

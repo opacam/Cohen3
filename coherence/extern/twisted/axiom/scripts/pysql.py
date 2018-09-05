@@ -13,5 +13,5 @@ while True:
         results = list(cur)
         if results:
             pprint(results)
-    except:
+    except Exception as e:
         traceback.print_exc()

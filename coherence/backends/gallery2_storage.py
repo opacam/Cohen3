@@ -56,24 +56,27 @@ class Gallery2Item(BackendItem):
         self.child_count = 0
         self.children = None
 
-        if (len(urlbase) and urlbase[-1] != '/'):
+        if len(urlbase) and urlbase[-1] != '/':
             urlbase += '/'
 
         if parent is None:
             self.gallery2_url = None
             self.url = urlbase + str(self.id)
         elif self.mimetype == 'directory':
-            # self.gallery2_url = parent.store.get_url_for_album(self.gallery2_id)
+            # self.gallery2_url = parent.store.get_url_for_album(
+            #     self.gallery2_id)
             self.url = urlbase + str(self.id)
         else:
-            self.gallery2_url = parent.store.get_url_for_image(self.gallery2_id)
+            self.gallery2_url = parent.store.get_url_for_image(
+                self.gallery2_id)
             self.url = urlbase + str(self.id)
             self.location = ProxyGallery2Image(self.gallery2_url)
 
         if self.mimetype == 'directory':
             self.update_id = 0
         else:
-            res = Resource(self.gallery2_url, 'http-get:*:%s:*' % self.mimetype)
+            res = Resource(self.gallery2_url,
+                           'http-get:*:%s:*' % self.mimetype)
             res.size = None
             self.item.res.append(res)
 
@@ -93,7 +96,8 @@ class Gallery2Item(BackendItem):
             self.update_id += 1
 
     def remove_child(self, child):
-        # self.info("remove_from %d (%s) child %d (%s)" % (self.id, self.get_name(), child.id, child.get_name()))
+        # self.info("remove_from %d (%s) child %d (%s)" % (
+        #     self.id, self.get_name(), child.id, child.get_name()))
         if child in self.children:
             self.child_count -= 1
             if isinstance(self.item, Container):
@@ -110,7 +114,7 @@ class Gallery2Item(BackendItem):
             else:
                 return self.children[start:request_count]
 
-        if (self.children is None):
+        if self.children is None:
             d = self.store.retrieveItemsForAlbum(self.gallery2_id, self)
             d.addCallback(process_items)
             return d
@@ -154,25 +158,30 @@ class Gallery2Store(BackendStore):
     implements = ['MediaServer']
 
     description = (
-    'Gallery2', 'exposes the photos from a Gallery2 photo repository.', None)
+        'Gallery2',
+        'exposes the photos from a Gallery2 photo repository.',
+        None)
 
-    options = [{'option': 'name', 'text': 'Server Name:', 'type': 'string',
-                'default': 'my media',
-                'help': 'the name under this MediaServer shall show up with on other UPnP clients'},
-               {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
-                'default': 2, 'enum': (2, 1),
-                'help': 'the highest UPnP version this MediaServer shall support',
-                'level': 'advance'},
-               {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
-                'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set',
-                'level': 'advance'},
-               {'option': 'server_url', 'text': 'Server URL:',
-                'type': 'string'},
-               {'option': 'username', 'text': 'User ID:', 'type': 'string',
-                'group': 'User Account'},
-               {'option': 'password', 'text': 'Password:', 'type': 'string',
-                'group': 'User Account'},
-               ]
+    options = [
+        {'option': 'name', 'text': 'Server Name:', 'type': 'string',
+         'default': 'my media',
+         'help': 'the name under this MediaServer '
+                 'shall show up with on other UPnP clients'},
+        {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
+         'default': 2, 'enum': (2, 1),
+         'help': 'the highest UPnP version this MediaServer shall support',
+         'level': 'advance'},
+        {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
+         'help': 'the unique (UPnP) identifier for this '
+                 'MediaServer, usually automatically set',
+         'level': 'advance'},
+        {'option': 'server_url', 'text': 'Server URL:',
+         'type': 'string'},
+        {'option': 'username', 'text': 'User ID:', 'type': 'string',
+         'group': 'User Account'},
+        {'option': 'password', 'text': 'Password:', 'type': 'string',
+         'group': 'User Account'},
+    ]
 
     def __init__(self, server, **kwargs):
         BackendStore.__init__(self, server, **kwargs)
@@ -191,15 +200,15 @@ class Gallery2Store(BackendStore):
         self.gallery2_username = self.config.get('username', None)
         self.gallery2_password = self.config.get('password', None)
 
-        self.store[1000] = Gallery2Item(1000, {'title': 'Gallery2',
-                                               'gallery2_id': '0',
-                                               'mimetype': 'directory'}, None,
-                                        'directory', self.urlbase, Container,
-                                        update=True)
+        self.store[1000] = Gallery2Item(
+            1000, {'title': 'Gallery2',
+                   'gallery2_id': '0',
+                   'mimetype': 'directory'},
+            None, 'directory', self.urlbase, Container, update=True)
         self.store[1000].store = self
 
         self.gallery2_remote = Gallery(self.gallery2_server_url, 2)
-        if not None in [self.gallery2_username, self.gallery2_password]:
+        if None not in [self.gallery2_username, self.gallery2_password]:
             d = self.gallery2_remote.login(self.gallery2_username,
                                            self.gallery2_password)
             d.addCallback(lambda x: self.retrieveAlbums('0', self.store[1000]))
@@ -230,13 +239,13 @@ class Gallery2Store(BackendStore):
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0,
-                                                                  'SystemUpdateID',
-                                                                  self.update_id)
+                self.server.content_directory_server.set_variable(
+                    0, 'SystemUpdateID', self.update_id)
             # if parent:
             #    value = (parent.get_id(),parent.get_update_id())
             #    if self.server:
-            #        self.server.content_directory_server.set_variable(0, 'ContainerUpdateIDs', value)
+            #        self.server.content_directory_server.set_variable(
+            #            0, 'ContainerUpdateIDs', value)
 
         if mimetype == 'directory':
             return self.store[id]
@@ -260,7 +269,7 @@ class Gallery2Store(BackendStore):
             id = 1000
         try:
             return self.store[id]
-        except:
+        except KeyError:
             return None
 
     def getnextID(self):
@@ -274,16 +283,21 @@ class Gallery2Store(BackendStore):
     def upnp_init(self):
         self.current_connection_id = None
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                               'http-get:*:image/jpeg:*,'
-                                                               'http-get:*:image/gif:*,'
-                                                               'http-get:*:image/png:*',
-                                                               default=True)
+            self.server.connection_manager_server.set_variable(
+                0,
+                'SourceProtocolInfo',
+                'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;'
+                'DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+                'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;'
+                'DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+                'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;'
+                'DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+                'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;'
+                'DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+                'http-get:*:image/jpeg:*,'
+                'http-get:*:image/gif:*,'
+                'http-get:*:image/png:*',
+                default=True)
 
     def retrieveAlbums(self, album_gallery2_id, parent):
         d = self.gallery2_remote.fetch_albums()

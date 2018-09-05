@@ -94,8 +94,8 @@ class RadiotimeStore(AbstractBackendStore):
             identification_param = "serial=%s" % self.serial
         formats_value = DEFAULT_FORMAT
         root_url = "%s?partnerId=%s&%s&formats=%s&locale=%s" % (
-        self.browse_url, self.partner_id, identification_param, formats_value,
-        self.locale)
+            self.browse_url, self.partner_id, identification_param,
+            formats_value, self.locale)
 
         # set root item
         root_item = LazyContainer(None, "root", "root", self.refresh,
@@ -110,20 +110,20 @@ class RadiotimeStore(AbstractBackendStore):
         self.wmc_mapping = {'4': self.get_root_id()}
 
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'http-get:*:audio/mpeg:*',
-                                                                   'http-get:*:audio/x-scpls:*'],
-                                                               default=True)
+            self.server.connection_manager_server.set_variable(
+                0, 'SourceProtocolInfo',
+                ['http-get:*:audio/mpeg:*',
+                 'http-get:*:audio/x-scpls:*'],
+                default=True)
 
     def retrieveItemsForOPML(self, parent, url):
 
         def append_outline(parent, outline):
             type = outline.get('type')
             if type is None:
-                # This outline is just a classification item containing other outline elements
-                # the corresponding item will a static Container
+                # This outline is just a classification item containing
+                # other outline elements the corresponding item
+                # will a static Container
                 text = outline.get('text')
                 key = outline.get('key')
                 external_id = None
@@ -150,8 +150,9 @@ class RadiotimeStore(AbstractBackendStore):
                     external_id = "%s_%s" % (parent.external_id, key)
                 if external_id is None:
                     external_id = outline_url
-                item = LazyContainer(parent, text, external_id, self.refresh,
-                                     self.retrieveItemsForOPML, url=outline_url)
+                item = LazyContainer(
+                    parent, text, external_id, self.refresh,
+                    self.retrieveItemsForOPML, url=outline_url)
                 parent.add_child(item, external_id=external_id)
 
             elif type == 'audio':

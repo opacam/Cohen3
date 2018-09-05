@@ -17,7 +17,7 @@ from coherence.upnp.core.utils import ReverseProxyUriResource
 
 try:
     import feedparser
-except:
+except ImportError:
     raise ImportError("""
         This backend depends on the feedparser module.
         You can get it at http://www.feedparser.org/.""")
@@ -84,7 +84,8 @@ class FeedEnclosure(BackendItem):
         self.location = RedirectingReverseProxyUriResource(
             enclosure.url.encode('latin-1'))
 
-        # doing this because some (Fraunhofer Podcast) feeds say there mime type is audio/x-mpeg
+        # doing this because some (Fraunhofer Podcast)
+        # feeds say there mime type is audio/x-mpeg
         # which at least my XBOX doesn't like
         ext = enclosure.url.rsplit('.', 1)[0]
         if ext in MIME_TYPES_EXTENTION_MAPPING:
@@ -127,26 +128,24 @@ class FeedStore(BackendStore):
                 "only feed_urls OR opml_url can be set")
 
         self.server = server
-        self.refresh = int(kwargs.get('refresh', 1)) * (
-                    60 * 60)  # TODO: not used yet
+        self.refresh = \
+            int(kwargs.get('refresh', 1)) * (60 * 60)  # TODO: not used yet
         self.store = {}
-        self.wmc_mapping = {'4': str(AUDIO_ALL_CONTAINER_ID),  # all tracks
-                            '7': str(AUDIO_ALBUM_CONTAINER_ID),  # all albums
-                            '6': str(AUDIO_ARTIST_CONTAINER_ID),  # all artists
-                            '15': str(VIDEO_FOLDER_CONTAINER_ID),  # all videos
-                            }
+        self.wmc_mapping = {
+            '4': str(AUDIO_ALL_CONTAINER_ID),  # all tracks
+            '7': str(AUDIO_ALBUM_CONTAINER_ID),  # all albums
+            '6': str(AUDIO_ARTIST_CONTAINER_ID),  # all artists
+            '15': str(VIDEO_FOLDER_CONTAINER_ID),  # all videos
+        }
 
-        self.store[ROOT_CONTAINER_ID] = FeedContainer(-1, ROOT_CONTAINER_ID,
-                                                      self.name)
-        self.store[AUDIO_ALL_CONTAINER_ID] = FeedContainer(-1,
-                                                           AUDIO_ALL_CONTAINER_ID,
-                                                           'AUDIO_ALL_CONTAINER')
-        self.store[AUDIO_ALBUM_CONTAINER_ID] = FeedContainer(-1,
-                                                             AUDIO_ALBUM_CONTAINER_ID,
-                                                             'AUDIO_ALBUM_CONTAINER')
-        self.store[VIDEO_FOLDER_CONTAINER_ID] = FeedContainer(-1,
-                                                              VIDEO_FOLDER_CONTAINER_ID,
-                                                              'VIDEO_FOLDER_CONTAINER')
+        self.store[ROOT_CONTAINER_ID] = FeedContainer(
+            -1, ROOT_CONTAINER_ID, self.name)
+        self.store[AUDIO_ALL_CONTAINER_ID] = FeedContainer(
+            -1, AUDIO_ALL_CONTAINER_ID, 'AUDIO_ALL_CONTAINER')
+        self.store[AUDIO_ALBUM_CONTAINER_ID] = FeedContainer(
+            -1, AUDIO_ALBUM_CONTAINER_ID, 'AUDIO_ALBUM_CONTAINER')
+        self.store[VIDEO_FOLDER_CONTAINER_ID] = FeedContainer(
+            -1, VIDEO_FOLDER_CONTAINER_ID, 'VIDEO_FOLDER_CONTAINER')
 
         try:
             self._update_data()
@@ -202,10 +201,9 @@ class FeedStore(BackendStore):
                 self.store[container_id])
             for item in fp_dict.entries:
                 for enclosure in item.enclosures:
-                    self.store[item_id] = FeedEnclosure(self, container_id,
-                                                        item_id, '%04d - %s' % (
-                                                        item_id, item.title),
-                                                        enclosure)
+                    self.store[item_id] = FeedEnclosure(
+                        self, container_id, item_id, '%04d - %s' % (
+                            item_id, item.title), enclosure)
                     self.store[container_id].children.append(
                         self.store[item_id])
                     if enclosure.type.startswith('audio'):
@@ -213,8 +211,10 @@ class FeedStore(BackendStore):
                             self.store[item_id])
                         if not isinstance(self.store[container_id].item,
                                           DIDLLite.MusicAlbum):
-                            self.store[container_id].item = DIDLLite.MusicAlbum(
-                                container_id, AUDIO_ALBUM_CONTAINER_ID, name)
+                            self.store[container_id].item = \
+                                DIDLLite.MusicAlbum(
+                                    container_id, AUDIO_ALBUM_CONTAINER_ID,
+                                    name)
 
                     item_id += 1
             if container_id <= 1000:

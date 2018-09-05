@@ -113,8 +113,9 @@ class SWR3Store(BackendStore, BackendRssMixin):
         self.next_id = 1000
         self.update_id = 0
         self.last_updated = None
-        self.store = {ROOT_CONTAINER_ID: Container(ROOT_CONTAINER_ID, self, -1,
-                                                   self.name)}
+        self.store = {
+            ROOT_CONTAINER_ID: Container(
+                ROOT_CONTAINER_ID, self, -1, self.name)}
 
         self.parse_opml()
         self.init_completed()
@@ -155,10 +156,8 @@ class SWR3Store(BackendStore, BackendRssMixin):
 
     def upnp_init(self):
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'http-get:*:audio/mpeg:*'])
+            self.server.connection_manager_server.set_variable(
+                0, 'SourceProtocolInfo', ['http-get:*:audio/mpeg:*'])
 
     def parse_data(self, xml_data, container):
         root = xml_data.getroot()

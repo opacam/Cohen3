@@ -63,31 +63,37 @@ class PlaylistStore(AbstractBackendStore):
 
     wmc_mapping = {'16': 1000}
 
-    description = ('Playlist',
-                   'exposes the list of video/audio streams from a m3u playlist (e.g. web TV listings published by french ISPs such as Free, SFR...).',
-                   None)
+    description = (
+        'Playlist',
+        'exposes the list of video/audio streams from a m3u playlist (e.g. '
+        'web TV listings published by french ISPs such as Free, SFR...).',
+        None)
 
-    options = [{'option': 'name', 'text': 'Server Name:', 'type': 'string',
-                'default': 'my media',
-                'help': 'the name under this MediaServer shall show up with on other UPnP clients'},
-               {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
-                'default': 2, 'enum': (2, 1),
-                'help': 'the highest UPnP version this MediaServer shall support',
-                'level': 'advance'},
-               {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
-                'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set',
-                'level': 'advance'},
-               {'option': 'playlist_url', 'text': 'Playlist file URL:',
-                'type': 'string', 'help': 'URL to the playlist file (M3U).'},
-               ]
+    options = [
+        {'option': 'name', 'text': 'Server Name:', 'type': 'string',
+         'default': 'my media',
+         'help': 'the name under this MediaServer '
+                 'shall show up with on other UPnP clients'},
+        {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
+         'default': 2, 'enum': (2, 1),
+         'help': 'the highest UPnP version this MediaServer shall support',
+         'level': 'advance'},
+        {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
+         'help': 'the unique (UPnP) identifier for this MediaServer, '
+                 'usually automatically set',
+         'level': 'advance'},
+        {'option': 'playlist_url', 'text': 'Playlist file URL:',
+         'type': 'string', 'help': 'URL to the playlist file (M3U).'},
+    ]
 
     playlist_url = None
 
     def __init__(self, server, **kwargs):
         AbstractBackendStore.__init__(self, server, **kwargs)
 
-        self.playlist_url = self.config.get('playlist_url',
-                                            'http://mafreebox.freebox.fr/freeboxtv/playlist.m3u')
+        self.playlist_url = self.config.get(
+            'playlist_url',
+            'http://mafreebox.freebox.fr/freeboxtv/playlist.m3u')
         self.name = self.config.get('name', 'playlist')
 
         self.init_completed()
@@ -115,15 +121,13 @@ class PlaylistStore(AbstractBackendStore):
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0,
-                                                                  'SystemUpdateID',
-                                                                  self.update_id)
+                self.server.content_directory_server.set_variable(
+                    0, 'SystemUpdateID', self.update_id)
             if parent:
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'ContainerUpdateIDs',
-                                                                      value)
+                    self.server.content_directory_server.set_variable(
+                        0, 'ContainerUpdateIDs', value)
 
         if mimetype == 'directory':
             return self.store[id]
@@ -133,14 +137,14 @@ class PlaylistStore(AbstractBackendStore):
     def upnp_init(self):
         self.current_connection_id = None
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'rtsp-rtp-udp:*:video/mpeg:*',
-                                                                   'http-get:*:video/mpeg:*',
-                                                                   'rtsp-rtp-udp:*:audio/mpeg:*',
-                                                                   'http-get:*:audio/mpeg:*'],
-                                                               default=True)
+            self.server.connection_manager_server.set_variable(
+                0,
+                'SourceProtocolInfo',
+                ['rtsp-rtp-udp:*:video/mpeg:*',
+                 'http-get:*:video/mpeg:*',
+                 'rtsp-rtp-udp:*:audio/mpeg:*',
+                 'http-get:*:audio/mpeg:*'],
+                default=True)
 
         rootItem = Container(None, self.name)
         self.set_root_item(rootItem)

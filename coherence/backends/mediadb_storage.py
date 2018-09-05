@@ -19,26 +19,27 @@ with proper tagged ones via some import tool
 or/and allow imports via the web-UI.
 
 depends on:
-            for the sqlite db handling:
+    for the sqlite db handling:
 
-                Axiom - http://divmod.org/trac/wiki/DivmodAxiom
-                Epsilon - http://divmod.org/trac/wiki/DivmodEpsilon
+        Axiom - http://divmod.org/trac/wiki/DivmodAxiom
+        Epsilon - http://divmod.org/trac/wiki/DivmodEpsilon
 
-            for id3 tag extraction:
+    for id3 tag extraction:
 
-                libmtag - http://code.google.com/p/libmtag/
-                taglib - http://developer.kde.org/~wheeler/taglib.html
+        libmtag - http://code.google.com/p/libmtag/
+        taglib - http://developer.kde.org/~wheeler/taglib.html
 
-                or
+        or
 
-                pyid3lib - http://pyid3lib.sourceforge.net/doc.html
+        pyid3lib - http://pyid3lib.sourceforge.net/doc.html
 
-                or
+        or
 
-                tagpy - http://news.tiker.net/software/tagpy
-                taglib - http://developer.kde.org/~wheeler/taglib.html
+        tagpy - http://news.tiker.net/software/tagpy
+        taglib - http://developer.kde.org/~wheeler/taglib.html
 
-            CoversByAmazon - https://coherence.beebits.net/browser/trunk/coherence/extern/covers_by_amazon.py
+    CoversByAmazon - https://coherence.beebits.net/browser/
+                     trunk/coherence/extern/covers_by_amazon.py
 """
 
 import os
@@ -86,7 +87,6 @@ def _dict_from_tags(tag):
 try:
     import libmtag
 
-
     def get_tags(filename):
         audio_file = libmtag.File(filename)
         tags = {}
@@ -100,7 +100,6 @@ except ImportError:
     try:
         import pyid3lib
 
-
         def get_tags(filename):
             audio_file = pyid3lib.tag(filename)
             return _dict_from_tags(audio_file)
@@ -108,7 +107,6 @@ except ImportError:
     except ImportError:
         try:
             import tagpy
-
 
             def get_tags(filename):
                 audio_file = tagpy.FileRef(filename)
@@ -118,7 +116,8 @@ except ImportError:
 
 if not get_tags:
     raise ImportError(
-        "we need some installed id3 tag library for this backend: python-tagpy, pyid3lib or libmtag")
+        "we need some installed id3 tag library for this backend: "
+        "python-tagpy, pyid3lib or libmtag")
 
 MEDIA_DB = 'tests/media.db'
 
@@ -141,8 +140,8 @@ def sanitize(filename):
 class Container(BackendItem):
     get_path = None
 
-    def __init__(self, id, parent_id, name, children_callback=None, store=None,
-                 play_container=False):
+    def __init__(self, id, parent_id, name, children_callback=None,
+                 store=None, play_container=False):
         BackendItem.__init__(self)
         self.id = id
         self.parent_id = parent_id
@@ -180,10 +179,10 @@ class Container(BackendItem):
         item.childCount = self.get_child_count()
         if self.store and self.play_container:
             if item.childCount > 0:
-                res = DIDLLite.PlayContainerResource(self.store.server.uuid,
-                                                     cid=self.get_id(),
-                                                     fid=self.get_children()[
-                                                         0].get_id())
+                res = DIDLLite.PlayContainerResource(
+                    self.store.server.uuid,
+                    cid=self.get_id(),
+                    fid=self.get_children()[0].get_id())
                 item.res.append(res)
         return item
 
@@ -207,14 +206,13 @@ class Artist(item.Item, BackendItem):
     get_path = None
 
     def get_artist_all_tracks(self, start=0, request_count=0):
-        children = [x[1] for x in list(self.store.query((Album, Track),
-                                                        attributes.AND(
-                                                            Album.artist == self,
-                                                            Track.album == Album.storeID),
-                                                        sort=(
-                                                        Album.title.ascending,
-                                                        Track.track_nr.ascending)
-                                                        ))]
+        children = [x[1] for x in list(
+            self.store.query(
+                (Album, Track),
+                attributes.AND(Album.artist == self,
+                               Track.album == Album.storeID),
+                sort=(Album.title.ascending, Track.track_nr.ascending)
+            ))]
         if request_count == 0:
             return children[start:]
         else:
@@ -294,10 +292,10 @@ class Album(item.Item, BackendItem):
                 (self.store.urlbase, str(self.get_id()), '?cover', ext))
 
         if self.get_child_count() > 0:
-            res = DIDLLite.PlayContainerResource(self.store.server.uuid,
-                                                 cid=self.get_id(),
-                                                 fid=self.get_children()[
-                                                     0].get_id())
+            res = DIDLLite.PlayContainerResource(
+                self.store.server.uuid,
+                cid=self.get_id(),
+                fid=self.get_children()[0].get_id())
             item.res.append(res)
         return item
 
@@ -311,12 +309,14 @@ class Album(item.Item, BackendItem):
         return self.cover
 
     def __repr__(self):
-        return '<Album %d title="%s" artist="%s" #cds %d cover="%s" musicbrainz="%s">' \
-               % (self.storeID, self.title.encode('ascii', 'ignore'),
-                  self.artist.name.encode('ascii', 'ignore'),
-                  self.cd_count,
-                  self.cover.encode('ascii', 'ignore'),
-                  self.musicbrainz_id)
+        return \
+            '<Album %d title="%s" artist="%s" #cds %d cover="%s" ' \
+            'musicbrainz="%s">' % (
+                self.storeID, self.title.encode('ascii', 'ignore'),
+                self.artist.name.encode('ascii', 'ignore'),
+                self.cd_count,
+                self.cover.encode('ascii', 'ignore'),
+                self.musicbrainz_id)
 
 
 class Track(item.Item, BackendItem):
@@ -374,7 +374,7 @@ class Track(item.Item, BackendItem):
                                 'internal:%s:%s:*' % (host, mimetype))
         try:
             res.size = statinfo.st_size
-        except:
+        except Exception:
             res.size = 0
         item.res.append(res)
 
@@ -383,34 +383,38 @@ class Track(item.Item, BackendItem):
         res = DIDLLite.Resource(url, 'http-get:*:%s:*' % mimetype)
         try:
             res.size = statinfo.st_size
-        except:
+        except Exception:
             res.size = 0
         item.res.append(res)
 
-        # if self.store.server.coherence.config.get('transcoding', 'no') == 'yes':
-        #    if mimetype in ('audio/mpeg',
-        #                    'application/ogg','audio/ogg',
-        #                    'audio/x-m4a',
-        #                    'application/x-flac'):
-        #        dlna_pn = 'DLNA.ORG_PN=LPCM'
-        #        dlna_tags = DIDLLite.simple_dlna_tags[:]
-        #        dlna_tags[1] = 'DLNA.ORG_CI=1'
-        #        #dlna_tags[2] = 'DLNA.ORG_OP=00'
-        #        new_res = DIDLLite.Resource(url+'?transcoded=lpcm',
-        #            'http-get:*:%s:%s' % ('audio/L16;rate=44100;channels=2', ';'.join([dlna_pn]+dlna_tags)))
-        #        new_res.size = None
-        #        item.res.append(new_res)
+        # if self.store.server.coherence.config.get(
+        #         'transcoding', 'no') == 'yes':
+        #     if mimetype in ('audio/mpeg',
+        #                     'application/ogg','audio/ogg',
+        #                     'audio/x-m4a',
+        #                     'application/x-flac'):
+        #         dlna_pn = 'DLNA.ORG_PN=LPCM'
+        #         dlna_tags = DIDLLite.simple_dlna_tags[:]
+        #         dlna_tags[1] = 'DLNA.ORG_CI=1'
+        #         #dlna_tags[2] = 'DLNA.ORG_OP=00'
+        #         new_res = DIDLLite.Resource(
+        #             url+'?transcoded=lpcm',
+        #             'http-get:*:%s:%s' % (
+        #                 'audio/L16;rate=44100;channels=2', ';'.join(
+        #                     [dlna_pn]+dlna_tags)))
+        #         new_res.size = None
+        #         item.res.append(new_res)
         #
-        #        if mimetype != 'audio/mpeg':
-        #            new_res = DIDLLite.Resource(url+'?transcoded=mp3',
-        #                'http-get:*:%s:*' % 'audio/mpeg')
-        #            new_res.size = None
-        #            item.res.append(new_res)
+        #         if mimetype != 'audio/mpeg':
+        #             new_res = DIDLLite.Resource(url+'?transcoded=mp3',
+        #                 'http-get:*:%s:*' % 'audio/mpeg')
+        #             new_res.size = None
+        #             item.res.append(new_res)
 
         try:
             # FIXME: getmtime is deprecated in Twisted 2.6
             item.date = datetime.fromtimestamp(statinfo.st_mtime)
-        except:
+        except Exception:
             item.date = None
 
         return item
@@ -431,12 +435,13 @@ class Track(item.Item, BackendItem):
         return self.album.cover
 
     def __repr__(self):
-        return '<Track %d title="%s" nr="%d" album="%s" artist="%s" path="%s">' \
-               % (self.storeID, self.title.encode('ascii', 'ignore'),
-                  self.track_nr,
-                  self.album.title.encode('ascii', 'ignore'),
-                  self.album.artist.name.encode('ascii', 'ignore'),
-                  self.location.encode('ascii', 'ignore'))
+        return \
+            '<Track %d title="%s" nr="%d" album="%s" artist="%s" path="%s">' \
+            % (self.storeID, self.title.encode('ascii', 'ignore'),
+               self.track_nr,
+               self.album.title.encode('ascii', 'ignore'),
+               self.album.artist.name.encode('ascii', 'ignore'),
+               self.location.encode('ascii', 'ignore'))
 
 
 class Playlist(item.Item, BackendItem):
@@ -544,27 +549,31 @@ class MediaStore(BackendStore):
                 title = 'UNKNOWN_TITLE'
             # print "Tags:", file, album, artist, title, track
 
-            artist_ds = self.db.findOrCreate(Artist, name=str(artist, 'utf8'))
-            album_ds = self.db.findOrCreate(Album,
-                                            title=str(album, 'utf8'),
-                                            artist=artist_ds)
+            artist_ds = self.db.findOrCreate(
+                Artist, name=str(artist, 'utf8'))
+            album_ds = self.db.findOrCreate(
+                Album,
+                title=str(album, 'utf8'),
+                artist=artist_ds)
             if len(album_ds.cover) == 0:
                 dirname = str(os.path.dirname(file), 'utf-8')
                 album_ds.cover = check_for_cover_art(dirname)
                 if len(album_ds.cover) > 0:
                     filename = "%s - %s" % (
-                    album_ds.artist.name, album_ds.title)
+                        album_ds.artist.name, album_ds.title)
                     filename = sanitize(
                         filename + os.path.splitext(album_ds.cover)[1])
                     filename = os.path.join(dirname, filename)
-                    shutil.move(os.path.join(dirname, album_ds.cover), filename)
+                    shutil.move(os.path.join(dirname, album_ds.cover),
+                                filename)
                     album_ds.cover = filename
             # print album_ds.cover
-            track_ds = self.db.findOrCreate(Track,
-                                            title=str(title, 'utf8'),
-                                            track_nr=int(track),
-                                            album=album_ds,
-                                            location=str(file, 'utf8'))
+            track_ds = self.db.findOrCreate(
+                Track,
+                title=str(title, 'utf8'),
+                track_nr=int(track),
+                album=album_ds,
+                location=str(file, 'utf8'))
 
         for file in self.filelist:
             d = defer.maybeDeferred(get_tags, file)
@@ -590,29 +599,34 @@ class MediaStore(BackendStore):
         artist = self.db.query(Artist,Artist.name == artist_name)
         artist = list(artist)[0]
         for album in list(self.db.query(Album, Album.artist == artist)):
-            for track in list(self.db.query(Track, Track.album == album,sort=Track.title.ascending)):
-                print track
+            for track in list(
+                    self.db.query(
+                        Track, Track.album == album,
+                        sort=Track.title.ascending)):
+                print(track)
         """
-        for track in [x[2] for x in list(self.db.query((Artist, Album, Track),
-                                                       attributes.AND(
-                                                           Artist.name == artist_name,
-                                                           Album.artist == Artist.storeID,
-                                                           Track.album == Album.storeID),
-                                                       sort=(
-                                                       Track.title.ascending)
-                                                       ))]:
+        for track in [x[2] for x in list(
+                self.db.query(
+                    (Artist, Album, Track),
+                    attributes.AND(Artist.name == artist_name,
+                                   Album.artist == Artist.storeID,
+                                   Track.album == Album.storeID),
+                    sort=Track.title.ascending
+                ))]:
             print(track)
 
     def show_tracks_by_title(self, title_or_part):
         for track in list(
-                self.db.query(Track, Track.title.like('%', title_or_part, '%'),
-                              sort=Track.title.ascending)):
+                self.db.query(
+                    Track, Track.title.like('%', title_or_part, '%'),
+                    sort=Track.title.ascending)):
             print(track)
 
     def show_tracks_to_filename(self, title_or_part):
         for track in list(
-                self.db.query(Track, Track.title.like('%', title_or_part, '%'),
-                              sort=Track.title.ascending)):
+                self.db.query(
+                    Track, Track.title.like('%', title_or_part, '%'),
+                    sort=Track.title.ascending)):
             print(track.title, track.album.artist.name, track.track_nr)
             _, ext = os.path.splitext(track.path)
             f = "%02d - %s - %s%s" % (track.track_nr, track.album.artist.name,
@@ -627,7 +641,8 @@ class MediaStore(BackendStore):
             filename = sanitize(filename)
 
             if self.coverlocation is not None:
-                cover_path = os.path.join(self.coverlocation, filename + '.jpg')
+                cover_path = os.path.join(
+                    self.coverlocation, filename + '.jpg')
                 if os.path.exists(cover_path) is True:
                     print("cover found:", cover_path)
                     album.cover = cover_path
@@ -638,7 +653,7 @@ class MediaStore(BackendStore):
 
                     aws_key = '1XHSE4FQJ0RK0X3S9WR2'
                     CoverGetter(cover_path, aws_key,
-                                callback=(got_it, (album)),
+                                callback=(got_it, album),
                                 artist=album.artist.name,
                                 title=album.title)
 
@@ -651,7 +666,7 @@ class MediaStore(BackendStore):
         if isinstance(id, str) and id.startswith('artist_all_tracks_'):
             try:
                 return self.containers[id]
-            except:
+            except KeyError:
                 return None
         try:
             id = int(id)
@@ -659,11 +674,12 @@ class MediaStore(BackendStore):
             id = 1000
         try:
             item = self.containers[id]
-        except:
+        except KeyError:
             try:
                 item = self.db.getItemByID(id - 1000)
-            except:
+            except Exception as e:
                 item = None
+                self.warning("get_by_id not found %r", e)
         self.info("get_by_id found %s", item)
         return item
 
@@ -711,26 +727,25 @@ class MediaStore(BackendStore):
 
         self.current_connection_id = None
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'internal:%s:audio/mpeg:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:audio/mpeg:*',
-                                                                   'internal:%s:application/ogg:*' % self.server.coherence.hostname,
-                                                                   'http-get:*:application/ogg:*'],
-                                                               default=True)
+            self.server.connection_manager_server.set_variable(
+                0,
+                'SourceProtocolInfo',
+                ['internal:%s:audio/mpeg:*' % self.server.coherence.hostname,
+                 'http-get:*:audio/mpeg:*',
+                 'internal:%s:application/ogg:*' %
+                 self.server.coherence.hostname,
+                 'http-get:*:application/ogg:*'],
+                default=True)
 
 
 if __name__ == '__main__':
     from twisted.internet import reactor
-
 
     def run():
         m = MediaStore(None, medialocation='/data/audio/music',
                        coverlocation='/data/audio/covers',
                        mediadb='/tmp/media.db')
         m.upnp_init()
-
 
     reactor.callWhenRunning(run)
     reactor.run()

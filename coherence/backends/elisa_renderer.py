@@ -39,7 +39,7 @@ class ElisaPlayer(log.LogAble, Plugin):
                 self.player = common.get_application().get_player()
                 louie.send('Coherence.UPnP.Backend.init_completed', None,
                            backend=self)
-            except:
+            except ImportError:
                 self.warning("this works only from within Elisa")
                 raise ImportError
         else:
@@ -88,8 +88,9 @@ class ElisaPlayer(log.LogAble, Plugin):
         def got_result(result):
             self.info("poll_player %r", result)
             if self.server is not None:
-                connection_id = self.server.connection_manager_server.lookup_avt_id(
-                    self.current_connection_id)
+                connection_id = \
+                    self.server.connection_manager_server.lookup_avt_id(
+                        self.current_connection_id)
             if result in ('STOPPED', 'READY'):
                 transport_state = 'STOPPED'
             if result == 'PLAYING':
@@ -103,9 +104,8 @@ class ElisaPlayer(log.LogAble, Plugin):
             if self.state != transport_state:
                 self.state = transport_state
                 if self.server is not None:
-                    self.server.av_transport_server.set_variable(connection_id,
-                                                                 'TransportState',
-                                                                 transport_state)
+                    self.server.av_transport_server.set_variable(
+                        connection_id, 'TransportState', transport_state)
 
         self.call_player("get_readable_state", got_result)
 
@@ -114,37 +114,34 @@ class ElisaPlayer(log.LogAble, Plugin):
             self.info("query_position %s", result)
             position, duration = result
             if self.server is not None:
-                connection_id = self.server.connection_manager_server.lookup_avt_id(
-                    self.current_connection_id)
-                self.server.av_transport_server.set_variable(connection_id,
-                                                             'CurrentTrack', 0)
+                connection_id = \
+                    self.server.connection_manager_server.lookup_avt_id(
+                        self.current_connection_id)
+                self.server.av_transport_server.set_variable(
+                    connection_id, 'CurrentTrack', 0)
 
             if position is not None:
                 m, s = divmod(position / 1000000000, 60)
                 h, m = divmod(m, 60)
                 if self.server is not None:
-                    self.server.av_transport_server.set_variable(connection_id,
-                                                                 'RelativeTimePosition',
-                                                                 '%02d:%02d:%02d' % (
-                                                                 h, m, s))
-                    self.server.av_transport_server.set_variable(connection_id,
-                                                                 'AbsoluteTimePosition',
-                                                                 '%02d:%02d:%02d' % (
-                                                                 h, m, s))
+                    self.server.av_transport_server.set_variable(
+                        connection_id, 'RelativeTimePosition',
+                        '%02d:%02d:%02d' % (h, m, s))
+                    self.server.av_transport_server.set_variable(
+                        connection_id, 'AbsoluteTimePosition',
+                        '%02d:%02d:%02d' % (h, m, s))
 
             if duration is not None:
                 m, s = divmod(duration / 1000000000, 60)
                 h, m = divmod(m, 60)
 
                 if self.server is not None:
-                    self.server.av_transport_server.set_variable(connection_id,
-                                                                 'CurrentTrackDuration',
-                                                                 '%02d:%02d:%02d' % (
-                                                                 h, m, s))
-                    self.server.av_transport_server.set_variable(connection_id,
-                                                                 'CurrentMediaDuration',
-                                                                 '%02d:%02d:%02d' % (
-                                                                 h, m, s))
+                    self.server.av_transport_server.set_variable(
+                        connection_id, 'CurrentTrackDuration',
+                        '%02d:%02d:%02d' % (h, m, s))
+                    self.server.av_transport_server.set_variable(
+                        connection_id, 'CurrentMediaDuration',
+                        '%02d:%02d:%02d' % (h, m, s))
 
                 if self.duration is None:
                     if self.metadata is not None:
@@ -152,7 +149,7 @@ class ElisaPlayer(log.LogAble, Plugin):
                         for item in elt:
                             for res in item.findall('res'):
                                 res.attrib['duration'] = "%d:%02d:%02d" % (
-                                h, m, s)
+                                    h, m, s)
                         self.metadata = elt.toString()
 
                         if self.server is not None:
@@ -173,25 +170,23 @@ class ElisaPlayer(log.LogAble, Plugin):
             self.duration = None
             self.metadata = metadata
             self.tags = {}
-            connection_id = self.server.connection_manager_server.lookup_avt_id(
-                self.current_connection_id)
-            self.server.av_transport_server.set_variable(connection_id,
-                                                         'CurrentTransportActions',
-                                                         'Play,Stop,Pause')
-            self.server.av_transport_server.set_variable(connection_id,
-                                                         'NumberOfTracks', 1)
-            self.server.av_transport_server.set_variable(connection_id,
-                                                         'CurrentTrackURI', uri)
-            self.server.av_transport_server.set_variable(connection_id,
-                                                         'AVTransportURI', uri)
-            self.server.av_transport_server.set_variable(connection_id,
-                                                         'AVTransportURIMetaData',
-                                                         metadata)
-            self.server.av_transport_server.set_variable(connection_id,
-                                                         'CurrentTrackURI', uri)
-            self.server.av_transport_server.set_variable(connection_id,
-                                                         'CurrentTrackMetaData',
-                                                         metadata)
+            connection_id = \
+                self.server.connection_manager_server.lookup_avt_id(
+                    self.current_connection_id)
+            self.server.av_transport_server.set_variable(
+                connection_id, 'CurrentTransportActions', 'Play,Stop,Pause')
+            self.server.av_transport_server.set_variable(
+                connection_id, 'NumberOfTracks', 1)
+            self.server.av_transport_server.set_variable(
+                connection_id, 'CurrentTrackURI', uri)
+            self.server.av_transport_server.set_variable(
+                connection_id, 'AVTransportURI', uri)
+            self.server.av_transport_server.set_variable(
+                connection_id, 'AVTransportURIMetaData', metadata)
+            self.server.av_transport_server.set_variable(
+                connection_id, 'CurrentTrackURI', uri)
+            self.server.av_transport_server.set_variable(
+                connection_id, 'CurrentTrackMetaData', metadata)
 
         self.call_player("set_uri", got_result, uri)
 
@@ -201,27 +196,27 @@ class ElisaPlayer(log.LogAble, Plugin):
 
     def stop(self):
         def got_result(result):
-            self.server.av_transport_server.set_variable( \
+            self.server.av_transport_server.set_variable(
                 self.server.connection_manager_server.lookup_avt_id(
-                    self.current_connection_id), \
+                    self.current_connection_id),
                 'TransportState', 'STOPPED')
 
         self.call_player("stop", got_result)
 
     def play(self):
         def got_result(result):
-            self.server.av_transport_server.set_variable( \
+            self.server.av_transport_server.set_variable(
                 self.server.connection_manager_server.lookup_avt_id(
-                    self.current_connection_id), \
+                    self.current_connection_id),
                 'TransportState', 'PLAYING')
 
         self.call_player("play", got_result)
 
     def pause(self):
         def got_result(result):
-            self.server.av_transport_server.set_variable( \
+            self.server.av_transport_server.set_variable(
                 self.server.connection_manager_server.lookup_avt_id(
-                    self.current_connection_id), \
+                    self.current_connection_id),
                 'TransportState', 'PAUSED_PLAYBACK')
 
         self.call_player("pause", got_result)
@@ -238,8 +233,8 @@ class ElisaPlayer(log.LogAble, Plugin):
             rcs_id = self.server.connection_manager_server.lookup_rcs_id(
                 self.current_connection_id)
             # FIXME: use result, not True
-            self.server.rendering_control_server.set_variable(rcs_id, 'Mute',
-                                                              'True')
+            self.server.rendering_control_server.set_variable(
+                rcs_id, 'Mute', 'True')
 
         self.call_player("mute", got_result)
 
@@ -248,8 +243,8 @@ class ElisaPlayer(log.LogAble, Plugin):
             rcs_id = self.server.connection_manager_server.lookup_rcs_id(
                 self.current_connection_id)
             # FIXME: use result, not False
-            self.server.rendering_control_server.set_variable(rcs_id, 'Mute',
-                                                              'False')
+            self.server.rendering_control_server.set_variable(
+                rcs_id, 'Mute', 'False')
 
         self.call_player("un_mute", got_result)
 
@@ -288,26 +283,22 @@ class ElisaPlayer(log.LogAble, Plugin):
 
     def upnp_init(self):
         self.current_connection_id = None
-        self.server.connection_manager_server.set_variable(0,
-                                                           'SinkProtocolInfo',
-                                                           [
-                                                               'internal:%s:*:*' % self.host,
-                                                               'http-get:*:audio/mpeg:*'],
-                                                           default=True)
-        self.server.av_transport_server.set_variable(0, 'TransportState',
-                                                     'NO_MEDIA_PRESENT',
-                                                     default=True)
-        self.server.av_transport_server.set_variable(0, 'TransportStatus', 'OK',
-                                                     default=True)
-        self.server.av_transport_server.set_variable(0, 'CurrentPlayMode',
-                                                     'NORMAL', default=True)
-        self.server.av_transport_server.set_variable(0,
-                                                     'CurrentTransportActions',
-                                                     '', default=True)
-        self.server.rendering_control_server.set_variable(0, 'Volume',
-                                                          self.get_volume())
-        self.server.rendering_control_server.set_variable(0, 'Mute',
-                                                          self.get_mute())
+        self.server.connection_manager_server.set_variable(
+            0, 'SinkProtocolInfo',
+            ['internal:%s:*:*' % self.host, 'http-get:*:audio/mpeg:*'],
+            default=True)
+        self.server.av_transport_server.set_variable(
+            0, 'TransportState', 'NO_MEDIA_PRESENT', default=True)
+        self.server.av_transport_server.set_variable(
+            0, 'TransportStatus', 'OK', default=True)
+        self.server.av_transport_server.set_variable(
+            0, 'CurrentPlayMode', 'NORMAL', default=True)
+        self.server.av_transport_server.set_variable(
+            0, 'CurrentTransportActions', '', default=True)
+        self.server.rendering_control_server.set_variable(
+            0, 'Volume', self.get_volume())
+        self.server.rendering_control_server.set_variable(
+            0, 'Mute', self.get_mute())
         self.poll_LC.start(1.0, True)
 
     def upnp_Play(self, *args, **kwargs):
@@ -330,8 +321,9 @@ class ElisaPlayer(log.LogAble, Plugin):
         InstanceID = int(kwargs['InstanceID'])
         CurrentURI = kwargs['CurrentURI']
         CurrentURIMetaData = kwargs['CurrentURIMetaData']
-        local_protocol_infos = self.server.connection_manager_server.get_variable(
-            'SinkProtocolInfo').value.split(',')
+        local_protocol_infos = \
+            self.server.connection_manager_server.get_variable(
+                'SinkProtocolInfo').value.split(',')
         # print '>>>', local_protocol_infos
         if len(CurrentURIMetaData) == 0:
             self.load(CurrentURI, CurrentURIMetaData)
@@ -345,8 +337,9 @@ class ElisaPlayer(log.LogAble, Plugin):
                     res = item.res.get_matching(local_protocol_infos)
                 if len(res) > 0:
                     res = res[0]
-                    remote_protocol, remote_network, remote_content_format, _ = res.protocolInfo.split(
-                        ':')
+                    remote_protocol, remote_network, \
+                        remote_content_format, _ = res.protocolInfo.split(
+                            ':')
                     self.load(res.data, CurrentURIMetaData)
                     return {}
         return failure.Failure(errorCode(714))

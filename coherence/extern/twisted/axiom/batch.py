@@ -169,17 +169,17 @@ class _ReliableListener(item.Item):
     """)
 
     def __repr__(self):
-        return '<ReliableListener %s %r #%r>' % ({iaxiom.REMOTE: 'remote',
-                                                  iaxiom.LOCAL: 'local'}[
-                                                     self.style],
-                                                 self.listener,
-                                                 self.storeID)
+        return \
+            '<ReliableListener %s %r #%r>' % \
+            ({iaxiom.REMOTE: 'remote',
+              iaxiom.LOCAL: 'local'}[self.style],
+             self.listener, self.storeID)
 
     def addItem(self, item):
         assert type(item) is self.processor.workUnitType, \
             "Adding work unit of type %r to listener for type %r" % (
                 type(item), self.processor.workUnitType)
-        if item.storeID >= self.backwardMark and item.storeID <= self.forwardMark:
+        if self.backwardMark <= item.storeID <= self.forwardMark:
             _ReliableTracker(store=self.store,
                              listener=self,
                              item=item)
@@ -214,10 +214,11 @@ class _ReliableListener(item.Item):
             log.msg("Processing a unit of work: %r" % (workUnit,))
         try:
             self.listener.processItem(workUnit)
-        except:
+        except Exception as er:
             f = failure.Failure()
             if VERBOSE:
-                log.msg("Processing failed: %s" % (f.getErrorMessage(),))
+                log.msg("Processing failed: %s [ERROR: %r]" % (
+                    f.getErrorMessage(), er,))
                 log.err(f)
             raise failureType(self, workUnit, f)
 
@@ -261,26 +262,26 @@ class _BatchProcessorMixin:
         now = extime.Time()
         first = True
 
-        for listener in self.store.query(_ReliableListener,
-                                         attributes.AND(
-                                             _ReliableListener.processor == self,
-                                             _ReliableListener.style == style,
-                                             _ReliableListener.listener.notOneOf(
-                                                 skip)),
-                                         sort=_ReliableListener.lastRun.ascending):
+        for listener in self.store.query(
+                _ReliableListener,
+                attributes.AND(
+                    _ReliableListener.processor == self,
+                    _ReliableListener.style == style,
+                    _ReliableListener.listener.notOneOf(skip)),
+                sort=_ReliableListener.lastRun.ascending):
             if not first:
                 if VERBOSE:
                     log.msg(
-                        "Found more work to do, returning True from %r.step()" % (
-                        self,))
+                        "Found more work to do, returning True from "
+                        "%r.step()" % (self,))
                 return True
             listener.lastRun = now
             try:
                 if listener.step():
                     if VERBOSE:
-                        log.msg(
-                            "%r.step() reported more work to do, returning True from %r.step()" % (
-                            listener, self))
+                        log.msg("%r.step() reported more work to do, "
+                                "returning True from %r.step()" % (
+                                    listener, self))
                     return True
             except _NoWorkUnits:
                 if VERBOSE:
@@ -288,9 +289,8 @@ class _BatchProcessorMixin:
             else:
                 first = False
         if VERBOSE:
-            log.msg(
-                "No listeners left with work, returning False from %r.step()" % (
-                self,))
+            log.msg("No listeners left with work, returning False from "
+                    "%r.step()" % (self,))
         return False
 
     def run(self):
@@ -333,11 +333,12 @@ class _BatchProcessorMixin:
 
         @return: An Item representing L{listener}'s persistent tracking state.
         """
-        existing = self.store.findUnique(_ReliableListener,
-                                         attributes.AND(
-                                             _ReliableListener.processor == self,
-                                             _ReliableListener.listener == listener),
-                                         default=None)
+        existing = self.store.findUnique(
+            _ReliableListener,
+            attributes.AND(
+                _ReliableListener.processor == self,
+                _ReliableListener.listener == listener),
+            default=None)
         if existing is not None:
             return existing
 
@@ -366,12 +367,16 @@ class _BatchProcessorMixin:
         """
         Remove a previously added listener.
         """
-        self.store.query(_ReliableListener,
-                         attributes.AND(_ReliableListener.processor == self,
-                                        _ReliableListener.listener == listener)).deleteFromStore()
-        self.store.query(BatchProcessingError,
-                         attributes.AND(BatchProcessingError.processor == self,
-                                        BatchProcessingError.listener == listener)).deleteFromStore()
+        self.store.query(
+            _ReliableListener,
+            attributes.AND(
+                _ReliableListener.processor == self,
+                _ReliableListener.listener == listener)).deleteFromStore()
+        self.store.query(
+            BatchProcessingError,
+            attributes.AND(
+                BatchProcessingError.processor == self,
+                BatchProcessingError.listener == listener)).deleteFromStore()
 
     def getReliableListeners(self):
         """
@@ -491,7 +496,7 @@ def processor(forType):
             '__init__': __init__,
 
             '__repr__': lambda self: '<Batch of %s #%d>' % (
-            reflect.qual(self.workUnitType), self.storeID),
+                reflect.qual(self.workUnitType), self.storeID),
 
             'schemaVersion': 2,
 
@@ -1077,9 +1082,9 @@ class BatchProcessingProtocol(JuiceChild):
         except eaxiom.SQLError as e:
             # Generally, database is locked.
             log.msg("SubStore query failed with SQLError: %r" % (e,))
-        except:
+        except Exception as e:
             # WTF?
-            log.msg("SubStore query failed with bad error:")
+            log.msg("SubStore query failed with bad error: %r" % (e,))
             log.err()
         else:
             for removed in set(self.subStores) - paths:
@@ -1094,12 +1099,13 @@ class BatchProcessingProtocol(JuiceChild):
                     # Generally, database is locked.
                     log.msg(
                         "Opening sub-Store failed with SQLError: %r" % (e,))
-                except:
-                    log.msg("Opening sub-Store failed with bad error:")
+                except Exception as e:
+                    log.msg(
+                        "Opening sub-Store failed with bad error: %r" % (e,))
                     log.err()
                 else:
-                    self.subStores[added] = BatchProcessingService(s,
-                                                                   style=iaxiom.REMOTE)
+                    self.subStores[added] = BatchProcessingService(
+                        s, style=iaxiom.REMOTE)
                     self.subStores[added].setServiceParent(self.service)
                     if VERBOSE:
                         log.msg("Added SubStore " + added)
@@ -1107,7 +1113,8 @@ class BatchProcessingProtocol(JuiceChild):
 
 class BatchProcessingService(service.Service):
     """
-    Steps over the L{iaxiom.IBatchProcessor} powerups for a single L{axiom.store.Store}.
+    Steps over the L{iaxiom.IBatchProcessor} powerups
+    for a single L{axiom.store.Store}.
     """
 
     def __init__(self, store, style=iaxiom.LOCAL):
@@ -1162,14 +1169,14 @@ class BatchProcessingService(service.Service):
                 item = items.pop()
                 if VERBOSE:
                     log.msg("Stepping processor %r (suspended is %r)" % (
-                    item, self.suspended))
+                        item, self.suspended))
                 try:
                     itemHasMore = item.store.transact(item.step,
                                                       style=self.style,
                                                       skip=self.suspended)
                 except _ProcessingFailure as e:
                     log.msg("%r failed while processing %r:" % (
-                    e.reliableListener, e.workUnit))
+                        e.reliableListener, e.workUnit))
                     log.err(e.failure)
                     e.mark()
 

@@ -11,23 +11,25 @@
     or in the config as an XMl fragment
 
     coherence --plugin=backend:TestStore,name:Test,\
-                       item:<item><location>audio.mp3</location>\
-                            <mimetype>audio/mpeg</mimetype></item>,\
-                       item:<item><location>audio.ogg</location>\
-                            <mimetype>audio/ogg</mimetype></item>
+       item:<item><location>audio.mp3</location>\
+            <mimetype>audio/mpeg</mimetype></item>,\
+       item:<item><location>audio.ogg</location>\
+            <mimetype>audio/ogg</mimetype></item>
 
     coherence --plugin="backend:TestStore,name:Test,\
-                       item:<item><type>gstreamer</type>\
-                            <pipeline>v4l2src num-buffers=1 ! video/x-raw-yuv,width=640,height=480 ! ffmpegcolorspace ! jpegenc name=enc</pipeline>\
-                            <mimetype>image/jpeg></mimetype></item>"
+       item:<item><type>gstreamer</type>\
+            <pipeline>v4l2src num-buffers=1 ! video/x-raw-yuv,width=640,\
+            height=480 ! ffmpegcolorspace ! jpegenc name=enc</pipeline>\
+            <mimetype>image/jpeg></mimetype></item>"
 
-                "video/x-raw-yuv,width=640,height=480" won't work here as it is a delimiter for the plugin string,
-                so if you need things like that in the pipeline, you need to use a config file
+    "video/x-raw-yuv,width=640,height=480" won't work here as it is a delimiter
+     for the plugin string, so if you need things like that in the pipeline,
+      you need to use a config file
 
     coherence --plugin="backend:TestStore,name:Test,\
-                        item:<item><type>process</type>\
-                            <command>man date</command>\
-                            <mimetype>text/html</mimetype></item>"
+        item:<item><type>process</type>\
+            <command>man date</command>\
+            <mimetype>text/html</mimetype></item>"
 
     The XML fragment has these elements:
 
@@ -46,8 +48,9 @@
     'fourth_field': value for the 4th field of the protocolInfo phalanx,
                     default is '*'
     'pipeline': a GStreamer pipeline that has to end with a bin named 'enc',
-                some pipelines do only work properly when we have a glib mainloop
-                running, so coherence needs to be started with -o glib:yes
+                some pipelines do only work properly when we have a glib
+                mainloop running, so coherence needs to be started
+                with -o glib:yes
     'command': the commandline for an external script to run, its output will
               be returned as the items content
 
@@ -178,8 +181,9 @@ class ExternalProcessProducer(log.LogAble):
             argv = self.pipeline.split()
             executable = argv[0]
             argv[0] = os.path.basename(argv[0])
-            self.process = reactor.spawnProcess(ExternalProcessProtocol(self),
-                                                executable, argv, {})
+            self.process = reactor.spawnProcess(
+                ExternalProcessProtocol(self),
+                executable, argv, {})
 
     def pauseProducing(self):
         pass
@@ -220,8 +224,9 @@ class Item(BackendItem):
             self.item.description = self.description
             self.item.date = self.date
 
-            res = DIDLLite.Resource(self.url, 'http-get:*:%s:%s' % (
-            self.mimetype, self.fourth_field))
+            res = DIDLLite.Resource(
+                self.url, 'http-get:*:%s:%s' % (
+                    self.mimetype, self.fourth_field))
             res.duration = self.duration
             res.size = self.get_size()
             self.item.res.append(res)
@@ -364,31 +369,35 @@ class TestStore(BackendStore):
                     item_id = str(item_id) + extension
 
                 if type in ('file', 'url'):
-                    new_item = Item(self.store[ROOT_CONTAINER_ID], item_id,
-                                    name, location, self.urlbase + str(item_id))
+                    new_item = Item(
+                        self.store[ROOT_CONTAINER_ID], item_id,
+                        name, location, self.urlbase + str(item_id))
                 elif type == 'gstreamer':
                     pipeline = item.get('pipeline')
                     try:
                         pipeline = GStreamerPipeline(pipeline, mimetype)
-                        new_item = ResourceItem(self.store[ROOT_CONTAINER_ID],
-                                                item_id, name, pipeline,
-                                                self.urlbase + str(item_id))
+                        new_item = ResourceItem(
+                            self.store[ROOT_CONTAINER_ID],
+                            item_id, name, pipeline,
+                            self.urlbase + str(item_id))
                     except NameError:
                         self.warning(
-                            "Can't enable GStreamerPipeline, probably pygst not installed")
+                            "Can't enable GStreamerPipeline, "
+                            "probably pygst not installed")
                         continue
 
                 elif type == 'process':
                     pipeline = item.get('command')
                     pipeline = ExternalProcessPipeline(pipeline, mimetype)
-                    new_item = ResourceItem(self.store[ROOT_CONTAINER_ID],
-                                            item_id, name, pipeline,
-                                            self.urlbase + str(item_id))
+                    new_item = ResourceItem(
+                        self.store[ROOT_CONTAINER_ID],
+                        item_id, name, pipeline,
+                        self.urlbase + str(item_id))
 
                 try:
                     new_item.upnp_class = self.get_upnp_class(
                         item.get('upnp_class', 'object.item'))
-                except:
+                except Exception:
                     pass
                 # item.description = u'some text what's the file about'
                 # item.date = something
@@ -399,7 +408,7 @@ class TestStore(BackendStore):
                 self.store[ROOT_CONTAINER_ID].add_child(new_item)
                 self.store[item_id] = new_item
 
-            except:
+            except Exception:
                 import traceback
                 self.warning(traceback.format_exc())
         # print self.store

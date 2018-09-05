@@ -82,7 +82,7 @@ class Action(log.LogAble):
     def get_callback(self):
         try:
             return self.callback
-        except:
+        except AttributeError:
             return None
 
     def call(self, *args, **kwargs):
@@ -91,9 +91,9 @@ class Action(log.LogAble):
         self.info("in arguments %s", [a.get_name() for a in in_arguments])
         instance_id = 0
         for arg_name, arg in kwargs.items():
-            l = [a for a in in_arguments if arg_name == a.get_name()]
-            if len(l) > 0:
-                in_arguments.remove(l[0])
+            al = [a for a in in_arguments if arg_name == a.get_name()]
+            if len(al) > 0:
+                in_arguments.remove(al[0])
             else:
                 self.error("argument %s not valid for action %s", arg_name,
                            self.name)
@@ -157,7 +157,9 @@ class Action(log.LogAble):
 
         # XXX A_ARG_TYPE_ arguments probably don't need a variable update
         # if len(out_arguments) == 1:
-        #    self.service.get_state_variable(out_arguments[0].get_state_variable(), instance_id).update(results)
+        #    self.service.get_state_variable(
+        #       out_arguments[0].get_state_variable(),
+        #       instance_id).update(results)
         # elif len(out_arguments) > 1:
 
         if len(out_arguments) > 0:

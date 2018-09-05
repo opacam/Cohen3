@@ -104,24 +104,24 @@ class Resources(list):
             # print "res", res.protocolInfo, res.data
             remote_protocol, remote_network, remote_content_format, _ = \
                 res.protocolInfo.split(':')
-            # print "remote", remote_protocol,remote_network,remote_content_format
+            # print("remote", remote_protocol,
+            #       remote_network,remote_content_format)
             if (protocol_type is not None and
                     remote_protocol.lower() != protocol_type.lower()):
                 continue
             for protocol_info in local_protocol_infos:
                 local_protocol, local_network, local_content_format, _ = \
                     protocol_info.split(':')
-                # print "local", local_protocol,local_network,local_content_format
-                if (remote_protocol == local_protocol
-                    or remote_protocol == '*'
-                    or local_protocol == '*') \
-                        and (remote_network == local_network
-                             or remote_network == '*'
-                             or local_network == '*') \
-                        and (
-                        remote_content_format.startswith(local_content_format)
-                        or remote_content_format == '*'
-                        or local_content_format == '*'):
+                # print("local", local_protocol,
+                #       local_network,local_content_format)
+                if (remote_protocol == local_protocol or
+                    remote_protocol == '*' or local_protocol == '*') and \
+                        (remote_network == local_network or
+                         remote_network == '*' or local_network == '*') and \
+                        (remote_content_format.startswith(
+                            local_content_format) or
+                         remote_content_format == '*' or
+                         local_content_format == '*'):
                     result.append(res)
         return result
 
@@ -181,9 +181,11 @@ def build_dlna_additional_info(content_format, does_playcontainer=False):
         additional_info = ['DLNA.ORG_PN=MPEG_TS_PAL'] + simple_dlna_tags
         content_format = 'video/mpeg'
     if content_format in ['video/mp4', 'video/x-m4a']:
-        additional_info = ['DLNA.ORG_PN=AVC_TS_BL_CIF15_AAC'] + simple_dlna_tags
+        additional_info = \
+            ['DLNA.ORG_PN=AVC_TS_BL_CIF15_AAC'] + simple_dlna_tags
     if content_format in ['video/x-msvideo', 'video/avi', 'video/divx']:
-        # additional_info = ';'.join(['DLNA.ORG_PN=MPEG4_P2_MP4_SP_AAC']+simple_dlna_tags)
+        # additional_info = ';'.join(
+        #     ['DLNA.ORG_PN=MPEG4_P2_MP4_SP_AAC']+simple_dlna_tags)
         additional_info = ['*']
     if content_format == 'video/x-ms-wmv':
         additional_info = ['DLNA.ORG_PN=WMV_BASE'] + simple_dlna_tags
@@ -221,8 +223,8 @@ class Resource(object):
         self.importUri = None
 
         if self.protocolInfo is not None:
-            protocol, network, content_format, additional_info = self.protocolInfo.split(
-                ':')
+            protocol, network, content_format, additional_info = \
+                self.protocolInfo.split(':')
             if additional_info == '*':
                 self.protocolInfo = ':'.join([protocol,
                                               network,
@@ -336,7 +338,8 @@ class Resource(object):
         elif format == 'mpegts':
             if content_format == 'video/mpeg':
                 return None
-            dlna_pn = 'DLNA.ORG_PN=MPEG_PS_PAL'  # 'DLNA.ORG_PN=MPEG_TS_SD_EU' # FIXME - don't forget HD
+            # 'DLNA.ORG_PN=MPEG_TS_SD_EU' # FIXME - don't forget HD
+            dlna_pn = 'DLNA.ORG_PN=MPEG_PS_PAL'
             content_format = 'video/mpeg'
         else:
             return None
@@ -466,12 +469,14 @@ class Object(log.LogAble):
                 root.attrib['parentID'] = kwargs.get('parent_container')
                 if kwargs.get('upnp_client', '') != 'XBox':
                     self.info(
-                        "Changing ID from %r to %r, with parentID from %r to %r",
+                        "Changing ID from %r to %r, "
+                        "with parentID from %r to %r",
                         root.attrib['refID'], root.attrib['id'], self.parentID,
                         root.attrib['parentID'])
                 else:
                     self.info(
-                        "Changing ID from %r to %r, with parentID from %r to %r",
+                        "Changing ID from %r to %r, "
+                        "with parentID from %r to %r",
                         self.id, root.attrib['id'], self.parentID,
                         root.attrib['parentID'])
 
@@ -494,45 +499,47 @@ class Object(log.LogAble):
             root.attrib['restricted'] = '0'
 
         if self.creator is not None:
-            etree.SubElement(
-                root, qname('creator', xml_constants.DC_NS)).text = self.creator
+            etree.SubElement(root, qname(
+                'creator', xml_constants.DC_NS)).text = self.creator
 
         if self.writeStatus is not None:
-            etree.SubElement(
-                root, qname('writeStatus', xml_constants.UPNP_NS)).text = \
-                self.writeStatus
+            etree.SubElement(root, qname(
+                'writeStatus', xml_constants.UPNP_NS)).text = self.writeStatus
 
         if self.date is not None:
             if isinstance(self.date, datetime):
-                etree.SubElement(
-                    root, qname('date', xml_constants.DC_NS)).text = \
-                    self.date.isoformat()
+                etree.SubElement(root, qname(
+                    'date', xml_constants.DC_NS)).text = self.date.isoformat()
             else:
-                etree.SubElement(
-                    root, qname('date', xml_constants.DC_NS)).text = self.date
+                etree.SubElement(root, qname(
+                    'date', xml_constants.DC_NS)).text = self.date
         else:
-            etree.SubElement(
-                root, qname('date', xml_constants.DC_NS)).text = \
-                utils.datefaker().isoformat()
+            etree.SubElement(root, qname(
+                'date',
+                xml_constants.DC_NS)).text = utils.datefaker().isoformat()
 
         if self.albumArtURI is not None:
-            e = etree.SubElement(root,
-                                 qname('albumArtURI', xml_constants.UPNP_NS))
+            e = etree.SubElement(
+                root, qname('albumArtURI', xml_constants.UPNP_NS))
             e.text = self.albumArtURI
-            e.attrib[qname('profileID', xml_constants.DLNA_NS)] = 'JPEG_TN'
+            e.attrib[qname(
+                'profileID', xml_constants.DLNA_NS)] = 'JPEG_TN'
 
         if self.artist is not None:
             etree.SubElement(
-                root, qname('artist', xml_constants.UPNP_NS)).text = self.artist
+                root, qname(
+                    'artist', xml_constants.UPNP_NS)).text = self.artist
 
         if self.genre is not None:
             etree.SubElement(
-                root, qname('genre', xml_constants.UPNP_NS)).text = self.genre
+                root, qname(
+                    'genre', xml_constants.UPNP_NS)).text = self.genre
 
         if self.genres is not None:
             for genre in self.genres:
                 etree.SubElement(
-                    root, qname('genre', xml_constants.UPNP_NS)).text = genre
+                    root, qname(
+                        'genre', xml_constants.UPNP_NS)).text = genre
 
         if self.originalTrackNumber is not None:
             etree.SubElement(
@@ -547,7 +554,7 @@ class Object(log.LogAble):
 
         if self.longDescription is not None:
             etree.SubElement(
-                root, qname('longDescription',xml_constants.UPNP_NS)).text = \
+                root, qname('longDescription', xml_constants.UPNP_NS)).text = \
                 self.longDescription
 
         if self.server_uuid is not None:
@@ -573,8 +580,8 @@ class Object(log.LogAble):
 
         self.refID = elt.attrib.get('refID', None)
 
-        if elt.attrib.get('restricted', None) in [1, 'true', 'True', '1', 'yes',
-                                                  'Yes']:
+        if elt.attrib.get('restricted', None) in [
+                1, 'true', 'True', '1', 'yes', 'Yes']:
             self.restricted = True
         else:
             self.restricted = False

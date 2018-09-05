@@ -3,6 +3,7 @@
 
 # Copyright 2006-2008, Frank Scholz <coherence@beebits.net>
 
+
 class ConnectionManagerClient:
 
     def __init__(self, service):

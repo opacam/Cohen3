@@ -35,7 +35,7 @@ class JuiceBox(dict):
         self.update(kw)
         if __body:
             assert isinstance(__body, str), "body must be a string: %r" % (
-            repr(__body),)
+                repr(__body),)
             self['body'] = __body
 
     def body():
@@ -231,11 +231,11 @@ class DispatchMixin:
             for name, extraArg in command.extra:
                 kw[name] = extraArg.fromTransport(proto.transport)
 
-            #             def checkIsDict(result):
-            #                 if not isinstance(result, dict):
-            #                     raise RuntimeError("%r returned %r, not dictionary" % (
-            #                             aCallable, result))
-            #                 return result
+            # def checkIsDict(result):
+            #     if not isinstance(result, dict):
+            #         raise RuntimeError("%r returned %r, not dictionary" % (
+            #                 aCallable, result))
+            #     return result
             def checkKnownErrors(error):
                 key = error.trap(*command.allErrors)
                 code = command.allErrors[key]
@@ -412,7 +412,7 @@ class JuiceParserBase(DispatchMixin):
         else:
             raise RuntimeError(
                 "Empty packet received over connection-oriented juice: %r" % (
-                box,))
+                    box,))
 
     def sendBoxCommand(self, command, box, requiresAnswer=True):
         """
@@ -699,8 +699,8 @@ class Command:
         try:
             return objectsToStrings(objects, cls.response, cls.responseType(),
                                     proto)
-        except:
-            log.msg("Exception in %r.makeResponse" % (cls,))
+        except Exception as e:
+            log.msg("Exception in %r.makeResponse [ERROR: %r]" % (cls, e,))
             raise
 
     makeResponse = classmethod(makeResponse)
@@ -832,13 +832,15 @@ class Juice(LineReceiver, JuiceParserBase):
 
     def __repr__(self):
         return '<%s %s/%s at 0x%x>' % (
-        self.__class__.__name__, self.isClient and 'client' or 'server',
-        self.innerProtocol, id(self))
+            self.__class__.__name__,
+            self.isClient and 'client' or 'server',
+            self.innerProtocol, id(self))
 
     __locked = False
 
     def _lock(self):
-        """ Lock this Juice instance so that no further Juice traffic may be sent.
+        """
+        Lock this Juice instance so that no further Juice traffic may be sent.
         This is used when sending a request to switch underlying protocols.
         You probably want to subclass ProtocolSwitchCommand rather than calling
         this directly.
@@ -848,12 +850,14 @@ class Juice(LineReceiver, JuiceParserBase):
     innerProtocol = None
 
     def _switchTo(self, newProto, clientFactory=None):
-        """ Switch this Juice instance to a new protocol.  You need to do this
+        """
+        Switch this Juice instance to a new protocol.  You need to do this
         'simultaneously' on both ends of a connection; the easiest way to do
         this is to use a subclass of ProtocolSwitchCommand.
         """
 
-        assert self.innerProtocol is None, "Protocol can only be safely switched once."
+        assert self.innerProtocol is None,\
+            "Protocol can only be safely switched once."
         self.setRawMode()
         self.innerProtocol = newProto
         self.innerProtocolClientFactory = clientFactory
@@ -874,7 +878,8 @@ class Juice(LineReceiver, JuiceParserBase):
 
         Note: transport.write is never called outside of this method.
         """
-        assert not self.__locked, "You cannot send juice packets when a connection is locked"
+        assert not self.__locked, \
+            "You cannot send juice packets when a connection is locked"
         if self._startingTLSBuffer is not None:
             self._startingTLSBuffer.append(completeBox)
         else:
@@ -895,10 +900,10 @@ class Juice(LineReceiver, JuiceParserBase):
         self._transportPeer = transport.getPeer()
         self._transportHost = transport.getHost()
         log.msg("%s %s connection established (HOST:%s PEER:%s)" % (
-        self.isClient and "client" or "server",
-        self.__class__.__name__,
-        self._transportHost,
-        self._transportPeer))
+            self.isClient and "client" or "server",
+            self.__class__.__name__,
+            self._transportHost,
+            self._transportPeer))
         self._outstandingRequests = {}
         self._requestBuffer = []
         LineReceiver.makeConnection(self, transport)
@@ -995,9 +1000,10 @@ class Juice(LineReceiver, JuiceParserBase):
         return version
 
     def renegotiateVersion(self, newVersion):
-        assert newVersion in VERSIONS, (
-                "This side of the connection doesn't support version %r"
-                % (newVersion,))
+        assert \
+            newVersion in VERSIONS, (
+                "This side of the connection doesn't support version %r" %
+                (newVersion,))
         v = VERSIONS[:]
         v.remove(newVersion)
         return Negotiate(versions=[newVersion]).do(self).addCallback(

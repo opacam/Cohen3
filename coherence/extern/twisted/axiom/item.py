@@ -75,9 +75,9 @@ class MetaItem(slotmachine.SchemaMetaMachine):
                 return T
             otherT = _typeNameToMostRecentClass[T.typeName]
 
-            if (otherT.__name__ == T.__name__
-                    and getabsfile(T) == getabsfile(otherT)
-                    and T.__module__ != otherT.__module__):
+            if (otherT.__name__ == T.__name__ and
+                    getabsfile(T) == getabsfile(otherT) and
+                    T.__module__ != otherT.__module__):
 
                 if len(T.__module__) < len(otherT.__module__):
                     relmod = T.__module__
@@ -96,8 +96,9 @@ class MetaItem(slotmachine.SchemaMetaMachine):
 
     # def __cmp__(self, other):
     #     """
-    #     Ensure stable sorting between Item classes.  This provides determinism
-    #     in SQL generation, which is beneficial for debugging and performance
+    #     Ensure stable sorting between Item classes.
+    #     This provides determinism in SQL generation, which is beneficial
+    #     for debugging and performance
     #     purposes.
     #     """
     #     if isinstance(other, MetaItem):
@@ -137,7 +138,8 @@ def noop():
 @implementer(IColumn)
 class _StoreIDComparer(Comparable):
     """
-    See Comparable's docstring for the explanation of the requirements of my implementation.
+    See Comparable's docstring for the explanation
+    of the requirements of my implementation.
     """
 
     def __init__(self, type):
@@ -319,11 +321,12 @@ class Empowered(object):
             for interface, priority in powerup._getPowerupInterfaces():
                 self.powerDown(powerup, interface)
         else:
-            for cable in self.store.query(_PowerupConnector,
-                                          AND(_PowerupConnector.item == self,
-                                              _PowerupConnector.interface == str(
-                                                  qual(interface)),
-                                              _PowerupConnector.powerup == powerup)):
+            for cable in self.store.query(
+                    _PowerupConnector,
+                    AND(_PowerupConnector.item == self,
+                        _PowerupConnector.interface == str(
+                            qual(interface)),
+                        _PowerupConnector.powerup == powerup)):
                 cable.deleteFromStore()
                 return
             raise ValueError("Not powered up for %r with %r" % (interface,
@@ -392,10 +395,10 @@ class Empowered(object):
         in an unpredictable, implementation-dependent way if used on one.
         """
         pc = _PowerupConnector
-        for iface in self.store.query(pc,
-                                      AND(pc.item == self,
-                                          pc.powerup == powerup)).getColumn(
-            'interface'):
+        for iface in self.store.query(
+                pc,
+                AND(pc.item == self,
+                    pc.powerup == powerup)).getColumn('interface'):
             yield namedAny(iface)
 
     def _getPowerupInterfaces(self):
@@ -573,8 +576,8 @@ class Item(Empowered, slotmachine._Strict, metaclass=MetaItem):
 
         return get, set, """
 
-        A reference to a Store; when set for the first time, inserts this object
-        into that store.  Cannot be set twice; once inserted, objects are
+        A reference to a Store; when set for the first time, inserts this
+        object into that store. Cannot be set twice; once inserted, objects are
         'stuck' to a particular store and must be copied by creating a new
         Item.
 
@@ -640,9 +643,9 @@ class Item(Empowered, slotmachine._Strict, metaclass=MetaItem):
 
     def __init__(self, **kw):
         """
-        Create a new Item.  This is called on an item *only* when it is being created
-        for the first time, not when it is loaded from the database.  The
-        'activate()' hook is called every time an item is loaded from the
+        Create a new Item.  This is called on an item *only* when it is being
+        created for the first time, not when it is loaded from the database.
+        The 'activate()' hook is called every time an item is loaded from the
         database, as well as the first time that an item is inserted into the
         store.  This will be inside __init__ if you pass a 'store' keyword
         argument to an Item's constructor.
@@ -726,8 +729,8 @@ class Item(Empowered, slotmachine._Strict, metaclass=MetaItem):
         self.__deletingObject = False
 
     def deleted(self):
-        """User-definable callback that is invoked when an object is well and truly
-        gone from the database; the transaction which deleted it has been
+        """User-definable callback that is invoked when an object is well and
+        truly gone from the database; the transaction which deleted it has been
         committed.
         """
 
@@ -783,7 +786,8 @@ class Item(Empowered, slotmachine._Strict, metaclass=MetaItem):
                                             [-1, self.storeID])
 
                 # Can't do this any more:
-                # self.store.executeSchemaSQL(_schema.DELETE_OBJECT, [self.storeID])
+                # self.store.executeSchemaSQL(
+                #     _schema.DELETE_OBJECT, [self.storeID])
 
                 # TODO: need to measure the performance impact of this, then do
                 # it to make sure things are in fact deleted:
@@ -834,7 +838,7 @@ class Item(Empowered, slotmachine._Strict, metaclass=MetaItem):
         # but it is useful to pass them anyway to make sure the code is
         # functioning as expected
         assert typename == self.typeName, '%r != %r' % (
-        typename, self.typeName)
+            typename, self.typeName)
         assert oldversion == self.schemaVersion
         key = typename, newversion
         T = None
@@ -889,7 +893,7 @@ class Item(Empowered, slotmachine._Strict, metaclass=MetaItem):
     schemaVersion = None
     typeName = None
 
-    ###### SQL generation ######
+    # SQL generation
     def _baseSelectSQL(cls, st):
         if cls not in st.typeToSelectSQLCache:
             st.typeToSelectSQLCache[cls] = ' '.join(['SELECT * FROM',
@@ -907,12 +911,12 @@ class Item(Empowered, slotmachine._Strict, metaclass=MetaItem):
         if cls not in st.typeToInsertSQLCache:
             attrs = list(cls.getSchema())
             qs = ', '.join((['?'] * (len(attrs) + 1)))
-            st.typeToInsertSQLCache[cls] = (
-                    'INSERT INTO ' +
-                    st.getTableName(cls) + ' (' + ', '.join(
-                [st.getShortColumnName(cls.storeID)] +
-                [st.getShortColumnName(a[1]) for a in attrs]) +
-                    ') VALUES (' + qs + ')')
+            st.typeToInsertSQLCache[cls] = \
+                ('INSERT INTO ' + st.getTableName(cls) + ' (' +
+                 ', '.join(
+                     [st.getShortColumnName(cls.storeID)] +
+                     [st.getShortColumnName(a[1]) for a in attrs]) +
+                 ') VALUES (' + qs + ')')
         return st.typeToInsertSQLCache[cls]
 
     _baseInsertSQL = classmethod(_baseInsertSQL)
@@ -1036,10 +1040,11 @@ class Placeholder(object):
 
         t1 = Placeholder(Tag)
         t2 = Placeholder(Tag)
-        store.query(SomethingElse, AND(t1.taggedObject == SomethingElse.storeID,
-                                       t1.tagName == u"foo",
-                                       t2.taggedObject == SomethingElse.storeID,
-                                       t2.tagName == u"bar"))
+        store.query(
+            SomethingElse, AND(t1.taggedObject == SomethingElse.storeID,
+                               t1.tagName == u"foo",
+                               t2.taggedObject == SomethingElse.storeID,
+                               t2.tagName == u"bar"))
     """
     _placeholderTableAlias = None
 
@@ -1120,8 +1125,8 @@ def declareLegacyItem(typeName, schemaVersion, attributes, dummyBases=()):
     with upgrading.
 
     @param typeName: a string, the Axiom TypeName to have attributes for.
-    @param schemaVersion: an int, the (old) version of the schema this is a proxy
-    for.
+    @param schemaVersion: an int, the (old) version of the schema this
+    is a proxy for.
     @param attributes: a dict mapping {columnName: attr instance} describing
     the schema of C{typeName} at C{schemaVersion}.
 
@@ -1178,9 +1183,9 @@ def empowerment(iface, priority=0):
     """
 
     def _deco(cls):
-        cls.powerupInterfaces = (
-                tuple(getattr(cls, 'powerupInterfaces', ())) +
-                ((iface, priority),))
+        cls.powerupInterfaces = \
+            (tuple(getattr(cls, 'powerupInterfaces', ())) +
+             ((iface, priority),))
         implementer(iface)(cls)
         return cls
 

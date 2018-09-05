@@ -12,15 +12,15 @@ class PendingEvent(object):
         return d
 
     def callback(self, result):
-        l = self.listeners
+        lis = self.listeners
         self.listeners = []
-        for d in l:
+        for d in lis:
             d.callback(result)
 
     def errback(self, result=None):
         if result is None:
             result = Failure()
-        l = self.listeners
+        lis = self.listeners
         self.listeners = []
-        for d in l:
+        for d in lis:
             d.errback(result)

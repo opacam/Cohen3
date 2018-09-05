@@ -27,7 +27,7 @@ def dependentsOf(cls):
         return [d[0] for d in deps]
 
 
-## Totally ripping off z.i
+# Totally ripping off z.i
 
 
 def dependsOn(itemType, itemCustomizer=None, doc='',
@@ -75,7 +75,7 @@ def _dependsOn_advice(cls):
         # bail if we end up here twice, somehow
         return cls
     for itemType, itemCustomizer, ref in cls.__dict__[
-        '__dependsOn_advice_data__']:
+            '__dependsOn_advice_data__']:
         classDependsOn(cls, itemType, itemCustomizer, ref)
     del cls.__dependsOn_advice_data__
     return cls
@@ -92,10 +92,11 @@ class _DependencyConnector(Item):
     """
     installee = reference(doc="The item installed.")
     target = reference(doc="The item installed upon.")
-    explicitlyInstalled = boolean(doc="Whether this item was installed"
-                                      "explicitly (and thus whether or not it"
-                                      "should be automatically uninstalled when"
-                                      "nothing depends on it)")
+    explicitlyInstalled = boolean(
+        doc="Whether this item was installed"
+        "explicitly (and thus whether or not it"
+        "should be automatically uninstalled when"
+        "nothing depends on it)")
 
 
 def installOn(self, target):
@@ -111,8 +112,9 @@ def installOn(self, target):
 
 def _installOn(self, target, __explicitlyInstalled=False):
     depBlob = _globalDependencyMap.get(self.__class__, [])
-    dependencies, itemCustomizers, refs = (list(map(list, list(zip(*depBlob))))
-                                           or ([], [], []))
+    dependencies, itemCustomizers, refs = \
+        (list(map(list, list(zip(*depBlob)))) or
+         ([], [], []))
     # See if any of our dependencies have been installed already
     for dc in self.store.query(_DependencyConnector,
                                _DependencyConnector.target == target):
@@ -120,8 +122,8 @@ def _installOn(self, target, __explicitlyInstalled=False):
             i = dependencies.index(dc.installee.__class__)
             refs[i].__set__(self, dc.installee)
             del dependencies[i], itemCustomizers[i], refs[i]
-        if (dc.installee.__class__ == self.__class__
-                and self.__class__ in set(
+        if (dc.installee.__class__ == self.__class__ and
+                self.__class__ in set(
                     itertools.chain([blob[0][0] for blob in
                                      list(_globalDependencyMap.values())]))):
             # Somebody got here before we did... let's punt
@@ -143,7 +145,8 @@ def _installOn(self, target, __explicitlyInstalled=False):
             _DependencyConnector.installee == self,
             _DependencyConnector.explicitlyInstalled == __explicitlyInstalled),
         None)
-    assert dc is None, "Dependency connector already exists, wtf are you doing?"
+    assert dc is None, \
+        "Dependency connector already exists, wtf are you doing?"
     _DependencyConnector(store=self.store, target=target,
                          installee=self,
                          explicitlyInstalled=__explicitlyInstalled)
@@ -231,8 +234,8 @@ def installedUniqueRequirements(self, target):
 
     for dc in self.store.query(_DependencyConnector,
                                _DependencyConnector.target == target):
-        if (dc.installee.__class__ in myDepends
-                and not dc.explicitlyInstalled):
+        if (dc.installee.__class__ in myDepends and
+                not dc.explicitlyInstalled):
             yield dc.installee
 
 

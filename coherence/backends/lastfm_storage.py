@@ -2,19 +2,29 @@
 # http://opensource.org/licenses/mit-license.php
 
 """
-INFO  lastFM_user                 Dez 14 17:35:27  Got new sessionid: '1488f34a1cbed7c9f4232f8fd563c3bd' (coherence/backends/lastfm_storage.py:60)
-DEBUG lastFM_stream               Dez 14 17:35:53  render <GET /da525474-5357-4d1b-a894-76b1293224c9/1005 HTTP/1.1> (coherence/backends/lastfm_storage.py:148)
+INFO  lastFM_user                 Dez 14 17:35:27  Got new sessionid:
+    '1488f34a1cbed7c9f4232f8fd563c3bd'
+    (coherence/backends/lastfm_storage.py:60)
+DEBUG lastFM_stream               Dez 14 17:35:53  render
+    <GET /da525474-5357-4d1b-a894-76b1293224c9/1005 HTTP/1.1>
+    (coherence/backends/lastfm_storage.py:148)
 command GET
 rest /user/e0362c757ef49169e9a0f0970cc2d367.mp3
-headers {'icy-metadata': '1', 'host': 'kingpin5.last.fm', 'te': 'trailers', 'connection': 'TE', 'user-agent': 'gnome-vfs/2.12.0.19 neon/0.24.7'}
+headers {'icy-metadata': '1', 'host': 'kingpin5.last.fm',
+         'te': 'trailers', 'connection': 'TE',
+         'user-agent': 'gnome-vfs/2.12.0.19 neon/0.24.7'}
 ProxyClient handleStatus HTTP/1.1 200 OK
 ProxyClient handleHeader Content-Type audio/mpeg
 ProxyClient handleHeader Content-Length 4050441
 ProxyClient handleHeader Cache-Control no-cache, must-revalidate
-DEBUG lastFM_stream               Dez 14 17:35:53  render <GET /da525474-5357-4d1b-a894-76b1293224c9/1005 HTTP/1.1> (coherence/backends/lastfm_storage.py:148)
+DEBUG lastFM_stream               Dez 14 17:35:53  render
+    <GET /da525474-5357-4d1b-a894-76b1293224c9/1005 HTTP/1.1>
+    (coherence/backends/lastfm_storage.py:148)
 command GET
 rest /user/e0362c757ef49169e9a0f0970cc2d367.mp3
-headers {'icy-metadata': '1', 'host': 'kingpin5.last.fm', 'te': 'trailers', 'connection': 'TE', 'user-agent': 'gnome-vfs/2.12.0.19 neon/0.24.7'}
+headers {'icy-metadata': '1', 'host': 'kingpin5.last.fm',
+         'te': 'trailers', 'connection': 'TE',
+         'user-agent': 'gnome-vfs/2.12.0.19 neon/0.24.7'}
 ProxyClient handleStatus HTTP/1.1 403 Invalid ticket
 """
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
@@ -66,11 +76,11 @@ class LastFMUser(log.LogAble):
                         self.sessionid = tuple[1]
                         self.info("Got new sessionid: %r", self.sessionid)
                     if tuple[0] == "base_url":
-                        if (self.host != tuple[1]):
+                        if self.host != tuple[1]:
                             self.host = tuple[1]
                             self.info("Got new host: %s", self.host)
                     if tuple[0] == "base_path":
-                        if (self.basepath != tuple[1]):
+                        if self.basepath != tuple[1]:
                             self.basepath = tuple[1]
                             self.info("Got new path: %s", self.basepath)
             self.get_tracks()
@@ -79,19 +89,21 @@ class LastFMUser(log.LogAble):
             self.warning("Login to LastFM Failed! %r", error)
             self.debug("%r", error.getTraceback())
 
-        def hexify(
-                s):  # This function might be GPL! Found this code in some other Projects, too.
+        # This function might be GPL!
+        # Found this code in some other Projects, too.
+        def hexify(s):
             result = ""
             for c in s:
                 result = result + ("%02x" % ord(c))
             return result
 
         password = hexify(md5(self.passwd).digest())
-        req = self.basepath + "/handshake.php/?version=1&platform=win&username=" + self.user + "&passwordmd5=" + password + "&language=en&player=coherence"
-        utils.getPage("http://" + self.host + req).addCallbacks(got_page,
-                                                                got_error, None,
-                                                                None, None,
-                                                                None)
+        req = \
+            self.basepath + "/handshake.php/?version=1&platform=win&username="\
+            + self.user + "&passwordmd5=" + password\
+            + "&language=en&player=coherence"
+        utils.getPage("http://" + self.host + req).addCallbacks(
+            got_page, got_error, None, None, None, None)
 
     def get_tracks(self):
         if self.getting_tracks:
@@ -130,11 +142,11 @@ class LastFMUser(log.LogAble):
             self.getting_tracks = False
 
         self.getting_tracks = True
-        req = self.basepath + "/xspf.php?sk=" + self.sessionid + "&discovery=0&desktop=1.3.1.1"
-        utils.getPage("http://" + self.host + req).addCallbacks(got_page,
-                                                                got_error, None,
-                                                                None, None,
-                                                                None)
+        req = \
+            self.basepath + "/xspf.php?sk=" + self.sessionid \
+            + "&discovery=0&desktop=1.3.1.1"
+        utils.getPage("http://" + self.host + req).addCallbacks(
+            got_page, got_error, None, None, None, None)
 
     def update(self, item):
         if 0 < self.tracks.count(item):
@@ -143,7 +155,7 @@ class LastFMUser(log.LogAble):
                 if track == item:
                     break
                 self.tracks.remove(track)
-                # Do not remoce so the tracks to answer the browse
+                # Do not remove so the tracks to answer the browse
                 # request correctly.
                 # track.store.remove(track)
                 # del track
@@ -211,7 +223,7 @@ class LastFMItem(log.LogAble):
         self.child_count = 0
         self.children = []
 
-        if (len(urlbase) and urlbase[-1] != '/'):
+        if len(urlbase) and urlbase[-1] != '/':
             urlbase += '/'
 
         if self.mimetype == 'directory':
@@ -224,12 +236,14 @@ class LastFMItem(log.LogAble):
         if self.mimetype == 'directory':
             self.update_id = 0
         else:
-            res = Resource(self.url, 'http-get:*:%s:%s' % (obj.get('mimetype'),
-                                                           ';'.join((
-                                                                    'DLNA.ORG_PN=MP3',
-                                                                    'DLNA.ORG_CI=0',
-                                                                    'DLNA.ORG_OP=01',
-                                                                    'DLNA.ORG_FLAGS=01700000000000000000000000000000'))))
+            res = Resource(
+                self.url,
+                'http-get:*:%s:%s' % (
+                    obj.get('mimetype'), ';'.join(
+                        ('DLNA.ORG_PN=MP3',
+                         'DLNA.ORG_CI=0',
+                         'DLNA.ORG_OP=01',
+                         'DLNA.ORG_FLAGS=01700000000000000000000000000000'))))
             res.size = -1  # None
             self.item.res.append(res)
 
@@ -249,7 +263,8 @@ class LastFMItem(log.LogAble):
             self.update_id += 1
 
     def remove_child(self, child):
-        self.info("remove_from %d (%s) child %d (%s)", self.id, self.get_name(),
+        self.info("remove_from %d (%s) child %d (%s)",
+                  self.id, self.get_name(),
                   child.id, child.get_name())
         if child in self.children:
             self.child_count -= 1
@@ -338,16 +353,14 @@ class LastFMStore(log.LogAble, Plugin):
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0,
-                                                                  'SystemUpdateID',
-                                                                  self.update_id)
+                self.server.content_directory_server.set_variable(
+                    0, 'SystemUpdateID', self.update_id)
             if parent:
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'ContainerUpdateIDs',
-                                                                      value)
+                    self.server.content_directory_server.set_variable(
+                        0, 'ContainerUpdateIDs', value)
 
         return self.store[id]
 
@@ -359,16 +372,14 @@ class LastFMStore(log.LogAble, Plugin):
             if hasattr(self, 'update_id'):
                 self.update_id += 1
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'SystemUpdateID',
-                                                                      self.update_id)
+                    self.server.content_directory_server.set_variable(
+                        0, 'SystemUpdateID', self.update_id)
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'ContainerUpdateIDs',
-                                                                      value)
-        except:
+                    self.server.content_directory_server.set_variable(
+                        0, 'ContainerUpdateIDs', value)
+        except (ValueError, KeyError):
             pass
 
     def len(self):
@@ -384,7 +395,7 @@ class LastFMStore(log.LogAble, Plugin):
             id = 1000
         try:
             return self.store[id]
-        except:
+        except KeyError:
             return None
 
     def getnextID(self):
@@ -403,11 +414,9 @@ class LastFMStore(log.LogAble, Plugin):
         self.LFM.login()
 
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'http-get:*:audio/mpeg:*'],
-                                                               default=True)
+            self.server.connection_manager_server.set_variable(
+                0, 'SourceProtocolInfo', ['http-get:*:audio/mpeg:*'],
+                default=True)
 
 
 def main():
