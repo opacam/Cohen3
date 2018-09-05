@@ -9,7 +9,7 @@ import coherence.extern.louie as louie
 from coherence import log
 from coherence.upnp.devices.wan_connection_device_client import \
     WANConnectionDeviceClient
-from coherence.upnp.services.clients.wan_common_interface_config_client import \
+from coherence.upnp.services.clients.wan_common_interface_config_client import\
     WANCommonInterfaceConfigClient
 
 
@@ -36,14 +36,15 @@ class WANDeviceClient(log.LogAble):
 
         try:
             wan_connection_device = \
-            self.device.get_embedded_device_by_type('WANConnectionDevice')[0]
+                self.device.get_embedded_device_by_type(
+                    'WANConnectionDevice')[0]
             self.wan_connection_device = WANConnectionDeviceClient(
                 wan_connection_device)
-        except:
+        except Exception as er:
             self.warning(
                 "Embedded WANConnectionDevice device not available, "
                 "device not implemented properly according to "
-                "the UPnP specification")
+                "the UPnP specification [ERROR: {}]".format(er))
             raise
 
         louie.connect(self.service_notified,
@@ -73,7 +74,8 @@ class WANDeviceClient(log.LogAble):
         if self.embedded_device_detection_completed is True and \
                 self.service_detection_completed is True:
             louie.send(
-                'Coherence.UPnP.EmbeddedDeviceClient.detection_completed', None,
+                'Coherence.UPnP.EmbeddedDeviceClient.detection_completed',
+                None,
                 self)
 
     def service_notified(self, service):
@@ -84,11 +86,13 @@ class WANDeviceClient(log.LogAble):
             if not hasattr(self.wan_common_interface_connection.service,
                            'last_time_updated'):
                 return
-            if self.wan_common_interface_connection.service.last_time_updated is None:
+            if self.wan_common_interface_connection.\
+                    service.last_time_updated is None:
                 return
         self.service_detection_completed = True
         if self.embedded_device_detection_completed is True and \
                 self.service_detection_completed is True:
             louie.send(
-                'Coherence.UPnP.EmbeddedDeviceClient.detection_completed', None,
+                'Coherence.UPnP.EmbeddedDeviceClient.detection_completed',
+                None,
                 self)

@@ -1,4 +1,6 @@
-# Wraps DB-API 2.0 query results to provide a nice list and dictionary interface.
+# Wraps DB-API 2.0 query results to provide
+# a nice list and dictionary interface.
+#
 # Copyright (C) 2002  Dr. Conan C. Albrecht <conan_albrecht@byu.edu>
 #
 # This library is free software; you can redistribute it and/or
@@ -28,8 +30,8 @@
 # list interface (by column number) is also provided.
 #
 # I can't believe the DB-API 2.0 api didn't include dictionary-style results.
-# I'd love to see the reasoning behind not requiring them of database connection
-# classes.
+# I'd love to see the reasoning behind not requiring them of database
+# connection classes.
 
 # This module comes from:
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/163605
@@ -88,7 +90,7 @@ class DBRow(object):
 
     def __getitem__(self, key):
         """Return the value of the named column"""
-        if type(key) == type(1):  # if a number
+        if isinstance(type(key), int):  # if a number
             return self.row[key]
         else:  # a field name
             return self.row[self.fields[key]]
@@ -133,7 +135,7 @@ class DBRow(object):
         return len(self.row) != 0
 
     def __eq__(self, other):
-        ## Error if other is not set
+        # Error if other is not set
         if other is None:
             return False
         return self.fields == other.fields

@@ -85,7 +85,8 @@ class DeviceHttpRoot(resource.Resource, log.LogAble):
 #         uuid = str(uuid)
 #         root = ET.Element('root')
 #         root.attrib['xmlns'] = xmlns
-#         device_type_uri = ':'.join((device_uri_base, device_type, str(version)))
+#         device_type_uri = ':'.join(
+#             (device_uri_base, device_type, str(version)))
 #         e = ET.SubElement(root, 'specVersion')
 #         ET.SubElement(e, 'major').text = '1'
 #         ET.SubElement(e, 'minor').text = '0'
@@ -138,15 +139,21 @@ class DeviceHttpRoot(resource.Resource, log.LogAble):
 #                     v = service.version
 #                 else:
 #                     v = version
-#                 ET.SubElement(s, 'serviceType').text = 'urn:%s:service:%s:%d' % (namespace, id, int(v))
+#                 ET.SubElement(s, 'serviceType').text = \
+#                     'urn:%s:service:%s:%d' % (namespace, id, int(v))
 #                 try:
 #                     namespace = service.id_namespace
 #                 except:
 #                     namespace = 'upnp-org'
-#                 ET.SubElement(s, 'serviceId').text = 'urn:%s:serviceId:%s' % (namespace, id)
-#                 ET.SubElement(s, 'SCPDURL').text = '/' + uuid[5:] + '/' + id + '/' + service.scpd_url
-#                 ET.SubElement(s, 'controlURL').text = '/' + uuid[5:] + '/' + id + '/' + service.control_url
-#                 ET.SubElement(s, 'eventSubURL').text = '/' + uuid[5:] + '/' + id + '/' + service.subscription_url
+#                 ET.SubElement(s, 'serviceId').text = \
+#                     'urn:%s:serviceId:%s' % (namespace, id)
+#                 ET.SubElement(s, 'SCPDURL').text = \
+#                     '/' + uuid[5:] + '/' + id + '/' + service.scpd_url
+#                 ET.SubElement(s, 'controlURL').text = \
+#                     '/' + uuid[5:] + '/' + id + '/' + service.control_url
+#                 ET.SubElement(s, 'eventSubURL').text = \
+#                     '/' + uuid[5:] + '/' + id + '/' + \
+#                     service.subscription_url
 #
 #         if len(devices):
 #             e = ET.SubElement(d, 'deviceList')
@@ -160,29 +167,41 @@ class DeviceHttpRoot(resource.Resource, log.LogAble):
 #                     if icon['url'].startswith('file://'):
 #                         icon_path = icon['url'][7:]
 #                     elif icon['url'] == '.face':
-#                         icon_path = os.path.join(os.path.expanduser('~'), ".face")
+#                         icon_path = os.path.join(
+#                             os.path.expanduser('~'), ".face")
 #                     else:
 #                         from pkg_resources import resource_filename
-#                         icon_path = os.path.abspath(resource_filename(__name__, os.path.join('..', '..', '..', 'misc', 'device-icons', icon['url'])))
+#                         icon_path = os.path.abspath(
+#                             resource_filename(
+#                                 __name__,
+#                                 os.path.join(
+#                                     '..', '..', '..', 'misc',
+#                                     'device-icons', icon['url'])))
 #
 #                 if os.path.exists(icon_path):
 #                     i = ET.SubElement(e, 'icon')
 #                     for k, v in icon.items():
 #                         if k == 'url':
 #                             if v.startswith('file://'):
-#                                 ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + os.path.basename(v)
+#                                 ET.SubElement(i, k).text = \
+#                                     '/' + uuid[5:] + '/' + \
+#                                     os.path.basename(v)
 #                                 continue
 #                             elif v == '.face':
-#                                 ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + 'face-icon.png'
+#                                 ET.SubElement(i, k).text = \
+#                                     '/' + uuid[5:] + '/' + 'face-icon.png'
 #                                 continue
 #                             else:
-#                                 ET.SubElement(i, k).text = '/' + uuid[5:] + '/' + os.path.basename(v)
+#                                 ET.SubElement(i, k).text = \
+#                                     '/' + uuid[5:] + '/' + \
+#                                     os.path.basename(v)
 #                                 continue
 #                         ET.SubElement(i, k).text = str(v)
 #         #if self.has_level(LOG_DEBUG):
 #         #    indent( root)
 #
-#         self.xml = """<?xml version="1.0" encoding="utf-8"?>""" + ET.tostring(root, encoding='utf-8')
+        # self.xml = """<?xml version="1.0" encoding="utf-8"?>""" + \
+        #            ET.tostring(root, encoding='utf-8')
 #         static.Data.__init__(self, self.xml, 'text/xml')
 
 
@@ -227,7 +246,7 @@ class BasicDeviceMixin(object):
         if self.backend != backend:
             return
         self.warning('backend not installed, %s activation aborted - %s' % (
-        self.device_type, msg.getErrorMessage()))
+            self.device_type, msg.getErrorMessage()))
         self.debug(msg)
         try:
             del self.coherence.active_backends[str(self.uuid)]
@@ -285,7 +304,7 @@ class BasicDeviceMixin(object):
             while service_version > 0:
                 try:
                     namespace = service.namespace
-                except:
+                except AttributeError:
                     namespace = 'schemas-upnp-org'
 
                 device_description_tmpl = 'description-%d.xml' % device_version
@@ -321,14 +340,22 @@ class BasicDeviceMixin(object):
         for service in self._services:
             try:
                 service.check_subscribers_loop.stop()
-            except:
-                pass
+            except Exception as e1:
+                ms = 'BasicDeviceMixin.unregister: %r' % e1
+                if hasattr(self, 'warning'):
+                    self.warning(ms)
+                else:
+                    print('WARNING: ', ms)
             if hasattr(service, 'check_moderated_loop') and \
                     service.check_moderated_loop is not None:
                 try:
                     service.check_moderated_loop.stop()
-                except:
-                    pass
+                except Exception as e2:
+                    ms = 'BasicDeviceMixin.unregister: %r' % e2
+                    if hasattr(self, 'warning'):
+                        self.warning(ms)
+                    else:
+                        print('WARNING: ', ms)
             if hasattr(service, 'release'):
                 service.release()
             if hasattr(service, '_release'):
@@ -341,7 +368,7 @@ class BasicDeviceMixin(object):
         version = self.version
         while version > 0:
             s.doByebye('%s::urn:schemas-upnp-org:device:%s:%d' % (
-            uuid, self.device_type, version))
+                uuid, self.device_type, version))
             for service in self._services:
                 if hasattr(service, 'version') and service.version < version:
                     continue
@@ -350,7 +377,7 @@ class BasicDeviceMixin(object):
                 except AttributeError:
                     namespace = 'schemas-upnp-org'
                 s.doByebye('%s::urn:%s:service:%s:%d' % (
-                uuid, namespace, service.id, version))
+                    uuid, namespace, service.id, version))
 
             version -= 1
 

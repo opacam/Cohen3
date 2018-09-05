@@ -49,8 +49,8 @@ def require(packageName, fixName):
             deferredgenerator_tfailure.install()
         else:
             assert result == [None]
-    elif (packageName, fixName) == (
-    "twisted", "proto_helpers_stringtransport"):
+    elif (packageName, fixName) == \
+            ("twisted", "proto_helpers_stringtransport"):
         from twisted.test.proto_helpers import StringTransport
         st = StringTransport()
         try:
@@ -83,7 +83,7 @@ def require(packageName, fixName):
             plugin_package_paths.install()
     elif (packageName, fixName) == ("twisted", "loopbackasync_reentrancy"):
         # This one is really hard to detect reasonably.  Invoking the code
-        # involves triggering the reactor, which it would be good to avoid. 
+        # involves triggering the reactor, which it would be good to avoid.
         from twisted import version
         if (version.major, version.minor) < (8, 2):
             from coherence.extern.twisted.epsilon.hotfixes import \

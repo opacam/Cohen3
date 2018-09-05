@@ -23,80 +23,103 @@ from coherence.upnp.core.DIDLLite import Resource
 SHOUTCAST_WS_URL = 'http://www.shoutcast.com/sbin/newxml.phtml'
 
 genre_families = {
-    # genre hierarchy created from http://forums.winamp.com/showthread.php?s=&threadid=303231
-    "Alternative": ["Adult Alternative", "Britpop", "Classic Alternative",
-                    "College", "Dancepunk", "Dream Pop", "Emo", "Goth",
-                    "Grunge", "Indie Pop", "Indie Rock", "Industrial", "Lo-Fi",
-                    "Modern Rock", "New Wave", "Noise Pop", "Post-Punk",
-                    "Power Pop", "Punk", "Ska", "Xtreme"],
-    "Blues": ["Acoustic Blues", "Chicago Blues", "Contemporary Blues",
-              "Country Blues", "Delta Blues", "Electric Blues", "Cajun/Zydeco"],
-    "Classical": ["Baroque", "Chamber", "Choral", "Classical Period",
-                  "Early Classical", "Impressionist", "Modern", "Opera",
-                  "Piano", "Romantic", "Symphony"],
-    "Country": ["Alt-Country", "Americana", "Bluegrass", "Classic Country",
-                "Contemporary Bluegrass", "Contemporary Country", "Honky Tonk",
-                "Hot Country Hits", "Western"],
+    # genre hierarchy created from:
+    #     http://forums.winamp.com/showthread.php?s=&threadid=303231
+    "Alternative":
+        ["Adult Alternative", "Britpop", "Classic Alternative",
+         "College", "Dancepunk", "Dream Pop", "Emo", "Goth",
+         "Grunge", "Indie Pop", "Indie Rock", "Industrial", "Lo-Fi",
+         "Modern Rock", "New Wave", "Noise Pop", "Post-Punk",
+         "Power Pop", "Punk", "Ska", "Xtreme"],
+    "Blues":
+        ["Acoustic Blues", "Chicago Blues", "Contemporary Blues",
+         "Country Blues", "Delta Blues", "Electric Blues",
+         "Cajun/Zydeco"],
+    "Classical":
+        ["Baroque", "Chamber", "Choral", "Classical Period",
+         "Early Classical", "Impressionist", "Modern", "Opera",
+         "Piano", "Romantic", "Symphony"],
+    "Country":
+        ["Alt-Country", "Americana", "Bluegrass", "Classic Country",
+         "Contemporary Bluegrass", "Contemporary Country", "Honky Tonk",
+         "Hot Country Hits", "Western"],
     "Easy Listening": ["Exotica", "Light Rock", "Lounge", "Orchestral Pop",
                        "Polka", "Space Age Pop"],
-    "Electronic": ["Acid House", "Ambient", "Big Beat", "Breakbeat", "Dance",
-                   "Demo", "Disco", "Downtempo", "Drum and Bass", "Electro",
-                   "Garage", "Hard House", "House", "IDM", "Remixes", "Jungle",
-                   "Progressive", "Techno", "Trance", "Tribal", "Trip Hop"],
-    "Folk": ["Alternative Folk", "Contemporary Folk", "Folk Rock",
-             "New Acoustic", "Traditional Folk", "World Folk"],
-    "Themes": ["Adult", "Best Of", "Chill", "Experimental", "Female",
-               "Heartache", "LGBT", "Love/Romance", "Party Mix", "Patriotic",
-               "Rainy Day Mix", "Reality", "Sexy", "Shuffle", "Travel Mix",
-               "Tribute", "Trippy", "Work Mix"],
-    "Rap": ["Alternative Rap", "Dirty South", "East Coast Rap", "Freestyle",
-            "Hip Hop", "Gangsta Rap", "Mixtapes", "Old School", "Turntablism",
-            "Underground Hip-Hop", "West Coast Rap"],
-    "Inspirational": ["Christian", "Christian Metal", "Christian Rap",
-                      "Christian Rock", "Classic Christian",
-                      "Contemporary Gospel", "Gospel", "Praise/Worship",
-                      "Sermons/Services", "Southern Gospel",
-                      "Traditional Gospel"],
-    "International": ["African", "Afrikaans", "Arabic", "Asian", "Brazilian",
-                      "Caribbean", "Celtic", "European", "Filipino", "Greek",
-                      "Hawaiian/Pacific", "Hindi", "Indian", "Japanese",
-                      "Jewish", "Klezmer", "Mediterranean", "Middle Eastern",
-                      "North American", "Polskie", "Polska", "Soca",
-                      "South American", "Tamil", "Worldbeat", "Zouk"],
-    "Jazz": ["Acid Jazz", "Avant Garde", "Big Band", "Bop", "Classic Jazz",
-             "Cool Jazz", "Fusion", "Hard Bop", "Latin Jazz", "Smooth Jazz",
-             "Swing", "Vocal Jazz", "World Fusion"],
-    "Latin": ["Bachata", "Banda", "Bossa Nova", "Cumbia", "Latin Dance",
-              "Latin Pop", "Latin Rap/Hip-Hop", "Latin Rock", "Mariachi",
-              "Merengue", "Ranchera", "Reggaeton", "Regional Mexican", "Salsa",
-              "Tango", "Tejano", "Tropicalia"],
-    "Metal": ["Black Metal", "Classic Metal", "Extreme Metal", "Grindcore",
-              "Hair Metal", "Heavy Metal", "Metalcore", "Power Metal",
-              "Progressive Metal", "Rap Metal"],
-    "New Age": ["Environmental", "Ethnic Fusion", "Healing", "Meditation",
-                "Spiritual"],
-    "Decades": ["30s", "40s", "50s", "60s", "70s", "80s", "90s"],
-    "Pop": ["Adult Contemporary", "Barbershop", "Bubblegum Pop", "Dance Pop",
-            "Idols", "Oldies", "JPOP", "Soft Rock", "Teen Pop", "Top 40",
-            "World Pop"],
-    "R&B/Urban": ["Classic R&B", "Contemporary R&B", "Doo Wop", "Funk",
-                  "Motown", "Neo-Soul", "Quiet Storm", "Soul",
-                  "Urban Contemporary", "Reggae", "Contemporary Reggae",
-                  "Dancehall", "Dub", "Pop-Reggae", "Ragga", "Rock Steady",
-                  "Reggae Roots"],
-    "Rock": ["Adult Album Alternative", "British Invasion", "Classic Rock",
-             "Garage Rock", "Glam", "Hard Rock", "Jam Bands", "Piano Rock",
-             "Prog Rock", "Psychedelic", "Rock & Roll", "Rockabilly",
-             "Singer/Songwriter", "Surf"],
-    "Seasonal/Holiday": ["Anniversary", "Birthday", "Christmas", "Halloween",
-                         "Hanukkah", "Honeymoon", "Valentine", "Wedding",
-                         "Winter"],
-    "Soundtracks": ["Anime", "Bollywood", "Kids", "Original Score", "Showtunes",
-                    "Video Game Music"],
-    "Talk": ["Comedy", "Community", "Educational", "Government", "News",
-             "Old Time Radio", "Other Talk", "Political", "Public Radio",
-             "Scanner", "Spoken Word", "Sports", "Technology", "Hardcore",
-             "Eclectic", "Instrumental"],
+    "Electronic":
+        ["Acid House", "Ambient", "Big Beat", "Breakbeat", "Dance",
+         "Demo", "Disco", "Downtempo", "Drum and Bass", "Electro",
+         "Garage", "Hard House", "House", "IDM", "Remixes", "Jungle",
+         "Progressive", "Techno", "Trance", "Tribal", "Trip Hop"],
+    "Folk":
+        ["Alternative Folk", "Contemporary Folk", "Folk Rock",
+         "New Acoustic", "Traditional Folk", "World Folk"],
+    "Themes":
+        ["Adult", "Best Of", "Chill", "Experimental", "Female",
+         "Heartache", "LGBT", "Love/Romance", "Party Mix", "Patriotic",
+         "Rainy Day Mix", "Reality", "Sexy", "Shuffle", "Travel Mix",
+         "Tribute", "Trippy", "Work Mix"],
+    "Rap":
+        ["Alternative Rap", "Dirty South", "East Coast Rap", "Freestyle",
+         "Hip Hop", "Gangsta Rap", "Mixtapes", "Old School", "Turntablism",
+         "Underground Hip-Hop", "West Coast Rap"],
+    "Inspirational":
+        ["Christian", "Christian Metal", "Christian Rap",
+         "Christian Rock", "Classic Christian",
+         "Contemporary Gospel", "Gospel", "Praise/Worship",
+         "Sermons/Services", "Southern Gospel",
+         "Traditional Gospel"],
+    "International":
+        ["African", "Afrikaans", "Arabic", "Asian", "Brazilian",
+         "Caribbean", "Celtic", "European", "Filipino", "Greek",
+         "Hawaiian/Pacific", "Hindi", "Indian", "Japanese",
+         "Jewish", "Klezmer", "Mediterranean", "Middle Eastern",
+         "North American", "Polskie", "Polska", "Soca",
+         "South American", "Tamil", "Worldbeat", "Zouk"],
+    "Jazz":
+        ["Acid Jazz", "Avant Garde", "Big Band", "Bop", "Classic Jazz",
+         "Cool Jazz", "Fusion", "Hard Bop", "Latin Jazz", "Smooth Jazz",
+         "Swing", "Vocal Jazz", "World Fusion"],
+    "Latin":
+        ["Bachata", "Banda", "Bossa Nova", "Cumbia", "Latin Dance",
+         "Latin Pop", "Latin Rap/Hip-Hop", "Latin Rock", "Mariachi",
+         "Merengue", "Ranchera", "Reggaeton", "Regional Mexican", "Salsa",
+         "Tango", "Tejano", "Tropicalia"],
+    "Metal":
+        ["Black Metal", "Classic Metal", "Extreme Metal", "Grindcore",
+         "Hair Metal", "Heavy Metal", "Metalcore", "Power Metal",
+         "Progressive Metal", "Rap Metal"],
+    "New Age":
+        ["Environmental", "Ethnic Fusion", "Healing",
+         "Meditation", "Spiritual"],
+    "Decades":
+        ["30s", "40s", "50s", "60s", "70s", "80s", "90s"],
+    "Pop":
+        ["Adult Contemporary", "Barbershop", "Bubblegum Pop", "Dance Pop",
+         "Idols", "Oldies", "JPOP", "Soft Rock", "Teen Pop", "Top 40",
+         "World Pop"],
+    "R&B/Urban":
+        ["Classic R&B", "Contemporary R&B", "Doo Wop", "Funk",
+         "Motown", "Neo-Soul", "Quiet Storm", "Soul",
+         "Urban Contemporary", "Reggae", "Contemporary Reggae",
+         "Dancehall", "Dub", "Pop-Reggae", "Ragga", "Rock Steady",
+         "Reggae Roots"],
+    "Rock":
+        ["Adult Album Alternative", "British Invasion", "Classic Rock",
+         "Garage Rock", "Glam", "Hard Rock", "Jam Bands", "Piano Rock",
+         "Prog Rock", "Psychedelic", "Rock & Roll", "Rockabilly",
+         "Singer/Songwriter", "Surf"],
+    "Seasonal/Holiday":
+        ["Anniversary", "Birthday", "Christmas", "Halloween",
+         "Hanukkah", "Honeymoon", "Valentine", "Wedding",
+         "Winter"],
+    "Soundtracks":
+        ["Anime", "Bollywood", "Kids", "Original Score",
+         "Showtunes", "Video Game Music"],
+    "Talk":
+        ["Comedy", "Community", "Educational", "Government", "News",
+         "Old Time Radio", "Other Talk", "Political", "Public Radio",
+         "Scanner", "Spoken Word", "Sports", "Technology", "Hardcore",
+         "Eclectic", "Instrumental"],
     "Misc": [],
 }
 
@@ -126,7 +149,10 @@ useless_genres = [
 
 
 class PlaylistStreamProxy(utils.ReverseProxyUriResource, log.LogAble):
-    """ proxies audio streams published as M3U playlists (typically the case for shoutcast streams) """
+    """
+    proxies audio streams published as M3U playlists
+    (typically the case for shoutcast streams)
+    """
     logCategory = 'PlaylistStreamProxy'
 
     stream_url = None
@@ -149,7 +175,7 @@ class PlaylistStreamProxy(utils.ReverseProxyUriResource, log.LogAble):
                 if result is None:
                     self.warning(
                         'Error to retrieve playlist - nothing retrieved')
-                    return requestFinished(result)
+                    return self.requestFinished(result)
                 result = result[0].split('\n')
                 for line in result:
                     if line.startswith('File1='):
@@ -157,8 +183,9 @@ class PlaylistStreamProxy(utils.ReverseProxyUriResource, log.LogAble):
                         break
                 if self.stream_url is None:
                     self.warning(
-                        'Error to retrieve playlist - inconsistent playlist file')
-                    return requestFinished(result)
+                        'Error to retrieve playlist - '
+                        'inconsistent playlist file')
+                    return self.requestFinished(result)
                 # self.resetUri(self.stream_url)
                 request.uri = self.stream_url
                 return self.render(request)
@@ -214,12 +241,14 @@ class IRadioItem(BackendItem):
             upnp_parent_id = self.parent.get_id()
             self.item = DIDLLite.AudioBroadcast(upnp_id, upnp_parent_id,
                                                 self.name)
-            res = Resource(self.url, 'http-get:*:%s:%s' % (self.mimetype,
-                                                           ';'.join((
-                                                                    'DLNA.ORG_PN=MP3',
-                                                                    'DLNA.ORG_CI=0',
-                                                                    'DLNA.ORG_OP=01',
-                                                                    'DLNA.ORG_FLAGS=01700000000000000000000000000000'))))
+            res = Resource(
+                self.url, 'http-get:*:%s:%s' % (
+                    self.mimetype,
+                    ';'.join(
+                        ('DLNA.ORG_PN=MP3',
+                         'DLNA.ORG_CI=0',
+                         'DLNA.ORG_OP=01',
+                         'DLNA.ORG_FLAGS=01700000000000000000000000000000'))))
             res.size = 0  # None
             self.item.res.append(res)
         return self.item
@@ -251,8 +280,8 @@ class IRadioStore(AbstractBackendStore):
         root_item = Container(None, self.name)
         self.set_root_item(root_item)
 
-        # set root-level genre family containers
-        # and populate the genre_parent_items dict from the family hierarchy information
+        # set root-level genre family containers and populate the genre_
+        # parent_items dict from the family hierarchy information
         for family, genres in list(genre_families.items()):
             family_item = self.append_genre(root_item, family)
             if family_item is not None:
@@ -260,11 +289,14 @@ class IRadioStore(AbstractBackendStore):
                 for genre in genres:
                     self.genre_parent_items[genre] = family_item
 
-        # retrieve asynchronously the list of genres from the souhtcast server
-        # genres not already attached to a family will be attached to the "Misc" family
+        # retrieve asynchronously the list of genres from
+        # the souhtcast server genres not already attached to
+        # a family will be attached to the "Misc" family
         self.retrieveGenreList_attemptCount = 0
         deferredRoot = self.retrieveGenreList()
-        # self.init_completed() # will be fired when the genre list is retrieved
+
+        # will be fired when the genre list is retrieved
+        # self.init_completed()
 
     def append_genre(self, parent, genre):
         if genre in useless_genres:
@@ -307,12 +339,11 @@ class IRadioStore(AbstractBackendStore):
         self.wmc_mapping = {'4': self.get_root_id()}
 
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'http-get:*:audio/mpeg:*',
-                                                                   'http-get:*:audio/x-scpls:*'],
-                                                               default=True)
+            self.server.connection_manager_server.set_variable(
+                0, 'SourceProtocolInfo',
+                ['http-get:*:audio/mpeg:*',
+                 'http-get:*:audio/x-scpls:*'],
+                default=True)
 
     # populate a genre container (parent) with the sub-genre containers
     # and corresponding IRadio (list retrieved from the shoutcast server)
@@ -329,8 +360,9 @@ class IRadioStore(AbstractBackendStore):
                 self.append_genre(parent, family_genre)
 
         def got_page(result):
-            self.info('connection to ShoutCast service successful for genre %s',
-                      genre)
+            self.info(
+                'connection to ShoutCast service successful for genre %s',
+                genre)
             result = utils.parse_xml(result, encoding='utf-8')
             tunein = result.find('tunein')
             if tunein is not None:
@@ -374,7 +406,7 @@ class IRadioStore(AbstractBackendStore):
             self.warning("connection to ShoutCast service failed: %s", url)
             self.debug("%r", error.getTraceback())
             parent.childrenRetrievingNeeded = True  # we retry
-            return Failure("Unable to retrieve stations for genre" % genre)
+            return Failure("Unable to retrieve stations for genre %s" % genre)
 
         d = utils.getPage(url)
         d.addCallbacks(got_page, got_error)
@@ -388,11 +420,12 @@ class IRadioStore(AbstractBackendStore):
 
         def got_page(result):
             if self.retrieveGenreList_attemptCount == 0:
-                self.info(
-                    "Connection to ShoutCast service successful for genre listing")
+                self.info("Connection to ShoutCast service "
+                          "successful for genre listing")
             else:
                 self.warning(
-                    "Connection to ShoutCast service successful for genre listing after %d attempts.",
+                    "Connection to ShoutCast service "
+                    "successful for genre listing after %d attempts.",
                     self.retrieveGenreList_attemptCount)
             result = utils.parse_xml(result, encoding='utf-8')
 
@@ -416,9 +449,8 @@ class IRadioStore(AbstractBackendStore):
             self.init_completed()
 
         def got_error(error):
-            self.warning(
-                "connection to ShoutCast service for genre listing failed - Will retry! %r",
-                error)
+            self.warning("connection to ShoutCast service "
+                         "for genre listing failed - Will retry! %r", error)
             self.debug("%r", error.getTraceback())
             self.retrieveGenreList_attemptCount += 1
             reactor.callLater(5, self.retrieveGenreList)

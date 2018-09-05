@@ -62,12 +62,13 @@ class SimpleRoot(resource.Resource, log.LogAble):
         # at this stage, name should be a device UUID
         try:
             return self.coherence.children[name]
-        except:
+        except KeyError:
             self.warning("Cannot find device for requested name: %r", name)
             request.setResponseCode(404)
-            return static.Data(
-                b'<html><p>No device for requested UUID: %s</p></html>' % name.encode('ascii'),
-                'text/html')
+            return \
+                static.Data(
+                    b'<html><p>No device for requested UUID: %s</p></html>' %
+                    name.encode('ascii'), 'text/html')
 
     def listchilds(self, uri):
         if isinstance(uri, bytes):
@@ -91,7 +92,8 @@ class SimpleRoot(resource.Resource, log.LogAble):
     def render(self, request):
         result = """<html>
     <head><title>Coherence</title></head>
-    <body><a href="http://coherence.beebits.net">Coherence</a> - a Python DLNA/UPnP framework for the Digital Living
+    <body><a href="http://coherence.beebits.net">Coherence</a>
+     - a Python DLNA/UPnP framework for the Digital Living
     <p>Hosting:<ul>%r</ul></p>
     </body>
     </html>""" % self.listchilds(request.uri.encode('utf-8'))
@@ -157,8 +159,8 @@ class Plugins(log.LogAble):
         if pkg_resources and isinstance(plugin, pkg_resources.EntryPoint):
             try:
                 plugin = plugin.load(require=False)
-            except (
-            ImportError, AttributeError, pkg_resources.ResolutionError) as msg:
+            except (ImportError, AttributeError,
+                    pkg_resources.ResolutionError) as msg:
                 self.warning(
                     "Can't load plugin %s (%s), maybe missing dependencies...",
                     plugin.name, msg)
@@ -282,8 +284,8 @@ class Coherence(log.LogAble):
             try:
                 self.hostname = socket.gethostbyname(socket.gethostname())
             except socket.gaierror:
-                self.warning(
-                    "hostname can't be resolved, maybe a system misconfiguration?")
+                self.warning("hostname can't be resolved, "
+                             "maybe a system misconfiguration?")
                 self.hostname = '127.0.0.1'
 
         if self.hostname.startswith('127.'):
@@ -307,9 +309,8 @@ class Coherence(log.LogAble):
     def setup_part2(self):
         self.info('running on host: %s', self.hostname)
         if self.hostname.startswith('127.'):
-            self.warning(
-                'detection of own ip failed, using %s as own address, functionality will be limited',
-                self.hostname)
+            self.warning('detection of own ip failed, using %s as own address,'
+                         ' functionality will be limited', self.hostname)
 
         unittest = self.config.get('unittest', 'no')
         unittest = False if unittest == 'no' else True
@@ -332,7 +333,9 @@ class Coherence(log.LogAble):
         louie.connect(self.add_device,
                       'Coherence.UPnP.RootDevice.detection_completed',
                       louie.Any)
-        # louie.connect( self.receiver, 'Coherence.UPnP.Service.detection_completed', louie.Any)
+        # louie.connect(self.receiver,
+        #               'Coherence.UPnP.Service.detection_completed',
+        #               louie.Any)
 
         self.ssdp_server.subscribe("new_device", self.add_device)
         self.ssdp_server.subscribe("removed_device", self.remove_device)
@@ -355,14 +358,15 @@ class Coherence(log.LogAble):
             return
 
         self.urlbase = 'http://%s:%d/' % (self.hostname, self.web_server_port)
-        # self.renew_service_subscription_loop = task.LoopingCall(self.check_devices)
+        # self.renew_service_subscription_loop = \
+        #     task.LoopingCall(self.check_devices)
         # self.renew_service_subscription_loop.start(20.0, now=False)
 
         try:
             plugins = self.config['plugin']
             if isinstance(plugins, dict):
                 plugins = [plugins]
-        except:
+        except Exception:
             plugins = None
 
         if plugins is None:
@@ -459,14 +463,15 @@ class Coherence(log.LogAble):
                     self.warning(
                         "Can't enable %s plugin, sub-system %s not found!",
                         plugin, device)
-                except:
-                    self.exception("Can't enable %s plugin for sub-system %s",
-                                   plugin, device)
+                except Exception as e1:
+                    self.exception(
+                        "Can't enable %s plugin for sub-system %s "
+                        "[exception: %r]", plugin, device, e1)
                     self.debug(traceback.format_exc())
         except KeyError:
             self.warning("Can't enable %s plugin, not found!", plugin)
-        except Exception as msg:
-            self.warning("Can't enable %s plugin, %s!", plugin, msg)
+        except Exception as e2:
+            self.warning("Can't enable %s plugin, %s!", plugin, e2)
             self.debug(traceback.format_exc())
 
     def remove_plugin(self, plugin):
@@ -503,8 +508,8 @@ class Coherence(log.LogAble):
         """
         plugins = self.config.get('plugin')
         if plugins is None:
-            self.warning(
-                "storing a plugin config option is only possible with the new config file format")
+            self.warning("storing a plugin config option is only possible"
+                         " with the new config file format")
             return
         if isinstance(plugins, dict):
             plugins = [plugins]
@@ -517,8 +522,8 @@ class Coherence(log.LogAble):
                     for k, v in list(items.items()):
                         plugin[k] = v
                     self.config.save()
-            except:
-                pass
+            except Exception as e:
+                self.warning('Coherence.store_plugin_config: %r' % e)
         else:
             self.info(
                 "storing plugin config option for %s failed, plugin not found",
@@ -554,18 +559,18 @@ class Coherence(log.LogAble):
             if hasattr(self.ssdp_server, 'port'):
                 self.ssdp_server.port.stopListening()
             # self.renew_service_subscription_loop.stop()
-        except:
+        except Exception:
             pass
 
-        l = []
+        dev_l = []
         for root_device in self.get_devices():
             for device in root_device.get_devices():
                 dd = device.unsubscribe_service_subscriptions()
                 dd.addCallback(device.remove)
-                l.append(dd)
+                dev_l.append(dd)
             rd = root_device.unsubscribe_service_subscriptions()
             rd.addCallback(root_device.remove)
-            l.append(rd)
+            dev_l.append(rd)
 
         def homecleanup(result):
             """anything left over"""
@@ -582,12 +587,14 @@ class Coherence(log.LogAble):
             self.warning('Coherence UPnP framework shutdown')
             return result
 
-        dl = defer.DeferredList(l)
+        dl = defer.DeferredList(dev_l)
         dl.addCallback(homecleanup)
         return dl
 
     def check_devices(self):
-        """ iterate over devices and their embedded ones and renew subscriptions """
+        """
+        iterate over devices and their embedded ones and renew subscriptions
+        """
         for root_device in self.get_devices():
             root_device.renew_service_subscriptions()
             for device in root_device.get_devices():
@@ -622,7 +629,8 @@ class Coherence(log.LogAble):
         return found
 
     def get_device_with_id(self, device_id):
-        # print('get_device_with_id [{}]: {}'.format(type(device_id), device_id))
+        # print('get_device_with_id [{}]: {}'.format(
+        #     type(device_id), device_id))
         found = None
         for device in self.devices:
             id = device.get_id()
@@ -638,11 +646,13 @@ class Coherence(log.LogAble):
         return self.devices
 
     def get_local_devices(self):
-        # print('get_local_devices: {}'.format([d for d in self.devices if d.manifestation == 'local']))
+        # print('get_local_devices: {}'.format(
+        #     [d for d in self.devices if d.manifestation == 'local']))
         return [d for d in self.devices if d.manifestation == 'local']
 
     def get_nonlocal_devices(self):
-        # print('get_nonlocal_devices: {}'.format([d for d in self.devices if d.manifestation == 'remote']))
+        # print('get_nonlocal_devices: {}'.format(
+        #     [d for d in self.devices if d.manifestation == 'remote']))
         return [d for d in self.devices if d.manifestation == 'remote']
 
     def create_device(self, device_type, infos):

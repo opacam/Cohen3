@@ -52,7 +52,7 @@ class Reception(object):
 
     def checkin(self, plugin_path):
         """ import all valid files from plugin_path """
-        if not plugin_path in sys.path:
+        if plugin_path not in sys.path:
             sys.path.insert(0, plugin_path)
         for plugin in os.listdir(plugin_path):
             p = os.path.join(plugin_path, plugin)
@@ -63,10 +63,10 @@ class Reception(object):
                 except Exception as msg:
                     if self.log is None:
                         print("can't import %r - %s" % (
-                        os.path.splitext(plugin)[0], msg))
+                            os.path.splitext(plugin)[0], msg))
                     else:
                         self.log("can't import %r - %r" % (
-                        os.path.splitext(plugin)[0], msg))
+                            os.path.splitext(plugin)[0], msg))
 
     def guestlist(self, plugin_class=Plugin):
         """ returns a list of all Plugin subclasses """

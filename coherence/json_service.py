@@ -30,8 +30,9 @@ class JsonInterface(resource.Resource, log.LogAble):
         return d
 
     def getChildWithDefault(self, path, request):
-        self.info('getChildWithDefault, %r, %r, %r %r %r', request.method, path,
-                  request.uri, request.client, request.args)
+        self.info('getChildWithDefault, %r, %r, %r %r %r',
+                  request.method, path, request.uri,
+                  request.client, request.args)
         # return self.do_the_render(request)
         d = defer.maybeDeferred(self.do_the_render, request)
         return d
@@ -65,7 +66,7 @@ class JsonInterface(resource.Resource, log.LogAble):
                                       (path[2], path[1], path[0])
                         else:
                             msg = "service type %r for device %r not found" % (
-                            path[1], path[0])
+                                path[1], path[0])
 
                     else:
                         msg = "device with id %r not found" % path[0]
@@ -93,7 +94,8 @@ class JsonInterface(resource.Resource, log.LogAble):
         def fail(f):
             request.setResponseCode(404)
             return static.Data(
-                b"<html><p>Houston, we've got a problem</p></html>", 'text/html')
+                b"<html><p>Houston, we've got a problem</p></html>",
+                'text/html')
 
         d = action.call(**kwargs)
         d.addCallback(to_json)

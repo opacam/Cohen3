@@ -114,7 +114,8 @@ class SSDPServer(DatagramProtocol, log.LogAble):
         """Register a service or device that this SSDP server will
         respond to."""
 
-        self.info('Registering {} ({}) -> {}'.format(st, location, manifestation))
+        self.info('Registering {} ({}) -> {}'.format(
+            st, location, manifestation))
         self.debug('\t-searching usn: {}'.format(usn))
 
         try:
@@ -197,7 +198,8 @@ class SSDPServer(DatagramProtocol, log.LogAble):
         try:
             self.transport.write(r, d)
         except (AttributeError, socket.error) as msg:
-            self.info('failure sending out byebye notification: {}'.format(msg))
+            self.info('failure sending out byebye notification: '
+                      '{}'.format(msg))
 
     def discoveryRequest(self, headers, xxx_todo_changeme2):
         """Process a discovery request.  The response must be sent to
@@ -261,7 +263,8 @@ class SSDPServer(DatagramProtocol, log.LogAble):
             '%r: %r' % (k, v) for k, v in stcpy.items()])
         resp.extend(('', ''))
         r = '\r\n'.join(resp).encode('ascii')
-        self.debug('doNotify content {}  [transport is: {}]'.format(r, self.transport))
+        self.debug('doNotify content {}  [transport is: {}]'.format(
+            r, self.transport))
         if not self.transport:
             try:
                 self.warning('transport not initialized...'
@@ -329,7 +332,7 @@ class SSDPServer(DatagramProtocol, log.LogAble):
                 last_seen = self.known[usn]['last-seen']
                 self.debug('Checking if {} is still valid - last seen '
                            '{} (+{}), now {}'.format(
-                    self.known[usn]['USN'], last_seen, expiry, now))
+                               self.known[usn]['USN'], last_seen, expiry, now))
                 if last_seen + expiry + 30 < now:
                     self.debug('Expiring: {}'.format(self.known[usn]))
                     if self.known[usn]['ST'] == 'upnp:rootdevice':

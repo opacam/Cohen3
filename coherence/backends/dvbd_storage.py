@@ -192,10 +192,10 @@ class Recording(BackendItem):
         item.res.append(res)
 
         # add internal resource
-        res = DIDLLite.Resource('file://' + urllib.parse.quote(self.get_path()),
-                                'internal:%s:%s:*' % (
-                                self.store.server.coherence.hostname,
-                                self.mimetype))
+        res = DIDLLite.Resource(
+            'file://' + urllib.parse.quote(self.get_path()),
+            'internal:%s:%s:*' % (
+                self.store.server.coherence.hostname, self.mimetype))
         if self.size > 0:
             res.size = self.size
         if self.duration > 0:
@@ -245,8 +245,8 @@ class DVBDStore(BackendStore):
             self.upnp_DestroyObject = self.hidden_upnp_DestroyObject
 
         self.bus = dbus.SessionBus()
-        dvb_daemon_recordingsStore = self.bus.get_object(BUS_NAME,
-                                                         RECORDINGSSTORE_OBJECT_PATH)
+        dvb_daemon_recordingsStore = self.bus.get_object(
+            BUS_NAME, RECORDINGSSTORE_OBJECT_PATH)
         dvb_daemon_manager = self.bus.get_object(BUS_NAME, MANAGER_OBJECT_PATH)
 
         self.store_interface = dbus.Interface(dvb_daemon_recordingsStore,
@@ -254,9 +254,9 @@ class DVBDStore(BackendStore):
         self.manager_interface = dbus.Interface(dvb_daemon_manager,
                                                 'org.gnome.DVB.Manager')
 
-        dvb_daemon_recordingsStore.connect_to_signal('Changed',
-                                                     self.recording_changed,
-                                                     dbus_interface='org.gnome.DVB.RecordingsStore')
+        dvb_daemon_recordingsStore.connect_to_signal(
+            'Changed', self.recording_changed,
+            dbus_interface='org.gnome.DVB.RecordingsStore')
 
         self.containers = {}
         self.containers[ROOT_CONTAINER_ID] = \
@@ -285,8 +285,8 @@ class DVBDStore(BackendStore):
 
         def query_failed(error):
             self.error("ERROR: %s", error)
-            louie.send('Coherence.UPnP.Backend.init_failed', None, backend=self,
-                       msg=error)
+            louie.send('Coherence.UPnP.Backend.init_failed',
+                       None, backend=self, msg=error)
 
         # get_device_groups is called after get_channel_groups,
         # because we need channel groups first
@@ -316,7 +316,8 @@ class DVBDStore(BackendStore):
             try:
                 type, id = id.split('.')
                 if type == 'recording':
-                    return self.containers[RECORDINGS_CONTAINER_ID].children[id]
+                    return self.containers[
+                        RECORDINGS_CONTAINER_ID].children[id]
             except (ValueError, KeyError):
                 return None
         return item
@@ -333,15 +334,13 @@ class DVBDStore(BackendStore):
                     hasattr(self.server, 'content_directory_server')):
                 if hasattr(self, 'update_id'):
                     self.update_id += 1
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'SystemUpdateID',
-                                                                      self.update_id)
+                    self.server.content_directory_server.set_variable(
+                        0, 'SystemUpdateID', self.update_id)
                 value = (RECORDINGS_CONTAINER_ID,
                          self.containers[RECORDINGS_CONTAINER_ID].update_id)
                 self.debug("ContainerUpdateIDs new value: %s", value)
-                self.server.content_directory_server.set_variable(0,
-                                                                  'ContainerUpdateIDs',
-                                                                  value)
+                self.server.content_directory_server.set_variable(
+                    0, 'ContainerUpdateIDs', value)
 
         def handle_error(error):
             self.error("ERROR: %s", error)
@@ -369,13 +368,10 @@ class DVBDStore(BackendStore):
         d = defer.Deferred()
         d.addCallback(process_details)
         d.addErrback(handle_error)
-        self.store_interface.GetAllInformations(id,
-                                                reply_handler=lambda x,
-                                                                     success: d.callback(
-                                                    x),
-                                                error_handler=lambda x,
-                                                                     success: d.errback(
-                                                    x))
+        self.store_interface.GetAllInformations(
+            id,
+            reply_handler=lambda x, success: d.callback(x),
+            error_handler=lambda x, success: d.errback(x))
         return d
 
     def get_recordings(self):
@@ -389,19 +385,21 @@ class DVBDStore(BackendStore):
             self.debug("GOT RECORDINGS: %s", ids)
             if len(ids) == 0:
                 return []
-            l = []
+            rd = []
             for id in ids:
-                l.append(self.get_recording_details(id))
+                rd.append(self.get_recording_details(id))
 
-            dl = defer.DeferredList(l)
+            dl = defer.DeferredList(rd)
             return dl
 
         def process_details(results):
-            # print 'process_details', results
+            # print('process_details', results)
             for result, recording in results:
-                # print result, recording['name']
+                # print(result, recording['name'])
                 if result:
-                    # print "add", recording['id'], recording['name'], recording['path'], recording['date'], recording['duration']
+                    # print("add", recording['id'], recording['name'],
+                    #       recording['path'], recording['date'],
+                    #       recording['duration'])
                     video_item = Recording(self,
                                            recording['id'],
                                            RECORDINGS_CONTAINER_ID,
@@ -428,35 +426,24 @@ class DVBDStore(BackendStore):
 
         def get_name(id):
             d = defer.Deferred()
-            channelList_interface.GetChannelName(id,
-                                                 reply_handler=lambda x,
-                                                                      success: d.callback(
-                                                     x),
-                                                 error_handler=lambda x,
-                                                                      success: d.errback(
-                                                     x))
+            channelList_interface.GetChannelName(
+                id,
+                reply_handler=lambda x, success: d.callback(x),
+                error_handler=lambda x, success: d.errback(x))
             return d
 
         def get_network(id):
             d = defer.Deferred()
-            channelList_interface.GetChannelNetwork(id,
-                                                    reply_handler=lambda x,
-                                                                         success: d.callback(
-                                                        x),
-                                                    error_handler=lambda x,
-                                                                         success: d.errback(
-                                                        x))
+            channelList_interface.GetChannelNetwork(
+                id, reply_handler=lambda x, success: d.callback(x),
+                error_handler=lambda x, success: d.errback(x))
             return d
 
         def get_url(id):
             d = defer.Deferred()
-            channelList_interface.GetChannelURL(id,
-                                                reply_handler=lambda x,
-                                                                     success: d.callback(
-                                                    x),
-                                                error_handler=lambda x,
-                                                                     success: d.errback(
-                                                    x))
+            channelList_interface.GetChannelURL(
+                id, reply_handler=lambda x, success: d.callback(x),
+                error_handler=lambda x, success: d.errback(x))
             return d
 
         def process_details(r, id):
@@ -495,19 +482,16 @@ class DVBDStore(BackendStore):
             d = defer.Deferred()
             d.addCallback(process_getChannelsOfGroup, group_id)
             d.addErrback(handle_error)
-            channelList_interface.GetChannelsOfGroup(group_id,
-                                                     reply_handler=lambda x,
-                                                                          success: d.callback(
-                                                         x),
-                                                     error_handler=lambda x,
-                                                                          success: d.callback(
-                                                         x))
+            channelList_interface.GetChannelsOfGroup(
+                group_id,
+                reply_handler=lambda x, success: d.callback(x),
+                error_handler=lambda x, success: d.callback(x))
             return d
 
-        l = []
+        ml = []
         for group_id, group_name in self.channel_groups:
-            l.append(get_members(channelList_interface, group_id))
-        dl = defer.DeferredList(l)
+            ml.append(get_members(channelList_interface, group_id))
+        dl = defer.DeferredList(ml)
         return dl
 
     def get_tv_channels(self, channelList_interface):
@@ -521,11 +505,12 @@ class DVBDStore(BackendStore):
             self.debug("GetChannels: %s", channels)
             if len(channels) == 0:
                 return []
-            l = []
+            cl = []
             for channel_id in channels:
-                l.append(
-                    self.get_channel_details(channelList_interface, channel_id))
-            dl = defer.DeferredList(l)
+                cl.append(
+                    self.get_channel_details(
+                        channelList_interface, channel_id))
+            dl = defer.DeferredList(cl)
             return dl
 
         def process_details(results):
@@ -543,7 +528,8 @@ class DVBDStore(BackendStore):
                                          channel['url'],
                                          channel['network'],
                                          'video/mpegts')
-                    self.containers[CHANNELS_CONTAINER_ID].add_child(video_item)
+                    self.containers[CHANNELS_CONTAINER_ID].add_child(
+                        video_item)
                     channels[int(channel['id'])] = video_item
             return channels
 
@@ -569,8 +555,8 @@ class DVBDStore(BackendStore):
         def process_getChannelList_result(result):
             self.debug("GetChannelList: %s", result)
             dvbd_channelList = self.bus.get_object(BUS_NAME, result)
-            channelList_interface = dbus.Interface(dvbd_channelList,
-                                                   'org.gnome.DVB.ChannelList')
+            channelList_interface = dbus.Interface(
+                dvbd_channelList, 'org.gnome.DVB.ChannelList')
 
             return self.get_tv_channels(channelList_interface)
 
@@ -593,15 +579,15 @@ class DVBDStore(BackendStore):
             self.debug("GetRegisteredDeviceGroups: %s", ids)
             if len(ids) == 0:
                 return
-            l = []
+            gl = []
             for group_object_path in ids:
                 dvbd_devicegroup = self.bus.get_object(BUS_NAME,
                                                        group_object_path)
-                devicegroup_interface = dbus.Interface(dvbd_devicegroup,
-                                                       'org.gnome.DVB.DeviceGroup')
-                l.append(self.get_deviceGroup_details(devicegroup_interface))
+                devicegroup_interface = dbus.Interface(
+                    dvbd_devicegroup, 'org.gnome.DVB.DeviceGroup')
+                gl.append(self.get_deviceGroup_details(devicegroup_interface))
 
-            dl = defer.DeferredList(l)
+            dl = defer.DeferredList(gl)
             return dl
 
         d = defer.Deferred()
@@ -642,12 +628,12 @@ class DVBDStore(BackendStore):
 
     def upnp_init(self):
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'http-get:*:video/mpegts:*',
-                                                                   'internal:%s:video/mpegts:*' % self.server.coherence.hostname, ],
-                                                               'rtsp-rtp-udp:*:video/mpegts:*', )
+            self.server.connection_manager_server.set_variable(
+                0, 'SourceProtocolInfo', [
+                    'http-get:*:video/mpegts:*',
+                    'internal:%s:video/mpegts:*' %
+                    self.server.coherence.hostname, ],
+                'rtsp-rtp-udp:*:video/mpegts:*', )
 
     def hidden_upnp_DestroyObject(self, *args, **kwargs):
         ObjectID = kwargs['ObjectID']
@@ -707,24 +693,17 @@ class DVBDScheduledRecording(BackendStore):
 
         def get_infos(tid):
             d = defer.Callback()
-            self.recorder_interface.GetAllInformations(tid,
-                                                       reply_handler=lambda x,
-                                                                            success: d.callback(
-                                                           x),
-                                                       error_handler=lambda x,
-                                                                            success: d.errback(
-                                                           x))
+            self.recorder_interface.GetAllInformations(
+                tid,
+                reply_handler=lambda x, success: d.callback(x),
+                error_handler=lambda x, success: d.errback(x))
             return d
 
         def get_start_time(tid):
             d = defer.Callback()
-            self.recorder_interface.GetStartTime(tid,
-                                                 reply_handler=lambda x,
-                                                                      success: d.callback(
-                                                     x),
-                                                 error_handler=lambda x,
-                                                                      success: d.errback(
-                                                     x))
+            self.recorder_interface.GetStartTime(
+                tid, reply_handler=lambda x, success: d.callback(x),
+                error_handler=lambda x, success: d.errback(x))
             return d
 
         def process_details(results):
@@ -749,17 +728,18 @@ class DVBDScheduledRecording(BackendStore):
             return error
 
         def process_GetTimers_results(timer_ids):
-            l = []
+            tl = []
             for tid in timer_ids:
-                l.append(self.get_timer_details(tid))
-            dl = defer.DeferredList(l)
+                tl.append(self.get_timer_details(tid))
+            dl = defer.DeferredList(tl)
             return dl
 
         d = defer.Deferred()
-        d.addCallback(process_GetTimers_result)
+        d.addCallback(process_GetTimers_results)
         d.addErrback(handle_error)
-        self.recorder_interface.GetTimers(reply_handler=lambda x: d.callback(x),
-                                          error_handler=lambda x: d.errback(x))
+        self.recorder_interface.GetTimers(
+            reply_handler=lambda x: d.callback(x),
+            error_handler=lambda x: d.errback(x))
         return d
 
     def add_timer(self, channel_id, start_datetime, duration):
@@ -777,17 +757,14 @@ class DVBDScheduledRecording(BackendStore):
         d.addCallback(process_AddTimer_result)
         d.addErrback(handle_error)
 
-        self.recorder_interface.AddTimer(channel_id, start_datetime.year,
-                                         start_datetime.month,
-                                         start_datetime.day,
-                                         start_datetime.hour,
-                                         start_datetime.minute, duration,
-                                         reply_handler=lambda x,
-                                                              success: d.callback(
-                                             x),
-                                         error_handler=lambda x,
-                                                              success: d.errback(
-                                             x))
+        self.recorder_interface.AddTimer(
+            channel_id, start_datetime.year,
+            start_datetime.month,
+            start_datetime.day,
+            start_datetime.hour,
+            start_datetime.minute, duration,
+            reply_handler=lambda x, success: d.callback(x),
+            error_handler=lambda x, success: d.errback(x))
         return d
 
     def delete_timer(self, tid):
@@ -806,13 +783,10 @@ class DVBDScheduledRecording(BackendStore):
         d = defer.Deferred()
         d.addCallback(process_DeleteTimer_result)
         d.addErrback(handle_error)
-        self.recorder_interface.DeleteTimer(tid,
-                                            reply_handler=lambda x,
-                                                                 success: d.callback(
-                                                x),
-                                            error_handler=lambda x,
-                                                                 success: d.errback(
-                                                x))
+        self.recorder_interface.DeleteTimer(
+            tid,
+            reply_handler=lambda x, success: d.callback(x),
+            error_handler=lambda x, success: d.errback(x))
         return d
 
     def upnp_GetPropertyList(self, *args, **kwargs):
@@ -863,11 +837,10 @@ class DVBDScheduledRecording(BackendStore):
         d = defer.Deferred()
         d.addCallback(process_IsTimerActive_result, rec_sched_id)
         d.addErrback(handle_error)
-        self.recorder_interface.IsTimerActive(rec_sched_id,
-                                              reply_handler=lambda
-                                                  x: d.callback(x),
-                                              error_handler=lambda x: d.errback(
-                                                  x))
+        self.recorder_interface.IsTimerActive(
+            rec_sched_id,
+            reply_handler=lambda x: d.callback(x),
+            error_handler=lambda x: d.errback(x))
         return d
 
     def upnp_GetRecordSchedule(self, *args, **kwargs):

@@ -34,16 +34,16 @@ class MediaRendererClient(log.LogAble):
 
         for service in self.device.get_services():
             if service.get_type() in [
-                "urn:schemas-upnp-org:service:RenderingControl:1",
-                "urn:schemas-upnp-org:service:RenderingControl:2"]:
+                    "urn:schemas-upnp-org:service:RenderingControl:1",
+                    "urn:schemas-upnp-org:service:RenderingControl:2"]:
                 self.rendering_control = RenderingControlClient(service)
             if service.get_type() in [
-                "urn:schemas-upnp-org:service:ConnectionManager:1",
-                "urn:schemas-upnp-org:service:ConnectionManager:2"]:
+                    "urn:schemas-upnp-org:service:ConnectionManager:1",
+                    "urn:schemas-upnp-org:service:ConnectionManager:2"]:
                 self.connection_manager = ConnectionManagerClient(service)
             if service.get_type() in [
-                "urn:schemas-upnp-org:service:AVTransport:1",
-                "urn:schemas-upnp-org:service:AVTransport:2"]:
+                    "urn:schemas-upnp-org:service:AVTransport:1",
+                    "urn:schemas-upnp-org:service:AVTransport:2"]:
                 self.av_transport = AVTransportClient(service)
         self.info("MediaRenderer %s", self.device.get_friendly_name())
         if self.rendering_control:
@@ -62,20 +62,25 @@ class MediaRendererClient(log.LogAble):
             # self.rendering_control.set_mute(desired_mute=1)
         else:
             self.warning(
-                "RenderingControl not available, device not implemented properly according to the UPnP specification")
+                "RenderingControl not available, device not implemented"
+                " properly according to the UPnP specification")
             return
         if self.connection_manager:
             self.info("ConnectionManager available")
             # self.connection_manager.get_protocol_info()
         else:
             self.warning(
-                "ConnectionManager not available, device not implemented properly according to the UPnP specification")
+                "ConnectionManager not available, device not implemented"
+                " properly according to the UPnP specification")
             return
         if self.av_transport:
             self.info("AVTransport (optional) available")
-            # self.av_transport.service.subscribe_for_variable('LastChange', 0, self.state_variable_change)
-            # self.av_transport.service.subscribe_for_variable('TransportState', 0, self.state_variable_change)
-            # self.av_transport.service.subscribe_for_variable('CurrentTransportActions', 0, self.state_variable_change)
+            # self.av_transport.service.subscribe_for_variable(
+            #     'LastChange', 0, self.state_variable_change)
+            # self.av_transport.service.subscribe_for_variable(
+            #     'TransportState', 0, self.state_variable_change)
+            # self.av_transport.service.subscribe_for_variable(
+            #     'CurrentTransportActions', 0, self.state_variable_change)
             # self.av_transport.get_transport_info()
             # self.av_transport.get_current_transport_actions()
 
@@ -98,7 +103,8 @@ class MediaRendererClient(log.LogAble):
         if self.detection_completed:
             return
         if self.rendering_control is not None:
-            if not hasattr(self.rendering_control.service, 'last_time_updated'):
+            if not hasattr(self.rendering_control.service,
+                           'last_time_updated'):
                 return
             if self.rendering_control.service.last_time_updated is None:
                 return

@@ -51,9 +51,11 @@ class Service(log.LogAble):
         self.id = service_id
         self.control_url = control_url if isinstance(location, bytes) else \
             control_url.encode('ascii') if control_url else None
-        self.event_sub_url = event_sub_url if isinstance(event_sub_url, bytes) else \
+        self.event_sub_url = \
+            event_sub_url if isinstance(event_sub_url, bytes) else \
             event_sub_url.encode('ascii') if event_sub_url else None
-        self.presentation_url = presentation_url if isinstance(presentation_url, bytes) else \
+        self.presentation_url = \
+            presentation_url if isinstance(presentation_url, bytes) else \
             presentation_url.encode('ascii') if presentation_url else None
         self.scpd_url = scpd_url if isinstance(scpd_url, bytes) else \
             scpd_url.encode('ascii') if scpd_url else None
@@ -115,7 +117,8 @@ class Service(log.LogAble):
                     v = attribute
                 if v not in [None, 'None', b'']:
                     r.append((name, v))
-            except:
+            except Exception as e:
+                self.error('Service.as_tuples.append: %r' % e)
                 import traceback
                 self.debug(traceback.format_exc())
 
@@ -165,7 +168,7 @@ class Service(log.LogAble):
                   self.service_type, self.id)
         try:
             self.renew_subscription_call.cancel()
-        except:
+        except Exception:
             pass
         if self.event_connection is not None:
             self.event_connection.teardown()
@@ -199,7 +202,7 @@ class Service(log.LogAble):
             self.info("reset renew subscription call for %s/%s to %d",
                       self.device.friendly_name, self.service_type,
                       int(self.timeout) - 30)
-        except:
+        except Exception:
             self.renew_subscription_call = reactor.callLater(
                 int(self.timeout) - 30, self.renew_subscription)
             self.info("starting renew subscription call for %s/%s to %d",
@@ -284,9 +287,11 @@ class Service(log.LogAble):
             if callback is not None:
                 if signal:
                     callback(variable)
-                    louie.connect(callback,
-                                  signal='Coherence.UPnP.StateVariable.%s.changed' % var_name,
-                                  sender=self)
+                    louie.connect(
+                        callback,
+                        signal='Coherence.UPnP.StateVariable.%s.changed' %
+                               var_name,
+                        sender=self)
                 else:
                     variable.subscribe(callback)
 
@@ -314,35 +319,43 @@ class Service(log.LogAble):
                             var.attrib['val'])
                         self.info("updated var %r", var)
                         if len(var.attrib) > 1:
-                            self.info("Extended StateVariable %s - %r", var.tag,
-                                      var.attrib)
-                            if 'channel' in var.attrib and var.attrib[
-                                'channel'] != 'Master':
-                                # TODO handle attributes that them selves have multiple instances
+                            self.info("Extended StateVariable %s - %r",
+                                      var.tag, var.attrib)
+                            if 'channel' in var.attrib and \
+                                    var.attrib['channel'] != 'Master':
+                                # TODO handle attributes that
+                                # them selves have multiple instances
                                 self.info(
-                                    "Skipping update to %s its not for master channel %s",
+                                    "Skipping update to %s "
+                                    "its not for master channel %s",
                                     var.tag, var.attrib)
                                 pass
                             else:
                                 if not self.get_state_variables(instance_id):
                                     # TODO Create instance ?
                                     self.error(
-                                        "%r update failed (not self.get_state_variables(instance_id)) %r",
+                                        "%r update failed "
+                                        "(not self.get_state_variables"
+                                        "(instance_id)) %r",
                                         self, instance_id)
                                 elif tag not in self.get_state_variables(
                                         instance_id):
                                     # TODO Create instance StateVariable?
                                     # SONOS stuff
                                     self.error(
-                                        "%r update failed (not self.get_state_variables(instance_id).has_key(tag)) %r",
+                                        "%r update failed "
+                                        "(not self.get_state_variables"
+                                        "(instance_id).has_key(tag)) %r",
                                         self, tag)
                                 else:
                                     val = None
                                     if 'val' in var.attrib:
                                         val = var.attrib['val']
-                                    # self.debug("%r update %r %r %r", self,namespace_uri, tag, var.attrib['val'])
-                                    self.get_state_variable(tag,
-                                                            instance_id).update(
+                                    # self.debug("%r update %r %r %r",
+                                    #            self,namespace_uri,
+                                    #            tag, var.attrib['val'])
+                                    self.get_state_variable(
+                                        tag, instance_id).update(
                                         var.attrib['val'])
                                     self.debug("updated 'attributed' var %r",
                                                var)
@@ -433,7 +446,8 @@ class Service(log.LogAble):
             if (self.last_time_updated == None):
                 if( self.id.endswith('AVTransport') or
                     self.id.endswith('RenderingControl')):
-                    louie.send('Coherence.UPnP.DeviceClient.Service.notified', sender=self.device, service=self)
+                    louie.send('Coherence.UPnP.DeviceClient.Service.notified',
+                               sender=self.device, service=self)
                     self.last_time_updated = time.time()
             """
 
@@ -449,8 +463,7 @@ class Service(log.LogAble):
 
 
 moderated_variables = \
-    {'urn:schemas-upnp-org:service:AVTransport:2':
-         ['LastChange'],
+    {'urn:schemas-upnp-org:service:AVTransport:2': ['LastChange'],
      'urn:schemas-upnp-org:service:AVTransport:1':
          ['LastChange'],
      'urn:schemas-upnp-org:service:ContentDirectory:2':
@@ -482,7 +495,7 @@ class ServiceServer(log.LogAble):
             self.id_namespace = 'upnp-org'
 
         self.service_type = 'urn:%s:service:%s:%d' % (
-        self.namespace, id, int(self.version))
+            self.namespace, id, int(self.version))
         self.debug('\t-service_type: {}'.format(self.service_type))
 
         self.scpd_url = b'scpd.xml'
@@ -508,7 +521,7 @@ class ServiceServer(log.LogAble):
         try:
             if 'LastChange' in moderated_variables[self.service_type]:
                 self.last_change = self._variables[0]['LastChange']
-        except:
+        except Exception:
             pass
         self.debug('ServiceServer.__init__: putChild {} ...wait'.format(
             self.subscription_url))
@@ -633,13 +646,13 @@ class ServiceServer(log.LogAble):
                 value.addCallback(process_value)
             else:
                 process_value(value)
-        except:
+        except KeyError:
             pass
 
     def get_variable(self, variable_name, instance=0):
         try:
             return self._variables[int(instance)][variable_name]
-        except:
+        except KeyError:
             return None
 
     def build_single_notification(self, instance, variable_name, value):
@@ -656,15 +669,17 @@ class ServiceServer(log.LogAble):
             e = etree.SubElement(root, 'InstanceID')
             e.attrib['val'] = str(instance)
             for variable in list(vdict.values()):
-                if variable.name != 'LastChange' and variable.name[
-                                                     0:11] != 'A_ARG_TYPE_' and not variable.never_evented:
+                if variable.name != 'LastChange' and \
+                        variable.name[0:11] != 'A_ARG_TYPE_' and \
+                        not variable.never_evented:
                     if variable.updated or force:
                         s = etree.SubElement(e, variable.name)
                         s.attrib['val'] = str(variable.value)
                         variable.updated = False
                         got_one = True
                         if variable.dependant_variable is not None:
-                            dependants = variable.dependant_variable.get_allowed_values()
+                            dependants = variable.dependant_variable.\
+                                get_allowed_values()
                             if dependants is not None and len(dependants) > 0:
                                 s.attrib['channel'] = dependants[0]
         if got_one:
@@ -737,7 +752,7 @@ class ServiceServer(log.LogAble):
             variables = moderated_variables[self.get_type()]
             if name in variables:
                 return True
-        except:
+        except KeyError:
             pass
         return False
 
@@ -760,25 +775,34 @@ class ServiceServer(log.LogAble):
                                  allowed_value_range=None,
                                  moderated=False):
         """
-        enables a backend to add an own, vendor defined, StateVariable to the service
+        enables a backend to add an own,
+        vendor defined, StateVariable to the service
 
         @ivar name: the name of the new StateVariable
         @ivar implementation: either 'optional' or 'required'
-        @ivar instance: the instance number of the service that variable should be assigned to, usually '0'
-        @ivar evented: boolean, or the special keyword 'never' if the variable doesn't show up in a LastChange event too
-        @ivar data_type: 'string','boolean','bin.base64' or various number formats
-        @ivar dependant_variable: the name of another StateVariable that depends on this one
-        @ivar default_value: the value this StateVariable should have by default when created
-                             for another instance of in the service
+        @ivar instance: the instance number of the service that variable
+            should be assigned to, usually '0'
+        @ivar evented: boolean, or the special keyword 'never' if the variable
+            doesn't show up in a LastChange event too
+        @ivar data_type: 'string','boolean','bin.base64' or
+            various number formats
+        @ivar dependant_variable: the name of another StateVariable that
+            depends on this one
+        @ivar default_value: the value this StateVariable should have by
+            default when created for another instance of in the service
         @ivar allowed_values: a C{list} of values this StateVariable can have
-        @ivar has_vendor_values: boolean if there are values outside the allowed_values list too
-        @ivar allowed_value_range: a C{dict} of 'minimum','maximum' and 'step' values
-        @ivar moderated: boolean, True if this StateVariable should only be evented via a LastChange event
+        @ivar has_vendor_values: boolean if there are values outside
+            the allowed_values list too
+        @ivar allowed_value_range: a C{dict} of 'minimum','maximum'
+            and 'step' values
+        @ivar moderated: boolean, True if this StateVariable should only be
+            evented via a LastChange event
 
         """
 
         # FIXME
-        # we should raise an Exception when there as a StateVariable with that name already
+        # we should raise an Exception when there as a
+        # StateVariable with that name already
 
         if evented == 'never':
             send_events = 'no'
@@ -790,7 +814,8 @@ class ServiceServer(log.LogAble):
         if default_value is None:
             new_variable.default_value = ''
         else:
-            new_variable.default_value = new_variable.old_value = new_variable.value = default_value
+            new_variable.default_value = \
+                new_variable.old_value = new_variable.value = default_value
 
         new_variable.dependant_variable = dependant_variable
         new_variable.has_vendor_values = has_vendor_values
@@ -809,12 +834,13 @@ class ServiceServer(log.LogAble):
         @ivar name: the name of the new Action
         @ivar implementation: either 'optional' or 'required'
         @ivar arguments: a C{list} if argument C{tuples},
-                         like (name,direction,relatedStateVariable)
-        @ivar needs_callback: this Action needs a method in the backend or service class
+            like (name,direction,relatedStateVariable)
+        @ivar needs_callback: this Action needs a method in the backend
+            or service class
         """
-        # FIXME
-        # we should raise an Exception when there as an Action with that name already
-        # we should raise an Exception when there is no related StateVariable for an Argument
+        # FIXME -  we should raise an Exception when there as an Action
+        # with that name already we should raise an Exception when there is no
+        # related StateVariable for an Argument
 
         """ check for action in backend """
         callback = getattr(self.backend, "upnp_%s" % name, None)
@@ -829,16 +855,16 @@ class ServiceServer(log.LogAble):
             """
             if implementation == 'optional':
                 self.info(
-                    '%s has a missing callback for %s action %s, action disabled',
-                    self.id, implementation, name)
+                    '%s has a missing callback for %s action %s, '
+                    'action disabled', self.id, implementation, name)
                 return
             else:
-                if (hasattr(self,
-                            'implementation') and self.implementation == 'required') or not hasattr(
+                if (hasattr(self, 'implementation') and
+                    self.implementation == 'required') or not hasattr(
                         self, 'implementation'):
                     self.warning(
-                        '%s has a missing callback for %s action %s, service disabled',
-                        self.id, implementation, name)
+                        '%s has a missing callback for %s action %s, '
+                        'service disabled', self.id, implementation, name)
                 raise LookupError("missing callback")
 
         arguments_list = []
@@ -854,10 +880,10 @@ class ServiceServer(log.LogAble):
         return new_action
 
     def init_var_and_actions(self):
-        desc_file = util.sibpath(__file__,
-                                 os.path.join('xml-service-descriptions',
-                                              '%s%d.xml' % (
-                                              self.id, int(self.version))))
+        desc_file = util.sibpath(
+            __file__,
+            os.path.join('xml-service-descriptions',
+                         '%s%d.xml' % (self.id, int(self.version))))
         tree = etree.parse(desc_file)
 
         for action_node in tree.findall('.//action'):
@@ -870,12 +896,12 @@ class ServiceServer(log.LogAble):
                 needs_callback = True
             if action_node.find('Optional') is not None:
                 implementation = 'optional'
-                if action_node.find('Optional').attrib.get(
-                        '{urn:schemas-beebits-net:service-1-0}X_needs_backend',
-                        None) is not None \
-                        or action_node.attrib.get(
+                if action_node.find(
+                        'Optional').attrib.get(
                     '{urn:schemas-beebits-net:service-1-0}X_needs_backend',
-                    None) is not None:
+                        None) is not None or action_node.attrib.get(
+                    '{urn:schemas-beebits-net:service-1-0}X_needs_backend',
+                        None) is not None:
                     needs_callback = True
 
             arguments = []
@@ -902,16 +928,16 @@ class ServiceServer(log.LogAble):
                 """
                 if implementation == 'optional':
                     self.info(
-                        '%s has a missing callback for %s action %s, action disabled',
-                        self.id, implementation, name)
+                        '%s has a missing callback for %s action %s, '
+                        'action disabled', self.id, implementation, name)
                     continue
                 else:
-                    if (hasattr(self,
-                                'implementation') and self.implementation == 'required') or not hasattr(
-                            self, 'implementation'):
+                    if (hasattr(self, 'implementation') and
+                        self.implementation == 'required') or \
+                            not hasattr(self, 'implementation'):
                         self.warning(
-                            '%s has a missing callback for %s action %s, service disabled',
-                            self.id, implementation, name)
+                            '%s has a missing callback for %s action %s, '
+                            'service disabled', self.id, implementation, name)
                     raise LookupError("missing callback")
 
             new_action = action.Action(self, name, implementation, arguments)
@@ -945,13 +971,14 @@ class ServiceServer(log.LogAble):
             values = []
             for allowed in var_node.findall('.//allowedValue'):
                 values.append(allowed.text)
-            self._variables.get(instance)[name] = variable.StateVariable(self,
-                                                                         name,
-                                                                         implementation,
-                                                                         instance,
-                                                                         send_events,
-                                                                         data_type,
-                                                                         values)
+            self._variables.get(instance)[name] = \
+                variable.StateVariable(self,
+                                       name,
+                                       implementation,
+                                       instance,
+                                       send_events,
+                                       data_type,
+                                       values)
 
             dependant_variable = var_node.findtext(
                 '{urn:schemas-beebits-net:service-1-0}X_dependantVariable')
@@ -963,7 +990,8 @@ class ServiceServer(log.LogAble):
                 self._variables.get(instance)[name].set_default_value(
                     default_value)
             if var_node.find('sendEventsAttribute') is not None:
-                never_evented = var_node.find('sendEventsAttribute').attrib.get(
+                never_evented = var_node.find(
+                    'sendEventsAttribute').attrib.get(
                     '{urn:schemas-beebits-net:service-1-0}X_no_means_never',
                     None)
                 if never_evented is not None:
@@ -985,41 +1013,48 @@ class ServiceServer(log.LogAble):
                             variable_value_defaults)
 
                 if vendor_values is not None:
-                    self._variables.get(instance)[name].has_vendor_values = True
+                    self._variables.get(
+                        instance)[name].has_vendor_values = True
 
             allowed_value_range = var_node.find('allowedValueRange')
             if allowed_value_range:
-                vendor_values = allowed_value_range.attrib.get(
-                    '{urn:schemas-beebits-net:service-1-0}X_withVendorDefines',
-                    None)
+                vendor_values = \
+                    allowed_value_range.attrib.get(
+                        '{urn:schemas-beebits-net:service-1-0}'
+                        'X_withVendorDefines', None)
                 range = {}
                 for e in list(allowed_value_range):
                     range[e.tag] = e.text
                     if vendor_values is not None:
                         if service_range_defaults:
-                            variable_range_defaults = service_range_defaults.get(
-                                name)
+                            variable_range_defaults = \
+                                service_range_defaults.get(name)
                             if (variable_range_defaults is not None and
-                                    variable_range_defaults.get(e.tag) is not None):
-                                self.info("overwriting %s attribute %s with %s",
-                                          name,
-                                          e.tag,
-                                          str(variable_range_defaults[e.tag]))
+                                    variable_range_defaults.get(
+                                        e.tag) is not None):
+                                self.info(
+                                    "overwriting %s attribute %s with %s",
+                                    name,
+                                    e.tag,
+                                    str(variable_range_defaults[e.tag]))
                                 range[e.tag] = variable_range_defaults[e.tag]
                             elif e.text is None:
                                 self.info(
-                                    "missing vendor definition for %s, attribute %s",
-                                    name, e.tag)
+                                    "missing vendor definition for %s, "
+                                    "attribute %s", name, e.tag)
                 self._variables.get(instance)[name].set_allowed_value_range(
                     **range)
                 if vendor_values is not None:
-                    self._variables.get(instance)[name].has_vendor_values = True
+                    self._variables.get(
+                        instance)[name].has_vendor_values = True
             elif service_range_defaults:
                 variable_range_defaults = service_range_defaults.get(name)
                 if variable_range_defaults is not None:
-                    self._variables.get(instance)[name].set_allowed_value_range(
+                    self._variables.get(
+                        instance)[name].set_allowed_value_range(
                         **variable_range_defaults)
-                    self._variables.get(instance)[name].has_vendor_values = True
+                    self._variables.get(
+                        instance)[name].has_vendor_values = True
 
         for v in list(self._variables.get(0).values()):
             if isinstance(v.dependant_variable, str):
@@ -1058,9 +1093,10 @@ class scpdXML(static.Data, log.LogAble):
             for argument in action.get_arguments_list():
                 a = etree.SubElement(al, 'argument')
                 etree.SubElement(a, 'name').text = argument.get_name()
-                etree.SubElement(a, 'direction').text = argument.get_direction()
-                etree.SubElement(a,
-                                 'relatedStateVariable').text = argument.get_state_variable()
+                etree.SubElement(a, 'direction').text = \
+                    argument.get_direction()
+                etree.SubElement(a, 'relatedStateVariable').text = \
+                    argument.get_state_variable()
 
         e = etree.SubElement(root, 'serviceStateTable')
         for var in list(self.service_server._variables[0].values()):
@@ -1100,11 +1136,11 @@ class ServiceControl(log.LogAble):
     def get_action_results(self, result, action, instance):
         """ check for out arguments
             if yes: check if there are related ones to StateVariables with
-                    non A_ARG_TYPE_ prefix
-                    if yes: check if there is a call plugin method for this action
-                            if yes: update StateVariable values with call result
-                            if no:  get StateVariable values and
-                                    add them to result dict
+                non A_ARG_TYPE_ prefix
+                if yes: check if there is a call plugin method for this action
+                    if yes: update StateVariable values with call result
+                    if no:  get StateVariable values and
+                        add them to result dict
         """
         self.debug('get_action_results %s', result)
         # print 'get_action_results', action, instance
@@ -1117,7 +1153,8 @@ class ServiceControl(log.LogAble):
                     variable = self.variables[instance][
                         argument.get_state_variable()]
                     variable.update(r[argument.name])
-                    if variable.send_events == 'yes' and not variable.moderated:
+                    if variable.send_events == 'yes' and \
+                            not variable.moderated:
                         notify.append(variable)
                 else:
                     variable = self.variables[instance][
@@ -1142,12 +1179,12 @@ class ServiceControl(log.LogAble):
         """
         try:
             action = self.actions[kwargs['soap_methodName']]
-        except:
+        except KeyError:
             return failure.Failure(errorCode(401))
 
         try:
             instance = int(kwargs['InstanceID'])
-        except:
+        except Exception:
             instance = 0
 
         self.info("soap__generic %s %s %s", action, __name__, kwargs)
@@ -1165,9 +1202,9 @@ class ServiceControl(log.LogAble):
         for arg_name, arg in kwargs.items():
             if arg_name.find('X_') == 0:
                 continue
-            l = [a for a in in_arguments if arg_name == a.get_name()]
-            if len(l) > 0:
-                in_arguments.remove(l[0])
+            al = [a for a in in_arguments if arg_name == a.get_name()]
+            if len(al) > 0:
+                in_arguments.remove(al[0])
             else:
                 self.critical('argument %s not valid for action %s', arg_name,
                               action.name)

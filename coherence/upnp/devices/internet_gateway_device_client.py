@@ -30,13 +30,14 @@ class InternetGatewayDeviceClient(log.LogAble):
             sender=self.device)
 
         try:
-            wan_device = self.device.get_embedded_device_by_type('WANDevice')[0]
+            wan_device = self.device.get_embedded_device_by_type(
+                'WANDevice')[0]
             self.wan_device = WANDeviceClient(wan_device)
-        except:
+        except Exception as e:
             self.warning(
                 "Embedded WANDevice device not available, "
                 "device not implemented properly according "
-                "to the UPnP specification")
+                "to the UPnP specification [error: %r]" % e)
             raise
 
         self.info("InternetGatewayDevice %s", self.device.get_friendly_name())

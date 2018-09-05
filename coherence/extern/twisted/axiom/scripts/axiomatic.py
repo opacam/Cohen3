@@ -76,8 +76,8 @@ class PIDMixin:
         except (OSError, IOError) as e:
             if e.errno in (errno.ENOENT, errno.ESRCH):
                 raise usage.UsageError(
-                    'There is no server running from the Axiom database %r.' % (
-                    self.parent.getStoreDirectory(),))
+                    'There is no server running from the Axiom database '
+                    '%r.' % (self.parent.getStoreDirectory(),))
             else:
                 raise
 
@@ -92,7 +92,7 @@ class Status(usage.Options, PIDMixin):
         dbdir = self.parent.getStoreDirectory()
         serverpid = self.signalServer(0)
         print('A server is running from the Axiom database %r, PID %d.' % (
-        dbdir, serverpid))
+            dbdir, serverpid))
 
 
 class Start(twistd.ServerOptions):
@@ -157,7 +157,8 @@ class Options(usage.Options):
                 yield ('stop', None, Stop,
                        'Stop the server running from the given Axiom database')
                 yield ('status', None, Status,
-                       'Report whether a server is running from the given Axiom database')
+                       'Report whether a server is running '
+                       'from the given Axiom database')
 
             from coherence.extern.twisted.axiom import plugins
             for plg in getPlugins(IAxiomaticCommand, plugins):

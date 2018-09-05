@@ -7,7 +7,7 @@ Helpers for case-insensitive string handling.
 class Caseless(object):
     """
     Case-insensitive string wrapper type.
-    
+
     This wrapper is intended for use with strings that have case-insensitive
     semantics, such as HTTP/MIME header values.  It implements comparison-based
     operations case-insensitively, avoiding the need to manually call C{lower}

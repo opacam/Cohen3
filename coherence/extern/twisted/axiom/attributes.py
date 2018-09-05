@@ -625,13 +625,13 @@ class LikeComparison:
         return sql
 
     def getArgs(self, store):
-        l = []
+        al = []
         for lf in self.likeParts:
             for pyval in lf.getLikeArgs():
-                l.append(
+                al.append(
                     self.attribute.infilter(
                         pyval, None, store))
-        return l
+        return al
 
 
 @implementer(IComparison)
@@ -864,7 +864,7 @@ def requireType(attributeObj, value, typerepr, *types):
 
 
 inttyperepr = "integer between %r and %r" % (
-LARGEST_NEGATIVE, LARGEST_POSITIVE)
+    LARGEST_NEGATIVE, LARGEST_POSITIVE)
 
 
 class integer(SQLAttribute):
@@ -972,7 +972,9 @@ class textlist(text):
         if pyval is None:
             return None
         for innerVal in pyval:
-            assert self.delimiter not in innerVal and self.guard not in innerVal
+            assert \
+                self.delimiter not in innerVal and \
+                self.guard not in innerVal
         result = self.delimiter.join([self.guard] + list(pyval))
         return super(textlist, self).infilter(result, oself, store)
 
@@ -1016,8 +1018,8 @@ class path(text):
             storepath = os.path.normpath(store.filesdir.path)
             mysegs = mypath.split(os.sep)
             storesegs = storepath.split(os.sep)
-            if len(mysegs) <= len(storesegs) or mysegs[
-                                                :len(storesegs)] != storesegs:
+            if len(mysegs) <= len(storesegs) or \
+                    mysegs[:len(storesegs)] != storesegs:
                 raise InvalidPathError('%s not in %s' % (mypath, storepath))
             # In the database we use '/' to separate paths for portability.
             # This databaes could have relative paths created on Windows, then
@@ -1231,7 +1233,7 @@ class AbstractFixedPointDecimal(integer):
     places.
 
     This is stored in SQLite as a binary integer multiplied by M{10**N}
-    where C{N} is the number of decimal places required by Python. 
+    where C{N} is the number of decimal places required by Python.
     Therefore, in-database multiplication, division, or queries which
     compare to integers or fixedpointdecimals with a different number of
     decimal places, will not work.  Also, you cannot store, or sum to, fixed

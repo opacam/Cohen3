@@ -3,6 +3,7 @@
 
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
 
+
 class RenderingControlClient:
 
     def __init__(self, service):
@@ -80,7 +81,8 @@ class RenderingControlClient:
         return action.call(InstanceID=instance_id,
                            Channel=channel)
 
-    def set_loudness(self, instance_id=0, channel='Master', desired_loudness=0):
+    def set_loudness(self, instance_id=0,
+                     channel='Master', desired_loudness=0):
         action = self.service.get_action('SetLoudness')
         return action.call(InstanceID=instance_id,
                            Channel=channel,

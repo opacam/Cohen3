@@ -30,7 +30,8 @@ class AppleTrailerProxy(ReverseProxyUriResource):
 
     def render(self, request):
         request.received_headers[
-            'user-agent'] = 'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)'
+            'user-agent'] = \
+            'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)'
         return ReverseProxyUriResource.render(self, request)
 
 
@@ -43,7 +44,7 @@ class Trailer(BackendItem):
         self.id = id
         self.name = name
         self.cover = cover
-        if (len(urlbase) and urlbase[-1] != '/'):
+        if len(urlbase) and urlbase[-1] != '/':
             urlbase += '/'
         self.url = urlbase + str(self.id)
         self.location = AppleTrailerProxy(url)
@@ -57,7 +58,7 @@ class Trailer(BackendItem):
 class Container(BackendItem):
     logCategory = 'apple_trailers'
 
-    def __init__(self, id, parent_id, name, store=None, \
+    def __init__(self, id, parent_id, name, store=None,
                  children_callback=None):
         BackendItem.__init__(self)
         self.id = id
@@ -159,18 +160,19 @@ class AppleTrailersStore(BackendStore):
                     minutes, seconds = duration.split(':')
                 except ValueError:
                     seconds = duration
-            duration = "%d:%02d:%02d" % (int(hours), int(minutes), int(seconds))
-        except:
+            duration = "%d:%02d:%02d" % (
+                int(hours), int(minutes), int(seconds))
+        except Exception:
             pass
 
         try:
             trailer.item.director = item.find('./info/director').text
-        except:
+        except Exception:
             pass
 
         try:
             trailer.item.description = item.find('./info/description').text
-        except:
+        except Exception:
             pass
 
         res = DIDLLite.Resource(trailer.get_path(),
@@ -178,7 +180,7 @@ class AppleTrailersStore(BackendStore):
         res.duration = duration
         try:
             res.size = item.find('./preview/large').get('filesize', None)
-        except:
+        except Exception:
             pass
         trailer.item.res.append(res)
 
@@ -187,10 +189,10 @@ class AppleTrailersStore(BackendStore):
             dlna_tags = DIDLLite.simple_dlna_tags[:]
             dlna_tags[2] = 'DLNA.ORG_CI=1'
             url = self.urlbase + str(trailer.id) + '?transcoded=mp4'
-            new_res = DIDLLite.Resource(url,
-                                        'http-get:*:%s:%s' % ('video/mp4',
-                                                              ';'.join([
-                                                                           dlna_pn] + dlna_tags)))
+            new_res = DIDLLite.Resource(
+                url,
+                'http-get:*:%s:%s' % (
+                    'video/mp4', ';'.join([dlna_pn] + dlna_tags)))
             new_res.size = None
             res.duration = duration
             trailer.item.res.append(new_res)
@@ -201,10 +203,10 @@ class AppleTrailersStore(BackendStore):
             dlna_tags[3] = 'DLNA.ORG_FLAGS=00f00000000000000000000000000000'
             url = self.urlbase + str(
                 trailer.id) + '?attachment=poster&transcoded=thumb&type=jpeg'
-            new_res = DIDLLite.Resource(url,
-                                        'http-get:*:%s:%s' % ('image/jpeg',
-                                                              ';'.join([
-                                                                           dlna_pn] + dlna_tags)))
+            new_res = DIDLLite.Resource(
+                url, 'http-get:*:%s:%s' % (
+                    'image/jpeg',
+                    ';'.join([dlna_pn] + dlna_tags)))
             new_res.size = None
             # new_res.resolution = "160x160"
             trailer.item.res.append(new_res)
@@ -220,12 +222,12 @@ class AppleTrailersStore(BackendStore):
                 return self.container
             else:
                 return self.trailers.get(id, None)
-        except:
+        except Exception:
             return None
 
     def upnp_init(self):
         if self.server:
-            self.server.connection_manager_server.set_variable( \
+            self.server.connection_manager_server.set_variable(
                 0, 'SourceProtocolInfo',
                 ['http-get:*:video/quicktime:*', 'http-get:*:video/mp4:*'])
         self.container = Container(ROOT_ID, -1, self.name)

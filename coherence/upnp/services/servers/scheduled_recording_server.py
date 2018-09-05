@@ -30,8 +30,8 @@ class ScheduledRecordingServer(service.ServiceServer, resource.Resource):
             backend = self.device.backend
         resource.Resource.__init__(self)
         self.version = 1
-        service.ServiceServer.__init__(self, 'ScheduledRecording', self.version,
-                                       backend)
+        service.ServiceServer.__init__(
+            self, 'ScheduledRecording', self.version, backend)
 
         self.control = ScheduledRecordingControl(self)
         self.putChild(self.scpd_url, service.scpdXML(self, self.control))
@@ -46,5 +46,7 @@ class ScheduledRecordingServer(service.ServiceServer, resource.Resource):
         return cl
 
     def render(self, request):
-        return '<html><p>root of the ScheduledRecording</p><p><ul>%s</ul></p></html>' % self.listchilds(
-            request.uri)
+        return \
+            '<html><p>root of the ScheduledRecording</p>' \
+            '<p><ul>%s</ul></p></html>' % self.listchilds(
+                request.uri.decode('utf-8'))

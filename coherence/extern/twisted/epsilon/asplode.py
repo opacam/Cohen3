@@ -21,7 +21,7 @@ def splode(linerator, proj, capproj):
                 current.close()
             try:
                 os.makedirs(os.path.dirname(fname))
-            except:
+            except Exception as e:
                 pass
             current = open(fname, 'wb')
             status('Created: ' + fname)

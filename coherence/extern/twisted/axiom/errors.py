@@ -86,7 +86,8 @@ class UnknownItemType(Exception):
 
 class SQLWarning(Warning):
     """
-    Axiom internally generated some CREATE TABLE SQL that ... probably wasn't bad
+    Axiom internally generated some CREATE TABLE SQL that ...
+    probably wasn't bad
     """
 
 

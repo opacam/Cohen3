@@ -35,16 +35,16 @@ class MediaServerClient(log.LogAble):
 
         for service in self.device.get_services():
             if service.get_type() in [
-                "urn:schemas-upnp-org:service:ContentDirectory:1",
-                "urn:schemas-upnp-org:service:ContentDirectory:2"]:
+                    "urn:schemas-upnp-org:service:ContentDirectory:1",
+                    "urn:schemas-upnp-org:service:ContentDirectory:2"]:
                 self.content_directory = ContentDirectoryClient(service)
             if service.get_type() in [
-                "urn:schemas-upnp-org:service:ConnectionManager:1",
-                "urn:schemas-upnp-org:service:ConnectionManager:2"]:
+                    "urn:schemas-upnp-org:service:ConnectionManager:1",
+                    "urn:schemas-upnp-org:service:ConnectionManager:2"]:
                 self.connection_manager = ConnectionManagerClient(service)
             if service.get_type() in [
-                "urn:schemas-upnp-org:service:AVTransport:1",
-                "urn:schemas-upnp-org:service:AVTransport:2"]:
+                    "urn:schemas-upnp-org:service:AVTransport:1",
+                    "urn:schemas-upnp-org:service:AVTransport:2"]:
                 self.av_transport = AVTransportClient(service)
 
         self.info("MediaServer %s", self.device.get_friendly_name())
@@ -52,13 +52,15 @@ class MediaServerClient(log.LogAble):
             self.info("ContentDirectory available")
         else:
             self.warning(
-                "ContentDirectory not available, device not implemented properly according to the UPnP specification")
+                "ContentDirectory not available, device not implemented"
+                " properly according to the UPnP specification")
             return
         if self.connection_manager:
             self.info("ConnectionManager available")
         else:
             self.warning(
-                "ConnectionManager not available, device not implemented properly according to the UPnP specification")
+                "ConnectionManager not available, device not implemented"
+                " properly according to the UPnP specification")
             return
         if self.av_transport:
             self.info("AVTransport (optional) available")
@@ -81,7 +83,8 @@ class MediaServerClient(log.LogAble):
         if self.detection_completed:
             return
         if self.content_directory is not None:
-            if not hasattr(self.content_directory.service, 'last_time_updated'):
+            if not hasattr(self.content_directory.service,
+                           'last_time_updated'):
                 return
             if self.content_directory.service.last_time_updated is None:
                 return

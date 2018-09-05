@@ -67,5 +67,7 @@ class MediaReceiverRegistrarServer(service.ServiceServer, resource.Resource):
         return cl
 
     def render(self, request):
-        return '<html><p>root of the MediaReceiverRegistrar</p><p><ul>%s</ul></p></html>' % self.listchilds(
-            request.uri.decode('utf-8'))
+        return \
+            '<html><p>root of the MediaReceiverRegistrar</p>' \
+            '<p><ul>%s</ul></p></html>' % self.listchilds(
+                request.uri.decode('utf-8'))

@@ -18,7 +18,7 @@ def pluginModules(moduleNames):
         except ValueError as ve:
             if ve.args[0] != 'Empty module name':
                 traceback.print_exc()
-        except:
+        except Exception as e:
             traceback.print_exc()
 
 
@@ -26,8 +26,8 @@ def _regeneratePluginCache(pluginPackages):
     print('Regenerating cache with path: ', end=' ')
     pprint.pprint(sys.path)
     from twisted import plugin
-    for pluginModule in pluginModules([
-        p + ".plugins" for p in pluginPackages]):
+    for pluginModule in pluginModules(
+            [p + ".plugins" for p in pluginPackages]):
         # Not just *some* zigs, mind you - *every* zig:
         print('Full plugin list for %r: ' % (pluginModule.__name__))
         pprint.pprint(list(plugin.getPlugins(plugin.IPlugin, pluginModule)))
@@ -68,8 +68,8 @@ def autosetup(**kw):
                 if filename == 'dropin.cache':
                     continue
                 if (os.path.splitext(filename)[1] not in (
-                '.py', '.pyc', '.pyo')
-                        or '__init__.py' not in filenames):
+                        '.py', '.pyc', '.pyo') or
+                        '__init__.py' not in filenames):
                     D.append(
                         os.path.join(dirpath[len(package) + 1:], filename))
     autoresult = {

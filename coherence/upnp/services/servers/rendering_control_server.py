@@ -44,5 +44,7 @@ class RenderingControlServer(service.ServiceServer, resource.Resource):
         return cl
 
     def render(self, request):
-        return '<html><p>root of the RenderingControl</p><p><ul>%s</ul></p></html>' % self.listchilds(
-            request.uri)
+        return \
+            '<html><p>root of the RenderingControl</p>' \
+            '<p><ul>%s</ul></p></html>' % self.listchilds(
+                request.uri.decode('utf-8'))

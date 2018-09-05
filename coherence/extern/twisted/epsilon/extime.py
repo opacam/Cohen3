@@ -50,16 +50,15 @@ def _timedeltaToSignHrMin(offset):
 
     sign is a string, either "+" or "-". In the case of 0 offset, sign is "+".
     """
-    minutes = round((offset.days * 3600000000 * 24
-                     + offset.seconds * 1000000
-                     + offset.microseconds)
-                    / 60000000.0)
+    minutes = round((offset.days * 3600000000 * 24 +
+                     offset.seconds * 1000000 +
+                     offset.microseconds) / 60000000.0)
     if minutes < 0:
         sign = '-'
         minutes = -minutes
     else:
         sign = '+'
-    return (sign, minutes // 60, minutes % 60)
+    return sign, minutes // 60, minutes % 60
 
 
 def _timedeltaToSeconds(offset):
@@ -89,7 +88,7 @@ def _timedeltaToSeconds(offset):
     @rtype: float
     """
     return ((offset.days * 60 * 60 * 24) +
-            (offset.seconds) +
+            offset.seconds +
             (offset.microseconds * 1e-6))
 
 
@@ -440,29 +439,29 @@ class Time(object):
                 groups[key] = int(groups[key])
 
             for group, min, max in [
-                # some years have only 52 weeks
-                ('week', 1, 53),
-                ('weekday', 1, 7),
-                ('month', 1, 12),
-                ('day', 1, 31),
-                ('hour', 0, 24),
-                ('minute', 0, 59),
+                    # some years have only 52 weeks
+                    ('week', 1, 53),
+                    ('weekday', 1, 7),
+                    ('month', 1, 12),
+                    ('day', 1, 31),
+                    ('hour', 0, 24),
+                    ('minute', 0, 59),
 
-                # Sometime in the 22nd century AD, two leap seconds will be
-                # required every year.  In the 25th century AD, four every
-                # year.  We'll ignore that for now though because it would be
-                # tricky to get right and we certainly don't need it for our
-                # target applications.  In other words, post-singularity
-                # Martian users, please do not rely on this code for
-                # compatibility with Greater Galactic Protectorate of Earth
-                # date/time formatting!  Apologies, but no library I know of in
-                # Python is sufficient for processing their dates and times
-                # without ADA bindings to get the radiation-safety zone counter
-                # correct. -glyph
+                    # Sometime in the 22nd century AD, two leap seconds will be
+                    # required every year.  In the 25th century AD, four every
+                    # year.  We'll ignore that for now though because it would
+                    #  be tricky to get right and we certainly don't need it
+                    # for our target applications. In other words,
+                    # post-singularity Martian users, please do not rely on
+                    # this code for compatibility with Greater Galactic
+                    # Protectorate of Earth date/time formatting!  Apologies,
+                    #  but no library I know of in Python is sufficient for
+                    # processing their dates and times without ADA bindings to
+                    # get the radiation-safety zone counter correct. -glyph
 
-                ('second', 0, 61),
-                # don't forget leap years
-                ('dayofyear', 1, 366)]:
+                    ('second', 0, 61),
+                    # don't forget leap years
+                    ('dayofyear', 1, 366)]:
                 if not min <= groups[group] <= max:
                     raise ValueError(
                         '%s must be in %i..%i' % (group, min, max))
@@ -475,14 +474,14 @@ class Time(object):
                                    match.group('fractionalsec')) * 1000000))
 
             for testGroup, resolution in [
-                ('second', datetime.timedelta(seconds=1)),
-                ('minute', datetime.timedelta(minutes=1)),
-                ('hour', datetime.timedelta(hours=1)),
-                ('weekday', datetime.timedelta(days=1)),
-                ('dayofyear', datetime.timedelta(days=1)),
-                ('day', datetime.timedelta(days=1)),
-                ('week1', datetime.timedelta(weeks=1)),
-                ('week2', datetime.timedelta(weeks=1))]:
+                    ('second', datetime.timedelta(seconds=1)),
+                    ('minute', datetime.timedelta(minutes=1)),
+                    ('hour', datetime.timedelta(hours=1)),
+                    ('weekday', datetime.timedelta(days=1)),
+                    ('dayofyear', datetime.timedelta(days=1)),
+                    ('day', datetime.timedelta(days=1)),
+                    ('week1', datetime.timedelta(weeks=1)),
+                    ('week2', datetime.timedelta(weeks=1))]:
                 if match.group(testGroup) is not None:
                     return resolution
 
@@ -628,7 +627,8 @@ class Time(object):
 
     def fromRFC2822(klass, rfc822string):
         """
-        Return a new Time instance from a string formated as described in RFC 2822.
+        Return a new Time instance from a string formated
+        as described in RFC 2822.
 
         @type rfc822string: str
 
@@ -789,10 +789,10 @@ class Time(object):
             ('%s%02i' % (dateSep, dtime.day), datetime.timedelta(days=1)),
             ('T', datetime.timedelta(hours=1)),
             ('%02i' % (dtime.hour,), datetime.timedelta(hours=1)),
-            (
-            '%s%02i' % (timeSep, dtime.minute), datetime.timedelta(minutes=1)),
-            (
-            '%s%02i' % (timeSep, dtime.second), datetime.timedelta(seconds=1)),
+            ('%s%02i' % (timeSep, dtime.minute),
+             datetime.timedelta(minutes=1)),
+            ('%s%02i' % (
+                timeSep, dtime.second), datetime.timedelta(seconds=1)),
             (microsecond, datetime.timedelta(microseconds=1)),
             (timezone, datetime.timedelta(hours=1))
         ]
@@ -960,7 +960,8 @@ class Time(object):
     __str__ = asISO8601TimeAndDate
 
     def __contains__(self, other):
-        """Test if another Time instance is entirely within the period addressed by this one."""
+        """Test if another Time instance is entirely within
+        the period addressed by this one."""
         if not isinstance(other, Time):
             raise TypeError(
                 '%r is not a Time instance; can not test for containment'

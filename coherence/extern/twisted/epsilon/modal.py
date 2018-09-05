@@ -37,7 +37,7 @@ class ModalMethod(object):
         except KeyError:
             raise AttributeError(
                 "Method %r missing from mode %r on %r" % (
-                self.name, mode, instance))
+                    self.name, mode, instance))
 
         return new.instancemethod(func, instance, owner)
 
@@ -95,12 +95,10 @@ class ModalType(type):
     """
 
     def __new__(cls, name, bases, attrs):
-        modeAttribute = _getInheritedAttribute(name, 'modeAttribute', bases,
-                                               attrs)
-        initialMode = attrs['initialMode'] = _getInheritedAttribute(name,
-                                                                    'initialMode',
-                                                                    bases,
-                                                                    attrs)
+        modeAttribute = _getInheritedAttribute(
+            name, 'modeAttribute', bases, attrs)
+        initialMode = attrs['initialMode'] = _getInheritedAttribute(
+            name, 'initialMode', bases, attrs)
 
         # Dict mapping names of methods to another dict.  The inner
         # dict maps names of modes to implementations of that method
