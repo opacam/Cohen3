@@ -16,6 +16,7 @@ from lxml import etree
 from twisted.internet import defer
 from twisted.python.util import OrderedDict
 from twisted.web import resource
+from twisted.python import failure
 
 from coherence import log
 from coherence.upnp.core import DIDLLite
@@ -26,6 +27,7 @@ from coherence.upnp.core.soap_service import UPnPPublisher
 from coherence.upnp.core.utils import ReverseProxyUriResource
 from coherence.upnp.devices.media_server import RootDeviceXML
 from coherence.upnp.devices.basics import DeviceHttpRoot
+from coherence.upnp.core.soap_service import errorCode
 from .upnp.core import xml_constants
 
 
