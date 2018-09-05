@@ -28,8 +28,8 @@ class SwitchPowerServer(service.ServiceServer, resource.Resource):
         if backend is None:
             backend = self.device.backend
         resource.Resource.__init__(self)
-        service.ServiceServer.__init__(self, 'SwitchPower', self.device.version,
-                                       backend)
+        service.ServiceServer.__init__(
+            self, 'SwitchPower', self.device.version, backend)
 
         self.control = SwitchPowerControl(self)
         self.putChild(self.scpd_url, service.scpdXML(self, self.control))

@@ -7,63 +7,68 @@
 
 """
 This is a Media Backend that allows you to access the cool and cute pictures
-from lolcats.com. This is mainly meant as a Sample Media Backend to learn how to
-write a Media Backend.
+from lolcats.com. This is mainly meant as a Sample Media Backend to learn
+how to write a Media Backend.
 
 So. You are still reading which allows me to assume that you want to learn how
 to write a Media Backend for Coherence. NICE :) .
 
 Once again: This is a SIMPLE Media Backend. It does not contain any big
 requests, searches or even transcoding. The only thing we want to do in this
-simple example, is to fetch a rss link on startup, parse it, save it and restart
-the process one hour later again. Well, on top of this, we also want to provide
-these informations as a Media Server in the UPnP/DLNA Network of course ;) .
+simple example, is to fetch a rss link on startup, parse it, save it and
+restart the process one hour later again. Well, on top of this, we also want
+to provide these informations as a Media Server in the UPnP/DLNA
+Network of course ;) .
 
-Wow. You are still reading. You must be really interessted. Then let's go.
+Wow. You are still reading. You must be really interested. Then let's go.
 """
 
-########## NOTE:
-# Please don't complain about the coding style of this document - I know. It is
-# just this way to make it easier to document and to understand.
+# NOTE:
+# Please don't complain about the coding style of this document - I know.
+# It is just this way to make it easier to document and to understand.
 
-
+# THE IMPORTS
 # And to parse the RSS-Data (which is XML), we use lxml.etree.fromstring
 from lxml.etree import fromstring
-# And we also import the reactor, that allows us to specify an action to happen
-# later
+
+# And we also import the reactor,
+# that allows us to specify an action to happen later
 from twisted.internet import reactor
 
-# The data itself is stored in BackendItems. They are also the first things we
-# are going to create.
+# The data itself is stored in BackendItems.
+# They are also the first things we are going to create.
 from coherence.backend import BackendItem
-########## The imports
-# The entry point for each kind of Backend is a 'BackendStore'. The BackendStore
-# is the instance that does everything Usually. In this Example it can be
-# understood as the 'Server', the object retrieving and serving the data.
+
+# The entry point for each kind of Backend is a 'BackendStore'.
+# The BackendStore is the instance that does everything Usually.
+#  In this Example it can be understood as the 'Server', the object retrieving
+#  and serving the data.
 from coherence.backend import BackendStore
-# To make the data 'renderable' we need to define the DIDLite-Class of the Media
-# we are providing. For that we have a bunch of helpers that we also want to
-# import
+
+# To make the data 'renderable' we need to define the DIDLite-Class
+# of the Media we are providing. For that we have a bunch of helpers that we
+# also want to import
 from coherence.upnp.core import DIDLLite
-# Coherence relies on the Twisted backend. I hope you are familar with the
+
+# Coherence relies on the Twisted backend. I hope you are familiar with the
 # concept of deferreds. If not please read:
-#       http://twistedmatrix.com/projects/core/documentation/howto/async.html
+#   http://twistedmatrix.com/projects/core/documentation/howto/async.html
 #
-# It is a basic concept that you need to understand to understand the following
+# It is a basic concept that you need to understand the following
 # code. But why am I talking about it? Oh, right, because we use a http-client
 # based on the twisted.web.client module to do our requests.
 from coherence.upnp.core.utils import getPage
 
 
-########## The models
+# THE MODELS
 # After the download and parsing of the data is done, we want to save it. In
 # this case, we want to fetch the images and store their URL and the title of
 # the image. That is the LolcatsImage class:
 
 class LolcatsImage(BackendItem):
-    # We inherit from BackendItem as it already contains a lot of helper methods
-    # and implementations. For this simple example, we only have to fill the
-    # item with data.
+    # We inherit from BackendItem as it already contains a lot of
+    # helper methods and implementations. For this simple example,
+    #  we only have to fill the item with data.
 
     def __init__(self, parent_id, id, title, url):
         BackendItem.__init__(self)
@@ -83,9 +88,9 @@ class LolcatsImage(BackendItem):
         # case, we have an image.
         self.item = DIDLLite.ImageItem(id, parent_id, self.name)
 
-        # each Item.item has to have one or more Resource objects
-        # these hold detailed information about the media data
-        # and can represent variants of it (different sizes, transcoded formats)
+        # each Item.item has to have one or more Resource objects these hold
+        # detailed information about the media data and can represent variants
+        #  of it (different sizes, transcoded formats)
         res = DIDLLite.Resource(self.location, 'http-get:*:image/jpeg:*')
         res.size = None  # FIXME: we should have a size here
         #       and a resolution entry would be nice too
@@ -93,8 +98,8 @@ class LolcatsImage(BackendItem):
 
 
 class LolcatsContainer(BackendItem):
-    # The LolcatsContainer will hold the reference to all our LolcatsImages. This
-    # kind of BackenedItem is a bit different from the normal BackendItem,
+    # The LolcatsContainer will hold the reference to all our LolcatsImages.
+    # This kind of BackenedItem is a bit different from the normal BackendItem,
     # because it has 'children' (the lolcatsimages). Because of that we have
     # some more stuff to do in here.
 
@@ -112,8 +117,8 @@ class LolcatsContainer(BackendItem):
         self.mimetype = 'directory'
 
         # As we are updating our data periodically, we increase this value so
-        # that our clients can check easier if something has changed since their
-        # last request.
+        # that our clients can check easier if something has changed
+        # since their last request.
         self.update_id = 0
 
         # that is where we hold the children
@@ -126,8 +131,8 @@ class LolcatsContainer(BackendItem):
         self.item.childCount = None  # will be set as soon as we have images
 
     def get_children(self, start=0, end=0):
-        # This is the only important implementation thing: we have to return our
-        # list of children
+        # This is the only important implementation thing:
+        #     we have to return our list of children
         if end != 0:
             return self.children[start:end]
         return self.children[start:]
@@ -147,7 +152,7 @@ class LolcatsContainer(BackendItem):
         return self.id
 
 
-########## The server
+# THE SERVER
 # As already said before the implementation of the server is done in an
 # inheritance of a BackendStore. This is where the real code happens (usually).
 # In our case this would be: downloading the page, parsing the content, saving
@@ -158,23 +163,22 @@ class LolcatsStore(BackendStore):
     # allows other kind of Backends (like remote lights).
     implements = ['MediaServer']
 
-    # this is only for this implementation: the http link to the lolcats rss
+    # This is only for this implementation: the http link to the lolcats rss
     # feed that we want to read and parse:
     rss_url = "http://feeds.feedburner.com/ICanHasCheezburger?format=xml"
 
-    # as we are going to build a (very small) tree with the items, we need to
+    # As we are going to build a (very small) tree with the items, we need to
     # define the first (the root) item:
     ROOT_ID = 0
 
     def __init__(self, server, *args, **kwargs):
-        # first we inizialize our heritage
+        # First we initialize our heritage
         BackendStore.__init__(self, server, **kwargs)
 
         # When a Backend is initialized, the configuration is given as keyword
-        # arguments to the initialization. We receive it here as a dicitonary
+        # arguments to the initialization. We receive it here as a dictionary
         # and allow some values to be set:
-
-        # the name of the MediaServer as it appears in the network
+        #       the name of the MediaServer as it appears in the network
         self.name = kwargs.get('name', 'Lolcats')
 
         # timeout between updates in hours:
@@ -187,8 +191,8 @@ class LolcatsStore(BackendStore):
         # internally used to have a new id for each item
         self.next_id = 1000
 
-        # we store the last update from the rss feed so that we know if we have
-        # to parse again, or not:
+        # we store the last update from the rss feed so that we know
+        # if we have to parse again, or not:
         self.last_updated = None
 
         # initialize our lolcats container (no parent, this is the root)
@@ -205,17 +209,19 @@ class LolcatsStore(BackendStore):
         # and trigger an update of the data
         dfr = self.update_data()
 
-        # So, even though the initialize is kind of done, Coherence does not yet
-        # announce our Media Server.
+        # So, even though the initialize is kind of done,
+        # Coherence does not yet announce our Media Server.
         # Coherence does wait for signal send by us that we are ready now.
         # And we don't want that to happen as long as we don't have succeeded
-        # in fetching some first data, so we delay this signaling after the update is done:
+        # in fetching some first data, so we delay this signaling after
+        # the update is done:
         dfr.addCallback(self.init_completed)
         dfr.addCallback(self.queue_update)
 
     def get_by_id(self, id):
         print("asked for", id, type(id))
-        # what ever we are asked for, we want to return the container only
+        # what ever we are asked for,
+        #  we want to return the container only
         if isinstance(id, str):
             id = id.split('@', 1)[0]
         elif isinstance(id, bytes):
@@ -225,24 +231,26 @@ class LolcatsStore(BackendStore):
         return self.images.get(int(id), None)
 
     def upnp_init(self):
-        # after the signal was triggered, this method is called by coherence and
+        # After the signal was triggered,
+        # this method is called by coherence and
+        # from now on self.server is existing and we can do the
+        # necessary setup here that allows us to specify our server
+        # options in more detail.
 
-        # from now on self.server is existing and we can do
-        # the necessary setup here
-
-        # that allows us to specify our server options in more detail.
-
-        # here we define what kind of media content we do provide
+        # Here we define what kind of media content we do provide
         # mostly needed to make some naughty DLNA devices behave
         # will probably move into Coherence internals one day
-        self.server.connection_manager_server.set_variable(0,
-                                                           'SourceProtocolInfo',
-                                                           [
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-                                                               'http-get:*:image/jpeg:*'])
+        self.server.connection_manager_server.set_variable(
+            0, 'SourceProtocolInfo',
+            ['http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;'
+             'DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+             'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;'
+             'DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+             'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;'
+             'DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+             'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;'
+             'DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
+             'http-get:*:image/jpeg:*'])
 
         # and as it was done after we fetched the data the first time
         # we want to take care about the server wide updates as well
@@ -253,13 +261,11 @@ class LolcatsStore(BackendStore):
         # again this is something that will probably move
         # into Coherence internals one day
         if self.server:
-            self.server.content_directory_server.set_variable(0,
-                                                              'SystemUpdateID',
-                                                              self.update_id)
+            self.server.content_directory_server.set_variable(
+                0, 'SystemUpdateID', self.update_id)
             value = (self.ROOT_ID, self.container.update_id)
-            self.server.content_directory_server.set_variable(0,
-                                                              'ContainerUpdateIDs',
-                                                              value)
+            self.server.content_directory_server.set_variable(
+                0, 'ContainerUpdateIDs', value)
         return result
 
     def update_loop(self):
@@ -296,14 +302,14 @@ class LolcatsStore(BackendStore):
         # not the case, set this as the last update and continue
         self.last_updated = pub_date
 
-        # and reset the childrens list of the container and the local storage
+        # and reset the children list of the container and the local storage
         self.container.children = []
         self.images = {}
 
         # Attention, as this is an example, this code is meant to be as simple
         # as possible and not as efficient as possible. IMHO the following code
-        # pretty much sucks, because it is totally blocking (even though we have
-        # 'only' 20 elements)
+        # pretty much sucks, because it is totally blocking
+        # (even though we have 'only' 20 elements)
 
         # we go through our entries and do something specific to the
         # lolcats-rss-feed to fetch the data out of it

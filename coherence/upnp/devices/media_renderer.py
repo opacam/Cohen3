@@ -34,8 +34,8 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
     def fire(self, backend, **kwargs):
 
         if not kwargs.get('no_thread_needed', False):
-            """ this could take some time, put it in a  thread to be sure 
-                it doesn't block as we can't tell for sure that every 
+            """ this could take some time, put it in a  thread to be sure
+                it doesn't block as we can't tell for sure that every
                 backend is implemented properly """
 
             from twisted.internet import threads
@@ -53,8 +53,8 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
             d.addCallback(backend_ready)
             d.addErrback(backend_failure)
 
-            # FIXME: we need a timeout here so if the signal we wait for not arrives we'll
-            #        can close down this device
+            # FIXME: we need a timeout here so if the signal we wait for
+            # not arrives we'll can close down this device
         else:
             self.backend = backend(self, **kwargs)
 

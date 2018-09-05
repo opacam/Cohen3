@@ -34,12 +34,13 @@ class WANPPPConnectionClient:
         return action.call()
 
     def get_all_port_mapping_entries(self):
-        l = []
+        pml = []
 
         def handle_error(f):
             return f
 
-        variable = self.service.get_state_variable('PortMappingNumberOfEntries')
+        variable = self.service.get_state_variable(
+            'PortMappingNumberOfEntries')
         if variable.value != '':
             for i in range(int(variable.value)):
                 action = variable.service.get_action(
@@ -52,19 +53,21 @@ class WANPPPConnectionClient:
 
                 d.addCallback(add_index, i + 1)
                 d.addErrback(handle_error)
-                l.append(d)
+                pml.append(d)
 
         def request_cb(r, last_updated_timestamp, v):
             if last_updated_timestamp == v.last_time_touched:
                 mappings = [m[1] for m in r if m[0] is True]
                 mappings.sort(key=lambda x, y: cmp_to_key(
+                    # FIXME - cmp_to_key
                     x['NewPortMappingIndex'], y['NewPortMappingIndex']))
                 return mappings
             else:
-                # FIXME - we should raise something here, as the mappings have changed during our query
+                # FIXME - we should raise something here,
+                # as the mappings have changed during our query
                 return None
 
-        dl = defer.DeferredList(l)
+        dl = defer.DeferredList(pml)
         dl.addCallback(request_cb, variable.last_time_touched, variable)
         dl.addErrback(handle_error)
         return dl

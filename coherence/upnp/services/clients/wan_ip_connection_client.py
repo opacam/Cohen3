@@ -34,12 +34,13 @@ class WANIPConnectionClient:
         return action.call()
 
     def get_all_port_mapping_entries(self):
-        l = []
+        ml = []
 
         def handle_error(f):
             return f
 
-        variable = self.service.get_state_variable('PortMappingNumberOfEntries')
+        variable = self.service.get_state_variable(
+            'PortMappingNumberOfEntries')
         if variable.value != '':
             for i in range(int(variable.value)):
                 action = variable.service.get_action(
@@ -52,7 +53,7 @@ class WANIPConnectionClient:
 
                 d.addCallback(add_index, i + 1)
                 d.addErrback(handle_error)
-                l.append(d)
+                ml.append(d)
 
         def request_cb(r, last_updated_timestamp, v):
             if last_updated_timestamp == v.last_time_touched:
@@ -61,10 +62,11 @@ class WANIPConnectionClient:
                     x['NewPortMappingIndex'], y['NewPortMappingIndex']))
                 return mappings
             else:
-                # FIXME - we should raise something here, as the mappings have changed during our query
+                # FIXME - we should raise something here,
+                # as the mappings have changed during our query
                 return None
 
-        dl = defer.DeferredList(l)
+        dl = defer.DeferredList(ml)
         dl.addCallback(request_cb, variable.last_time_touched, variable)
         dl.addErrback(handle_error)
         return dl

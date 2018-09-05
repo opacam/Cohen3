@@ -8,11 +8,15 @@
 """
 A backend to access twitch.tv streams.
 
-To enable personalized features (e.g. 'Following' streams), add 'access_token' key into your config file.
+To enable personalized features (e.g. 'Following' streams),
+add 'access_token' key into your config file.
 
 1. To get access token copy and paste the following into your browser:
-  https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id=37684tuwyxmogmtduz6lz0jdtf0acob&redirect_uri=http://localhost&scope=user_read
-2. After authorization you will be redirected to http://localhost with access token in fragment part, e.g.
+  https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&
+  client_id=37684tuwyxmogmtduz6lz0jdtf0acob&
+  redirect_uri=http://localhost&scope=user_read
+2. After authorization you will be redirected to http://localhost with
+access token in fragment part, e.g.
   http://localhost/#access_token=<YOUR_ACCESS_TOKEN_IS_HERE>&scope=user_read
 3. Copy the token and paste in TwitchStore section of your config file:
   access_token = <YOUR_ACCESS_TOKEN (step 2)>
@@ -139,12 +143,13 @@ class GamesContainer(TwitchLazyContainer):
     def result_handler(self, result, **kwargs):
         for game_info in result['top']:
             game_name = game_info['game']['name']
-            item = StreamsContainer(self, game_name,
-                                    viewers=game_info['viewers'],
-                                    channels=game_info['channels'],
-                                    cover_url=game_info['game']['box']['large'],
-                                    game=game_name,
-                                    limit=self.children_limit)
+            item = StreamsContainer(
+                self, game_name,
+                viewers=game_info['viewers'],
+                channels=game_info['channels'],
+                cover_url=game_info['game']['box']['large'],
+                game=game_name,
+                limit=self.children_limit)
             # item.description = "%d viewers" % game_info['viewers']
             self.add_child(item, external_id=game_info['game']['_id'])
         return True
@@ -166,12 +171,13 @@ class StreamsContainer(TwitchLazyContainer):
     def result_handler(self, result, **kwargs):
         for stream in result['streams']:
             created_at = dateutil_parser.parse(stream['created_at'])
-            item = TwitchStreamItem(stream['channel']['display_name'],
-                                    stream['channel']['url'],
-                                    status=stream['channel']['status'],
-                                    viewers=stream['viewers'],
-                                    preview_url=stream['preview']['medium'],
-                                    created_at=created_at)
+            item = TwitchStreamItem(
+                stream['channel']['display_name'],
+                stream['channel']['url'],
+                status=stream['channel']['status'],
+                viewers=stream['viewers'],
+                preview_url=stream['preview']['medium'],
+                created_at=created_at)
             self.add_child(item, external_id='stream%d' % stream['_id'])
         return True
 
@@ -226,38 +232,30 @@ class TwitchStore(AbstractBackendStore):
     description = ('twitch.tv', 'twitch.tv', None)
 
     options = [
-        {
-            'option': 'name',
-            'text': 'Server Name:',
-            'type': 'string',
-            'default': 'twitch.tv',
-            'help': 'the name under this MediaServer shall show up with on other UPnP clients'
-        },
-        {
-            'option': 'access_token',
-            'text': 'OAuth Access Token:',
-            'type': 'string',
-            'default': '',
-            'help': 'access token to show personalized list of followed streams'
-        },
-        {
-            'option': 'version',
-            'text': 'UPnP Version:',
-            'type': 'int',
-            'default': 2,
-            'enum': (2, 1),
-            'help': 'the highest UPnP version this MediaServer shall support',
-            'level': 'advance'
-        },
-        {
-            'option': 'uuid',
-            'text': 'UUID Identifier:',
-            'type': 'string',
-            'default': 'twitch_tv',
-            'help': 'the unique (UPnP) identifier for this MediaServer',
-            'level': 'advance'
-        }
-    ]
+        {'option': 'name',
+         'text': 'Server Name:',
+         'type': 'string',
+         'default': 'twitch.tv',
+         'help': 'the name under this MediaServer shall '
+                 'show up with on other UPnP clients'},
+        {'option': 'access_token',
+         'text': 'OAuth Access Token:',
+         'type': 'string',
+         'default': '',
+         'help': 'access token to show personalized list of followed streams'},
+        {'option': 'version',
+         'text': 'UPnP Version:',
+         'type': 'int',
+         'default': 2,
+         'enum': (2, 1),
+         'help': 'the highest UPnP version this MediaServer shall support',
+         'level': 'advance'},
+        {'option': 'uuid',
+         'text': 'UUID Identifier:',
+         'type': 'string',
+         'default': 'twitch_tv',
+         'help': 'the unique (UPnP) identifier for this MediaServer',
+         'level': 'advance'}]
 
     def __init__(self, server, **kwargs):
         AbstractBackendStore.__init__(self, server, **kwargs)
@@ -273,11 +271,10 @@ class TwitchStore(AbstractBackendStore):
 
     def upnp_init(self):
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'http-get:*:%s:*' % MPEG_MIME],
-                                                               default=True)
+            self.server.connection_manager_server.set_variable(
+                0, 'SourceProtocolInfo',
+                ['http-get:*:%s:*' % MPEG_MIME],
+                default=True)
         # root item
         root_item = Container(None, self.name)
         self.set_root_item(root_item)
@@ -285,31 +282,31 @@ class TwitchStore(AbstractBackendStore):
         # 'Following' directory
         settings = self.config.get('Following', {})
         if self.access_token and settings.get('active') != 'no':
-            games_dir = StreamsContainer(root_item,
-                                         title=settings.get(
-                                             'name') or 'Following',
-                                         streams_url='%s/streams/followed',
-                                         limit=settings.get('limit', 25),
-                                         oauth_token=self.access_token)
+            games_dir = StreamsContainer(
+                root_item,
+                title=settings.get('name') or 'Following',
+                streams_url='%s/streams/followed',
+                limit=settings.get('limit', 25),
+                oauth_token=self.access_token)
             root_item.add_child(games_dir)
 
         # 'Games' directory
         settings = self.config.get('TopGames', {})
         if settings.get('active') != 'no':
-            games_dir = GamesContainer(root_item,
-                                       title=settings.get('name', 'Top Games'),
-                                       limit=settings.get('limit', 10),
-                                       children_limit=settings.get(
-                                           'children_limit', 25))
+            games_dir = GamesContainer(
+                root_item,
+                title=settings.get('name', 'Top Games'),
+                limit=settings.get('limit', 10),
+                children_limit=settings.get('children_limit', 25))
             root_item.add_child(games_dir)
 
         # 'Top Streams' directory
         settings = self.config.get('TopStreams', {})
         if settings.get('active') != 'no':
-            games_dir = StreamsContainer(root_item,
-                                         title=settings.get('name',
-                                                            'Top Streams'),
-                                         limit=settings.get('limit', 25))
+            games_dir = StreamsContainer(
+                root_item,
+                title=settings.get('name', 'Top Streams'),
+                limit=settings.get('limit', 25))
             root_item.add_child(games_dir)
 
 

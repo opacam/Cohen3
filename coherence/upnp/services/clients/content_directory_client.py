@@ -142,8 +142,8 @@ class ContentDirectoryClient:
         return d
 
     def dict2item(self, elements):
-        upnp_class = DIDLLite.upnp_classes.get(elements.get('upnp_class', None),
-                                               None)
+        upnp_class = DIDLLite.upnp_classes.get(
+            elements.get('upnp_class', None), None)
         if upnp_class is None:
             return None
 

@@ -1,5 +1,5 @@
-from coherence.extern.twisted.axiom.attributes import text, reference, integer, \
-    AND, timestamp
+from coherence.extern.twisted.axiom.attributes import \
+    text, reference, integer, AND, timestamp
 from coherence.extern.twisted.axiom.item import Item
 from coherence.extern.twisted.epsilon.extime import Time
 
@@ -67,7 +67,8 @@ class Catalog(Item):
                                     Tag.catalog == self)):
             return
 
-        # if the tag doesn't exist, maybe we need to create a new tagname object
+        # if the tag doesn't exist, maybe we
+        # need to create a new tagname object
         self.store.findOrCreate(_TagName, name=tagName, catalog=self)
 
         # Increment only if we are creating a new tag

@@ -103,7 +103,8 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
                 d.addErrback(self.requestFinished)
 
             if self.url_extractor_fct is not None:
-                d = self.url_extractor_fct(web_url, **self.url_extractor_params)
+                d = self.url_extractor_fct(
+                    web_url, **self.url_extractor_params)
                 d.addCallback(got_real_urls)
             else:
                 got_real_url(web_url)
@@ -129,7 +130,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
             self.info("gotError %s", error)
 
             error_value = error.value
-            if (isinstance(error_value, PageRedirect)):
+            if isinstance(error_value, PageRedirect):
                 self.info("got PageRedirect %r", error_value.location)
                 self.stream_url = error_value.location
                 self.resetUri(self.stream_url)
@@ -145,7 +146,8 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
         return d
 
     def proxyURL(self, request):
-        self.info("proxy_mode: %s, request %s", self.proxy_mode, request.method)
+        self.info("proxy_mode: %s, request %s",
+                  self.proxy_mode, request.method)
 
         if self.proxy_mode == 'redirect':
             # send stream url to client for redirection
@@ -163,8 +165,8 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
             filepath = os.path.join(self.cache_directory, self.id)
 
             file_is_already_available = False
-            if (os.path.exists(filepath)
-                    and os.path.getsize(filepath) == self.filesize):
+            if (os.path.exists(filepath) and
+                    os.path.getsize(filepath) == self.filesize):
                 res = self.renderFile(request, filepath)
                 if isinstance(res, int):
                     return res
@@ -186,7 +188,8 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
                                 end = int(end)
                             else:
                                 end = self.filesize - 1
-                            # Are we requesting something beyond the current size of the file?
+                            # Are we requesting something
+                            # beyond the current size of the file?
                             try:
                                 size = os.path.getsize(filepath)
                             except OSError:
@@ -194,14 +197,17 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
                             if (start >= size and
                                     end + 10 > self.filesize and
                                     end - start < 200000):
-                                # print "let's hand that through, it is probably a mp4 index request"
-                                res = ReverseProxyResource.render(self, request)
+                                # print "let's hand that through,
+                                # it is probably a mp4 index request"
+                                res = ReverseProxyResource.render(
+                                    self, request)
                                 if isinstance(res, int):
                                     return res
                                 request.write(res)
                                 return
 
-                res = self.renderBufferFile(request, filepath, self.buffer_size)
+                res = self.renderBufferFile(
+                    request, filepath, self.buffer_size)
                 if res == '' and request.method != 'HEAD':
                     return server.NOT_DONE_YET
                 if not isinstance(res, int):
@@ -232,7 +238,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
         rendering = False
         if os.path.exists(filepath) is True:
             filesize = os.path.getsize(filepath)
-            if ((filesize >= buffer_size) or (filesize == self.filesize)):
+            if (filesize >= buffer_size) or (filesize == self.filesize):
                 rendering = True
                 self.info("Render file %s %s %s %s", filepath, self.filesize,
                           filesize, buffer_size)
@@ -261,14 +267,14 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
         self.info(error)
 
     def downloadFile(self, request, filepath, callback, *args):
-        if (self.downloader is None):
+        if self.downloader is None:
             self.info("Proxy: download data to cache file %s", filepath)
             self.checkCacheSize()
             self.downloader = utils.downloadPage(self.stream_url, filepath,
                                                  supportPartial=1)
             self.downloader.addCallback(self.downloadFinished)
             self.downloader.addErrback(self.gotDownloadError, request)
-        if (callback is not None):
+        if callback is not None:
             self.downloader.addCallback(callback, request, filepath, *args)
         return self.downloader
 
@@ -282,7 +288,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
             cache_size += statinfo.st_size
         self.info("Cache size: %d (max is %s)", cache_size, self.cache_maxsize)
 
-        if (cache_size > self.cache_maxsize):
+        if cache_size > self.cache_maxsize:
             cache_targetsize = self.cache_maxsize * 2 / 3
             self.info("Cache above max size: Reducing to %d", cache_targetsize)
 
@@ -294,7 +300,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
 
             cache_listdir = sorted(cache_listdir, compare_atime)
 
-            while (cache_size > cache_targetsize):
+            while cache_size > cache_targetsize:
                 filename = cache_listdir.pop(0)
                 path = "%s%s%s" % (self.cache_directory, os.sep, filename)
                 cache_size -= os.stat(path).st_size
@@ -320,7 +326,7 @@ class YoutubeVideoItem(BackendItem):
         self.store = store
 
         def extractDataURL(url, quality):
-            if (quality == 'hd'):
+            if quality == 'hd':
                 format = '22'
             else:
                 format = '18'
@@ -349,17 +355,19 @@ class YoutubeVideoItem(BackendItem):
             deferred = fd.get_real_urls([url])
             return deferred
 
-        # self.location = VideoProxy(url, self.external_id,
-        #                           store.proxy_mode,
-        #                           store.cache_directory, store.cache_maxsize, store.buffer_size,
-        #                           extractDataURL, quality=self.store.quality)
+        # self.location = VideoProxy(
+        #     url, self.external_id,
+        #     store.proxy_mode,
+        #     store.cache_directory, store.cache_maxsize, store.buffer_size,
+        #     extractDataURL, quality=self.store.quality)
 
-        self.location = TestVideoProxy(url, self.external_id,
-                                       store.proxy_mode,
-                                       store.cache_directory,
-                                       store.cache_maxsize, store.buffer_size,
-                                       extractDataURL,
-                                       quality=self.store.quality)
+        self.location = TestVideoProxy(
+            url, self.external_id,
+            store.proxy_mode,
+            store.cache_directory,
+            store.cache_maxsize, store.buffer_size,
+            extractDataURL,
+            quality=self.store.quality)
 
     def get_item(self):
         if self.item is None:
@@ -377,7 +385,8 @@ class YoutubeVideoItem(BackendItem):
             if thumbnail_url is not None:
                 self.item.albumArtURI = thumbnail_url
 
-            res = DIDLLite.Resource(self.url, 'http-get:*:%s:*' % self.mimetype)
+            res = DIDLLite.Resource(
+                self.url, 'http-get:*:%s:*' % self.mimetype)
             res.duration = self.duration
             res.size = self.size
             self.item.res.append(res)
@@ -397,40 +406,46 @@ class YouTubeStore(AbstractBackendStore):
 
     implements = ['MediaServer']
 
-    description = ('Youtube',
-                   'connects to the YouTube service and exposes the standard feeds (public) and the uploads/favorites/playlists/subscriptions of a given user.',
-                   None)
+    description = (
+        'Youtube',
+        'connects to the YouTube service and exposes the standard feeds '
+        '(public) and the uploads/favorites/playlists/subscriptions '
+        'of a given user.',
+        None)
 
-    options = [{'option': 'name', 'text': 'Server Name:', 'type': 'string',
-                'default': 'my media',
-                'help': 'the name under this MediaServer shall show up with on other UPnP clients'},
-               {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
-                'default': 2, 'enum': (2, 1),
-                'help': 'the highest UPnP version this MediaServer shall support',
-                'level': 'advance'},
-               {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
-                'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set',
-                'level': 'advance'},
-               {'option': 'refresh', 'text': 'Refresh period',
-                'type': 'string'},
-               {'option': 'login', 'text': 'User ID:', 'type': 'string',
-                'group': 'User Account'},
-               {'option': 'password', 'text': 'Password:', 'type': 'string',
-                'group': 'User Account'},
-               {'option': 'location', 'text': 'Locale:', 'type': 'string'},
-               {'option': 'quality', 'text': 'Video quality:', 'type': 'string',
-                'default': 'sd', 'enum': ('sd', 'hd')},
-               {'option': 'standard_feeds', 'text': 'Include standard feeds:',
-                'type': 'bool', 'default': True},
-               {'option': 'proxy_mode', 'text': 'Proxy mode:', 'type': 'string',
-                'enum': ('redirect', 'proxy', 'cache', 'buffered')},
-               {'option': 'buffer_size', 'text': 'Buffering size:',
-                'type': 'int'},
-               {'option': 'cache_directory', 'text': 'Cache directory:',
-                'type': 'dir', 'group': 'Cache'},
-               {'option': 'cache_maxsize', 'text': 'Cache max size:',
-                'type': 'int', 'group': 'Cache'},
-               ]
+    options = [
+        {'option': 'name', 'text': 'Server Name:', 'type': 'string',
+         'default': 'my media',
+         'help': 'the name under this MediaServer shall '
+                 'show up with on other UPnP clients'},
+        {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
+         'default': 2, 'enum': (2, 1),
+         'help': 'the highest UPnP version this MediaServer shall support',
+         'level': 'advance'},
+        {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
+         'help': 'the unique (UPnP) identifier for this MediaServer, '
+                 'usually automatically set',
+         'level': 'advance'},
+        {'option': 'refresh', 'text': 'Refresh period',
+         'type': 'string'},
+        {'option': 'login', 'text': 'User ID:', 'type': 'string',
+         'group': 'User Account'},
+        {'option': 'password', 'text': 'Password:', 'type': 'string',
+         'group': 'User Account'},
+        {'option': 'location', 'text': 'Locale:', 'type': 'string'},
+        {'option': 'quality', 'text': 'Video quality:', 'type': 'string',
+         'default': 'sd', 'enum': ('sd', 'hd')},
+        {'option': 'standard_feeds', 'text': 'Include standard feeds:',
+         'type': 'bool', 'default': True},
+        {'option': 'proxy_mode', 'text': 'Proxy mode:', 'type': 'string',
+         'enum': ('redirect', 'proxy', 'cache', 'buffered')},
+        {'option': 'buffer_size', 'text': 'Buffering size:',
+         'type': 'int'},
+        {'option': 'cache_directory', 'text': 'Cache directory:',
+         'type': 'dir', 'group': 'Cache'},
+        {'option': 'cache_maxsize', 'text': 'Cache max size:',
+         'type': 'int', 'group': 'Cache'},
+    ]
 
     def __init__(self, server, **kwargs):
         AbstractBackendStore.__init__(self, server, **kwargs)
@@ -441,10 +456,9 @@ class YouTubeStore(AbstractBackendStore):
         self.password = kwargs.get('password', '')
         self.locale = kwargs.get('location', None)
         self.quality = kwargs.get('quality', 'sd')
-        self.showStandardFeeds = (
-                    kwargs.get('standard_feeds', 'True') in ['Yes', 'yes',
-                                                             'true', 'True',
-                                                             '1'])
+        self.showStandardFeeds = \
+            (kwargs.get('standard_feeds', 'True') in [
+                'Yes', 'yes', 'true', 'True', '1'])
         self.refresh = int(kwargs.get('refresh', 60)) * 60
         self.proxy_mode = kwargs.get('proxy_mode', 'redirect')
         self.cache_directory = kwargs.get('cache_directory',
@@ -452,7 +466,7 @@ class YouTubeStore(AbstractBackendStore):
         try:
             if self.proxy_mode != 'redirect':
                 os.mkdir(self.cache_directory)
-        except:
+        except Exception:
             pass
         self.cache_maxsize = kwargs.get('cache_maxsize', 100000000)
         self.buffer_size = kwargs.get('buffer_size', 750000)
@@ -460,8 +474,9 @@ class YouTubeStore(AbstractBackendStore):
         rootItem = Container(None, self.name)
         self.set_root_item(rootItem)
 
-        if (self.showStandardFeeds):
-            standardfeeds_uri = 'http://gdata.youtube.com/feeds/api/standardfeeds'
+        if self.showStandardFeeds:
+            standardfeeds_uri = \
+                'http://gdata.youtube.com/feeds/api/standardfeeds'
             if self.locale is not None:
                 standardfeeds_uri += "/%s" % self.locale
             standardfeeds_uri += "/%s"
@@ -489,14 +504,17 @@ class YouTubeStore(AbstractBackendStore):
             self.appendFeed('My Uploads',
                             userfeeds_uri % (self.login, 'uploads'), rootItem)
             self.appendFeed('My Favorites',
-                            userfeeds_uri % (self.login, 'favorites'), rootItem)
-            playlistsItem = LazyContainer(rootItem, 'My Playlists', None,
-                                          self.refresh,
-                                          self.retrievePlaylistFeeds)
+                            userfeeds_uri % (self.login, 'favorites'),
+                            rootItem)
+            playlistsItem = LazyContainer(
+                rootItem, 'My Playlists', None,
+                self.refresh,
+                self.retrievePlaylistFeeds)
             rootItem.add_child(playlistsItem)
-            subscriptionsItem = LazyContainer(rootItem, 'My Subscriptions',
-                                              None, self.refresh,
-                                              self.retrieveSubscriptionFeeds)
+            subscriptionsItem = LazyContainer(
+                rootItem, 'My Subscriptions',
+                None, self.refresh,
+                self.retrieveSubscriptionFeeds)
             rootItem.add_child(subscriptionsItem)
 
         self.init_completed()
@@ -516,7 +534,8 @@ class YouTubeStore(AbstractBackendStore):
         mimetype = MPEG4_MIMETYPE
 
         # mimetype = 'video/mpeg'
-        item = YoutubeVideoItem(external_id, title, url, mimetype, entry, self)
+        item = YoutubeVideoItem(
+            external_id, title, url, mimetype, entry, self)
         item.parent = parent
         parent.add_child(item, external_id=external_id)
 
@@ -524,17 +543,19 @@ class YouTubeStore(AbstractBackendStore):
         self.current_connection_id = None
 
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'http-get:*:%s:*' % MPEG4_MIMETYPE],
-                                                               default=True)
+            self.server.connection_manager_server.set_variable(
+                0, 'SourceProtocolInfo',
+                ['http-get:*:%s:*' % MPEG4_MIMETYPE],
+                default=True)
 
         self.wmc_mapping = {'15': self.get_root_id()}
 
         self.yt_service = YouTubeService()
-        self.yt_service.client_id = 'ytapi-JeanMichelSizun-youtubebackendpl-ruabstu7-0'
-        self.yt_service.developer_key = 'AI39si7dv2WWffH-s3pfvmw8fTND-cPWeqF1DOcZ8rwTgTPi4fheX7jjQXpn7SG61Ido0Zm_9gYR52TcGog9Pt3iG9Sa88-1yg'
+        self.yt_service.client_id = \
+            'ytapi-JeanMichelSizun-youtubebackendpl-ruabstu7-0'
+        self.yt_service.developer_key = \
+            'AI39si7dv2WWffH-s3pfvmw8fTND-cPWeqF1DOcZ8rwTg' \
+            'TPi4fheX7jjQXpn7SG61Ido0Zm_9gYR52TcGog9Pt3iG9Sa88-1yg'
         self.yt_service.email = self.login
         self.yt_service.password = self.password
         self.yt_service.source = 'Coherence UPnP backend'
@@ -608,9 +629,10 @@ class YouTubeStore(AbstractBackendStore):
                 playlist_id = playlist_video_entry.id.text.split("/")[
                     -1]  # FIXME find better way to retrieve the playlist ID
 
-                item = LazyContainer(parent, title, playlist_id, self.refresh,
-                                     self.retrievePlaylistFeedItems,
-                                     playlist_id=playlist_id)
+                item = LazyContainer(
+                    parent, title, playlist_id, self.refresh,
+                    self.retrievePlaylistFeedItems,
+                    playlist_id=playlist_id)
                 parent.add_child(item, external_id=playlist_id)
 
         def gotError(error):

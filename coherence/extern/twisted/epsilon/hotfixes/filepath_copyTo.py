@@ -63,8 +63,8 @@ class FilePath:
     path internally.
 
     @type alwaysCreate: C{bool}
-    @ivar alwaysCreate: When opening this file, only succeed if the file does not
-    already exist.
+    @ivar alwaysCreate: When opening this file, only succeed if the file does
+    not already exist.
     """
 
     # __slots__ = 'path abs'.split()
@@ -149,7 +149,8 @@ class FilePath:
 
     def open(self, mode='r'):
         if self.alwaysCreate:
-            assert 'a' not in mode, "Appending not supported when alwaysCreate == True"
+            assert 'a' not in mode, \
+                "Appending not supported when alwaysCreate == True"
             return self.create()
         return open(self.path, mode + 'b')
 
@@ -318,7 +319,8 @@ class FilePath:
         self.alwaysCreate = val
 
     def create(self):
-        """Exclusively create a file, only if this file previously did not exist.
+        """
+        Exclusively create a file, only if this file previously did not exist.
         """
         fdint = os.open(self.path, (os.O_EXCL |
                                     os.O_CREAT |
@@ -332,7 +334,8 @@ class FilePath:
 
     def temporarySibling(self):
         """
-        Create a path naming a temporary sibling of this path in a secure fashion.
+        Create a path naming a temporary sibling of
+        this path in a secure fashion.
         """
         sib = self.parent().child(_secureEnoughString() + self.basename())
         sib.requireCreate()

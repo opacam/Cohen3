@@ -105,7 +105,8 @@ def requiredAttribute(requiredAttributeName):
     @type requiredAttributeName: C{str}
 
     Example:
-        >>> from coherence.extern.twisted.epsilon.descriptor import requiredAttribute
+        >>> from coherence.extern.twisted.epsilon.descriptor import \
+        ...     requiredAttribute
         ...
         >>> class FooTestMixin:
         ...  expectedResult = requiredAttribute('expectedResult')

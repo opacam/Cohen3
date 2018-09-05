@@ -11,8 +11,8 @@ Another simple rss based Media Server, this time for TED.com content
 
 from coherence.backend import BackendItem
 from coherence.backends.appletrailers_storage import Container
-# I can reuse stuff. cool. But that also means we might want to refactor it into
-# a base class to reuse
+# I can reuse stuff. cool. But that also means
+# we might want to refactor it into a base class to reuse
 from coherence.backends.lolcats_storage import LolcatsStore
 from coherence.upnp.core import DIDLLite
 
@@ -30,8 +30,9 @@ class TedTalk(BackendItem):
 
         self.item = DIDLLite.VideoItem(id, parent_id, self.name)
 
-        res = DIDLLite.Resource(self.location,
-                                'http-get:*:video/mp4:*')  # FIXME should be video/x-m4a
+        res = DIDLLite.Resource(
+            self.location,
+            'http-get:*:video/mp4:*')  # FIXME should be video/x-m4a
         res.size = size
         res.duration = duration
         self.item.res.append(res)
@@ -67,7 +68,7 @@ class TEDStore(LolcatsStore):
 
     def upnp_init(self):
         if self.server:
-            self.server.connection_manager_server.set_variable( \
+            self.server.connection_manager_server.set_variable(
                 0, 'SourceProtocolInfo', ['http-get:*:video/mp4:*'])
 
     def parse_data(self, xml_data):
@@ -96,7 +97,8 @@ class TEDStore(LolcatsStore):
             data = {}
             data['parent_id'] = self.ROOT_ID
             data['id'] = self.next_id
-            data['title'] = item.find('./title').text.replace('TEDTalks : ', '')
+            data['title'] = item.find(
+                './title').text.replace('TEDTalks : ', '')
             # data ['summary'] = item.find(summary).text
             # data ['duration'] = item.find(duration).text
 
@@ -119,10 +121,8 @@ class TEDStore(LolcatsStore):
 
         if self.server and hasattr(self.server, 'content_directory_server'):
             # the content_directory_server may not yet be initialised
-            self.server.content_directory_server.set_variable(0,
-                                                              'SystemUpdateID',
-                                                              self.update_id)
+            self.server.content_directory_server.set_variable(
+                0, 'SystemUpdateID', self.update_id)
             value = (self.ROOT_ID, self.container.update_id)
-            self.server.content_directory_server.set_variable(0,
-                                                              'ContainerUpdateIDs',
-                                                              value)
+            self.server.content_directory_server.set_variable(
+                0, 'ContainerUpdateIDs', value)

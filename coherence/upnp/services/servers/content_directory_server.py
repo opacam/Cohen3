@@ -55,8 +55,10 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         return cl
 
     def render(self, request):
-        return '<html><p>root of the ContentDirectory</p><p><ul>%s</ul></p></html>' % self.listchilds(
-            request.uri.decode('utf-8'))
+        return \
+            '<html><p>root of the ContentDirectory</p>' \
+            '<p><ul>%s</ul></p></html>' % self.listchilds(
+                request.uri.decode('utf-8'))
 
     def upnp_Search(self, *args, **kwargs):
         ContainerID = kwargs['ContainerID']
@@ -97,7 +99,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             if result is None:
                 result = []
 
-            l = []
+            cl = []
 
             def process_items(result, tm):
                 if result is None:
@@ -110,11 +112,11 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
             for i in result:
                 d = defer.maybeDeferred(i.get_item)
-                l.append(d)
+                cl.append(d)
 
             if found_item is not None:
                 def got_child_count(count):
-                    dl = defer.DeferredList(l)
+                    dl = defer.DeferredList(cl)
                     dl.addCallback(process_items, count)
                     return dl
 
@@ -125,7 +127,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             elif total is None:
                 total = item.get_child_count()
 
-            dl = defer.DeferredList(l)
+            dl = defer.DeferredList(cl)
             dl.addCallback(process_items, total)
             return dl
 
@@ -144,7 +146,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
         try:
             root_id = ContainerID
-        except:
+        except Exception:
             pass
 
         wmc_mapping = getattr(self.backend, "wmc_mapping", None)
@@ -162,8 +164,8 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                             if int(RequestedCount) == 0:
                                 items = item[StartingIndex:]
                             else:
-                                items = item[
-                                        StartingIndex:StartingIndex + RequestedCount]
+                                items = item[StartingIndex:
+                                             StartingIndex + RequestedCount]
                             return process_result(items, total=total)
                         else:
                             if isinstance(item, defer.Deferred):
@@ -195,12 +197,13 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
     def upnp_Browse(self, *args, **kwargs):
         try:
             ObjectID = kwargs['ObjectID']
-        except:
+        except KeyError:
             self.debug(
-                "hmm, a Browse action and no ObjectID argument? An XBox maybe?")
+                "hmm, a Browse action and no ObjectID argument? "
+                "An XBox maybe?")
             try:
                 ObjectID = kwargs['ContainerID']
-            except:
+            except KeyError:
                 ObjectID = 0
         BrowseFlag = kwargs['BrowseFlag']
         Filter = kwargs['Filter']
@@ -235,7 +238,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             if result is None:
                 result = []
             if BrowseFlag == 'BrowseDirectChildren':
-                l = []
+                cl = []
 
                 def process_items(result, tm):
                     if result is None:
@@ -248,11 +251,11 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
                 for i in result:
                     d = defer.maybeDeferred(i.get_item)
-                    l.append(d)
+                    cl.append(d)
 
                 if found_item is not None:
                     def got_child_count(count):
-                        dl = defer.DeferredList(l)
+                        dl = defer.DeferredList(cl)
                         dl.addCallback(process_items, count)
                         return dl
 
@@ -263,7 +266,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                 elif total is None:
                     total = item.get_child_count()
 
-                dl = defer.DeferredList(l)
+                dl = defer.DeferredList(cl)
                 dl.addCallback(process_items, total)
                 return dl
             else:

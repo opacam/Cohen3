@@ -39,8 +39,8 @@ from twisted.python import log
 from zope.interface import implements, Interface
 
 from coherence.extern.twisted.axiom import upgrade, iaxiom
-from coherence.extern.twisted.axiom.attributes import text, integer, reference, \
-    boolean, AND, OR
+from coherence.extern.twisted.axiom.attributes import \
+    text, integer, reference, boolean, AND, OR
 from coherence.extern.twisted.axiom.errors import (
     BadCredentials, NoSuchUser, DuplicateUser, MissingDomainPart)
 from coherence.extern.twisted.axiom.item import Item
@@ -208,9 +208,9 @@ class LoginAccount(Item):
         siteStore = self.store.parent
 
         def _():
-            # No convenience method for the following because needing to do it is
-            # *rare*.  It *should* be ugly; 99% of the time if you need to do this
-            # you're making a mistake. -glyph
+            # No convenience method for the following because needing to do
+            # it is *rare*.  It *should* be ugly; 99% of the time if you need
+            # to do this you're making a mistake. -glyph
             siteStoreSubRef = siteStore.getItemByID(self.store.idInParent)
             self.cloneInto(siteStore, siteStoreSubRef)
             IScheduler(self.store).migrateUp()
@@ -219,7 +219,8 @@ class LoginAccount(Item):
 
     def cloneInto(self, newStore, avatars):
         """
-        Create a copy of this LoginAccount and all associated LoginMethods in a different Store.
+        Create a copy of this LoginAccount and all associated LoginMethods
+        in a different Store.
 
         Return the copied LoginAccount.
         """
@@ -245,7 +246,7 @@ class LoginAccount(Item):
     def addLoginMethod(self, localpart, domain, protocol=ANY_PROTOCOL,
                        verified=False, internal=False):
         """
-        Add a login method to this account, propogating up or down as necessary
+        Add a login method to this account, propagating up or down as necessary
         to site store or user store to maintain consistency.
         """
         # Out takes you west or something
@@ -285,10 +286,10 @@ def insertUserStore(siteStore, userStorePath):
     # exclusively by this process.
     ls = siteStore.findUnique(LoginSystem)
     unattachedSubStore = Store(userStorePath)
-    for lm in unattachedSubStore.query(LoginMethod,
-                                       LoginMethod.account == unattachedSubStore.findUnique(
-                                           LoginAccount),
-                                       sort=LoginMethod.internal.descending):
+    for lm in unattachedSubStore.query(
+            LoginMethod,
+            LoginMethod.account == unattachedSubStore.findUnique(LoginAccount),
+            sort=LoginMethod.internal.descending):
         if ls.accountByAddress(lm.localpart, lm.domain) is None:
             localpart, domain = lm.localpart, lm.domain
             break
@@ -432,11 +433,12 @@ class LoginBase:
         @type username: C{unicode} without NUL
         @type domain: C{unicode} without NUL
         """
-        for account in self.store.query(LoginAccount,
-                                        AND(LoginMethod.domain == domain,
-                                            LoginMethod.localpart == username,
-                                            LoginAccount.disabled == 0,
-                                            LoginMethod.account == LoginAccount.storeID)):
+        for account in self.store.query(
+                LoginAccount,
+                AND(LoginMethod.domain == domain,
+                    LoginMethod.localpart == username,
+                    LoginAccount.disabled == 0,
+                    LoginMethod.account == LoginAccount.storeID)):
             return account
 
     def addAccount(self, username, domain, password, avatars=None,

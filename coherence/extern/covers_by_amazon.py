@@ -173,7 +173,7 @@ class CoverGetter(object):
 
         if asin is not None:
             query = aws_asin_query + '&ItemId=%s' % urllib.parse.quote(asin)
-        elif (artist is not None or title is not None):
+        elif artist is not None or title is not None:
             query = aws_artist_query
             if artist is not None:
                 artist = sanitize(artist)
@@ -185,7 +185,8 @@ class CoverGetter(object):
                     (query, 'Title=%s' % urllib.parse.quote(title)))
         else:
             raise KeyError(
-                "Please supply either asin, title or artist and title arguments")
+                "Please supply either asin, title "
+                "or artist and title arguments")
         url = self.server + self.aws_base_query + aws_response_group + query
         WorkQueue(self.send_request, url)
 
@@ -198,7 +199,7 @@ class CoverGetter(object):
 
     def got_image(self, result, convert_from='', convert_to=''):
         # print "got_image"
-        if (len(convert_from) and len(convert_to)):
+        if len(convert_from) and len(convert_to):
             # print "got_image %d, convert to %s" % (len(result), convert_to)
             try:
                 import Image
@@ -209,8 +210,8 @@ class CoverGetter(object):
 
                 im.save(self.filename)
             except ImportError:
-                print(
-                    "we need the Python Imaging Library to do image conversion")
+                print("we need the Python Imaging Library "
+                      "to do image conversion")
 
         if self.filename is None:
             data = result
@@ -244,8 +245,9 @@ class CoverGetter(object):
     def got_response(self, result):
         convert_from = convert_to = ''
         result = etree.fromstring(result)
-        image_tag = result.find('.//{%s}%s' % (
-        aws_ns, aws_image_size.get(self.image_size, 'large')))
+        image_tag = result.find(
+            './/{%s}%s' % (aws_ns,
+                           aws_image_size.get(self.image_size, 'large')))
         if image_tag is not None:
             image_url = image_tag.findtext('{%s}URL' % aws_ns)
             if self.filename is None:
@@ -296,9 +298,7 @@ class CoverGetter(object):
 
 
 if __name__ == '__main__':
-
     from twisted.python import usage
-
 
     class Options(usage.Options):
         optParameters = [['artist', 'a', '', 'artist name'],
@@ -306,7 +306,6 @@ if __name__ == '__main__':
                          ['asin', 's', '', 'ASIN'],
                          ['filename', 'f', 'cover.jpg', 'filename'],
                          ]
-
 
     options = Options()
     try:
@@ -318,10 +317,8 @@ if __name__ == '__main__':
         print('%s: Try --help for usage details.' % (sys.argv[0]))
         sys.exit(1)
 
-
     def got_it(filename, *args, **kwargs):
         print("Mylady, it is an image and its name is", filename, args, kwargs)
-
 
     aws_key = '1XHSE4FQJ0RK0X3S9WR2'
     print(options['asin'], options['artist'], options['title'])

@@ -1,6 +1,7 @@
 # DELETE_OBJECT = 'DELETE FROM axiom_objects WHERE oid = ?'
 CREATE_OBJECT = 'INSERT INTO *DATABASE*.axiom_objects (type_id) VALUES (?)'
-CREATE_TYPE = 'INSERT INTO *DATABASE*.axiom_types (typename, module, version) VALUES (?, ?, ?)'
+CREATE_TYPE = 'INSERT INTO *DATABASE*.axiom_types ' \
+              '(typename, module, version) VALUES (?, ?, ?)'
 
 BASE_SCHEMA = ["""
 CREATE TABLE *DATABASE*.axiom_objects (
@@ -36,7 +37,9 @@ CREATE TABLE *DATABASE*.axiom_objects (
                """]
 
 TYPEOF_QUERY = """
-SELECT *DATABASE*.axiom_types.typename, *DATABASE*.axiom_types.module, *DATABASE*.axiom_types.version
+SELECT *DATABASE*.axiom_types.typename,
+*DATABASE*.axiom_types.module,
+*DATABASE*.axiom_types.version
     FROM *DATABASE*.axiom_types, *DATABASE*.axiom_objects
     WHERE *DATABASE*.axiom_objects.oid = ?
         AND *DATABASE*.axiom_types.oid = *DATABASE*.axiom_objects.type_id
@@ -51,7 +54,8 @@ IDENTIFYING_SCHEMA = ('SELECT indexed, sqltype, allow_none, attribute '
 
 ADD_SCHEMA_ATTRIBUTE = (
     'INSERT INTO *DATABASE*.axiom_attributes '
-    '(type_id, row_offset, indexed, sqltype, allow_none, attribute, docstring, pythontype) '
+    '(type_id, row_offset, indexed, sqltype, '
+    'allow_none, attribute, docstring, pythontype) '
     'VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
 
 ALL_TYPES = 'SELECT oid, module, typename, version FROM *DATABASE*.axiom_types'
@@ -65,4 +69,6 @@ SCHEMA_FOR_TYPE = ('SELECT indexed, pythontype, attribute, docstring '
 
 CHANGE_TYPE = 'UPDATE *DATABASE*.axiom_objects SET type_id = ? WHERE oid = ?'
 
-APP_VACUUM = 'DELETE FROM *DATABASE*.axiom_objects WHERE (type_id == -1) AND (oid != (SELECT MAX(oid) from *DATABASE*.axiom_objects))'
+APP_VACUUM = 'DELETE FROM *DATABASE*.axiom_objects ' \
+             'WHERE (type_id == -1) AND (oid != (SELECT MAX(oid) ' \
+             'from *DATABASE*.axiom_objects))'

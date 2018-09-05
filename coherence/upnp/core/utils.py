@@ -118,7 +118,8 @@ def get_ip_address(ifname):
         if ifname in netifaces.interfaces():
             iface = netifaces.ifaddresses(ifname)
             ifaceadr = iface[netifaces.AF_INET]
-            # we now have a list of address dictionaries, there may be multiple addresses bound
+            # we now have a list of address dictionaries,
+            # there may be multiple addresses bound
             return ifaceadr[0]['addr']
     import sys
     if sys.platform in ('win32', 'sunos5'):
@@ -142,7 +143,7 @@ def get_ip_address(ifname):
             SIOCGIFADDR,
             struct.pack(b'256s', ifname[:15].encode('ascii'))
         )[20:24])
-    except:
+    except Exception:
         ip = '127.0.0.1'
     # print('ip is: {}'.format(ip))
     return ip
@@ -159,8 +160,8 @@ def get_host_address():
         if have_netifaces:
             interfaces = netifaces.interfaces()
             if len(interfaces):
-                return get_ip_address(interfaces[
-                                          0])  # on windows assume first interface is primary
+                # on windows assume first interface is primary
+                return get_ip_address(interfaces[0])
     else:
         try:
             route_file = '/proc/net/route'
@@ -169,11 +170,11 @@ def get_host_address():
                 tmp = route.readline()  # skip first line
                 while tmp != '':
                     tmp = route.readline()
-                    l = tmp.split('\t')
-                    if (len(l) > 2):
-                        if l[1] == '00000000':  # default route...
+                    li = tmp.split('\t')
+                    if (len(li) > 2):
+                        if li[1] == '00000000':  # default route...
                             route.close()
-                            return get_ip_address(l[0])
+                            return get_ip_address(li[0])
         except IOError as msg:
             """ fallback to parsing the output of netstat """
             from twisted.internet import utils
@@ -183,9 +184,9 @@ def get_host_address():
                 (osname, _, _, _, _) = uname()
                 osname = osname.lower()
                 lines = r.split('\n')
-                for l in lines:
-                    l = l.strip(' \r\n')
-                    parts = [x.strip() for x in l.split(' ') if len(x) > 0]
+                for li in lines:
+                    li = li.strip(' \r\n')
+                    parts = [x.strip() for x in li.split(' ') if len(x) > 0]
                     if parts[0] in ('0.0.0.0', 'default'):
                         if osname[:6] == 'darwin':
                             return get_ip_address(parts[5])
@@ -482,7 +483,7 @@ def getPage(url, contextFactory=None, *args, **kwargs):
 
     if 'headers' in kwargs and 'user-agent' in kwargs['headers']:
         kwargs['agent'] = kwargs['headers']['user-agent']
-    elif not 'agent' in kwargs:
+    elif 'agent' not in kwargs:
         kwargs['agent'] = "Coherence PageGetter"
     new_kwargs = {}
     for k, v in kwargs.items():
@@ -519,7 +520,7 @@ def downloadPage(url, file, contextFactory=None, *args, **kwargs):
 
     if 'headers' in kwargs and 'user-agent' in kwargs['headers']:
         kwargs['agent'] = kwargs['headers']['user-agent']
-    elif not 'agent' in kwargs:
+    elif 'agent' not in kwargs:
         kwargs['agent'] = "Coherence PageGetter"
     new_kwargs = {}
     for k, v in kwargs.items():
@@ -626,7 +627,8 @@ class BufferFile(static.File):
             start, end = bytesrange[1].split('-', 1)
             if start:
                 start = int(start)
-                # Are we requesting something beyond the current size of the file?
+                # Are we requesting something
+                # beyond the current size of the file?
                 if (start >= self.getFileSize()):
                     # Retry later!
                     logger.info(bytesrange)

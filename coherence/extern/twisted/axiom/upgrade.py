@@ -147,7 +147,7 @@ class _StoreUpgrade(object):
                 upgradedAnything = True
                 try:
                     self.upgradeItem(theItem)
-                except:
+                except Exception as e:
                     f = Failure()
                     raise ItemUpgradeError(
                         f, theItem.storeID, itemType,
@@ -166,7 +166,7 @@ class _StoreUpgrade(object):
                     self._oldTypesRemaining.pop(0)
                     if didAny:
                         msg("%s finished upgrading %s" % (
-                        store.dbdir.path, qual(t0)))
+                            store.dbdir.path, qual(t0)))
                     continue
                 elif not didAny:
                     didAny = True
@@ -190,7 +190,8 @@ def registerUpgrader(upgrader, typeName, oldVersion, newVersion):
     @param newVersion: The version to which this will upgrade.  This must be
     exactly one greater than C{oldVersion}.
     """
-    # assert (typeName, oldVersion, newVersion) not in _upgradeRegistry, "duplicate upgrader"
+    # assert (typeName, oldVersion, newVersion) not in \
+    #        _upgradeRegistry, "duplicate upgrader"
     # ^ this makes the tests blow up so it's just disabled for now; perhaps we
     # should have a specific test mode
     # assert newVersion - oldVersion == 1, "read the doc string"

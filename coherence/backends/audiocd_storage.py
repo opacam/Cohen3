@@ -50,7 +50,7 @@ class TrackItem(BackendItem):
         self.fourth_field = TRACK_FOURTH_FIELD
         self.item = None
         self.pipeline = PLAY_TRACK_GST_PIPELINE % (
-        self.device_name, self.track_number)
+            self.device_name, self.track_number)
         self.location = GStreamerPipeline(self.pipeline, self.mimetype)
 
     def get_item(self):
@@ -58,10 +58,11 @@ class TrackItem(BackendItem):
             upnp_id = self.storage_id
             upnp_parent_id = self.parent.get_id()
             url = self.store.urlbase + str(self.storage_id)
-            self.item = DIDLLite.MusicTrack(upnp_id, upnp_parent_id, self.title)
+            self.item = DIDLLite.MusicTrack(
+                upnp_id, upnp_parent_id, self.title)
 
             res = DIDLLite.Resource(url, 'http-get:*:%s:%s' % (
-            self.mimetype, self.fourth_field))
+                self.mimetype, self.fourth_field))
             # res.duration = self.duration
             # res.size = self.get_size()
             self.item.res.append(res)
@@ -87,17 +88,19 @@ class AudioCDStore(AbstractBackendStore):
 
     description = ('audioCD', '', None)
 
-    options = [{'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
-                'default': 2, 'enum': (2, 1),
-                'help': 'the highest UPnP version this MediaServer shall support',
-                'level': 'advance'},
-               {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
-                'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set',
-                'level': 'advance'},
-               {'option': 'device_name', 'text': 'device name for audio CD:',
-                'type': 'string',
-                'help': 'device name containing the audio cd.'}
-               ]
+    options = [
+        {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
+         'default': 2, 'enum': (2, 1),
+         'help': 'the highest UPnP version this MediaServer shall support',
+         'level': 'advance'},
+        {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
+         'help': 'the unique (UPnP) identifier for this MediaServer, '
+                 'usually automatically set',
+         'level': 'advance'},
+        {'option': 'device_name', 'text': 'device name for audio CD:',
+         'type': 'string',
+         'help': 'device name containing the audio cd.'}
+    ]
 
     disc_title = None
     cdrom = None
@@ -109,25 +112,28 @@ class AudioCDStore(AbstractBackendStore):
         self.device_name = kwargs.get('device_name', "/dev/cdom")
 
         threads.deferToThread(self.extractAudioCdInfo)
-        # self.init_completed() # will be fired when the audio CD info is extracted
+
+        # will be fired when the audio CD info is extracted
+        # self.init_completed()
 
     def upnp_init(self):
         self.current_connection_id = None
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'http-get:*:%s:%s' % (
-                                                                   TRACK_MIMETYPE,
-                                                                   TRACK_FOURTH_FIELD)],
-                                                               default=True)
-            self.server.content_directory_server.set_variable(0,
-                                                              'SystemUpdateID',
-                                                              self.update_id)
-            # self.server.content_directory_server.set_variable(0, 'SortCapabilities', '*')
+            self.server.connection_manager_server.set_variable(
+                0, 'SourceProtocolInfo',
+                ['http-get:*:%s:%s' % (
+                    TRACK_MIMETYPE, TRACK_FOURTH_FIELD)],
+                default=True)
+            self.server.content_directory_server.set_variable(
+                0, 'SystemUpdateID', self.update_id)
+            # self.server.content_directory_server.set_variable(
+            #     0, 'SortCapabilities', '*')
 
     def extractAudioCdInfo(self):
-        """ extract the CD info (album art + artist + tracks), and construct the UPnP items"""
+        """
+        extract the CD info (album art + artist + tracks),
+        and construct the UPnP items
+        """
         self.cdrom = DiscID.open(self.device_name)
         disc_id = DiscID.disc_id(self.cdrom)
 
@@ -175,7 +181,7 @@ class AudioCDStore(AbstractBackendStore):
         try:
             disc_id = DiscID.disc_id(self.cdrom)
             reactor.callLater(2, self.checkIfAudioCdStillPresent)
-        except:
+        except Exception:
             self.warning('audio CD %s ejected: closing UPnP server!',
                          self.disc_title)
             self.server.coherence.remove_plugin(self.server)

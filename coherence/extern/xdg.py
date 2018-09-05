@@ -15,7 +15,8 @@ hot_dirs = {'XDG_MUSIC_DIR': ('audio', 'audio'),
 
 def xdg_content():
     content = []
-    xdg_config_home = os.path.expanduser(getenv('XDG_CONFIG_HOME', '~/.config'))
+    xdg_config_home = os.path.expanduser(
+        getenv('XDG_CONFIG_HOME', '~/.config'))
     user_dirs_file = os.path.join(xdg_config_home, 'user-dirs.dirs')
     if os.path.exists(user_dirs_file):
         f = open(user_dirs_file)

@@ -123,8 +123,9 @@ def checkSystemVersion(s, versions=None):
         versions = getSystemVersions()
 
     currentVersionMap = dict([(v.package, v) for v in versions])
-    mostRecentSystemVersion = s.findFirst(SystemVersion,
-                                          sort=SystemVersion.creation.descending)
+    mostRecentSystemVersion = s.findFirst(
+        SystemVersion,
+        sort=SystemVersion.creation.descending)
     mostRecentVersionMap = dict([(v.package, v.asVersion()) for v in
                                  s.query(SoftwareVersion,
                                          (SoftwareVersion.systemVersion ==

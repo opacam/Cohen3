@@ -73,8 +73,8 @@ class AxisCamItem(BackendItem):
             self.update_id += 1
 
     def remove_child(self, child):
-        self.info("remove_from %d (%s) child %d (%s)", self.id, self.get_name(),
-                  child.id, child.get_name())
+        self.info("remove_from %d (%s) child %d (%s)",
+                  self.id, self.get_name(), child.id, child.get_name())
         if child in self.children:
             if isinstance(self.item, Container):
                 self.item.childCount -= 1
@@ -158,16 +158,14 @@ class AxisCamStore(BackendStore):
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0,
-                                                                  'SystemUpdateID',
-                                                                  self.update_id)
+                self.server.content_directory_server.set_variable(
+                    0, 'SystemUpdateID', self.update_id)
             if parent:
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'ContainerUpdateIDs',
-                                                                      value)
+                    self.server.content_directory_server.set_variable(
+                        0, 'ContainerUpdateIDs', value)
 
         if mimetype == 'directory':
             return self.store[id]
@@ -187,7 +185,7 @@ class AxisCamStore(BackendStore):
             id = 1000
         try:
             return self.store[id]
-        except:
+        except KeyError:
             return None
 
     def getnextID(self):
@@ -208,10 +206,8 @@ class AxisCamStore(BackendStore):
                 self.append(v, parent)
 
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               source_protocols,
-                                                               default=True)
+            self.server.connection_manager_server.set_variable(
+                0, 'SourceProtocolInfo', source_protocols, default=True)
 
 
 def main():

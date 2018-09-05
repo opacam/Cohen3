@@ -45,7 +45,9 @@ class Upgrade(axiomatic.AxiomaticCommand):
     optParameters = [
         ('count', 'n', '100', 'Number of upgrades to perform per transaction')]
 
-    errorMessageFormat = 'Error upgrading item (with typeName=%s and storeID=%d) from version %d to %d.'
+    errorMessageFormat = \
+        'Error upgrading item (with typeName=%s and storeID=%d) ' \
+        'from version %d to %d.'
 
     def upgradeEverything(self, store):
         """
@@ -258,7 +260,8 @@ class UserBaseCommand(axiomatic.AxiomaticCommand):
 
 class Extract(axiomatic.AxiomaticCommand):
     name = 'extract-user'
-    description = 'Remove an account from the login system, moving its associated database to the filesystem.'
+    description = 'Remove an account from the login system, ' \
+                  'moving its associated database to the filesystem.'
     optParameters = [
         ('address', 'a', None,
          'localpart@domain-format identifier of the user store to extract.'),
@@ -284,7 +287,8 @@ class Extract(axiomatic.AxiomaticCommand):
 
 class Insert(axiomatic.AxiomaticCommand):
     name = 'insert-user'
-    description = 'Insert a user store, such as one extracted with "extract-user", into a site store and login system.'
+    description = 'Insert a user store, such as one extracted with ' \
+                  '"extract-user", into a site store and login system.'
     optParameters = [
         ('userstore', 'u', None, 'Path to user store to be inserted.')
     ]

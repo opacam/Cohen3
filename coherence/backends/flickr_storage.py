@@ -15,14 +15,12 @@ from email.utils import parsedate_tz
 try:
     import hashlib
 
-
     def md5(s):
         m = hashlib.md5()
         m.update(s)
         return m.hexdigest()
 except ImportError:
     import md5 as oldmd5
-
 
     def md5(s):
         m = oldmd5.new()
@@ -36,9 +34,10 @@ from twisted.python.filepath import FilePath
 
 from coherence.upnp.core.utils import parse_xml, ReverseProxyResource
 
-from coherence.upnp.core.DIDLLite import classChooser, Container, PhotoAlbum, \
-    Photo, ImageItem, Resource, DIDLElement
-from coherence.upnp.core.DIDLLite import simple_dlna_tags, PlayContainerResource
+from coherence.upnp.core.DIDLLite import classChooser, \
+    Container, PhotoAlbum, Photo, ImageItem, Resource, DIDLElement
+from coherence.upnp.core.DIDLLite import \
+    simple_dlna_tags, PlayContainerResource
 from coherence.upnp.core.soap_proxy import SOAPProxy
 from coherence.upnp.core.soap_service import errorCode
 
@@ -71,8 +70,9 @@ class FlickrAuthenticate(object):
         api_sig = ''.join(
             (api_secret, 'api_key', api_key, 'frob', frob, 'perms', perms))
         api_sig = md5(api_sig)
-        login_url = "http://flickr.com/services/auth/?api_key=%s&perms=%s&frob=%s&api_sig=%s" % (
-        api_key, perms, frob, api_sig)
+        login_url = "http://flickr.com/services/auth/" \
+                    "?api_key=%s&perms=%s&frob=%s&api_sig=%s" % (
+                        api_key, perms, frob, api_sig)
         browser.open(login_url)
         browser.select_form(name='login_form')
         browser['login'] = userid
@@ -84,7 +84,7 @@ class FlickrAuthenticate(object):
                     browser.form = form
                     browser.submit()
                     break
-            except:
+            except Exception:
                 pass
         else:
             raise Exception('no form for authentication found')  # lame :-/
@@ -158,7 +158,7 @@ class FlickrItem(log.LogAble):
         if self.mimetype == 'directory':
             try:
                 self.flickr_id = obj.get('id')
-            except:
+            except Exception:
                 self.flickr_id = None
             self.url = urlbase + str(self.id)
         elif isinstance(self.id, str) and self.id.startswith('upload.'):
@@ -172,9 +172,10 @@ class FlickrItem(log.LogAble):
                 date, time = datetaken.split(' ')
                 year, month, day = date.split('-')
                 hour, minute, second = time.split(':')
-                self.date = datetime(int(year), int(month), int(day), int(hour),
-                                     int(minute), int(second))
-            except:
+                self.date = datetime(
+                    int(year), int(month), int(day),
+                    int(hour), int(minute), int(second))
+            except Exception:
                 import traceback
                 self.debug(traceback.format_exc())
 
@@ -220,12 +221,8 @@ class FlickrItem(log.LogAble):
             self.warning("error requesting %s %s", failure, url)
             self.info(failure)
 
-        getPage(self.real_url, method='HEAD', timeout=60).addCallbacks(gotPhoto,
-                                                                       gotError,
-                                                                       None,
-                                                                       None, [
-                                                                           self.real_url],
-                                                                       None)
+        getPage(self.real_url, method='HEAD', timeout=60).addCallbacks(
+            gotPhoto, gotError, None, None, [self.real_url], None)
 
     def remove(self):
         # print "FSItem remove", self.id, self.get_name(), self.parent
@@ -239,8 +236,8 @@ class FlickrItem(log.LogAble):
             self.update_id += 1
 
     def remove_child(self, child):
-        self.info("remove_from %d (%s) child %d (%s)", self.id, self.get_name(),
-                  child.id, child.get_name())
+        self.info("remove_from %d (%s) child %d (%s)",
+                  self.id, self.get_name(), child.id, child.get_name())
         if child in self.children:
             self.children.remove(child)
             self.update_id += 1
@@ -344,13 +341,14 @@ class FlickrItem(log.LogAble):
             if hasattr(self, 'original_url'):
                 dlna_pn = 'DLNA.ORG_PN=JPEG_LRG'
                 if not self.store.proxy:
-                    res = Resource(self.original_url[0], 'http-get:*:%s:%s' % (
-                    self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
+                    res = Resource(
+                        self.original_url[0], 'http-get:*:%s:%s' % (
+                            self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
                 else:
-                    res = Resource(self.url + '?attachment=original',
-                                   'http-get:*:%s:%s' % (self.mimetype,
-                                                         ';'.join([
-                                                                      dlna_pn] + dlna_tags)))
+                    res = Resource(
+                        self.url + '?attachment=original',
+                        'http-get:*:%s:%s' % (
+                            self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
                     self.item.attachments['original'] = ProxyImage(
                         self.original_url[0])
                 res.resolution = self.original_url[1]
@@ -358,8 +356,9 @@ class FlickrItem(log.LogAble):
             elif hasattr(self, 'large_url'):
                 dlna_pn = 'DLNA.ORG_PN=JPEG_LRG'
                 if not self.store.proxy:
-                    res = Resource(self.large_url[0], 'http-get:*:%s:%s' % (
-                    self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
+                    res = Resource(
+                        self.large_url[0], 'http-get:*:%s:%s' % (
+                            self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
                 else:
                     res = Resource(
                         self.url + '?attachment=large',
@@ -372,13 +371,14 @@ class FlickrItem(log.LogAble):
             if hasattr(self, 'medium_url'):
                 dlna_pn = 'DLNA.ORG_PN=JPEG_MED'
                 if not self.store.proxy:
-                    res = Resource(self.medium_url[0], 'http-get:*:%s:%s' % (
-                    self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
+                    res = Resource(
+                        self.medium_url[0], 'http-get:*:%s:%s' % (
+                            self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
                 else:
-                    res = Resource(self.url + '?attachment=medium',
-                                   'http-get:*:%s:%s' % (self.mimetype,
-                                                         ';'.join([
-                                                                      dlna_pn] + dlna_tags)))
+                    res = Resource(
+                        self.url + '?attachment=medium',
+                        'http-get:*:%s:%s' % (
+                            self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
                     self.item.attachments['medium'] = ProxyImage(
                         self.medium_url[0])
                 res.resolution = self.medium_url[1]
@@ -386,13 +386,14 @@ class FlickrItem(log.LogAble):
             if hasattr(self, 'small_url'):
                 dlna_pn = 'DLNA.ORG_PN=JPEG_SM'
                 if not self.store.proxy:
-                    res = Resource(self.small_url[0], 'http-get:*:%s:%s' % (
-                    self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
+                    res = Resource(
+                        self.small_url[0], 'http-get:*:%s:%s' % (
+                            self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
                 else:
-                    res = Resource(self.url + '?attachment=small',
-                                   'http-get:*:%s:%s' % (self.mimetype,
-                                                         ';'.join([
-                                                                      dlna_pn] + dlna_tags)))
+                    res = Resource(
+                        self.url + '?attachment=small',
+                        'http-get:*:%s:%s' % (
+                            self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
                     self.item.attachments['small'] = ProxyImage(
                         self.small_url[0])
                 res.resolution = self.small_url[1]
@@ -400,13 +401,14 @@ class FlickrItem(log.LogAble):
             if hasattr(self, 'thumb_url'):
                 dlna_pn = 'DLNA.ORG_PN=JPEG_TN'
                 if not self.store.proxy:
-                    res = Resource(self.thumb_url[0], 'http-get:*:%s:%s' % (
-                    self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
+                    res = Resource(
+                        self.thumb_url[0], 'http-get:*:%s:%s' % (
+                            self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
                 else:
-                    res = Resource(self.url + '?attachment=thumb',
-                                   'http-get:*:%s:%s' % (self.mimetype,
-                                                         ';'.join([
-                                                                      dlna_pn] + dlna_tags)))
+                    res = Resource(
+                        self.url + '?attachment=thumb',
+                        'http-get:*:%s:%s' % (
+                            self.mimetype, ';'.join([dlna_pn] + dlna_tags)))
                     self.item.attachments['thumb'] = ProxyImage(
                         self.thumb_url[0])
                 res.resolution = self.thumb_url[1]
@@ -502,16 +504,14 @@ class FlickrStore(BackendStore):
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0,
-                                                                  'SystemUpdateID',
-                                                                  self.update_id)
+                self.server.content_directory_server.set_variable(
+                    0, 'SystemUpdateID', self.update_id)
             if parent:
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'ContainerUpdateIDs',
-                                                                      value)
+                    self.server.content_directory_server.set_variable(
+                        0, 'ContainerUpdateIDs', value)
 
         if mimetype == 'directory':
             return self.store[id]
@@ -520,8 +520,8 @@ class FlickrStore(BackendStore):
             dates = result.find('dates')
             self.debug("update_photo_details %s %s", dates.get('posted'),
                        dates.get('taken'))
-            photo.item.date = datetime(*time.strptime(dates.get('taken'),
-                                                      "%Y-%m-%d %H:%M:%S")[0:6])
+            photo.item.date = datetime(
+                *time.strptime(dates.get('taken'), "%Y-%m-%d %H:%M:%S")[0:6])
 
         # d = self.flickr_photos_getInfo(obj.get('id'),obj.get('secret'))
         # d.addCallback(update_photo_details, self.store[id])
@@ -543,16 +543,14 @@ class FlickrStore(BackendStore):
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0,
-                                                                  'SystemUpdateID',
-                                                                  self.update_id)
+                self.server.content_directory_server.set_variable(
+                    0, 'SystemUpdateID', self.update_id)
             if parent:
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'ContainerUpdateIDs',
-                                                                      value)
+                    self.server.content_directory_server.set_variable(
+                        0, 'ContainerUpdateIDs', value)
 
         return self.store[id]
 
@@ -571,23 +569,21 @@ class FlickrStore(BackendStore):
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0,
-                                                                  'SystemUpdateID',
-                                                                  self.update_id)
+                self.server.content_directory_server.set_variable(
+                    0, 'SystemUpdateID', self.update_id)
             if parent:
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'ContainerUpdateIDs',
-                                                                      value)
+                    self.server.content_directory_server.set_variable(
+                        0, 'ContainerUpdateIDs', value)
 
         def update_photo_details(result, photo):
             dates = result.find('dates')
             self.debug("update_photo_details %s %s", dates.get('posted'),
                        dates.get('taken'))
-            photo.item.date = datetime(*time.strptime(dates.get('taken'),
-                                                      "%Y-%m-%d %H:%M:%S")[0:6])
+            photo.item.date = datetime(
+                *time.strptime(dates.get('taken'), "%Y-%m-%d %H:%M:%S")[0:6])
 
         # d = self.flickr_photos_getInfo(obj.get('id'),obj.get('secret'))
         # d.addCallback(update_photo_details, self.store[id])
@@ -609,16 +605,14 @@ class FlickrStore(BackendStore):
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0,
-                                                                  'SystemUpdateID',
-                                                                  self.update_id)
+                self.server.content_directory_server.set_variable(
+                    0, 'SystemUpdateID', self.update_id)
             if parent:
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'ContainerUpdateIDs',
-                                                                      value)
+                    self.server.content_directory_server.set_variable(
+                        0, 'ContainerUpdateIDs', value)
 
         return self.store[id]
 
@@ -637,16 +631,14 @@ class FlickrStore(BackendStore):
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
-                self.server.content_directory_server.set_variable(0,
-                                                                  'SystemUpdateID',
-                                                                  self.update_id)
+                self.server.content_directory_server.set_variable(
+                    0, 'SystemUpdateID', self.update_id)
             if parent:
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'ContainerUpdateIDs',
-                                                                      value)
+                    self.server.content_directory_server.set_variable(
+                        0, 'ContainerUpdateIDs', value)
 
         return self.store[id]
 
@@ -660,16 +652,14 @@ class FlickrStore(BackendStore):
             if hasattr(self, 'update_id'):
                 self.update_id += 1
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'SystemUpdateID',
-                                                                      self.update_id)
+                    self.server.content_directory_server.set_variable(
+                        0, 'SystemUpdateID', self.update_id)
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
-                    self.server.content_directory_server.set_variable(0,
-                                                                      'ContainerUpdateIDs',
-                                                                      value)
-        except:
+                    self.server.content_directory_server.set_variable(
+                        0, 'ContainerUpdateIDs', value)
+        except (ValueError, KeyError):
             pass
 
     def append_flickr_result(self, result, parent):
@@ -716,7 +706,7 @@ class FlickrStore(BackendStore):
                 item = self.uploads[id]
                 self.info('get_by_id found %r', item)
                 return item
-            except:
+            except Exception:
                 return None
 
         if isinstance(id, str):
@@ -729,7 +719,7 @@ class FlickrStore(BackendStore):
 
         try:
             return self.store[id]
-        except:
+        except KeyError:
             return None
 
     def getnextID(self):
@@ -800,7 +790,8 @@ class FlickrStore(BackendStore):
 
         if self.flickr_authtoken is not None:
             d = self.flickr_photosets()
-            d.addCallback(self.update_flickr_result, self.photosets, 'photoset')
+            d.addCallback(
+                self.update_flickr_result, self.photosets, 'photoset')
             d.addErrback(self.got_error)
 
             d = self.flickr_notInSet()
@@ -844,22 +835,25 @@ class FlickrStore(BackendStore):
         return d
 
     def flickr_auth_getFrob(self):
-        api_sig = self.flickr_create_api_signature(method='flickr.auth.getFrob')
+        api_sig = self.flickr_create_api_signature(
+            method='flickr.auth.getFrob')
         d = self.flickr_call('flickr.auth.getFrob', api_sig=api_sig)
         return d
 
     def flickr_auth_getToken(self, frob):
-        api_sig = self.flickr_create_api_signature(frob=frob,
-                                                   method='flickr.auth.getToken')
-        d = self.flickr_call('flickr.auth.getToken', frob=frob, api_sig=api_sig)
+        api_sig = self.flickr_create_api_signature(
+            frob=frob, method='flickr.auth.getToken')
+        d = self.flickr_call(
+            'flickr.auth.getToken', frob=frob, api_sig=api_sig)
         return d
 
     def flickr_photos_getInfo(self, photo_id=None, secret=None):
         if secret:
-            d = self.flickr_call('flickr.photos.getInfo', photo_id=photo_id,
-                                 secret=secret)
+            d = self.flickr_call(
+                'flickr.photos.getInfo', photo_id=photo_id, secret=secret)
         else:
-            d = self.flickr_call('flickr.photos.getInfo', photo_id=photo_id)
+            d = self.flickr_call(
+                'flickr.photos.getInfo', photo_id=photo_id)
         return d
 
     def flickr_photos_getSizes(self, photo_id=None):
@@ -998,10 +992,11 @@ class FlickrStore(BackendStore):
             frob = result.text
             print(frob)
             from twisted.internet import threads
-            d = threads.deferToThread(FlickrAuthenticate, self.flickr_api_key,
-                                      self.flickr_api_secret, frob,
-                                      self.flickr_userid, self.flickr_password,
-                                      self.flickr_permissions)
+            d = threads.deferToThread(
+                FlickrAuthenticate, self.flickr_api_key,
+                self.flickr_api_secret, frob,
+                self.flickr_userid, self.flickr_password,
+                self.flickr_permissions)
             d.addCallback(get_auth_token, frob)
             d.addErrback(got_error)
 
@@ -1011,15 +1006,16 @@ class FlickrStore(BackendStore):
         return d
 
     def soap_flickr_test_echo(self, value):
-        client = SOAPProxy("http://api.flickr.com/services/soap/",
-                           namespace=("x", "urn:flickr"),
-                           envelope_attrib=[("xmlns:s",
-                                             "http://www.w3.org/2003/05/soap-envelope"),
-                                            ("xmlns:xsi",
-                                             "http://www.w3.org/1999/XMLSchema-instance"),
-                                            ("xmlns:xsd",
-                                             "http://www.w3.org/1999/XMLSchema")],
-                           soapaction="FlickrRequest")
+        client = SOAPProxy(
+            "http://api.flickr.com/services/soap/",
+            namespace=("x", "urn:flickr"),
+            envelope_attrib=[("xmlns:s",
+                             "http://www.w3.org/2003/05/soap-envelope"),
+                             ("xmlns:xsi",
+                             "http://www.w3.org/1999/XMLSchema-instance"),
+                             ("xmlns:xsd",
+                             "http://www.w3.org/1999/XMLSchema")],
+            soapaction="FlickrRequest")
         d = client.callRemote("FlickrRequest",
                               method='flickr.test.echo',
                               name=value,
@@ -1034,22 +1030,32 @@ class FlickrStore(BackendStore):
     def upnp_init(self):
         self.current_connection_id = None
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                               'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
-                                                               'http-get:*:image/jpeg:*,'
-                                                               'http-get:*:image/gif:*,'
-                                                               'http-get:*:image/png:*',
-                                                               default=True)
-        self.store[ROOT_CONTAINER_ID] = FlickrItem(ROOT_CONTAINER_ID, 'Flickr',
-                                                   None,
-                                                   'directory', self.urlbase,
-                                                   Container, store=self,
-                                                   update=True,
-                                                   proxy=self.proxy)
+            self.server.connection_manager_server.set_variable(
+                0,
+                'SourceProtocolInfo',
+                'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;'
+                'DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+
+                'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;'
+                'DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+
+                'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;'
+                'DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+
+                'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;'
+                'DLNA.ORG_FLAGS=00f00000000000000000000000000000,'
+
+                'http-get:*:image/jpeg:*,'
+                'http-get:*:image/gif:*,'
+                'http-get:*:image/png:*',
+                default=True)
+        self.store[ROOT_CONTAINER_ID] = FlickrItem(
+            ROOT_CONTAINER_ID, 'Flickr',
+            None,
+            'directory', self.urlbase,
+            Container, store=self,
+            update=True,
+            proxy=self.proxy)
 
         self.store[INTERESTINGNESS_CONTAINER_ID] = FlickrItem(
             INTERESTINGNESS_CONTAINER_ID, 'Most Wanted',
@@ -1057,14 +1063,14 @@ class FlickrStore(BackendStore):
             'directory', self.urlbase,
             PhotoAlbum, store=self, update=True, proxy=self.proxy)
 
-        self.store[RECENT_CONTAINER_ID] = FlickrItem(RECENT_CONTAINER_ID,
-                                                     'Recent',
-                                                     self.store[
-                                                         ROOT_CONTAINER_ID],
-                                                     'directory', self.urlbase,
-                                                     PhotoAlbum, store=self,
-                                                     update=True,
-                                                     proxy=self.proxy)
+        self.store[RECENT_CONTAINER_ID] = FlickrItem(
+            RECENT_CONTAINER_ID,
+            'Recent',
+            self.store[ROOT_CONTAINER_ID],
+            'directory', self.urlbase,
+            PhotoAlbum, store=self,
+            update=True,
+            proxy=self.proxy)
 
         self.most_wanted = self.store[INTERESTINGNESS_CONTAINER_ID]
         d = self.flickr_interestingness(per_page=self.limit)
@@ -1075,16 +1081,16 @@ class FlickrStore(BackendStore):
         d.addCallback(self.append_flickr_photo_result, self.recent)
 
         if self.flickr_authtoken is not None:
-            self.store[GALLERY_CONTAINER_ID] = FlickrItem(GALLERY_CONTAINER_ID,
-                                                          'Gallery',
-                                                          self.store[
-                                                              ROOT_CONTAINER_ID],
-                                                          'directory',
-                                                          self.urlbase,
-                                                          PhotoAlbum,
-                                                          store=self,
-                                                          update=True,
-                                                          proxy=self.proxy)
+            self.store[GALLERY_CONTAINER_ID] = FlickrItem(
+                GALLERY_CONTAINER_ID,
+                'Gallery',
+                self.store[ROOT_CONTAINER_ID],
+                'directory',
+                self.urlbase,
+                PhotoAlbum,
+                store=self,
+                update=True,
+                proxy=self.proxy)
             self.photosets = self.store[GALLERY_CONTAINER_ID]
             d = self.flickr_photosets()
             d.addCallback(self.append_flickr_photoset_result, self.photosets)
@@ -1182,7 +1188,7 @@ class FlickrStore(BackendStore):
                 return failure.Failure(errorCode(712))
 
             return failure.Failure(errorCode(712))
-            ### FIXME
+            # FIXME
 
             new_item = self.get_by_id(new_id)
             didl = DIDLElement()
@@ -1194,11 +1200,12 @@ class FlickrStore(BackendStore):
             new_id = 'upload.' + str(new_id)
             title = item.title or 'unknown'
             mimetype = 'image/jpeg'
-            self.uploads[new_id] = FlickrItem(new_id, title,
-                                              self.store[UNSORTED_CONTAINER_ID],
-                                              mimetype, self.urlbase,
-                                              ImageItem, store=self,
-                                              update=False, proxy=self.proxy)
+            self.uploads[new_id] = FlickrItem(
+                new_id, title,
+                self.store[UNSORTED_CONTAINER_ID],
+                mimetype, self.urlbase,
+                ImageItem, store=self,
+                update=False, proxy=self.proxy)
 
             new_item = self.uploads[new_id]
             for res in new_item.item.res:
@@ -1212,7 +1219,8 @@ class FlickrStore(BackendStore):
 
         return failure.Failure(errorCode(712))
 
-    # encode_multipart_form code is inspired by http://www.voidspace.org.uk/python/cgi.shtml#upload
+    # encode_multipart_form code is inspired by:
+    # http://www.voidspace.org.uk/python/cgi.shtml#upload
     def encode_multipart_form(self, fields):
         boundary = _make_boundary()
         body = []
@@ -1256,7 +1264,7 @@ class FlickrStore(BackendStore):
 
         (content_type, formdata) = self.encode_multipart_form(fields)
         headers = {b"Content-Type": content_type.encode('ascii'),
-            b"Content-Length": str(len(formdata)).encode('ascii')}
+                   b"Content-Length": str(len(formdata)).encode('ascii')}
 
         d = getPage(b"http://api.flickr.com/services/upload/",
                     method=b"POST",
@@ -1329,7 +1337,8 @@ def main():
                 photo.get('server').encode('utf-8'),
                 photo.get('id').encode('utf-8'),
                 photo.get('secret').encode('utf-8'))
-            # orginal_url = "http://farm%s.static.flickr.com/%s/%s_%s_o.jpg" % (
+            # orginal_url = \
+            #     "http://farm%s.static.flickr.com/%s/%s_%s_o.jpg" % (
             #            photo.get('farm').encode('utf-8'),
             #            photo.get('server').encode('utf-8'),
             #            photo.get('id').encode('utf-8'),

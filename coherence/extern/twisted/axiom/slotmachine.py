@@ -22,14 +22,14 @@ class Allowed(object):
         if self.default is not _NOSLOT:
             return self.default
         raise AttributeError("%r object did not have attribute %r" % (
-        oself.__class__.__name__, self.name))
+            oself.__class__.__name__, self.name))
 
     def __delete__(self, oself):
         if self.name not in oself.__dict__:
             # Returning rather than raising here because that's what
             # member_descriptor does, and Axiom relies upon that behavior.
-            ## raise AttributeError('%r object has no attribute %r' %
-            ##                      (oself.__class__.__name__, self.name))
+            #  # raise AttributeError('%r object has no attribute %r' %
+            #  #                     (oself.__class__.__name__, self.name))
             return
         del oself.__dict__[self.name]
 

@@ -64,7 +64,7 @@ class ElisaMediaStore(Plugin):
     def get_by_id(self, id):
         try:
             return self.store[int(id)]
-        except:
+        except (ValueError, KeyError):
             return None
 
     def set_root_id(self, id):
@@ -83,11 +83,9 @@ class ElisaMediaStore(Plugin):
 
     def upnp_init(self):
         if self.server:
-            self.server.connection_manager_server.set_variable(0,
-                                                               'SourceProtocolInfo',
-                                                               [
-                                                                   'internal:%s:*:*' % self.host,
-                                                                   'http-get:*:audio/mpeg:*'])
+            self.server.connection_manager_server.set_variable(
+                0, 'SourceProtocolInfo',
+                ['internal:%s:*:*' % self.host, 'http-get:*:audio/mpeg:*'])
 
     def upnp_Browse(self, *args, **kwargs):
         ObjectID = kwargs['ObjectID']
@@ -114,13 +112,13 @@ class ElisaMediaStore(Plugin):
                     external_url = elisa_item['location'].get('external')
                     try:
                         size = elisa_item['size']
-                    except:
+                    except IndexError:
                         size = None
                     try:
                         cover = elisa_item['cover']
                         if cover != '':
                             upnp_item.albumArtURI = cover
-                    except:
+                    except IndexError:
                         pass
 
                     res = Resource(internal_url,
@@ -141,8 +139,9 @@ class ElisaMediaStore(Plugin):
                 if RequestedCount == 0:
                     childs = children[StartingIndex:]
                 else:
-                    childs = children[
-                             StartingIndex:StartingIndex + RequestedCount]
+                    childs = \
+                        children[StartingIndex:
+                                 StartingIndex + RequestedCount]
                 for child in childs:
                     if child is not None:
                         item = build_upnp_item(child)
@@ -199,7 +198,6 @@ if __name__ == '__main__':
                             Filter='')
         dfr.addCallback(got_result)
         dfr.addCallback(lambda _: reactor.stop())
-
 
     reactor.callLater(0.1, main)
     reactor.run()

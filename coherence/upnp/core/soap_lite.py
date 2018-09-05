@@ -76,11 +76,12 @@ def build_soap_call(method, arguments, ns=None,
           add the arguments directly to the body (for an error msg)
         - arguments can be a dict or an etree.Element
     """
-    envelope = etree.Element(etree.QName(NS_SOAP_ENV, 'Envelope'),
-                             attrib={etree.QName(NS_SOAP_ENV,
-                                                 'encodingStyle'): NS_SOAP_ENC},
-                             nsmap={'s': NS_SOAP_ENV})
-    body = etree.SubElement(envelope, etree.QName(NS_SOAP_ENV, 'Body'))
+    envelope = etree.Element(
+        etree.QName(NS_SOAP_ENV, 'Envelope'),
+        attrib={etree.QName(NS_SOAP_ENV, 'encodingStyle'): NS_SOAP_ENC},
+        nsmap={'s': NS_SOAP_ENV})
+    body = etree.SubElement(
+        envelope, etree.QName(NS_SOAP_ENV, 'Body'))
 
     if method:
         if is_response is True:

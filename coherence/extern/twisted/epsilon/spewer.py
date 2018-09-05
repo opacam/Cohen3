@@ -57,8 +57,10 @@ def extractArgs(frame):
     co = frame.f_code
     dict = frame.f_locals
     n = co.co_argcount
-    if co.co_flags & 4: n = n + 1
-    if co.co_flags & 8: n = n + 1
+    if co.co_flags & 4:
+        n = n + 1
+    if co.co_flags & 8:
+        n = n + 1
     result = {}
     for i in range(n):
         name = co.co_varnames[i]

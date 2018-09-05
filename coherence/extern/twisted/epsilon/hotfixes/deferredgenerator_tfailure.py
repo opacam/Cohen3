@@ -21,7 +21,7 @@ def _deferGenerator(g, deferred=None):
         except StopIteration:
             deferred.callback(result)
             return deferred
-        except:
+        except Exception as e:
             deferred.errback()
             return deferred
 

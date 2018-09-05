@@ -57,7 +57,8 @@ class WANConnectionDeviceClient(log.LogAble):
         if self.detection_completed:
             return
         if self.wan_ip_connection is not None:
-            if not hasattr(self.wan_ip_connection.service, 'last_time_updated'):
+            if not hasattr(self.wan_ip_connection.service,
+                           'last_time_updated'):
                 return
             if self.wan_ip_connection.service.last_time_updated is None:
                 return

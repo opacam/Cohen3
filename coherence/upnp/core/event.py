@@ -44,8 +44,9 @@ class EventServer(resource.Resource, log.LogAble):
 
         command = {'method': request.method, 'path': request.path}
         headers = request.responseHeaders
-        louie.send('UPnP.Event.Server.message_received', None, command, headers,
-                   data)
+        louie.send(
+            'UPnP.Event.Server.message_received',
+            None, command, headers, data)
 
         if request.code != 200:
             self.info("data: %s", data)
@@ -70,13 +71,15 @@ class EventServer(resource.Resource, log.LogAble):
 
 class EventSubscriptionServer(resource.Resource, log.LogAble):
     """
-    This class ist the server part on the device side. It listens to subscribe
-    requests and registers the subscriber to send event messages to this device.
-    If an unsubscribe request is received, the subscription is cancelled and no
-    more event messages will be sent.
+    This class ist the server part on the device side. It listens
+    to subscribe requests and registers the subscriber to send
+    event messages to this device.
+    If an unsubscribe request is received, the subscription is cancelled
+    and no more event messages will be sent.
 
     we receive a subscription request
-    {'callback': '<http://192.168.213.130:9083/BYvZMzfTSQkjHwzOThaP/ConnectionManager>',
+    {'callback':
+        '<http://192.168.213.130:9083/BYvZMzfTSQkjHwzOThaP/ConnectionManager>',
      'host': '192.168.213.107:30020',
      'nt': 'upnp:event',
      'content-length': '0',
@@ -87,10 +90,12 @@ class EventSubscriptionServer(resource.Resource, log.LogAble):
     and pack it into a subscriber dict
 
     {'uuid:oAQbxiNlyYojCAdznJnC':
-        {'callback': '<http://192.168.213.130:9083/BYvZMzfTSQkjHwzOThaP/ConnectionManager>',
-         'created': 1162374189.257338,
-         'timeout': 'Second-300',
-         'sid': 'uuid:oAQbxiNlyYojCAdznJnC'}}
+        {
+        'callback':
+        '<http://192.168.213.130:9083/BYvZMzfTSQkjHwzOThaP/ConnectionManager>',
+        'created': 1162374189.257338,
+        'timeout': 'Second-300',
+        'sid': 'uuid:oAQbxiNlyYojCAdznJnC'}}
     """
     logCategory = 'event_subscription_server'
 
@@ -116,8 +121,8 @@ class EventSubscriptionServer(resource.Resource, log.LogAble):
 
         command = {'method': request.method, 'path': request.path}
         headers = request.responseHeaders
-        louie.send('UPnP.Event.Client.message_received', None, command, headers,
-                   data)
+        louie.send('UPnP.Event.Client.message_received',
+                   None, command, headers, data)
 
         if request.code != 200:
             self.debug("data: %s", data)
@@ -133,7 +138,8 @@ class EventSubscriptionServer(resource.Resource, log.LogAble):
                     request.setHeader(b'SERVER', SERVER_ID.encode('ascii'))
                     request.setHeader(b'CONTENT-LENGTH', 0)
                     return b""
-            except:
+            except Exception as e:
+                self.warning('render_SUBSCRIBE: %r' % e)
                 from .uuid import UUID
                 sid = UUID()
                 s = {'sid': str(sid),
@@ -145,7 +151,10 @@ class EventSubscriptionServer(resource.Resource, log.LogAble):
                 self.service.new_subscriber(s)
 
             request.setHeader(b'SID', s['sid'])
-            # request.setHeader(b'Subscription-ID', sid)  wrong example in the UPnP UUID spec?
+
+            # wrong example in the UPnP UUID spec?
+            # request.setHeader(b'Subscription-ID', sid)
+
             request.setHeader(b'TIMEOUT', s['timeout'])
             request.setHeader(b'SERVER', SERVER_ID.encode('ascii'))
             request.setHeader(b'CONTENT-LENGTH', 0)
@@ -154,15 +163,15 @@ class EventSubscriptionServer(resource.Resource, log.LogAble):
     def render_UNSUBSCRIBE(self, request):
         self.info(
             "EventSubscriptionServer %s (%s) received unsubscribe request "
-            "from %s, code: %d", self.service.id,  self.backend_name,
+            "from %s, code: %d", self.service.id, self.backend_name,
             request.client, request.code)
         data = request.content.getvalue()
         request.setResponseCode(200)
 
         command = {'method': request.method, 'path': request.path}
         headers = request.responseHeaders
-        louie.send('UPnP.Event.Client.message_received', None, command, headers,
-                   data)
+        louie.send('UPnP.Event.Client.message_received',
+                   None, command, headers, data)
 
         if request.code != 200:
             self.debug("data: %s", data)
@@ -225,7 +234,7 @@ class EventProtocol(Protocol, log.LogAble):
     def dataReceived(self, data):
         try:
             self.timeout_checker.cancel()
-        except:
+        except Exception:
             pass
         self.info("response received from the Service Events HTTP server ")
         # self.debug(data)
@@ -235,7 +244,8 @@ class EventProtocol(Protocol, log.LogAble):
             self.warning(
                 "response with error code %r received upon our %r request",
                 cmd[1], self.action)
-            # XXX get around devices that return an error on our event subscribe request
+            # XXX get around devices that return an
+            # error on our event subscribe request
             self.service.process_event({})
         else:
             try:
@@ -248,15 +258,14 @@ class EventProtocol(Protocol, log.LogAble):
                 elif timeout.startswith('Second-'):
                     timeout = int(timeout[len('Second-'):])
                     self.service.set_timeout(timeout)
-            except:
-                # print headers
-                pass
+            except Exception as e:
+                self.warning('EventProtocol.dataReceived: %r' % e)
         self.teardown()
 
     def connectionLost(self, reason):
         try:
             self.timeout_checker.cancel()
-        except:
+        except Exception:
             pass
         self.debug("connection closed %r from the Service Events HTTP server",
                    reason)
@@ -358,7 +367,8 @@ def subscribe(service, action='subscribe'):
     """ FIXME:
         we need to find a way to be sure that our unsubscribe calls get through
         on shutdown
-        reactor.addSystemEventTrigger( 'before', 'shutdown', prepare_connection, service, action)
+        reactor.addSystemEventTrigger(
+            'before', 'shutdown', prepare_connection, service, action)
     """
 
     # logger.debug("event.subscribe finished")
@@ -375,7 +385,7 @@ class NotificationProtocol(Protocol, log.LogAble):
     def dataReceived(self, data):
         try:
             self.timeout_checker.cancel()
-        except:
+        except Exception:
             pass
         if isinstance(data, bytes):
             d = str(data)
@@ -386,9 +396,9 @@ class NotificationProtocol(Protocol, log.LogAble):
         try:
             if int(cmd[1]) != 200:
                 self.warning(
-                    "response with error code %r received upon our notification",
-                    cmd[1])
-        except:
+                    "response with error code %r "
+                    "received upon our notification", cmd[1])
+        except (IndexError, ValueError):
             self.debug(
                 "response without error code received upon our notification")
         self.transport.loseConnection()
@@ -396,7 +406,7 @@ class NotificationProtocol(Protocol, log.LogAble):
     def connectionLost(self, reason):
         try:
             self.timeout_checker.cancel()
-        except:
+        except Exception:
             pass
         self.debug("connection closed %r", reason)
 
@@ -452,7 +462,8 @@ def send_notification(s, xml):
 
     d = defer.Deferred()
     f = _InstanceFactory(reactor, NotificationProtocol(), d)
-    port_item = reactor.connectTCP(host, port, f, timeout=30, bindAddress=None)
+    port_item = reactor.connectTCP(
+        host, port, f, timeout=30, bindAddress=None)
 
     d.addCallback(send_request, port_item)
     d.addErrback(got_error, port_item)
