@@ -5,6 +5,7 @@
 
 import time
 from functools import cmp_to_key
+from abc import ABCMeta, abstractmethod
 
 # Copyright 2007,, Frank Scholz <coherence@beebits.net>
 from lxml import etree
@@ -77,6 +78,7 @@ class Backend(log.LogAble, Plugin):
 class BackendStore(Backend):
     """ the base class for all MediaServer backend stores
     """
+    __metaclass__ = ABCMeta
 
     logCategory = 'backend_store'
 
@@ -153,6 +155,7 @@ class BackendStore(Backend):
                         items.append(child)
         return items
 
+    @abstractmethod
     def get_by_id(self, id):
         """ called by the CDS or the MediaServer web
 
