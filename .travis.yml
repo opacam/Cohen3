@@ -11,6 +11,8 @@ install:
   - pip install --upgrade cython
   - pip install -e git+https://github.com/fishstiqz/pycdb@master#egg=pycdb --no-dependencies
   - pip install -e git+https://github.com/JonnyJD/python-discid@master#egg=discid --no-dependencies
+  - pip install git+git://github.com/opacam/epsilon@python3#egg=Epsilon
+  - pip install git+git://github.com/opacam/axiom@python3#egg=Axiom
   - pip install service_identity
   - pip install python-coveralls==2.9.1
   - pip install pycodestyle

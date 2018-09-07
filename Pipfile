@@ -37,6 +37,8 @@ pygobject = "*"
 treq = "*"
 gdata = {git = "https://github.com/dvska/gdata-python3"}
 dbus-python = "*"
+epsilon = {ref = "python3", git = "git://github.com/opacam/epsilon"}
+Axiom = {ref = "python3", git = "git://github.com/opacam/axiom"}
 
 [dev-packages]
 pipenv = "==2018.7.1"

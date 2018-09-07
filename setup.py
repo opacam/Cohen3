@@ -23,8 +23,7 @@ deps = [
     'livestreamer',
     'lxml',
     'python-dateutil',
-    'pyopenssl',
-    'Nevow'
+    'pyopenssl'
 ]
 if sys.platform in ('win32', 'sunos5'):
     deps.append('Netifaces >= 0.4')
@@ -35,12 +34,21 @@ audio_store_require = [
     'discid',
 ]
 
+elisa_store_require = [
+    'Epsilon',
+    'Axiom',
+]
+
 picasa_store_require = [
     'gdata'
 ]
 
 youtube_store_require = [
     'gdata'
+]
+
+web_ui_require = [
+    'Nevow'
 ]
 
 gstreamer_player_require = [
@@ -146,13 +154,17 @@ setup(name='Cohen3',
           'dbus': dbus_require,
           'audio': audio_store_require,
           'gstreamer': gstreamer_player_require,
+          'elisa': elisa_store_require,
           'picasa': picasa_store_require,
           'youtube': youtube_store_require,
+          'web': web_ui_require,
       },
       dependency_links=[
           'git+git://github.com/dvska/gdata-python3@master#egg=gdata',
           'git+git://github.com/fishstiqz/pycdb@master#egg=pycdb',
           'git+git://github.com/JonnyJD/python-discid@master#egg=discid',
+          'git+git://github.com/opacam/epsilon@python3#egg=Epsilon',
+          'git+git://github.com/opacam/axiom@python3#egg=Axiom',
       ],
       entry_points=entry_points
       )

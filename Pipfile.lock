@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "91019a0f2c16ed04e6404bd7f14a8294ea52c76238347b3585add6ff70402517"
+            "sha256": "74198286f6d95ed51fc63eda84c486bf645a05da61644d5f92f392e485eb37f9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -39,6 +39,10 @@
             ],
             "index": "pypi",
             "version": "==0.7.0"
+        },
+        "axiom": {
+            "git": "git://github.com/opacam/axiom",
+            "ref": "ca210f12863becc31346ffec126f9ec13af90dc3"
         },
         "certifi": {
             "hashes": [
@@ -140,6 +144,10 @@
             ],
             "index": "pypi",
             "version": "==1.2.8"
+        },
+        "epsilon": {
+            "git": "git://github.com/opacam/epsilon",
+            "ref": "0a55024900f4dca6981313c705f546f33126e75b"
         },
         "futures": {
             "hashes": [
