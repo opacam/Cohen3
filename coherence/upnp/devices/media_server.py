@@ -555,7 +555,8 @@ class RootDeviceXML(static.Data):
                  services=None,
                  devices=None,
                  icons=None,
-                 presentation_url=None):
+                 presentation_url=None,
+                 dlna_caps=None):
         uuid = str(uuid)
         root = etree.Element(
             'root', nsmap={None: xml_constants.UPNP_DEVICE_NS})
@@ -668,6 +669,10 @@ class RootDeviceXML(static.Data):
         if presentation_url is None:
             presentation_url = '/' + uuid[5:]
         etree.SubElement(d, 'presentationURL').text = presentation_url
+        if dlna_caps is not None:
+            # TODO: Implement dlna caps for GstreamerPlayer
+            print('RootDeviceXML.__init__: dlna caps for GstreamerPlayer'
+                  ' still not implemented')
 
         x = etree.SubElement(d, 'X_DLNADOC')
         x.text = 'DMS-1.50'
