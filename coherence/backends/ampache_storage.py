@@ -483,7 +483,7 @@ class Track(BackendItem):
         if self.duration > 0:
             res.duration = str(self.duration)
         if self.bitrate > 0:
-            res.bitrate = str(bitrate)
+            res.bitrate = str(self.bitrate)
         item.res.append(res)
 
         return item
@@ -983,6 +983,44 @@ class AmpacheStore(BackendStore):
 
             return r
 
+        def got_error(r):
+            return r
+
+        def process_result(result, found_item):
+            if result is None:
+                result = []
+            if BrowseFlag == 'BrowseDirectChildren':
+                lc = []
+
+                def process_items(result, tm):
+                    if result is None:
+                        result = []
+                    for i in result:
+                        if i[0]:
+                            didl.addItem(i[1])
+
+                    return build_response(tm)
+
+                for it in result:
+                    md = defer.maybeDeferred(it.get_item)
+                    lc.append(md)
+
+                def got_child_count(count):
+                    dl = defer.DeferredList(lc)
+                    dl.addCallback(process_items, count)
+                    return dl
+
+                md = defer.maybeDeferred(found_item.get_child_count)
+                md.addCallback(got_child_count)
+
+                return md
+
+            else:
+                didl.addItem(result)
+                total = 1
+
+            return build_response(total)
+
         total = 0
         items = []
 
@@ -1021,44 +1059,6 @@ class AmpacheStore(BackendStore):
         item = self.get_by_id(root_id)
         if item is None:
             return failure.Failure(errorCode(701))
-
-        def got_error(r):
-            return r
-
-        def process_result(result, found_item):
-            if result is None:
-                result = []
-            if BrowseFlag == 'BrowseDirectChildren':
-                lc = []
-
-                def process_items(result, tm):
-                    if result is None:
-                        result = []
-                    for i in result:
-                        if i[0]:
-                            didl.addItem(i[1])
-
-                    return build_response(tm)
-
-                for it in result:
-                    md = defer.maybeDeferred(it.get_item)
-                    lc.append(md)
-
-                def got_child_count(count):
-                    dl = defer.DeferredList(lc)
-                    dl.addCallback(process_items, count)
-                    return dl
-
-                md = defer.maybeDeferred(found_item.get_child_count)
-                md.addCallback(got_child_count)
-
-                return md
-
-            else:
-                didl.addItem(result)
-                total = 1
-
-            return build_response(total)
 
         def proceed(result):
             if BrowseFlag == 'BrowseDirectChildren':

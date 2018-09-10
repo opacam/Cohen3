@@ -607,7 +607,7 @@ class BufferFile(static.File):
             f = self.openForReading()
         except IOError as e:
             import errno
-            if e[0] == errno.EACCES:
+            if e.errno == errno.EACCES:
                 return error.ForbiddenResource().render(request)
             else:
                 raise

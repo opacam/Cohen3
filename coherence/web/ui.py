@@ -7,13 +7,14 @@ import os
 
 from nevow import athena, loaders, tags, static
 from twisted.python import filepath, util
-from zope.interface import Interface
+from zope.interface import interface
 
 import coherence.extern.louie as louie
 from coherence import log
 
 
-class IWeb(Interface):
+class IWeb(interface.InterfaceClass):
+    __module__ = 'zope.interface'
 
     def goingLive(self):
         pass

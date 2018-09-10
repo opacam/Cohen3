@@ -294,6 +294,7 @@ class FileDownloader(object):
         if not self.params.get('ignoreerrors', False):
             raise DownloadError(message)
         self._download_retcode = 1
+        return self._download_retcode
 
     def slow_down(self, start_time, byte_counter):
         """Sleep if the download speed is over the rate limit."""
@@ -373,8 +374,6 @@ class FileDownloader(object):
 
         try:
             success = self._do_download(filename, info_dict['url'])
-        except (OSError, IOError) as err:
-            raise UnavailableFormatError
         except (urllib.error.URLError,
                 http.client.HTTPException,
                 socket.error) as err:
@@ -386,6 +385,8 @@ class FileDownloader(object):
                 '(expected %s bytes and served %s)' % (
                     err.expected, err.downloaded))
             return
+        except (OSError, IOError) as err:
+            raise UnavailableFormatError
 
         if success:
             try:
@@ -434,7 +435,7 @@ class FileDownloader(object):
                 def got_all_results(all_results):
                     results = [x for x in all_results if x is not None]
                     if len(results) != len(all_results):
-                        retcode = self.trouble()
+                        ret_code = self.trouble()
 
                     if len(results) > 1 and self.fixed_template():
                         raise SameFileError(self._params['outtmpl'])

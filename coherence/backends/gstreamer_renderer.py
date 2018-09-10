@@ -616,7 +616,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
                 if self.metadata is not None and len(self.metadata) > 0:
                     # FIXME: duration breaks client parsing MetaData?
                     elt = DIDLLite.DIDLElement.fromString(self.metadata)
-                    for item in elt:
+                    for item in elt.getItems():
                         for res in item.findall('res'):
                             formatted_duration = self._format_time(
                                 self.duration)
@@ -770,7 +770,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
             return r
 
     def start(self, uri):
-        self.load(uri)
+        self.load(uri, None)
         self.play()
 
     def stop(self, silent=False):

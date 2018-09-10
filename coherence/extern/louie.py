@@ -72,7 +72,8 @@ def reset():
 def connect(receiver, signal=All, sender=Any, weak=True):
     callback = receiver
     if signal in (Any, All):
-        raise NotImplemented("This is not allowed. Signal HAS to be something")
+        raise NotImplementedError(
+            "This is not allowed. Signal HAS to be something")
     receiver = _global_dispatcher.connect(signal, callback)
     _global_receivers_pool[(callback, signal)] = receiver
     return receiver
@@ -81,14 +82,16 @@ def connect(receiver, signal=All, sender=Any, weak=True):
 def disconnect(receiver, signal=All, sender=Any, weak=True):
     callback = receiver
     if signal in (Any, All):
-        raise NotImplemented("This is not allowed. Signal HAS to be something")
+        raise NotImplementedError(
+            "This is not allowed. Signal HAS to be something")
     receiver = _global_receivers_pool.pop((callback, signal))
     return _global_dispatcher.disconnect(receiver)
 
 
 def send(signal=All, sender=Anonymous, *arguments, **named):
     if signal in (Any, All):
-        raise NotImplemented("This is not allowed. Signal HAS to be something")
+        raise NotImplementedError(
+            "This is not allowed. Signal HAS to be something")
     # the first value of the callback shall always be the signal:
     return _global_dispatcher.save_emit(signal, *arguments, **named)
 

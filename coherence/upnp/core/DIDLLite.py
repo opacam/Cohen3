@@ -633,7 +633,7 @@ class Item(Object):
     refID = None
 
     director = None
-    actors = None
+    actors = []
     language = None
 
     def __init__(self, *args, **kwargs):
@@ -651,7 +651,7 @@ class Item(Object):
         if self.refID is not None:
             etree.SubElement(root, 'refID').text = self.refID
 
-        if self.actors is not None:
+        if len(self.actors) > 0:
             for actor in self.actors:
                 etree.SubElement(
                     root, qname('actor', xml_constants.DC_NS)).text = actor

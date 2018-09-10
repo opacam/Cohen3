@@ -88,11 +88,12 @@ class BzConnection(log.LogAble):
     """
     logCategory = 'buzztard_connection'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, backend=None, host='localhost', port=7654):
         log.LogAble.__init__(self)
+        self.debug("BzConnection __init__")
 
     def __new__(cls, *args, **kwargs):
-        cls.debug("BzConnection __new__")
+        cls.debug(cls, "BzConnection __new__")
         obj = getattr(cls, '_instance_', None)
         if obj is not None:
             louie.send('Coherence.UPnP.Backend.init_completed', None,
@@ -104,10 +105,6 @@ class BzConnection(log.LogAble):
             obj.connection = BzFactory(kwargs['backend'])
             reactor.connectTCP(kwargs['host'], kwargs['port'], obj.connection)
             return obj
-
-    def __init__(self, backend=None, host='localhost', port=7654):
-        log.LogAble.__init__(self)
-        self.debug("BzConnection __init__")
 
 
 class BuzztardItem(log.LogAble):
@@ -444,7 +441,7 @@ class BuzztardPlayer(log.LogAble):
     def poll_player(self):
         self.buzztard.connection.sendMessage('status')
 
-    def load(self, uri, metadata):
+    def load(self, uri, metadata=None):
         self.debug("load %s %s", uri, metadata)
         self.duration = None
         self.metadata = metadata

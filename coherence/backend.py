@@ -216,6 +216,9 @@ class BackendItem(log.LogAble):
         """
         log.LogAble.__init__(self)
 
+        self.store = None
+        self.storage_id = None
+
         # the basename of a file, the album title, the artists name...
         # is expected to be unicode
         self.name = 'my_name'
@@ -338,9 +341,6 @@ class Container(BackendItem):
             self.parent_id = self.parent.get_id()
         else:
             self.parent_id = -1
-
-        self.store = None
-        self.storage_id = None
 
         self.name = title
         self.mimetype = 'directory'

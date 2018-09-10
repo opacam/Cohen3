@@ -498,6 +498,7 @@ class ServiceServer(log.LogAble):
             self.namespace, id, int(self.version))
         self.debug('\t-service_type: {}'.format(self.service_type))
 
+        self.scpdXML = None
         self.scpd_url = b'scpd.xml'
         self.control_url = b'control'
         self.subscription_url = b'subscribe'
@@ -761,7 +762,7 @@ class ServiceServer(log.LogAble):
         self.set_variable(0, 'CurrentConnectionIDs', '0')
 
     def get_scpdXML(self):
-        if not hasattr(self, 'scpdXML') or self.scpdXML is None:
+        if self.scpdXML is None:
             self.scpdXML = scpdXML(self)
             self.scpdXML = self.scpdXML.build_xml()
         return self.scpdXML

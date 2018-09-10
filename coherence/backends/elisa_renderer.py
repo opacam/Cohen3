@@ -146,7 +146,7 @@ class ElisaPlayer(log.LogAble, Plugin):
                 if self.duration is None:
                     if self.metadata is not None:
                         elt = DIDLLite.DIDLElement.fromString(self.metadata)
-                        for item in elt:
+                        for item in elt.getItems():
                             for res in item.findall('res'):
                                 res.attrib['duration'] = "%d:%02d:%02d" % (
                                     h, m, s)
@@ -190,8 +190,8 @@ class ElisaPlayer(log.LogAble, Plugin):
 
         self.call_player("set_uri", got_result, uri)
 
-    def start(self, uri):
-        self.load(uri)
+    def start(self, uri, metadata=None):
+        self.load(uri, metadata)
         self.play()
 
     def stop(self):

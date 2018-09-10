@@ -48,6 +48,11 @@ from coherence import log
 
 from urllib.parse import urlsplit
 
+try:
+    from mechanize import Browser
+except ImportError:
+    raise ImportError('The mechanize module is not found')
+
 ROOT_CONTAINER_ID = 0
 INTERESTINGNESS_CONTAINER_ID = 100
 RECENT_CONTAINER_ID = 101
@@ -60,7 +65,6 @@ CONTACTS_CONTAINER_ID = 300
 class FlickrAuthenticate(object):
 
     def __init__(self, api_key, api_secret, frob, userid, password, perms):
-        from mechanize import Browser
 
         browser = Browser()
         browser.set_handle_robots(False)
@@ -952,10 +956,8 @@ class FlickrStore(BackendStore):
     def flickr_contact_recents(self, contact, date=None, per_page=100):
         api_sig = self.flickr_create_api_signature(
             auth_token=self.flickr_authtoken,
-            method='flickr.photos.getContactsPhotos',
-            photoset_id=photoset.obj.get('id'))
+            method='flickr.photos.getContactsPhotos')
         d = self.flickr_call('flickr.photos.getContactsPhotos',
-                             photoset_id=photoset.obj.get('id'),
                              auth_token=self.flickr_authtoken,
                              api_sig=api_sig)
         return d
@@ -1017,9 +1019,9 @@ class FlickrStore(BackendStore):
                              "http://www.w3.org/1999/XMLSchema")],
             soapaction="FlickrRequest")
         d = client.callRemote("FlickrRequest",
-                              method='flickr.test.echo',
-                              name=value,
-                              api_key='837718c8a622c699edab0ea55fcec224')
+                              {'method': 'flickr.test.echo',
+                               'name': value,
+                               'api_key': '837718c8a622c699edab0ea55fcec224'})
 
         def got_results(result):
             print(result)
@@ -1187,10 +1189,20 @@ class FlickrStore(BackendStore):
             if len(item.res) != 0:
                 return failure.Failure(errorCode(712))
 
-            return failure.Failure(errorCode(712))
-            # FIXME
-
-            new_item = self.get_by_id(new_id)
+            # TODO: Is this the right way to create a Flick container?
+            if 'ObjectID' in kwargs:
+                new_item = self.get_by_id(kwargs['ObjectID'])
+            if not new_item:
+                # the container does not exist,
+                # create a new id for the container
+                new_id = str(self.getnextID())
+                mimetype = 'directory'
+                self.uploads[new_id] = FlickrItem(
+                    new_id, item.title or 'unknown',
+                    self.store[UNSORTED_CONTAINER_ID],
+                    mimetype, self.urlbase,
+                    ImageItem, store=self,
+                    update=False, proxy=self.proxy)
             didl = DIDLElement()
             didl.addItem(new_item.item)
             return {'ObjectID': id, 'Result': didl.toString()}

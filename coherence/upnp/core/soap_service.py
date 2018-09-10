@@ -123,7 +123,7 @@ class UPnPPublisher(resource.Resource, log.LogAble):
         except (KeyError, ValueError):
             self._gotError(
                 failure.Failure(errorCode(415)),
-                request, methodName)
+                request, methodName, ns)
             return server.NOT_DONE_YET
 
         self.debug('headers: %r', headers)

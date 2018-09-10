@@ -101,7 +101,7 @@ class ControlPoint(log.LogAble):
 
     def browse(self, device):
         self.info('ControlPoint.browse: {}'.format(device))
-        device = self.coherence.get_device_with_usn(infos['USN'])
+        device = self.coherence.get_device_with_usn(device.get_usn())
         if not device:
             return
         self.check_device(device)
@@ -354,9 +354,10 @@ if __name__ == '__main__':
     config = {}
     config['logmode'] = 'warning'
     config['serverport'] = 30020
+    from coherence.base import Coherence
 
-    # ctrl = ControlPoint(Coherence(config),auto_client=[])
-    # ctrl = ControlPoint(Coherence(config))
+    ctrl = ControlPoint(Coherence(config),
+                        auto_client=[])
 
     def show_devices():
         print("show_devices")
@@ -368,19 +369,24 @@ if __name__ == '__main__':
 
     def query_devices():
         print("query_devices")
-        ctrl.add_query(DeviceQuery('host', '192.168.1.163', the_result))
+        ctrl.add_query(DeviceQuery('host', '192.168.0.1', the_result))
 
     def query_devices2():
         print("query_devices with timeout")
         ctrl.add_query(
-            DeviceQuery('host', '192.168.1.163', the_result, timeout=10,
+            DeviceQuery('host', '192.168.0.1', the_result, timeout=10,
                         oneshot=False))
 
-    # reactor.callLater(2, show_devices)
-    # reactor.callLater(3, query_devices)
-    # reactor.callLater(4, query_devices2)
-    # reactor.callLater(5, ctrl.add_query, DeviceQuery(
-    #     'friendly_name', 'Coherence Test Content',
-    #     the_result, timeout=10, oneshot=False))
+    def stop_reactor(*args):
+        reactor.stop()
+        print("Stoped reactor successfully")
+
+    reactor.callLater(2, show_devices)
+    reactor.callLater(3, query_devices)
+    reactor.callLater(4, query_devices2)
+    reactor.callLater(5, ctrl.add_query, DeviceQuery(
+        'friendly_name', 'Coherence Test Content',
+        the_result, timeout=10, oneshot=False))
+    reactor.callLater(6, stop_reactor)
 
     reactor.run()

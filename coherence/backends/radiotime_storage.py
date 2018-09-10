@@ -120,6 +120,7 @@ class RadiotimeStore(AbstractBackendStore):
 
         def append_outline(parent, outline):
             type = outline.get('type')
+            outline_url = outline.get('URL', None)
             if type is None:
                 # This outline is just a classification item containing
                 # other outline elements the corresponding item
@@ -142,7 +143,6 @@ class RadiotimeStore(AbstractBackendStore):
             elif type == 'link':
                 # the corresponding item will a self-populating Container
                 text = outline.get('text')
-                outline_url = outline.get('URL')
                 key = outline.get('key')
                 guide_id = outline.get('guide_id')
                 external_id = guide_id

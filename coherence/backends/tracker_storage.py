@@ -309,7 +309,7 @@ class Track(BackendItem):
         if self.duration > 0:
             res.duration = str(self.duration)
         if self.bitrate > 0:
-            res.bitrate = str(bitrate)
+            res.bitrate = str(self.bitrate)
         item.res.append(res)
         # if self.store.server.coherence.config.get(
         #        'transcoding', 'no') == 'yes':

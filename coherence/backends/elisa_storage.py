@@ -183,12 +183,14 @@ class ElisaMediaStore(Plugin):
 
 if __name__ == '__main__':
     def main():
-        p = 'localhost'
 
         def got_result(result):
             print(result)
-        from coherence.backends.mediadb_storage import MediaStore
-        f = MediaStore(None, 'my media', p, 'http://localhost/', ())
+        f = ElisaMediaStore(None,
+                            name='My Elisa Store',
+                            host='localhost',
+                            urlbase='http://localhost/'
+                            )
 
         dfr = f.upnp_Browse(BrowseFlag='BrowseDirectChildren',
                             RequestedCount=0,

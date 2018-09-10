@@ -72,6 +72,9 @@ aws_image_size = {'large': 'LargeImage',
 
 class WorkQueue(object):
     _instance_ = None  # Singleton
+    queue = []
+    workers = []
+    max_workers = 1
 
     def __new__(cls, *args, **kwargs):
         obj = getattr(cls, '_instance_', None)

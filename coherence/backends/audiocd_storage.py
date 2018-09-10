@@ -23,8 +23,15 @@
 
 # Copyright 2010, Jean-Michel Sizun
 
-import CDDB
-import DiscID
+try:
+    import CDDB
+except ImportError:
+    CDDB = None
+try:
+    import DiscID
+except ImportError:
+    DiscID = None
+from functools import cmp_to_key
 from twisted.internet import reactor, threads
 
 from coherence.backend import AbstractBackendStore, Container, BackendItem
@@ -161,7 +168,7 @@ class AudioCDStore(AbstractBackendStore):
 
         # we will sort the item by "track_number"
         def childs_sort(x, y):
-            return cmp(x.track_number, y.track_number)
+            return cmp_to_key(x.track_number, y.track_number)
 
         root_item.sorting_method = childs_sort
 

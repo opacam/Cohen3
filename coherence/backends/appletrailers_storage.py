@@ -215,6 +215,7 @@ class AppleTrailersStore(BackendStore):
             trailer.item.attachments['poster'] = data['cover']
 
         self.trailers[trailer.id] = trailer
+        return trailer
 
     def get_by_id(self, id):
         try:

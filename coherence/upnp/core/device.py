@@ -21,16 +21,16 @@ ns = xml_constants.UPNP_DEVICE_NS
 class Device(log.LogAble):
     logCategory = 'device'
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, udn=None):
         log.LogAble.__init__(self)
         self.parent = parent
+        self.udn = udn
         self.services = []
         # self.uid = self.usn[:-len(self.st)-2]
         self.friendly_name = ""
         self.device_type = ""
         self.friendly_device_type = "[unknown]"
         self.device_type_version = 0
-        self.udn = None
         self.detection_completed = False
         self.client = None
         self.icons = []
@@ -79,6 +79,7 @@ class Device(log.LogAble):
                 None, self.udn, self.client)
             self.client = None
         # del self
+        return True
 
     def receiver(self, *args, **kwargs):
         if self.detection_completed:
@@ -294,14 +295,14 @@ class Device(log.LogAble):
                     i['url'] = self.make_fullyqualified(
                         i['realurl']).decode('utf-8')
                     self.icons.append(i)
-                    self.debug('adding icon {} for {}'.format(
+                    self.debug('adding icon %r for %r' % (
                         i, self.friendly_name))
                 except Exception as e:
                     import traceback
                     self.debug(traceback.format_exc())
                     self.warning(
-                        'device {} seems to have an invalid icon description, '
-                        'ignoring that icon [error: %r]'.format(
+                        'device %r seems to have an invalid icon description, '
+                        'ignoring that icon [error: %r]' % (
                             self.friendly_name, e))
 
         serviceList = d.find('./{%s}serviceList' % ns)
@@ -491,6 +492,7 @@ class RootDevice(Device):
 
     def __init__(self, infos):
         self.usn = infos['USN']
+        self.udn = infos.get('UDN', None)
         self.server = infos['SERVER']
         self.st = infos['ST']
         self.location = infos['LOCATION']
@@ -505,7 +507,7 @@ class RootDevice(Device):
         # we need to handle root device completion
         # these events could be ourself or our children.
         self.parse_description()
-        self.debug('RootDevice initialized'.format(self.location))
+        self.debug('RootDevice initialized: %r' % self.location)
 
     def __repr__(self):
         return "rootdevice %r %r %r %r, manifestation %r" % \

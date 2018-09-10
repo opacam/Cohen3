@@ -116,6 +116,7 @@ class WebServer(log.LogAble):
 class Plugins(log.LogAble):
     logCategory = 'plugins'
     __instance = None  # Singleton
+    __initialized = False
 
     _valids = ("coherence.plugins.backend.media_server",
                "coherence.plugins.backend.media_renderer",
@@ -198,6 +199,8 @@ class Plugins(log.LogAble):
 
 class Coherence(log.LogAble):
     __instance = None  # Singleton
+    __initialized = False
+
     logCategory = 'coherence'
 
     def __new__(cls, *args, **kwargs):
@@ -664,8 +667,8 @@ class Coherence(log.LogAble):
             self.info('creating device/service  {}'.format(infos['USN']))
             root_id = infos['USN'][:-len(infos['ST']) - 2]
             root = self.get_device_with_id(root_id)
-            # FIXME doesn't look like doing right thing
-            device = Device(infos, root)
+            # TODO: must check that this is working as expected
+            device = Device(root, udn=infos['UDN'])
 
     def add_device(self, device):
         self.info('adding device {} {} {}'.format(

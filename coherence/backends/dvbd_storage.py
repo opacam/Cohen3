@@ -17,6 +17,7 @@ from twisted.python.filepath import FilePath
 import coherence.extern.louie as louie
 from coherence.backend import BackendItem, BackendStore
 from coherence.upnp.core import DIDLLite
+from coherence.upnp.core.soap_service import errorCode
 
 ROOT_CONTAINER_ID = 0
 
@@ -188,7 +189,7 @@ class Recording(BackendItem):
         if self.duration > 0:
             res.duration = str(self.duration)
         if self.bitrate > 0:
-            res.bitrate = str(bitrate)
+            res.bitrate = str(self.bitrate)
         item.res.append(res)
 
         # add internal resource
@@ -201,7 +202,7 @@ class Recording(BackendItem):
         if self.duration > 0:
             res.duration = str(self.duration)
         if self.bitrate > 0:
-            res.bitrate = str(bitrate)
+            res.bitrate = str(self.bitrate)
         item.res.append(res)
 
         return item
@@ -679,7 +680,7 @@ class DVBDScheduledRecording(BackendStore):
         self.device_group_interface = None
 
         dvbd_recorder = self.device_group_interface.GetRecorder()
-        self.recorder_interface = self.bus.get_object(BUS_NAME, dvdb_recorder)
+        self.recorder_interface = self.bus.get_object(BUS_NAME, dvbd_recorder)
 
     def __repr__(self):
         return "DVBDScheduledRecording"
@@ -712,10 +713,14 @@ class DVBDScheduledRecording(BackendStore):
             start_datetime = datetime(*start)
             # TODO return what we actually need
             # FIXME we properly want the channel id here rather than the name
-            return {'id': tid, 'duration': duration, 'channel': channel,
+            return {'id': tid, 'duration': duration,
+                    'channel': channel_name,
                     'start': start_datetime}
 
-        d = defer.DeferredList((self.get_infos(tid), self.get_start_time(tid)))
+        d = defer.DeferredList(
+            [self.get_infos(tid),
+             self.get_start_time(tid)]
+        )
         d.addCallback(process_details)
         d.addErrback(handle_error)
         return d
@@ -800,16 +805,18 @@ class DVBDScheduledRecording(BackendStore):
 
     def upnp_BrowseRecordSchedules(self, *args, **kwargs):
         schedules = []
-        sched = RecordSchedule()  # ChannelID, StartDateTime, Duration
+        # ChannelID, StartDateTime, Duration
+        sched = self.upnp_GetRecordSchedule(*args, **kwargs)
 
-        return self.get_timers()
+        return sched
 
     def upnp_BrowseRecordTasks(self, *args, **kwargs):
         rec_sched_id = int(kwargs['RecordScheduleID'])
         tasks = []
-        task = RecordTask()  # ScheduleID, ChannelID, StartDateTime, Duration
+        # ScheduleID, ChannelID, StartDateTime, Duration
+        task = self.upnp_GetRecordTask(*args, **kwargs)
 
-        return self.get_timer_details(rec_sched_id)
+        return task
 
     def upnp_CreateRecordSchedule(self, *args, **kwargs):
         schedule = kwargs['RecordScheduleParts']
