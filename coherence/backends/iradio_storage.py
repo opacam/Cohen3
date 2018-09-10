@@ -314,7 +314,8 @@ class IRadioStore(AbstractBackendStore):
         # in order to get the sub-genre containers first
         def childs_sort(x, y):
             if x.__class__ == y.__class__:
-                return cmp(x.name, y.name)  # same class, we compare the names
+                # same class, we compare the names
+                return utils.cmp(x.name, y.name)
             else:
                 # the IRadioItem is deemed the lowest item class,
                 # other classes are compared by name (as usual)
@@ -323,7 +324,7 @@ class IRadioStore(AbstractBackendStore):
                 elif isinstance(y, IRadioItem):
                     return -1
                 else:
-                    return cmp(x.name, y.name)
+                    return utils.cmp(x.name, y.name)
 
         family_item.sorting_method = childs_sort
 
