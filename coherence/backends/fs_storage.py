@@ -66,9 +66,8 @@ from coherence.upnp.core.soap_service import errorCode
 
 from coherence.upnp.core import utils
 
-# FIXME: doesn't work, migrate to twisted.inotify
 try:
-    from coherence.extern.inotify import (
+    from twisted.internet.inotify import (
         INotify, IN_CREATE, IN_DELETE, IN_MOVED_FROM, IN_MOVED_TO,
         IN_ISDIR, IN_CHANGED)
 except Exception as msg:
@@ -463,15 +462,15 @@ class FSItem(BackendItem):
 
     def get_path(self):
         if isinstance(self.location, FilePath):
-            return str(self.location.path)
+            return self.location.path
         else:
-            return str(self.location)
+            return self.location
 
     def get_realpath(self):
         if isinstance(self.location, FilePath):
-            return str(self.location.path)
+            return self.location.path
         else:
-            return str(self.location)
+            return self.location
 
     def set_path(self, path=None, extension=None):
         if path is None:
@@ -573,8 +572,10 @@ class FSStore(BackendStore):
             if INotify:
                 try:
                     self.inotify = INotify()
+                    self.inotify.startReading()
                 except Exception as msg:
-                    self.info("%s", msg)
+                    self.error("inotify disabled: %s", msg)
+                    self.inotify = None
             else:
                 self.info("%s", no_inotify_reason)
         else:
@@ -640,7 +641,7 @@ class FSStore(BackendStore):
 
     def release(self):
         if self.inotify is not None:
-            self.inotify.release()
+            self.inotify.stopReading()
 
     def len(self):
         return len(self.store)
