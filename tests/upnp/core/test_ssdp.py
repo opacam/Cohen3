@@ -92,9 +92,7 @@ class TestSSDP(unittest.TestCase):
             b'HOST: 239.255.255.250:1900\r\n',
             b'NOTIFY * HTTP/1.1\r\n',
             b'NTS: ssdp:alive\r\n']
-        # :fixme: What is the reason the notification is send twice?
-        self.assertEqual(len(self.tr.written), 2)
-        self.assertEqual(self.tr.written[0], self.tr.written[1])
+        self.assertEqual(len(self.tr.written), 1)
         data, (host, port) = self.tr.written[0]
         self.assertEqual(
             (host, port),

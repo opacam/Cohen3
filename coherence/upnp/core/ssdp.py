@@ -274,7 +274,6 @@ class SSDPServer(DatagramProtocol, log.LogAble):
                 self.error('Cannot initialize transport: {}'.format(er))
         try:
             self.transport.write(r, (SSDP_ADDR, SSDP_PORT))
-            self.transport.write(r, (SSDP_ADDR, SSDP_PORT))
         except (AttributeError, socket.error) as msg:
             self.info('failure sending out alive notification: {}'.format(msg))
 
