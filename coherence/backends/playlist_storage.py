@@ -8,24 +8,25 @@
 
 import re
 
-from coherence.backend import BackendItem, Container, \
-    AbstractBackendStore
+from coherence.backend import BackendItem, Container, AbstractBackendStore
 from coherence.upnp.core import DIDLLite
-from coherence.upnp.core.DIDLLite import classChooser, Container, Resource
+from coherence.upnp.core.DIDLLite import classChooser, Resource
 from coherence.upnp.core.utils import getPage
 
 
 class PlaylistItem(BackendItem):
     logCategory = 'playlist_store'
 
-    def __init__(self, title, stream_url, mimetype):
+    def __init__(self, title, stream_url, mimetype, **kwargs):
         BackendItem.__init__(self)
         self.name = title
         self.stream_url = stream_url
         self.mimetype = mimetype
 
         self.url = stream_url
-        self.item = None
+        self.item = kwargs.get('item', None)
+        self.parent = kwargs.get('parent', None)
+        self.update_id = kwargs.get('update_id', 0)
 
     def get_id(self):
         return self.storage_id
@@ -34,7 +35,7 @@ class PlaylistItem(BackendItem):
         if self.item is None:
             upnp_id = self.get_id()
             upnp_parent_id = self.parent.get_id()
-            if (self.mimetype.startswith('video/')):
+            if self.mimetype.startswith('video/'):
                 item = DIDLLite.VideoItem(upnp_id, upnp_parent_id, self.name)
             else:
                 item = DIDLLite.AudioItem(upnp_id, upnp_parent_id, self.name)
@@ -93,7 +94,8 @@ class PlaylistStore(AbstractBackendStore):
 
         self.playlist_url = self.config.get(
             'playlist_url',
-            'http://mafreebox.freebox.fr/freeboxtv/playlist.m3u')
+            'https://mafreebox.freebox.fr/freeboxtv/playlist.m3u'
+        )
         self.name = self.config.get('name', 'playlist')
 
         self.init_completed()
@@ -113,8 +115,12 @@ class PlaylistStore(AbstractBackendStore):
         if hasattr(self, 'update_id'):
             update = True
 
-        item = PlaylistItem(id, obj, parent, mimetype, self.urlbase,
-                            UPnPClass, update=update)
+        item = PlaylistItem(
+            id, obj, mimetype,
+            parent=parent,
+            storageid=parent,
+            upnpclass=UPnPClass,
+            update=update)
 
         self.store[id] = item
         self.store[id].store = self
@@ -148,21 +154,26 @@ class PlaylistStore(AbstractBackendStore):
 
         rootItem = Container(None, self.name)
         self.set_root_item(rootItem)
-        self.retrievePlaylistItems(self.playlist_url, rootItem)
+        return self.retrievePlaylistItems(self.playlist_url, rootItem)
 
     def retrievePlaylistItems(self, url, parent_item):
 
         def gotPlaylist(playlist):
             self.info("got playlist")
-            items = {}
+            items = []
             if playlist:
                 content, header = playlist
+                if isinstance(content, bytes):
+                    content = content.decode('utf-8')
                 lines = content.splitlines().__iter__()
                 line = next(lines)
                 while line is not None:
+                    self.debug(line)
                     if re.search('#EXTINF', line):
                         channel = re.match('#EXTINF:.*,(.*)', line).group(1)
                         mimetype = 'video/mpeg'
+                        self.info('\t- channel found: [%r] => %r' % (
+                            mimetype, channel))
                         line = next(lines)
                         while re.search('#EXTVLCOPT', line):
                             option = re.match('#EXTVLCOPT:(.*)', line).group(1)
@@ -172,6 +183,7 @@ class PlaylistStore(AbstractBackendStore):
                         url = line
                         item = PlaylistItem(channel, url, mimetype)
                         parent_item.add_child(item)
+                        items.append(item)
                     try:
                         line = next(lines)
                     except StopIteration:
