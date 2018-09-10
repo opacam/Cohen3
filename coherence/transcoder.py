@@ -17,7 +17,6 @@ gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from gi.repository import GObject
 Gst.init(None)
-GObject.threads_init()
 
 import os.path
 import urllib.request
@@ -61,12 +60,14 @@ class FakeTransformer(Gst.Element, log.LogAble):
     def __init__(self, destination=None, request=None):
         Gst.Element.__init__(self)
         log.LogAble.__init__(self)
-        self.sinkpad = Gst.Pad(self._sinkpadtemplate, "sink")
-        self.srcpad = Gst.Pad(self._srcpadtemplate, "src")
+        self.sinkpad = Gst.Pad.new_from_template(
+            self._sinkpadtemplate, "sink")
+        self.srcpad = Gst.Pad.new_from_template(
+            self._srcpadtemplate, "src")
         self.add_pad(self.sinkpad)
         self.add_pad(self.srcpad)
 
-        self.sinkpad.set_chain_function(self.chainfunc)
+        self.sinkpad.set_chain_function_full(self.chainfunc)
 
         self.buffer = ''
         self.buffer_size = 0
@@ -78,7 +79,7 @@ class FakeTransformer(Gst.Element, log.LogAble):
         return \
             struct.pack(
                 ">L4s", 32, 'ftyp') + \
-            "mp42\x00\x00\x00\x00mp42mp41isomiso2"
+            b"mp42\x00\x00\x00\x00mp42mp41isomiso2"
 
     def chainfunc(self, pad, buffer):
         if self.proxy:
@@ -122,11 +123,12 @@ class DataSink(Gst.Element, log.LogAble):
     def __init__(self, destination=None, request=None):
         Gst.Element.__init__(self)
         log.LogAble.__init__(self)
-        self.sinkpad = Gst.Pad(self._sinkpadtemplate, "sink")
+        self.sinkpad = Gst.Pad.new_from_template(
+            self._sinkpadtemplate, "sink")
         self.add_pad(self.sinkpad)
 
-        self.sinkpad.set_chain_function(self.chainfunc)
-        self.sinkpad.set_event_function(self.eventfunc)
+        self.sinkpad.set_chain_function_full(self.chainfunc)
+        self.sinkpad.set_event_function_full(self.eventfunc)
         self.destination = destination
         self.request = request
 
@@ -137,8 +139,9 @@ class DataSink(Gst.Element, log.LogAble):
         self.got_new_segment = False
         self.closed = False
 
-    def chainfunc(self, pad, buffer):
-        buf_data = buffer.extract_dup(0, buffer.get_size())
+    def chainfunc(self, pad, inst, buffer):
+        size = buffer.get_size()
+        buf_data = buffer.extract_dup(0, size)
         if not isinstance(buf_data, bytes):
             buf = buffer.encode('ascii')
         if self.closed:
@@ -153,16 +156,16 @@ class DataSink(Gst.Element, log.LogAble):
         else:
             self.buffer += buffer.data
 
-        self.data_size += buffer.size
+        self.data_size += size
         return Gst.FlowReturn.OK
 
-    def eventfunc(self, pad, event):
-        if event.type == Gst.Event.NEWSEGMENT:
+    def eventfunc(self, pad, inst, event):
+        if event.type == Gst.Event.new_stream_start('').type:
             if not self.got_new_segment:
                 self.got_new_segment = True
             else:
                 self.closed = True
-        elif event.type == Gst.Event.EOS:
+        elif event.type == Gst.Event.new_eos().type:
             if self.destination is not None:
                 self.destination.close()
             elif self.request is not None:
@@ -379,7 +382,7 @@ class PCMTranscoder(BaseTranscoder, InternalTranscoder):
             "%s ! decodebin ! audioconvert name=conv" % self.uri)
 
         conv = self.pipeline.get_by_name('conv')
-        caps = Gst.Caps(
+        caps = Gst.Caps.from_string(
             "audio/x-raw-int,rate=44100,endianness=4321,"
             "channels=2,width=16,depth=16,signed=true")
         # FIXME: UGLY. 'filter' is a python builtin!
@@ -712,7 +715,9 @@ class TranscoderManager(log.LogAble):
     def __new__(cls, *args, **kwargs):
         """ creates the singleton """
         if cls._instance_ is None:
-            obj = super(TranscoderManager, cls).__new__(cls, **kwargs)
+            obj = super(TranscoderManager, cls).__new__(cls)
+            if 'coherence' in kwargs:
+                obj.coherence = kwargs['coherence']
             cls._instance_ = obj
         return cls._instance_
 
@@ -786,7 +791,3 @@ class TranscoderManager(log.LogAble):
 
         transcoder = self.transcoders[name](uri)
         return transcoder
-
-
-if __name__ == '__main__':
-    t = Transcoder(None)
