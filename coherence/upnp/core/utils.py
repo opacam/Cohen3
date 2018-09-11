@@ -8,7 +8,7 @@ from urllib.parse import urlsplit, urlparse
 
 from twisted.internet import reactor, defer, abstract
 from twisted.python import failure
-from twisted.web import client, error
+from twisted.web import client
 from twisted.web import http, static
 from twisted.web import proxy, resource, server
 
@@ -608,7 +608,7 @@ class BufferFile(static.File):
         except IOError as e:
             import errno
             if e.errno == errno.EACCES:
-                return error.ForbiddenResource().render(request)
+                return resource.ForbiddenResource().render(request)
             else:
                 raise
         if request.setLastModified(self.getmtime()) is http.CACHED:
