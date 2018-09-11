@@ -1,14 +1,16 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
-# Copyright 2006,2007,2008,2009 Frank Scholz <coherence@beebits.net>
-
+# Copyright 2006-2009 Frank Scholz <coherence@beebits.net>
+# Copyright 2018 Pol Canelles <canellestudi@gmail.com>
 
 import os
 import platform
-import string
 import tokenize
 from io import StringIO
+
+from twisted.internet import gtk3reactor
+gtk3reactor.install()
 
 from twisted.internet import reactor, defer
 from twisted.internet.task import LoopingCall
@@ -48,6 +50,7 @@ class Player(log.LogAble):
         self.bus = None
 
         self.views = []
+        self.tags = {}
 
         self.playing = False
         self.duration = None
@@ -234,7 +237,7 @@ class Player(log.LogAble):
         return muted
 
     def get_state(self):
-        return self.player.get_state()
+        return self.player.get_state(Gst.CLOCK_TIME_NONE)
 
     def get_uri(self):
         """ playbin2 has an empty uri property after a
@@ -250,26 +253,31 @@ class Player(log.LogAble):
                 return None
 
     def set_uri(self, uri):
-        self.source.set_property(self.player_uri, uri.encode('utf-8'))
+        if not isinstance(uri, str):
+            uri = uri.encode('utf-8')
+        self.source.set_property(self.player_uri, uri)
         if self.player.get_name() == 'player':
-            self.current_uri = uri.encode('utf-8')
+            self.current_uri = uri
 
     def on_message(self, bus, message):
-        # print "on_message", message
-        # print "from", message.src.get_name()
+        # print("on_message", message, "from", message.src.get_name())
         t = message.type
-        # print t
-        if t == Gst.Message.ERROR:
+        struct = message.get_structure()
+        if t == Gst.MessageType.ERROR:
             err, debug = message.parse_error()
             self.warning("Gstreamer error: %s,%r", err.message, debug)
             if self.playing:
                 self.seek('-0')
             # self.player.set_state(Gst.State.READY)
-        elif t == Gst.Message.TAG:
-            for key in list(message.parse_tag().keys()):
-                self.tags[key] = message.structure[key]
-            # print self.tags
-        elif t == Gst.Message.STATE_CHANGED:
+        elif t == Gst.MessageType.TAG and \
+                message.parse_tag() and struct.has_field('taglist'):
+            taglist = struct.get_value('taglist')
+            for x in range(taglist.n_tags()):
+                key = taglist.nth_tag_name(x)
+                val = taglist.get_string(key)[1]
+                # print('  %s: %s' % (key, val))
+                self.tags[key] = val
+        elif t == Gst.MessageType.STATE_CHANGED:
             if message.src == self.player:
                 old, new, pending = message.parse_state_changed()
                 # print("player (%s) state_change:" % (
@@ -288,20 +296,18 @@ class Player(log.LogAble):
                 # elif new == Gst.State.READY:
                 #    self.update()
 
-        elif t == Gst.Message.EOS:
+        elif t == Gst.MessageType.EOS:
             self.debug("reached file end")
             self.seek('-0')
-            self.update(message=Gst.Message.EOS)
+            self.update(message=Gst.MessageType.EOS)
 
     def query_position(self):
-        # print "query_position"
         try:
             position, format = self.player.query_position(Gst.Format.TIME)
         except Exception:
-            # print "CLOCK_TIME_NONE", Gst.CLOCK_TIME_NONE
+            # print("CLOCK_TIME_NONE", Gst.CLOCK_TIME_NONE)
             position = Gst.CLOCK_TIME_NONE
             position = 0
-        # print position
 
         if self.duration is None:
             try:
@@ -311,23 +317,21 @@ class Player(log.LogAble):
                 self.duration = Gst.CLOCK_TIME_NONE
                 self.duration = 0
                 # import traceback
-                # print traceback.print_exc()
-
-        # print self.duration
+                # print(traceback.print_exc())
 
         r = {}
         if self.duration == 0:
             self.duration = None
             self.debug("duration unknown")
             return r
-        r['raw'] = {'position': str(str(position)),
-                    'remaining': str(str(self.duration - position)),
-                    'duration': str(str(self.duration))}
+        r['raw'] = {'position': str(position),
+                    'remaining': str(self.duration - position),
+                    'duration': str(self.duration)}
 
-        position_human = '%d:%02d' % (divmod(position / 1000000000, 60))
-        duration_human = '%d:%02d' % (divmod(self.duration / 1000000000, 60))
+        position_human = '%d:%02d' % (divmod(position / Gst.SECOND, 60))
+        duration_human = '%d:%02d' % (divmod(self.duration / Gst.SECOND, 60))
         remaining_human = '%d:%02d' % (
-            divmod((self.duration - position) / 1000000000, 60))
+            divmod((self.duration - position) / Gst.SECOND, 60))
 
         r['human'] = {'position': position_human, 'remaining': remaining_human,
                       'duration': duration_human}
@@ -339,11 +343,10 @@ class Player(log.LogAble):
 
     def load(self, uri, mimetype):
         self.debug("load --> %r %r", uri, mimetype)
-        _, state, _ = self.player.get_state()
-        if (state == Gst.State.PLAYING or state == Gst.State.PAUSED):
+        _, state, _ = self.player.get_state(Gst.CLOCK_TIME_NONE)[1]
+        if state == Gst.State.PLAYING or state == Gst.State.PAUSED:
             self.stop()
 
-        # print "player -->", self.player.get_name()
         if self.player.get_name() != 'player':
             self.create_pipeline(mimetype)
 
@@ -365,7 +368,7 @@ class Player(log.LogAble):
 
         if self.player.get_name() != 'player':
             if not self.player_clean:
-                # print "rebuild pipeline"
+                # print("rebuild pipeline")
                 self.player.set_state(Gst.State.NULL)
 
                 self.create_pipeline(mimetype)
@@ -386,7 +389,7 @@ class Player(log.LogAble):
         self.debug("stop --> %r", self.get_uri())
         self.seek('-0')
         self.player.set_state(Gst.State.READY)
-        self.update(message=Gst.Message.EOS)
+        self.update(message=Gst.MessageType.EOS)
         self.debug("stop <-- %r ", self.get_uri())
 
     def seek(self, location):
@@ -396,47 +399,49 @@ class Player(log.LogAble):
                             -nL = relative seek backwards n seconds
         """
 
-        _, state, _ = self.player.get_state()
+        _, state, _ = self.player.get_state(Gst.CLOCK_TIME_NONE)
         if state != Gst.State.PAUSED:
             self.player.set_state(Gst.State.PAUSED)
-        loc = int(location) * 1000000000
-        qp = self.query_position()
-
-        # print(qp['raw']['position'], l)
+        loc = int(location) * Gst.SECOND
+        position = self.player.query_position(Gst.Format.TIME)[1]
+        duration = self.player.query_duration(Gst.Format.TIME)[1]
 
         if location[0] == '+':
-            loc = \
-                int(qp['raw']['position']) + \
-                (int(location[1:]) * 1000000000)
-            loc = min(loc, int(qp['raw']['duration']))
+            loc = position + (int(location[1:]) * Gst.SECOND)
+            loc = min(loc, duration)
         elif location[0] == '-':
             if location == '-0':
                 loc = 0
             else:
-                loc = \
-                    int(qp['raw']['position']) - \
-                    (int(location[1:]) * 1000000000)
+                loc = position - (int(location[1:]) * Gst.SECOND)
                 loc = max(loc, 0)
 
         self.debug("seeking to %r", loc)
-        """
-        self.player.seek( 1.0, Gst.Format.TIME,
-            Gst.SeekFlags.FLUSH | Gst.SeekFlags.ACCURATE,
-            Gst.SeekType.SET, loc,
-            Gst.SeekType.NONE, 0)
 
-        """
-        event = Gst.event_new_seek(
+        # Standard seek mode
+        # self.player.seek( 1.0, Gst.Format.TIME,
+        #     Gst.SeekFlags.FLUSH | Gst.SeekFlags.ACCURATE,
+        #     Gst.SeekType.SET, loc,
+        #     Gst.SeekType.NONE, 0)
+        # event_send = False
+
+        # Simple seek mode
+        # self.player.seek_simple(
+        #     Gst.Format.TIME,
+        #     Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT, loc)
+        # event_send = False
+
+        # Event seek mode
+        event = Gst.Event.new_seek(
             1.0, Gst.Format.TIME,
             Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
             Gst.SeekType.SET, loc,
             Gst.SeekType.NONE, 0)
+        event_send = self.player.send_event(event)
 
-        res = self.player.send_event(event)
-        if res:
-            pass
-            # print "setting new stream time to 0"
-            # self.player.set_new_stream_time(0L)
+        if event_send:
+            print("seek to %r ok" % location)
+            # self.player.set_start_time(0)
         elif location != '-0':
             print("seek to %r failed" % location)
 
@@ -533,7 +538,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
             av_transport.set_variable(conn_id, 'TransportState',
                                       'PAUSED_PLAYBACK')
         elif self.playcontainer is not None and \
-                message == Gst.Message.EOS and \
+                message == Gst.MessageType.EOS and \
                 self.playcontainer[0] + 1 < len(self.playcontainer[2]):
             state = 'transitioning'
             av_transport.set_variable(conn_id, 'TransportState',
@@ -566,7 +571,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
                 state = 'idle'
                 av_transport.set_variable(
                     conn_id, 'TransportState', 'STOPPED')
-        elif message == Gst.Message.EOS and \
+        elif message == Gst.MessageType.EOS and \
                 len(av_transport.get_variable(
                     'NextAVTransportURI').value) > 0:
             state = 'transitioning'
@@ -633,9 +638,9 @@ class GStreamerPlayer(log.LogAble, Plugin):
                                                   self.metadata)
 
             self.info("%s %d/%d/%d - %d%%/%d%% - %s/%s/%s", state,
-                      int(position['raw']['position']) / 1000000000,
-                      int(position['raw']['remaining']) / 1000000000,
-                      int(position['raw']['duration']) / 1000000000,
+                      int(position['raw']['position']) / Gst.SECOND,
+                      int(position['raw']['remaining']) / Gst.SECOND,
+                      int(position['raw']['duration']) / Gst.SECOND,
                       position['percent']['position'],
                       position['percent']['remaining'],
                       position['human']['position'],
@@ -659,7 +664,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
     def _format_time(self, time):
         fmt = '%d:%02d:%02d'
         try:
-            m, s = divmod(time / 1000000000, 60)
+            m, s = divmod(time / Gst.SECOND, 60)
             h, m = divmod(m, 60)
         except ValueError:
             h = m = s = 0
@@ -1218,11 +1223,69 @@ class GStreamerPlayer(log.LogAble, Plugin):
 
 
 if __name__ == '__main__':
-
     import sys
 
-    p = Player(None)
-    if len(sys.argv) > 1:
-        reactor.callWhenRunning(p.start, sys.argv[1])
+    # FIXME: this tests should be adapted and moved into the tests folder
+    # Test audio
+    # uri = 'https://sampleswap.org/samples-ghost/INSTRUMENTS%20multisampled' \
+    #       '/GUITAR/acoustic%20guitar%20harmonics/1192[kb]E7fret.aif.mp3'
+    # p = Player()
 
+    # Test Video
+    # uri = 'file:///home/user/videos/sample.mp4'  # example for local files
+    uri = 'https://www.sample-videos.com/video/' \
+          'mp4/720/big_buck_bunny_720p_1mb.mp4'
+    p = Player(default_mimetype='video/x-h264',
+               # video_sink_name='ximagesink'
+               )
+
+    def check_bus_state(bus, message):
+        """Example function to check the player bus state and act accordingly
+        """
+        t = message.type
+        if t == Gst.MessageType.EOS:
+            print('Reached end of file: Ending reactor/GLib.MainLoop...')
+            # For twisted.internet.reactor
+            if reactor.running:
+                reactor.stop()
+
+            # For GLib.MainLoop()
+            # loop.quit()
+        elif t == Gst.MessageType.ERROR:
+            print('Some error happened: Ending reactor/GLib.MainLoop...')
+            # For twisted.internet.reactor
+            if reactor.running:
+                reactor.stop()
+
+            # For GLib.MainLoop()
+            # loop.quit()
+
+    def main(play_uri):
+        # Connect the player to a custom function,
+        # to check the current player state
+        p.bus.connect('message', check_bus_state)
+
+        # Set url to play and start it
+        p.set_uri(play_uri)
+        p.play()
+
+        # Seek example: The line below will jump to second 5
+        # p.seek('+5')
+
+    # Use twisted.internet.reactor (for the main loop)
+    if len(sys.argv) > 1:
+        reactor.callWhenRunning(main, sys.argv[1])
+    else:
+        reactor.callWhenRunning(main, uri)
     reactor.run()
+
+    # Use GLib.MainLoop (for the main loop)
+    # from gi.repository import GLib
+    # loop = GLib.MainLoop()
+    # if len(sys.argv) > 1:
+    #     main(sys.argv[1])
+    # else:
+    #     main(uri)
+    # loop.run()
+
+    print('Ended reactor/GLib.MainLoop OK')
