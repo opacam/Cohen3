@@ -200,6 +200,8 @@ class Plugins(log.LogAble):
 class Coherence(log.LogAble):
     __instance = None  # Singleton
     __initialized = False
+    __incarnations = 0
+    __cls = None
 
     logCategory = 'coherence'
 
@@ -209,6 +211,7 @@ class Coherence(log.LogAble):
             cls.__instance.__initialized = False
             cls.__instance.__incarnations = 0
             cls.__instance.__cls = cls
+            cls.__instance.config = kwargs.get('config', {})
         cls.__instance.__incarnations += 1
         return cls.__instance
 
