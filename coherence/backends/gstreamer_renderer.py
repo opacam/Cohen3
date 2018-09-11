@@ -633,23 +633,23 @@ class GStreamerPlayer(log.LogAble, Plugin):
                                                   self.metadata)
 
             self.info("%s %d/%d/%d - %d%%/%d%% - %s/%s/%s", state,
-                      string.atol(position['raw']['position']) / 1000000000,
-                      string.atol(position['raw']['remaining']) / 1000000000,
-                      string.atol(position['raw']['duration']) / 1000000000,
+                      int(position['raw']['position']) / 1000000000,
+                      int(position['raw']['remaining']) / 1000000000,
+                      int(position['raw']['duration']) / 1000000000,
                       position['percent']['position'],
                       position['percent']['remaining'],
                       position['human']['position'],
                       position['human']['remaining'],
                       position['human']['duration'])
 
-            duration = string.atol(position['raw']['duration'])
+            duration = int(position['raw']['duration'])
             formatted = self._format_time(duration)
             av_transport.set_variable(conn_id, 'CurrentTrackDuration',
                                       formatted)
             av_transport.set_variable(conn_id, 'CurrentMediaDuration',
                                       formatted)
 
-            position = string.atol(position['raw']['position'])
+            position = int(position['raw']['position'])
             formatted = self._format_time(position)
             av_transport.set_variable(conn_id, 'RelativeTimePosition',
                                       formatted)
