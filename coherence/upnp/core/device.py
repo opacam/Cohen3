@@ -29,6 +29,7 @@ class Device(log.LogAble):
         # self.uid = self.usn[:-len(self.st)-2]
         self.friendly_name = ""
         self.device_type = ""
+        self.upnp_version = "n/a"
         self.friendly_device_type = "[unknown]"
         self.device_type_version = 0
         self.detection_completed = False

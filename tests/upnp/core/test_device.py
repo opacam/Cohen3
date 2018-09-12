@@ -157,6 +157,7 @@ class DeviceWithoutDescription(unittest.TestCase):
                           ('URL base', "DummyParentDevice's URL base"),
                           ('UDN', None),
                           ('Type', ''),
+                          ('UPnP Version', 'n/a'),
                           ('Friendly Name', ''),
                           ])
 
@@ -241,9 +242,7 @@ class RootDeviceDescriptionNotFound(unittest.TestCase):
         self.assertEqual(dev.get_usn(), "RootDevice's USN")
         self.assertEqual(dev.get_st(), "RootDevice's ST")
         self.assertEqual(dev.get_location(), b"RootDevice's Location")
-        # :fixme: should behave like a normal Device (or normal Device
-        # should raise, too)
-        self.assertRaises(AttributeError, dev.get_upnp_version)
+        self.assertEqual(dev.get_upnp_version(), "n/a")
         # :fixme: should behave like a normal Device (or normal Device
         # should raise, too)
         self.assertRaises(AttributeError, dev.get_urlbase)
@@ -292,6 +291,7 @@ class RootDeviceDescriptionNotFound(unittest.TestCase):
                           # ('URL base', "RootDevice's URL base"),
                           ('UDN', None),
                           ('Type', ''),
+                          ('UPnP Version', 'n/a'),
                           ('Friendly Name', ''),
                           ])
 
