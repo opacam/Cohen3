@@ -811,7 +811,8 @@ class FSStore(BackendStore):
                         IN_CREATE | IN_DELETE | IN_MOVED_FROM | \
                         IN_MOVED_TO | IN_CHANGED
                     self.inotify.watch(
-                        path, mask=mask, autoAdd=False,
+                        FilePath(os.path.abspath(path)),
+                        mask=mask, autoAdd=False,
                         callbacks=[partial(self.notify, parameter=id)])
                 return self.store[id]
         except OSError as os_msg:
