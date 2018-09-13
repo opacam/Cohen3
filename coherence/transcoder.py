@@ -316,11 +316,13 @@ class BaseTranscoder(resource.Resource, log.LogAble):
     logCategory = 'transcoder'
     addSlash = True
 
-    def __init__(self, uri, destination=None):
+    def __init__(self, uri, destination=None, content_type=None):
         if uri[:7] not in ['file://', 'http://']:
             uri = 'file://' + urllib.parse.quote(uri)  # FIXME
         self.uri = uri
         self.destination = destination
+        self.contentType = None
+        self.pipeline = None
         resource.Resource.__init__(self)
         log.LogAble.__init__(self)
         self.info('uri %s %r', uri, type(uri))
@@ -332,7 +334,7 @@ class BaseTranscoder(resource.Resource, log.LogAble):
     def render_GET(self, request):
         self.info('render GET %r', request)
         request.setResponseCode(200)
-        if hasattr(self, 'contentType'):
+        if self.contentType is not None:
             request.setHeader(b'Content-Type', self.contentType)
         request.write(b'')
 
@@ -370,6 +372,11 @@ class BaseTranscoder(resource.Resource, log.LogAble):
 
     def cleanup(self):
         self.pipeline.set_state(Gst.State.NULL)
+
+    def start(self, request=None):
+        """This method should be sub classed for each
+        class which inherits from BaseTranscoder"""
+        pass
 
 
 class PCMTranscoder(BaseTranscoder, InternalTranscoder):
@@ -543,8 +550,13 @@ class GStreamerTranscoder(BaseTranscoder):
 
         same for the attribute contentType
     """
+    pipeline_description = None
 
     def start(self, request=None):
+        if self.pipeline_description is None:
+            raise NotImplementedError(
+                "Warning: operation cancelled. You must set a value for "
+                "GStreamerTranscoder.pipeline_description")
         self.info("start %r", request)
         self.pipeline = Gst.parse_launch(self.pipeline_description % self.uri)
         enc = self.pipeline.get_by_name('mux')
@@ -643,6 +655,8 @@ class ExternalProcessProducer(object):
 class ExternalProcessPipeline(resource.Resource, log.LogAble):
     logCategory = 'externalprocess'
     addSlash = False
+    pipeline_description = None
+    contentType = None
 
     def __init__(self, uri):
         self.uri = uri
@@ -654,11 +668,12 @@ class ExternalProcessPipeline(resource.Resource, log.LogAble):
 
     def render(self, request):
         print("ExternalProcessPipeline render")
-        try:
-            if self.contentType:
-                request.setHeader('Content-Type', self.contentType)
-        except AttributeError:
-            pass
+        if self.pipeline_description is None:
+            raise NotImplementedError(
+                "Warning: operation cancelled. You must set a value for "
+                "ExternalProcessPipeline.pipeline_description")
+        if self.contentType is not None:
+            request.setHeader(b'Content-Type', self.contentType)
 
         ExternalProcessProducer(self.pipeline_description % self.uri, request)
         return server.NOT_DONE_YET
