@@ -17,6 +17,7 @@ import string
 import sys
 import time
 import urllib
+import urllib.error
 
 from coherence.upnp.core.utils import getPage
 
@@ -336,6 +337,11 @@ class FileDownloader(object):
         """Report download finished."""
         self.to_stdout('')
 
+    def _do_download(self, *args):
+        raise NotImplementedError('Error: the _do_download method was removed'
+                                  'at some point of the project, operation'
+                                  'cancelled')
+
     def process_info(self, info_dict):
         """Process a single dictionary returned by an InfoExtractor."""
         # Do nothing else if in simulate mode
@@ -373,6 +379,8 @@ class FileDownloader(object):
             return
 
         try:
+            # Fixme: This should be reimplemented, probably that the best shoot
+            #  will be to use an external python package to deal with that
             success = self._do_download(filename, info_dict['url'])
         except (urllib.error.URLError,
                 http.client.HTTPException,
@@ -422,7 +430,7 @@ class FileDownloader(object):
     def get_real_urls(self, url_list):
         """Download a given list of URLs."""
         if len(url_list) > 1 and self.fixed_template():
-            raise SameFileError(self._params['outtmpl'])
+            raise SameFileError(self.params['outtmpl'])
 
         for url in url_list:
             suitable_found = False
@@ -438,7 +446,7 @@ class FileDownloader(object):
                         ret_code = self.trouble()
 
                     if len(results) > 1 and self.fixed_template():
-                        raise SameFileError(self._params['outtmpl'])
+                        raise SameFileError(self.params['outtmpl'])
 
                     real_urls = []
                     for result in results:

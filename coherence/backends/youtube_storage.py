@@ -48,6 +48,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
         self.cache_maxsize = int(cache_maxsize)
         self.buffer_size = int(buffer_size)
         self.downloader = None
+        self.connection = None
 
         self.video_url = None  # the url we get from the youtube page
         self.stream_url = None  # the real video stream, cached somewhere
@@ -62,7 +63,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
     def requestFinished(self, result):
         """ self.connection is set in utils.ReverseProxyResource.render """
         self.info("ProxyStream requestFinished: %s", result)
-        if hasattr(self, 'connection'):
+        if self.connection is not None:
             self.connection.transport.loseConnection()
 
     def render(self, request):
