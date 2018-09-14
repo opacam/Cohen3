@@ -192,9 +192,11 @@ class TwitchStreamItem(BackendItem):
         self.status = status
         self.mimetype = MPEG_MIME
         self.created_at = created_at
-        self.preview_url = preview_url
         self.viewers = viewers
+        self.url = url
+        self.preview_url = preview_url
         self.location = LiveStreamerProxyResource(url, 'best')
+        self.parent = None
 
     def get_item(self):
         if self.item is None:

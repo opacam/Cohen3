@@ -516,6 +516,8 @@ class ServiceServer(log.LogAble):
 
         self._pending_notifications = {}
 
+        self.implementation = None
+
         self.last_change = None
         self.init_var_and_actions()
 
@@ -526,7 +528,8 @@ class ServiceServer(log.LogAble):
             pass
         self.debug('ServiceServer.__init__: putChild {} ...wait'.format(
             self.subscription_url))
-        self.putChild(self.subscription_url, EventSubscriptionServer(self))
+        self.putChild(  # pylint: disable=no-member
+            self.subscription_url, EventSubscriptionServer(self))
         self.debug('ServiceServer.__init__: putChild {} => OK'.format(
             self.subscription_url))
 
@@ -714,7 +717,7 @@ class ServiceServer(log.LogAble):
                 if n.dependant_variable is not None:
                     dependants = n.dependant_variable.get_allowed_values()
                     if dependants is not None and len(dependants) > 0:
-                        s.attrib['channel'] = dependants[0]
+                        e.attrib['channel'] = dependants[0]
 
         if evented_variables == 0:
             return
@@ -1151,17 +1154,20 @@ class ServiceControl(log.LogAble):
             # print 'get_state_variable_contents', argument.name
             if argument.name[0:11] != 'A_ARG_TYPE_':
                 if action.get_callback() is not None:
-                    variable = self.variables[instance][
-                        argument.get_state_variable()]
+                    variable = \
+                        self.variables[instance][  # pylint: disable=no-member
+                            argument.get_state_variable()]
                     variable.update(r[argument.name])
                     if variable.send_events == 'yes' and \
                             not variable.moderated:
                         notify.append(variable)
                 else:
-                    variable = self.variables[instance][
-                        argument.get_state_variable()]
+                    variable = \
+                        self.variables[instance][  # pylint: disable=no-member
+                            argument.get_state_variable()]
                     r[argument.name] = variable.value
-            self.service.propagate_notification(notify)
+            self.service.propagate_notification(  # pylint: disable=no-member
+                notify)
 
         self.info('action_results unsorted %s %s', action.name, r)
         if len(r) == 0:
@@ -1179,7 +1185,8 @@ class ServiceControl(log.LogAble):
             in the server service control class can be found
         """
         try:
-            action = self.actions[kwargs['soap_methodName']]
+            action = self.actions[  # pylint: disable=no-member
+                kwargs['soap_methodName']]
         except KeyError:
             return failure.Failure(errorCode(401))
 

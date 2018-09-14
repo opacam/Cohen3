@@ -18,12 +18,17 @@ from coherence.upnp.core.soap_service import errorCode
 
 class BzClient(LineReceiver, log.LogAble):
     logCategory = 'buzztard_client'
+    factory = None
 
     def __init__(self, *args, **kwargs):
         log.LogAble.__init__(self)
 
     def connectionMade(self):
         self.info("connected to Buzztard")
+        if self.factory is None:
+            self.error('Cannot access to BzClient.factory '
+                       'property...cancelled')
+            return False
         self.factory.clientReady(self)
 
     def lineReceived(self, line):
@@ -87,6 +92,7 @@ class BzConnection(log.LogAble):
     """ a singleton class
     """
     logCategory = 'buzztard_connection'
+    connection = None
 
     def __init__(self, backend=None, host='localhost', port=7654):
         log.LogAble.__init__(self)

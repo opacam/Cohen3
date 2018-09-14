@@ -83,6 +83,7 @@ class MovieItem(BackendItem):
         self.size = None
         self.mimetype = url_mimetype
         self.item = None
+        self.parent = None
 
     def get_item(self):
         if self.item is None:

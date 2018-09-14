@@ -50,6 +50,7 @@ class ElisaMediaStore(Plugin):
         self.server = server
         self.update_id = 0
         self.root_id = 0
+        self.store = {}
         self.get_root_id()
 
     def __repr__(self):
@@ -158,7 +159,7 @@ class ElisaMediaStore(Plugin):
                  'NumberReturned': didl.numItems()}
 
             if hasattr(elisa_item, 'update_id'):
-                r['UpdateID'] = item.update_id
+                r['UpdateID'] = item.update_id  # pylint: disable=no-member
             else:
                 r['UpdateID'] = self.update_id
 

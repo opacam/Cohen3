@@ -53,9 +53,11 @@ class TrackItem(BackendItem):
         self.track_number = track_number
         self.artist = artist
         self.title = title
+        self.size = None
         self.mimetype = TRACK_MIMETYPE
         self.fourth_field = TRACK_FOURTH_FIELD
         self.item = None
+        self.parent = None
         self.pipeline = PLAY_TRACK_GST_PIPELINE % (
             self.device_name, self.track_number)
         self.location = GStreamerPipeline(self.pipeline, self.mimetype)

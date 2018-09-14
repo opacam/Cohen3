@@ -326,6 +326,8 @@ class LastFMStore(log.LogAble, Plugin):
 
         self.update_id = 0
         self.store = {}
+        self.server = server
+        self.urlbase = 'http://ws.audioscrobbler.com/2.0/'
 
         self.wmc_mapping = {'4': 1000}
 

@@ -335,6 +335,7 @@ class Album(BackendItem):
 
 class BasePlaylist(BackendItem):
     """ definition for a playlist """
+    id_type = "baseplaylist"
     mimetype = 'directory'
     get_path = None
 
@@ -346,6 +347,11 @@ class BasePlaylist(BackendItem):
         self.title = self._row.Name
         if self.title:
             self.title = self.title.encode("utf-8")
+
+    @property
+    def db_id(self):
+        """Should be implemented in subclass"""
+        return ''
 
     def get_tracks(self, request_count):
         return []
@@ -359,7 +365,7 @@ class BasePlaylist(BackendItem):
         return "%s.%d" % (self.id_type, self.db_id)
 
     def __repr__(self):
-        return '<%s %d title="%s">' % (self.__class___.__name__,
+        return '<%s %d title="%s">' % (self.__class__.__name__,
                                        self.db_id, self.title)
 
     def get_children(self, start=0, request_count=0):
@@ -461,6 +467,7 @@ class BaseTrack(BackendItem):
         self.track_nr = self._row.TrackNumber
         self.location = self._row.Uri
         self.playlist = kwargs.get("playlist")
+        self.album = None
 
     def get_children(self, start=0, request_count=0):
         return []

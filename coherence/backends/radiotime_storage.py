@@ -38,6 +38,7 @@ class RadiotimeAudioItem(BackendItem):
         # self.url = self.stream_url
 
         self.item = None
+        self.parent = None
 
     def replace_by(self, item):
         # do nothing: we suppose the replacement item is the same
@@ -64,7 +65,7 @@ class RadiotimeAudioItem(BackendItem):
         return self.item
 
     def get_path(self):
-        return self.url
+        return self.stream_url
 
     def get_id(self):
         return self.storage_id
@@ -85,7 +86,7 @@ class RadiotimeStore(AbstractBackendStore):
         self.partner_id = self.config.get('partner_id', 'TMe3Cn6v')
         self.username = self.config.get('username', None)
         self.locale = self.config.get('locale', 'en')
-        self.serial = server.uuid
+        self.serial = server.uuid if server else 'n/a'
 
         # construct URL for root menu
         if self.username is not None:

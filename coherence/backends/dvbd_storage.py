@@ -692,34 +692,34 @@ class DVBDScheduledRecording(BackendStore):
             self.error("ERROR: %s", error)
             return error
 
-        def get_infos(tid):
+        def get_infos(t_id):
             d = defer.Callback()
             self.recorder_interface.GetAllInformations(
-                tid,
+                t_id,
                 reply_handler=lambda x, success: d.callback(x),
                 error_handler=lambda x, success: d.errback(x))
             return d
 
-        def get_start_time(tid):
+        def get_start_time(t_id):
             d = defer.Callback()
             self.recorder_interface.GetStartTime(
-                tid, reply_handler=lambda x, success: d.callback(x),
+                t_id, reply_handler=lambda x, success: d.callback(x),
                 error_handler=lambda x, success: d.errback(x))
             return d
 
         def process_details(results):
-            tid, duration, active, channel_name, title = results[0][1]
+            t_id, duration, active, channel_name, title = results[0][1]
             start = results[1][1]
             start_datetime = datetime(*start)
             # TODO return what we actually need
             # FIXME we properly want the channel id here rather than the name
-            return {'id': tid, 'duration': duration,
+            return {'id': t_id, 'duration': duration,
                     'channel': channel_name,
                     'start': start_datetime}
 
         d = defer.DeferredList(
-            [self.get_infos(tid),
-             self.get_start_time(tid)]
+            [get_infos(tid),
+             get_start_time(tid)]
         )
         d.addCallback(process_details)
         d.addErrback(handle_error)

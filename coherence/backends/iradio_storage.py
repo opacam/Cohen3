@@ -230,6 +230,7 @@ class IRadioItem(BackendItem):
         self.location = PlaylistStreamProxy(self.stream_url)
 
         self.item = None
+        self.parent = None
 
     def replace_by(self, item):
         # do nothing: we suppose the replacement item is the same
