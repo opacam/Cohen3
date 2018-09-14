@@ -157,7 +157,6 @@ class FSItem(BackendItem):
         if mimetype in ['directory', 'root']:
             self.update_id = 0
             self.get_url = lambda: self.url
-            self.get_path = lambda: None
             # self.item.searchable = True
             # self.item.searchClass = 'object'
             if (isinstance(self.location, FilePath) and
@@ -461,6 +460,8 @@ class FSItem(BackendItem):
             return None
 
     def get_path(self):
+        if self.mimetype in ['directory', 'root']:
+            return None
         if isinstance(self.location, FilePath):
             return self.location.path
         else:
