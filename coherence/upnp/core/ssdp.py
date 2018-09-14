@@ -87,8 +87,24 @@ class SSDPServer(DatagramProtocol, log.LogAble):
         lines = [x.replace(': ', ':', 1) for x in lines[1:]]
         lines = [x for x in lines if len(x) > 0]
 
+        # TODO: Find  and fix where some of the header's keys are quoted.
+        # This hack, allows to fix the quoted keys for the headers, introduced
+        # at some point of the source code. I notice that the issue appears
+        # when using FSStore plugin. But where?
+        def fix_string(s, to_lower=True):
+            for q in ["'", "\""]:
+                while s.startswith(q):
+                    s = s[1:]
+            for q in ["'", "\""]:
+                while s.endswith(q):
+                    s = s[:-1]
+            if to_lower:
+                s = s.lower()
+            return s
         headers = [x.split(':', 1) for x in lines]
-        headers = dict([(x[0].lower(), x[1]) for x in headers])
+        headers = \
+            dict([(fix_string(x[0]),
+                   fix_string(x[1], to_lower=False)) for x in headers])
 
         self.msg('SSDP command {} {} - from {}:{}'.format(
             cmd[0], cmd[1], host, port))
