@@ -30,10 +30,14 @@ install:
   - pip install python-coveralls==2.9.1
   - pip install pycodestyle==2.4.0
   - pip install pylint==2.1.1
+  - pip install travis-sphinx
+  - pip install sphinx-rtd-theme
   - pip install -e .[test]
 script:
   - pycodestyle coherence --ignore=E402,W504
   - pylint -E coherence --rcfile=.pylintrc
   - nosetests --with-coverage --cover-erase --cover-package=coherence --cover-html
+  - travis-sphinx build -n --source=docs
 after_success:
+  - travis-sphinx deploy
   - coveralls

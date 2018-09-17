@@ -24,7 +24,7 @@ Cohen3 is actually a highly simplified and refreshed version of
 project by `Frank Scholz <mailto:dev@coherence-project.org>`_ which looks like
 no longer supported.
 
-- Documentation: https://cohen3.readthedocs.org/
+- Documentation: https://opacam.github.io/Cohen3/
 - GitHub: https://github.com/opacam/Cohen3
 - Issue tracker: https://github.com/opacam/Cohen3/issues
 - PyPI: https://pypi.python.org/pypi/cohen3
@@ -72,7 +72,7 @@ This will copy the Python module files into your local Python package
 folder and the cohen executable to ``/usr/local/bin/cohen3``.
 
 If you want to install Cohen3 with extra dependencies you must do the steps above
-and moreover install pip then you can run the following command
+and moreover install pip, then you can run the following command
 (instead of the mentioned above) for installing the development dependencies::
 
   $ sudo pip install -e .[dev]
