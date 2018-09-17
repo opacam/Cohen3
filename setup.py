@@ -20,7 +20,6 @@ deps = [
     'Twisted >= 18.7',
     'zope.interface',
     'louie-latest',
-    'livestreamer',
     'lxml',
     'python-dateutil',
     'pyopenssl'
@@ -41,6 +40,10 @@ elisa_store_require = [
 
 picasa_store_require = [
     'gdata'
+]
+
+twitch_store_require = [
+    'livestreamer'
 ]
 
 youtube_store_require = [
@@ -156,6 +159,7 @@ setup(name='Cohen3',
           'gstreamer': gstreamer_player_require,
           'elisa': elisa_store_require,
           'picasa': picasa_store_require,
+          'twitch': twitch_store_require,
           'youtube': youtube_store_require,
           'web': web_ui_require,
       },
