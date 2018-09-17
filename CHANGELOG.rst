@@ -1,17 +1,30 @@
-0.8.0 - Moves to python 3
+0.8.0 - Cohen3 project started
 ------------------------------
 
 General:
-    - Renames project from Cohen to Cohen3
-    - Migrates source code to python version 3
-    - Reformat, Cleanup and  some PEP8 fixes
+    - Remove livestreamer as basic dependency
+    - Migrate from pygtk to gi.repository
+    - Migrate Gstreamer from version 0.10 to 1.0
+    - Enhance Travis with more tests
+    - Reformat according pep8 directives.
+    - Rename project from Cohen to Cohen3
+    - Migrate source code to python version 3
     - Twisted >= 18.7.0 is now required
     - Louie-latest is now required (instead of Louie)
+
+Fixes:
+    - Fix quoted keys for some headers
+    - Fix Inotify (now uses twisted's Inotify)
+    - Fix all pep8/pylint errors
 
 0.7.3 - Fixes and improvements
 ------------------------------
 
+General:
+    - Travis enhancements: make travis upload to pypi
 
+Fixes:
+    - Hotfix for LazyContainer
 
 0.7.2 - Minor bugfixes
 ----------------------
