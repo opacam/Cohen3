@@ -3,12 +3,12 @@
 Command-Line Interface
 ======================
 
-SYNOPSIS
+Synopsis
 --------
 
 ``cohen3`` <options> [--plugin=<BACKEND> [ , <PARAM_NAME> : <PARAM_VALUE> ] ...]
 
-DESCRIPTION
+Description
 -----------
 
 Cohen3 is a Python DLNA/UPnP Media Server made to broadcast digital media content over your network.
@@ -21,7 +21,7 @@ of:
   * server and client for HTTP/SOAP requests, and
   * server and client for Event Subscription and Notification (GENA).
 
-OPTIONS
+Options
 -------
 
 -v, --version  Show program's version number and exit
@@ -39,7 +39,7 @@ OPTIONS
 -l, --logfile=PATH   Path to log file.
 
 
-EXAMPLES
+Examples
 --------
 
 :cohen3 --plugin=backend\:FSStore,name\:MyCoherence:
@@ -50,7 +50,7 @@ EXAMPLES
     located in `$HOME/Music` and the media metadata store in
     `/tmp/media.db`.
 
-AVAILABLE STORES
+Available stores
 ----------------
 
 BetterLight, AmpacheStore, FlickrStore, MiroStore, ElisaPlayer,
@@ -59,19 +59,19 @@ BuzztardStore, GStreamerPlayer, ITVStore, SWR3Store, TrackerStore,
 LolcatsStore, BBCStore, MediaStore, AppleTrailerStore, LastFMStore,
 AxisCamStore, YouTubeStore, TEDStore, IRadioStore, TwitchStore
 
-FILES
+Files
 -----
 
 :$HOME/.cohen3: default config file
 
-ENVIRONMENT VARIABLES
+Environment variables
 ---------------------
 
 :COHEN_DEBUG=<STORE>:
     Supplies debug information pertaining to the named store.
 
 
-SEE ALSO
+See also
 --------
 
 Project Homepage https://github.com/opacam/Cohen3

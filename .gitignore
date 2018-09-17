@@ -12,6 +12,9 @@
 *.rej
 
 # Python build artefacts
+_build/
+_static/
+_templates/
 /build/
 /dist/
 /_venv/

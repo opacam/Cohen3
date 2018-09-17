@@ -17,7 +17,7 @@ no longer supported.
 - Latest release: |version| (:ref:`changelog`)
 - GitHub: https://github.com/opacam/Cohen3
 - Issue tracker: https://github.com/opacam/Cohen3/issues
-- PyPI: https://pypi.python.org/pypi/cohen3
+- PyPI: https://pypi.python.org/pypi/cohen3 *(still not available)*
 - Free software: MIT licence
 
 
@@ -52,13 +52,19 @@ The config file can be placed anywhere, cohen looks by default for
   $ cohen3 -c /path/to/config/file
 
 
+
 Table of Contents
 -----------------
 
 .. toctree::
-    :glob:
 
     install
     cli
     backends
-    backend/*
+    source/coherence
+    changelog
+
+.. automodule:: mod
+
+ Members
+ =======
