@@ -62,6 +62,8 @@ Table of Contents
     cli
     backends
     source/coherence
+    contributing
+    contributor_code_of_conduct
     changelog
 
 .. automodule:: mod
