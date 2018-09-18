@@ -33,9 +33,9 @@ except ImportError:
     dbus = None
 
 try:
-    from twisted.internet.gireactor import GIReactor  # for non-GUI apps
+    from twisted.internet import gireactor
 except ImportError:
-    GIReactor = None
+    gireactor = None
 
 BUS_NAME = 'org.Coherence'
 OBJECT_PATH = '/org/Coherence'
@@ -54,7 +54,7 @@ def get_the_gireactor(f):
             try:
                 if "twisted.internet.reactor" in sys.modules and \
                         not isinstance(sys.modules["twisted.internet.reactor"],
-                                       GIReactor):
+                                       gireactor.GIReactor):
                     print(
                         "Something has already installed a Twisted reactor. "
                         "Attempting to uninstall it...",
@@ -63,7 +63,6 @@ def get_the_gireactor(f):
                     del sys.modules["twisted.internet.reactor"]
                 if "twisted.internet.reactor" not in sys.modules:
                     global reactor
-                    from twisted.internet import gireactor  # for non-GUI apps
                     gireactor.install(useGtk=False)
                     from twisted.internet import reactor
             except ImportError:
@@ -78,14 +77,9 @@ def get_the_gireactor(f):
 class TestDBUS(unittest.TestCase):
     if not dbus:
         skip = "Python dbus-bindings not available."
-    elif not GIReactor:
-        skip = "Python GIReactor not available."
-    else:
-        # TODO: Fix the conflict between dbus test and the utils tests
-        skip = "All dependencies are satisfied but we skip this test anyway" \
-               "...because this test will cause failures in other " \
-               "tests (utils.getPage). In order to test the dbus, " \
-               "run this test alone by commenting this \"else\" condition."
+    elif gireactor is None:
+        skip = "Python dbus-bindings not available, we need" \
+               "a twisted.internet.gireactor.GIReactor"
 
     def setUp(self):
         louie.reset()
@@ -100,6 +94,8 @@ class TestDBUS(unittest.TestCase):
 
         def cleaner(r):
             self.coherence.clear()
+            if "twisted.internet.reactor" in sys.modules:
+                del sys.modules["twisted.internet.reactor"]
             return r
 
         dl = self.coherence.shutdown()
