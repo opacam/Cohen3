@@ -1,21 +1,28 @@
-0.8.0 - Cohen3 project started
+0.8.1 - Fixes and enhancements
 ------------------------------
 
 General:
+    - Automate documentation building via travis
+    - Add more sphinx documentation
     - Remove livestreamer as basic dependency
     - Migrate from pygtk to gi.repository
     - Migrate Gstreamer from version 0.10 to 1.0
     - Enhance Travis with more tests
     - Reformat according pep8 directives.
-    - Rename project from Cohen to Cohen3
-    - Migrate source code to python version 3
-    - Twisted >= 18.7.0 is now required
-    - Louie-latest is now required (instead of Louie)
 
 Fixes:
     - Fix quoted keys for some headers
     - Fix Inotify (now uses twisted's Inotify)
     - Fix all pep8/pylint errors
+
+0.8.0 - Cohen3 project started
+------------------------------
+
+General:
+    - Rename project from Cohen to Cohen3
+    - Migrate source code to python version 3
+    - Twisted >= 18.7.0 is now required
+    - Louie-latest is now required (instead of Louie)
 
 0.7.3 - Fixes and improvements
 ------------------------------
