@@ -38,6 +38,10 @@ elisa_store_require = [
     'Axiom',
 ]
 
+feed_store_require = [
+    'feedparser'
+]
+
 picasa_store_require = [
     'gdata'
 ]
@@ -158,6 +162,7 @@ setup(name='Cohen3',
           'audio': audio_store_require,
           'gstreamer': gstreamer_player_require,
           'elisa': elisa_store_require,
+          'feed': feed_store_require,
           'picasa': picasa_store_require,
           'twitch': twitch_store_require,
           'youtube': youtube_store_require,
