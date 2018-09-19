@@ -45,11 +45,11 @@ install:
 script:
   - pycodestyle coherence --ignore=E402,W504
   - pylint -E coherence --rcfile=.pylintrc
-  - nosetests --with-coverage --cover-erase --cover-package=coherence --cover-html
+  - nosetests --config=.noserc
   - travis-sphinx build -n --source=docs
 after_success:
   - travis-sphinx deploy
-  - coveralls
+  - coveralls --rcfile=.coveragerc
 #deploy:
 #  provider: pypi
 #  distributions: sdist bdist_wheel

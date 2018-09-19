@@ -1,4 +1,7 @@
+[run]
+omit = tests/*
 [report]
+ignore_errors = True
 omit =
     */python?.?/*
     */site-packages/nose/*
