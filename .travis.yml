@@ -49,7 +49,7 @@ script:
   - travis-sphinx build -n --source=docs
 after_success:
   - travis-sphinx deploy
-  - coveralls --rcfile=.coveragerc
+  - coveralls --config_file .coveragerc
 #deploy:
 #  provider: pypi
 #  distributions: sdist bdist_wheel
