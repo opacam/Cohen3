@@ -2,7 +2,7 @@
 cover-package=coherence
 verbosity=3
 with-xunit=1
-xunit-file=xunit.xml
+xunit-file=coverage.xml
 with-coverage=1
 cover-html=1
 where=tests
