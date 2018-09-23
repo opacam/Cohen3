@@ -20,6 +20,7 @@ from twisted.web.http import datetimeToString
 from twisted.test import proto_helpers
 
 import coherence.extern.louie as louie
+from coherence.upnp.core.utils import to_bytes, to_string
 from coherence import log, SERVER_ID
 
 SSDP_PORT = 1900
@@ -72,8 +73,7 @@ class SSDPServer(DatagramProtocol, log.LogAble):
         """Handle a received multicast datagram."""
         self.debug('datagramReceived: {}'.format(data))
         (host, port) = xxx_todo_changeme
-        if isinstance(data, bytes):
-            data = data.decode('utf-8')
+        data = to_string(data)
         try:
             header, payload = data.split('\r\n\r\n')[:2]
         except ValueError as err:
@@ -207,12 +207,9 @@ class SSDPServer(DatagramProtocol, log.LogAble):
     def send_it(self, response, destination, delay, usn):
         self.info('send discovery response delayed by '
                   '{} for {} to {}'.format(delay, usn, destination))
-        r = response if isinstance(response, bytes) else \
-            response.encode('ascii')
-        d = destination if isinstance(destination, bytes) else \
-            destination.encode('ascii')
         try:
-            self.transport.write(r, d)
+            self.transport.write(
+                to_bytes(response), to_bytes(destination))
         except (AttributeError, socket.error) as msg:
             self.info('failure sending out byebye notification: '
                       '{}'.format(msg))
