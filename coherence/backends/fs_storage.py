@@ -638,7 +638,7 @@ class FSStore(BackendStore):
         louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
 
     def __repr__(self):
-        return str(self.__class__).split('.')[-1]
+        return self.__class__.__name__
 
     def release(self):
         if self.inotify is not None:
