@@ -69,7 +69,7 @@ from coherence.upnp.core import utils
 try:
     from twisted.internet.inotify import (
         INotify, IN_CREATE, IN_DELETE, IN_MOVED_FROM, IN_MOVED_TO,
-        IN_ISDIR, IN_CHANGED)
+        IN_ISDIR, IN_CHANGED, _FLAG_TO_HUMAN)
 except Exception as msg:
     INotify = None
     no_inotify_reason = msg
@@ -847,7 +847,7 @@ class FSStore(BackendStore):
 
     def notify(self, ignore, path, mask, parameter=None):
         self.info("Event %s on %s - parameter %r",
-                  ', '.join(self.inotify.flag_to_human(mask)), path.path,
+                  ', '.join(_FLAG_TO_HUMAN(mask)), path.path,
                   parameter)
 
         if mask & IN_CHANGED:
