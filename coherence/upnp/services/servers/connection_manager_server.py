@@ -14,6 +14,7 @@ from coherence.upnp.core import service
 from coherence.upnp.core.DIDLLite import build_dlna_additional_info
 from coherence.upnp.core.soap_service import UPnPPublisher
 from coherence.upnp.core.soap_service import errorCode
+from coherence.upnp.core.utils import to_string
 
 
 class ConnectionManagerControl(service.ServiceControl, UPnPPublisher):
@@ -186,17 +187,26 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
             return 0
 
     def listchilds(self, uri):
-        if isinstance(uri, bytes):
-            uri = uri.decode('utf-8')
+        uri = to_string(uri)
         cl = ''
         for c in self.children:
+            c = to_string(c)
             cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)
         return cl
 
     def render(self, request):
-        return \
-            '<html><p>root of the ConnectionManager</p>' \
-            '<p><ul>%s</ul></p></html>' % self.listchilds(request.uri)
+        html = """\
+        <html>
+        <head>
+            <title>Cohen3 (ConnectionManagerServer)</title>
+            <link rel="stylesheet" type="text/css" href="/styles/main.css" />
+        </head>
+        <h5>
+            <img class="logo-icon" src="/server-images/coherence-icon.svg">
+            </img>Root of the ConnectionManager</h5>
+        <div class="list"><ul>%s</ul></div>
+        </html>""" % self.listchilds(request.uri)
+        return html.encode('ascii')
 
     def set_variable(self, instance, variable_name, value, default=False):
         if (variable_name == 'SourceProtocolInfo' or

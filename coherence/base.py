@@ -13,6 +13,7 @@ from twisted.internet import defer
 from twisted.internet import reactor
 from twisted.internet.tcp import CannotListenError
 from twisted.web import resource, static
+from twisted.python.util import sibpath
 
 from coherence import __version__
 from coherence import log
@@ -20,6 +21,7 @@ from coherence.extern import louie
 from coherence.upnp.core.device import Device, RootDevice
 from coherence.upnp.core.msearch import MSearch
 from coherence.upnp.core.ssdp import SSDPServer
+from coherence.upnp.core.utils import to_string
 from coherence.upnp.core.utils import Site
 from coherence.upnp.core.utils import get_ip_address, get_host_address
 from coherence.upnp.devices.control_point import ControlPoint
@@ -43,10 +45,16 @@ class SimpleRoot(resource.Resource, log.LogAble):
         log.LogAble.__init__(self)
         self.coherence = coherence
 
+        self.putChild(b'styles',
+                      static.File(sibpath(__file__, 'web/static/styles'),
+                                  defaultType="text/css"))
+        self.putChild(b'server-images',
+                      static.File(sibpath(__file__, 'web/static/images'),
+                                  defaultType="text/css"))
+
     def getChild(self, name, request):
         self.debug('SimpleRoot getChild %s, %s', name, request)
-        if isinstance(name, bytes):
-            name = name.decode('utf-8')
+        name = to_string(name)
         if name == 'oob':
             """ we have an out-of-band request """
             return static.File(
@@ -71,11 +79,11 @@ class SimpleRoot(resource.Resource, log.LogAble):
                     name.encode('ascii'), 'text/html')
 
     def listchilds(self, uri):
-        if isinstance(uri, bytes):
-            uri = uri.decode('utf-8')
+        uri = to_string(uri)
         self.info('listchilds %s', uri)
         if uri[-1] != '/':
             uri += '/'
+
         cl = []
         for child in self.coherence.children:
             device = self.coherence.get_device_with_id(child)
@@ -85,19 +93,44 @@ class SimpleRoot(resource.Resource, log.LogAble):
                     device.get_device_type_version(),
                     device.get_friendly_name()))
 
-        for child in self.children:
-            cl.append('<li><a href=%s%s>%s</a></li>' % (uri, child, child))
+        # We put in a blacklist the styles and server-images folders,
+        # in order to avoid to appear into the generated html list
+        blacklist = ['styles', 'server-images']
+        for c in self.children:
+            c = to_string(c)
+            if c in blacklist:
+                continue
+            cl.append('<li><a href=%s%s>%s</a></li>' % (uri, c, c))
         return "".join(cl)
 
     def render(self, request):
-        result = """<html>
-    <head><title>Coherence</title></head>
-    <body><a href="http://coherence.beebits.net">Coherence</a>
-     - a Python DLNA/UPnP framework for the Digital Living
-    <p>Hosting:<ul>%r</ul></p>
-    </body>
-    </html>""" % self.listchilds(request.uri.encode('utf-8'))
-        return result
+        html = """\
+        <html>
+        <head profile="http://www.w3.org/2005/10/profile">
+            <title>Cohen3 (SimpleRoot)</title>
+            <link rel="stylesheet" type="text/css" href="/styles/main.css"/>
+            <link rel="icon" type="image/png"
+            href="/server-images/coherence-icon.ico"/>
+        </head>
+        <body>
+            <div class="text-center column col-100 bottom-0">
+                <h5>Dlna/UPnP framework</h5>
+                <img id="logo-image"
+                    src="/server-images/coherence-icon.svg"/>
+                <h5>For the Digital Living</h5>
+            </div>
+            <div class="column col-100">
+                    <h6 class="title-head-lines">
+                        <img class="logo-icon"
+                        src="/server-images/coherence-icon.svg"></img>
+                        Hosting:
+                    </h6>
+                <div class="list">
+                    <ul>%s</ul>
+                </div>
+            </div>
+        </body></html>""" % self.listchilds(request.uri)
+        return html.encode('ascii')
 
 
 class WebServer(log.LogAble):
@@ -109,8 +142,9 @@ class WebServer(log.LogAble):
         self.port = reactor.listenTCP(port, self.site)
 
         coherence.web_server_port = self.port.getHost().port
-
-        self.warning("WebServer on port %r ready", coherence.web_server_port)
+        self.warning(
+            "WebServer on ip http://%s:%r ready",
+            coherence.hostname, coherence.web_server_port)
 
 
 class Plugins(log.LogAble):
@@ -358,8 +392,8 @@ class Coherence(log.LogAble):
             self.web_server = WebServer(self.config.get('web-ui', None),
                                         self.web_server_port, self)
         except CannotListenError:
-            self.warning('port %r already in use, aborting!',
-                         self.web_server_port)
+            self.error('port %r already in use, aborting!',
+                       self.web_server_port)
             reactor.stop()
             return
 
