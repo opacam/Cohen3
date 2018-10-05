@@ -37,7 +37,7 @@ h5 { font-size: .83em; }
 h6 { font-size: .75em; }
 
 p {
-    font-size: 1em;
+    font-size: .70em;
     color: #666;
 }
 
@@ -54,6 +54,11 @@ TEXT ALIGN UTILITIES
 
 .text-center {
     text-align: center !important;
+}
+
+.text-justify {
+    text-align: justify !important;
+    text-justify: inter-word !important;
 }
 
 /*
@@ -374,3 +379,60 @@ THE LOGO
 #devices {background-color:  #000;}
 #logging {background-color:  #000;}
 #about {background-color:  #000;}
+
+/*
+Frame for loaded html pages
+*/
+div.frame{
+    width:50%;
+    height:50%;
+    border:solid #000 1px;
+}
+
+/*
+Logging terminal
+*/
+div.log-box {
+    background-color: #346217;
+    min-height: 10em;
+    border: 1px solid #fff;
+}
+
+.log-box p {
+    color: #fff;
+}
+
+.log-info .log-log {
+    color: #fff !important;
+}
+
+.log-warning {
+    color: #E0DD1E !important;
+}
+
+.log-debug {
+    color: #474747 !important;
+}
+
+.log-error {
+    color: #D57515 !important;
+}
+
+.log-critical {
+    color: #D51515 !important;
+}
+
+/*
+Fixed bottom footer
+*/
+.footer p {
+    font-size: .45em;
+    color: #666;
+}
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #232323;
+}

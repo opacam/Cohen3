@@ -501,8 +501,15 @@ class MSRoot(resource.Resource, log.LogAble):
                         except (UnicodeEncodeError, UnicodeDecodeError):
                             title = c.get_name().encode('utf-8').encode(
                                 'string_escape')
-                        page += '<li><a href="%s">%s</a></li>' % \
-                                (path, title)
+                        it_cls = ""
+                        if c.mimetype.startswith('video'):
+                            it_cls = 'class="item-video"'
+                        elif c.mimetype.startswith('audio'):
+                            it_cls = 'class="item-audio"'
+                        elif c.mimetype.startswith('image'):
+                            it_cls = 'class="item-image"'
+                        page += '<li><a %s href="%s">%s</a></li>' % \
+                                (it_cls, path, title)
                 page += """</ul></div>"""
                 page += """</body></html>"""
                 return static.Data(page.encode('ascii'), 'text/html')
@@ -521,7 +528,7 @@ class MSRoot(resource.Resource, log.LogAble):
             path = urllib.parse.quote(item.get_path().encode('utf-8'))
             title = item.get_name().decode(
                 'utf-8', 'xmlcharrefreplace')
-            page += """<p><img src="%s" alt="%s"></p>""" % \
+            page += """<p><img class="item-image" src="%s" alt="%s"></p>""" % \
                     (path, title)
         else:
             pass
