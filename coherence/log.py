@@ -222,7 +222,7 @@ def init(logfilename=None, loglevel=logging.WARN):
             format=LOG_FORMAT)
 
         logger = logging.getLogger()
-        logger = logging.setLevel(loglevel)
+        logger.setLevel(loglevel)
         logger.propagate = False
         loggers['coherence'] = logger
         logger.debug('Added logger with logCategory: {}'.format('coherence'))
