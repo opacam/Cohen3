@@ -55,7 +55,7 @@ youtube_store_require = [
 ]
 
 web_ui_require = [
-    'Nevow'
+    'autobahn'
 ]
 
 gstreamer_player_require = [

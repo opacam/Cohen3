@@ -126,7 +126,7 @@ some extra dependencies:
     - youtube_store:
         - gdata
     - web_ui:
-        - Nevow
+        - autobahn
     - gstreamer_player:
         - pygobject>= 3.30.0
         - pycairo>=1.17.1
