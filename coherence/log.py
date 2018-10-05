@@ -212,7 +212,7 @@ def init(logfilename=None, loglevel=logging.WARN):
     global loggers
     if loggers.get('coherence'):
         log = loggers.get('coherence')
-        log.setLevel(get_main_log_level())
+        log.setLevel(loglevel)
         return log
     else:
         logging.addLevelName(100, 'NONE')
@@ -222,6 +222,7 @@ def init(logfilename=None, loglevel=logging.WARN):
             format=LOG_FORMAT)
 
         logger = logging.getLogger()
+        logger = logging.setLevel(loglevel)
         logger.propagate = False
         loggers['coherence'] = logger
         logger.debug('Added logger with logCategory: {}'.format('coherence'))
