@@ -200,7 +200,8 @@ def parse_http_response(data):
     lines = [x for x in lines if len(x) > 0]
 
     headers = [x.split(':', 1) for x in lines]
-    headers = dict([(x[0].lower().replace("'", ""), x[1].replace("'", "")) for x in headers])
+    headers = dict([(x[0].lower().replace("'", ""),
+                     x[1].replace("'", "")) for x in headers])
 
     return cmd, headers
 
