@@ -411,14 +411,13 @@ ignored-classes=optparse.Values,
         twisted.internet.defer,
         Message,
         INotify,
-        feedparser,
-        nevow.tags
+        feedparser
 
 # List of module names for which member attributes should not be checked
 # (useful for modules/projects where namespaces are manipulated during runtime
 # and thus existing member attributes cannot be deduced by static analysis. It
 # supports qualified module names, as well as Unix pattern matching.
-ignored-modules=gstreamer_renderer,ui,nevow,gdata.photos,gdata.youtube
+ignored-modules=gstreamer_renderer,ui,gdata.photos,gdata.youtube
 
 # Show a hint with possible names when a member name was not found. The aspect
 # of finding the hint is based on edit distance.

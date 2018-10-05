@@ -33,6 +33,7 @@ install:
   - pip install git+git://github.com/opacam/epsilon@python3#egg=Epsilon
   - pip install git+git://github.com/opacam/axiom@python3#egg=Axiom
   - pip install git+https://github.com/dvska/gdata-python3#egg=gdata
+  - pip install autobahn
   - pip install feedparser
   - pip install livestreamer
   - pip install service_identity

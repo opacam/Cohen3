@@ -11,8 +11,10 @@ import traceback
 
 from twisted.internet import defer
 from twisted.internet import reactor
+from twisted.internet import endpoints
 from twisted.internet.tcp import CannotListenError
 from twisted.web import resource, static
+from twisted.python.util import sibpath
 
 from coherence import __version__
 from coherence import log
@@ -20,6 +22,7 @@ from coherence.extern import louie
 from coherence.upnp.core.device import Device, RootDevice
 from coherence.upnp.core.msearch import MSearch
 from coherence.upnp.core.ssdp import SSDPServer
+from coherence.upnp.core.utils import to_string
 from coherence.upnp.core.utils import Site
 from coherence.upnp.core.utils import get_ip_address, get_host_address
 from coherence.upnp.devices.control_point import ControlPoint
@@ -43,10 +46,16 @@ class SimpleRoot(resource.Resource, log.LogAble):
         log.LogAble.__init__(self)
         self.coherence = coherence
 
+        self.putChild(b'styles',
+                      static.File(sibpath(__file__, 'web/static/styles'),
+                                  defaultType="text/css"))
+        self.putChild(b'server-images',
+                      static.File(sibpath(__file__, 'web/static/images'),
+                                  defaultType="text/css"))
+
     def getChild(self, name, request):
         self.debug('SimpleRoot getChild %s, %s', name, request)
-        if isinstance(name, bytes):
-            name = name.decode('utf-8')
+        name = to_string(name)
         if name == 'oob':
             """ we have an out-of-band request """
             return static.File(
@@ -71,11 +80,11 @@ class SimpleRoot(resource.Resource, log.LogAble):
                     name.encode('ascii'), 'text/html')
 
     def listchilds(self, uri):
-        if isinstance(uri, bytes):
-            uri = uri.decode('utf-8')
+        uri = to_string(uri)
         self.info('listchilds %s', uri)
         if uri[-1] != '/':
             uri += '/'
+
         cl = []
         for child in self.coherence.children:
             device = self.coherence.get_device_with_id(child)
@@ -85,19 +94,44 @@ class SimpleRoot(resource.Resource, log.LogAble):
                     device.get_device_type_version(),
                     device.get_friendly_name()))
 
-        for child in self.children:
-            cl.append('<li><a href=%s%s>%s</a></li>' % (uri, child, child))
+        # We put in a blacklist the styles and server-images folders,
+        # in order to avoid to appear into the generated html list
+        blacklist = ['styles', 'server-images']
+        for c in self.children:
+            c = to_string(c)
+            if c in blacklist:
+                continue
+            cl.append('<li><a href=%s%s>%s</a></li>' % (uri, c, c))
         return "".join(cl)
 
     def render(self, request):
-        result = """<html>
-    <head><title>Coherence</title></head>
-    <body><a href="http://coherence.beebits.net">Coherence</a>
-     - a Python DLNA/UPnP framework for the Digital Living
-    <p>Hosting:<ul>%r</ul></p>
-    </body>
-    </html>""" % self.listchilds(request.uri.encode('utf-8'))
-        return result
+        html = """\
+        <html>
+        <head profile="http://www.w3.org/2005/10/profile">
+            <title>Cohen3 (SimpleRoot)</title>
+            <link rel="stylesheet" type="text/css" href="/styles/main.css"/>
+            <link rel="icon" type="image/png"
+            href="/server-images/coherence-icon.ico"/>
+        </head>
+        <body>
+            <div class="text-center column col-100 bottom-0">
+                <h5>Dlna/UPnP framework</h5>
+                <img id="logo-image"
+                    src="/server-images/coherence-icon.svg"/>
+                <h5>For the Digital Living</h5>
+            </div>
+            <div class="column col-100">
+                    <h6 class="title-head-lines">
+                        <img class="logo-icon"
+                        src="/server-images/coherence-icon.svg"></img>
+                        Hosting:
+                    </h6>
+                <div class="list">
+                    <ul>%s</ul>
+                </div>
+            </div>
+        </body></html>""" % self.listchilds(request.uri)
+        return html.encode('ascii')
 
 
 class WebServer(log.LogAble):
@@ -106,11 +140,82 @@ class WebServer(log.LogAble):
     def __init__(self, ui, port, coherence):
         log.LogAble.__init__(self)
         self.site = Site(SimpleRoot(coherence))
-        self.port = reactor.listenTCP(port, self.site)
 
-        coherence.web_server_port = self.port.getHost().port
+        self.endpoint = endpoints.TCP4ServerEndpoint(reactor, port)
+        self._endpoint_listen(coherence, port)
 
-        self.warning("WebServer on port %r ready", coherence.web_server_port)
+    def _endpoint_listen(self, coherence, port):
+        self.endpoint_listen = self.endpoint.listen(self.site)
+
+        def set_listen_port(p):
+            self.endpoint_port = p
+            coherence.web_server_port = port
+            self.warning(
+                "WebServer on ip http://%s:%r ready",
+                coherence.hostname, coherence.web_server_port)
+
+        def clear(whatever):
+            self.endpoint_listen = None
+            return whatever
+        self.endpoint_listen.addCallback(set_listen_port).addBoth(clear)
+
+
+class WebServerUi(WebServer):
+    logCategory = 'webserverui'
+
+    def __init__(self, port, coherence, unittests=False):
+        log.LogAble.__init__(self)
+        self.coherence = coherence
+        from coherence.web.ui import Web, IWeb, WebUI
+        from twisted.web import server, resource
+        from twisted.python.components import registerAdapter
+
+        def resource_factory(original):
+            return WebUI(IWeb, original)
+
+        registerAdapter(resource_factory, Web, resource.IResource)
+
+        self.web_root_resource = WebUI(coherence)
+        if not unittests:
+            site_cls = server.Site
+        else:
+            from tests.web_utils import DummySite
+            site_cls = DummySite
+        self.site = site_cls(self.web_root_resource)
+
+        self.endpoint = endpoints.TCP4ServerEndpoint(reactor, port)
+        self._endpoint_listen(coherence, port)
+
+        self.ws_endpoint = endpoints.TCP4ServerEndpoint(reactor, 9000)
+        self._ws_endpoint_listen(coherence)
+
+    def _endpoint_listen(self, coherence, port):
+        self.endpoint_listen = self.endpoint.listen(self.site)
+
+        def set_listen_port(p):
+            self.endpoint_port = p
+            coherence.web_server_port = port
+            self.warning(
+                "WebServerUi on ip http://%s:%r ready",
+                coherence.hostname, coherence.web_server_port)
+
+        def clear(whatever):
+            self.endpoint_listen = None
+            return whatever
+        self.endpoint_listen.addCallback(set_listen_port).addBoth(clear)
+
+    def _ws_endpoint_listen(self, coherence):
+        self.ws_endpoint_listen = self.ws_endpoint.listen(
+            self.web_root_resource.factory)
+
+        def set_ws_listen_port(p):
+            self.ws_endpoint_port = p
+
+        def clear_ws(whatever):
+            self.ws_endpoint_listen = None
+            return whatever
+        self.ws_endpoint_listen.addCallback(
+            set_ws_listen_port).addBoth(clear_ws)
 
 
 class Plugins(log.LogAble):
@@ -234,7 +339,7 @@ class Coherence(log.LogAble):
 
         self.external_address = None
         self.urlbase = None
-        self.web_server_port = int(config.get('serverport', 0))
+        self.web_server_port = int(config.get('serverport', 8080))
 
         """ Services """
         self.ctrl = None
@@ -253,7 +358,6 @@ class Coherence(log.LogAble):
             logmode = config.get('logging').get('level', 'warning')
         except (KeyError, AttributeError):
             logmode = config.get('logmode', 'warning')
-
         try:
             subsystems = config.get('logging')['subsystem']
             if isinstance(subsystems, dict):
@@ -280,8 +384,9 @@ class Coherence(log.LogAble):
             logfile = config.get('logfile', None)
         log.init(logfile, logmode.upper())
 
-        self.warning("Coherence UPnP framework version %s starting...",
-                     __version__)
+        self.warning(
+            "Coherence UPnP framework version {} starting"
+            " [log level: {}]...".format(__version__, logmode))
 
         network_if = config.get('interface')
         if network_if:
@@ -355,11 +460,15 @@ class Coherence(log.LogAble):
         """
         try:
             # TODO: add ip/interface bind
-            self.web_server = WebServer(self.config.get('web-ui', None),
-                                        self.web_server_port, self)
+            if self.config.get('web-ui', 'no') != 'yes':
+                self.web_server = WebServer(
+                    None, self.web_server_port, self)
+            else:
+                self.web_server = WebServerUi(
+                    self.web_server_port, self, unittests=unittest)
         except CannotListenError:
-            self.warning('port %r already in use, aborting!',
-                         self.web_server_port)
+            self.error('port %r already in use, aborting!',
+                       self.web_server_port)
             reactor.stop()
             return
 
@@ -552,10 +661,20 @@ class Coherence(log.LogAble):
         self.active_backends = {}
 
         """ send service unsubscribe messages """
+        if self.web_server is not None:
+            if hasattr(self.web_server, 'endpoint_listen'):
+                if self.web_server.endpoint_listen is not None:
+                    self.web_server.endpoint_listen.cancel()
+                    self.web_server.endpoint_listen = None
+                if self.web_server.endpoint_port is not None:
+                    self.web_server.endpoint_port.stopListening()
+            if hasattr(self.web_server, 'ws_endpoint_listen'):
+                if self.web_server.ws_endpoint_listen is not None:
+                    self.web_server.ws_endpoint_listen.cancel()
+                    self.web_server.ws_endpoint_listen = None
+                if self.web_server.ws_endpoint_port is not None:
+                    self.web_server.ws_endpoint_port.stopListening()
         try:
-            if self.web_server.port is not None:
-                self.web_server.port.stopListening()
-                self.web_server.port = None
             if hasattr(self.msearch, 'double_discover_loop'):
                 self.msearch.double_discover_loop.stop()
             if hasattr(self.msearch, 'port'):

@@ -1,9 +1,52 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
-import xml.etree.ElementTree as ET
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+"""
+Utils
+=====
+
+Set of utilities to help process the data and the assets of the Cohen3 project.
+It includes several methods which covers different fields, here are grouped by
+his functionality:
+    - encode/decode strings:
+        - :meth:`~coherence.upnp.core.utils.to_string`
+        - :meth:`~coherence.upnp.core.utils.to_bytes`
+    - parse xml/html data:
+        - :meth:`~coherence.upnp.core.utils.parse_xml`
+        - :meth:`~coherence.upnp.core.utils.parse_http`
+        - :meth:`~coherence.upnp.core.utils.de_chunk_payload`
+    - get ip/host:
+        - :meth:`~coherence.upnp.core.utils.get_ip_address`
+        - :meth:`~coherence.upnp.core.utils.get_host_address`
+    - get/download page related:
+        - :meth:`~coherence.upnp.core.utils.getPage`
+        - :meth:`~coherence.upnp.core.utils.downloadPage`
+        - :class:`~coherence.upnp.core.utils.myHTTPPageGetter`
+        - :class:`~coherence.upnp.core.utils.HeaderAwareHTTPClientFactory`
+    - proxy clients and resources:
+        - :class:`~coherence.upnp.core.utils.ProxyClient`
+        - :class:`~coherence.upnp.core.utils.ProxyClientFactory`
+        - :class:`~coherence.upnp.core.utils.ReverseProxyResource`
+        - :class:`~coherence.upnp.core.utils.ReverseProxyUriResource`
+    - file assets:
+        - :attr:`~coherence.upnp.core.utils.StaticFile`
+        - :class:`~coherence.upnp.core.utils.BufferFile`
+        - :class:`~coherence.upnp.core.utils.BufferFileTransfer`
+    - date/time operations:
+        - :class:`~coherence.upnp.core.utils._tz`
+        - :class:`~coherence.upnp.core.utils._CET`
+        - :class:`~coherence.upnp.core.utils._CEST`
+        - :meth:`~coherence.upnp.core.utils.datefaker`
+        - :attr:`~coherence.upnp.core.utils._bdates`
+    - python 2to3 compatibility methods:
+        - :meth:`~coherence.upnp.core.utils.cmp`
+
+"""
+import xml.etree.ElementTree as ET
 from urllib.parse import urlsplit, urlparse
 
 from twisted.internet import reactor, defer, abstract
@@ -30,9 +73,68 @@ except ImportError:
     have_netifaces = False
 
 
+def to_string(x):
+    """
+    This method is a helper function that takes care of converting into a
+    string any string or bytes string or integer. This is useful for
+    decoding twisted responses into the default python 3 string encoding or
+    to get a string representation of an object.
+
+    .. versionadded:: 0.8.2
+
+    .. note:: If the argument passed is not of type str, bytes or int,
+              it will try to get the string representation of the object.
+
+    .. warning:: This is similar to :meth:`~coherence.upnp.core.utils.to_bytes`
+                 but with the difference that the returned result it will be
+                 always a string.
+    """
+    if isinstance(x, str):
+        return x
+    elif isinstance(x, bytes):
+        return x.decode('utf-8')
+    else:
+        return str(x)
+
+
+def to_bytes(x):
+    """
+    This method is a helper function that takes care of converting a string
+    or string of bytes into bytes, needed for most of the write operations for
+    twisted responses. It is useful when we don't know the type of the
+    processed string.
+
+    .. versionadded:: 0.8.2
+
+    .. note:: If the argument passed is not of type str or bytes,
+              it will be ignored, cause some twisted.web operations has the
+              capability to extract the needed bytes string from the object
+              itself via the render method.
+
+    .. warning:: This is similar to :meth:`~coherence.upnp.core.utils.
+                 to_string` but with the difference that the returned result
+                 it could be an object.
+    """
+    if isinstance(x, bytes):
+        return x
+    elif isinstance(x, str):
+        return x.encode('ascii')
+    else:
+        return x
+
+
 def means_true(value):
-    if isinstance(value, str):
-        value = value.lower()
+    """
+    Transform a value representing a boolean into a boolean.
+
+    The valid expressions are:
+        - True or 'True'
+        - 1 or '1'
+        - 'yes' or 'ok'
+
+    .. note:: the string expressions are not case sensitive
+    """
+    value = to_string(value).lower()
     return value in [True, 1, '1', 'true', 'yes', 'ok']
 
 
@@ -51,6 +153,9 @@ generalize_boolean = generalise_boolean
 
 
 def parse_xml(data, encoding="utf-8", dump_invalid_data=False):
+    """
+    Takes an xml string and returns an XML element hierarchy
+    """
     parser = ET.XMLParser()
 
     # my version of twisted.web returns page_infos as a dictionary in
@@ -78,7 +183,13 @@ def parse_xml(data, encoding="utf-8", dump_invalid_data=False):
 
 
 def parse_http_response(data):
-    """ don't try to get the body, there are reponses without """
+    """
+     Takes a response as argument and returns a tuple: cmd, headers
+
+     The first value of the tuple (cmd) will contain the server response and
+     the second one the headers.
+
+     .. note:: don't try to get the body, there are responses without """
     if isinstance(data, bytes):
         data = data.decode('utf-8')
     header = data.split('\r\n\r\n')[0]
@@ -89,14 +200,15 @@ def parse_http_response(data):
     lines = [x for x in lines if len(x) > 0]
 
     headers = [x.split(':', 1) for x in lines]
-    headers = dict([(x[0].lower(), x[1]) for x in headers])
+    headers = dict([(x[0].lower().replace("'", ""),
+                     x[1].replace("'", "")) for x in headers])
 
     return cmd, headers
 
 
 def get_ip_address(ifname):
     """
-    determine the IP address by interface name
+    Determine the IP address by interface name
 
     http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/439094
     (c) Paul Cannon
@@ -235,9 +347,15 @@ def de_chunk_payload(response):
 
 
 class Request(server.Request):
+    """
+    Custom implementation of twisted.web.server.Request which takes care of
+    process data for our needs.
+    """
 
     def process(self):
-        "Process a request."
+        """
+        Process a request.
+        """
 
         # get site from channel
         self.site = self.channel.site
@@ -248,9 +366,7 @@ class Request(server.Request):
         self.setHeader(b'content-type', b"text/html")
 
         # Resource Identification
-        url = self.path
-        if isinstance(url, bytes):
-            url = url.decode('utf-8')
+        url = to_string(self.path)
 
         # remove trailing "/", if ever
         url = url.rstrip('/')
@@ -265,9 +381,8 @@ class Request(server.Request):
             self.postpath = list(i.encode('ascii') for i in raw_p)
         try:
             def deferred_rendering(r):
-                if isinstance(r, str):
-                    r = r.encode('ascii')
-                self.render(r)
+                rb = to_bytes(r)
+                self.render(rb)
 
             resrc = self.site.getResourceFor(self)
             if resrc is None:
@@ -280,8 +395,7 @@ class Request(server.Request):
                 resrc.addCallback(deferred_rendering)
                 resrc.addErrback(self.processingFailed)
             else:
-                if isinstance(resrc, str):
-                    resrc = resrc.encode('ascii')
+                resrc = to_bytes(resrc)
                 self.render(resrc)
 
         except Exception as e:
@@ -290,6 +404,9 @@ class Request(server.Request):
 
 
 class Site(server.Site):
+    """
+    Custom implementation of twisted.web.server.Site.
+    """
     noisy = False
     requestFactory = Request
 
@@ -333,34 +450,30 @@ class ProxyClientFactory(proxy.ProxyClientFactory):
 
 class ReverseProxyResource(proxy.ReverseProxyResource):
     """
-    Resource that renders the results gotten from another server
+    Resource that renders the results gotten from another server.
 
     Put this resource in the tree to cause everything below it to be relayed
     to a different server.
-
-    @ivar proxyClientFactoryClass: a proxy client factory class, used to create
-        new connections.
-    @type proxyClientFactoryClass: L{ClientFactory}
-
-    @ivar reactor: the reactor used to create connections.
-    @type reactor: object providing L{twisted.internet.interfaces.IReactorTCP}
     """
 
     proxyClientFactoryClass = ProxyClientFactory
+    """
+    proxyClientFactoryClass (:obj:`twisted.web.proxy.ProxyClientFactory`):
+    a proxy client factory class, used to create new connections.
+    """
 
     def __init__(self, host, port, path, reactor=reactor):
         """
-        @param host: the host of the web server to proxy.
-        @type host: C{str}
-
-        @param port: the port of the web server to proxy.
-        @type port: C{port}
-
-        @param path: the base path to fetch data from. Note that you shouldn't
-            put any trailing slashes in it, it will be added automatically in
-            request. For example, if you put B{/foo}, a request on B{/bar} will
-            be proxied to B{/foo/bar}.
-        @type path: C{str}
+        Args:
+          host (str): the host of the web server to proxy.
+          port (int): the port of the web server to proxy.
+          path (str): the base path to fetch data from. Note that you shouldn't
+                      put any trailing slashes in it, it will be added
+                      automatically in request. For example, if you put
+                      B{/foo}, a request on B{/bar} will be proxied to
+                      B{/foo/bar}.
+          reactor (:obj:`twisted.internet.interfaces.IReactorTCP`):
+              the reactor used to create connections.
         """
         resource.Resource.__init__(self)
         self.host = host
@@ -467,15 +580,15 @@ def getPage(url, contextFactory=None, *args, **kwargs):
     Download a page. Return a deferred, which will callback with a
     page (as a string) or errback with a description of the error.
 
-    See HTTPClientFactory to see what extra args can be passed.
-    """
-    # This function is like twisted.web.client.getPage, except it uses
-    # our HeaderAwareHTTPClientFactory instead of HTTPClientFactory
-    # and sets the user agent.
+    See `twisted.web.client.HTTPClientFactory to see what extra args can be
+    passed.
 
-    url_bytes = url
-    if not isinstance(url, bytes):
-        url_bytes = url.encode('ascii')
+    .. note:: This function is like `twisted.web.client.getPage`, except it
+              uses our HeaderAwareHTTPClientFactory instead of
+              HTTPClientFactory and sets the user agent.
+    """
+
+    url_bytes = to_bytes(url)
     if args is None:
         args = []
     if kwargs is None:
@@ -490,8 +603,8 @@ def getPage(url, contextFactory=None, *args, **kwargs):
         if k == 'headers':
             new_kwargs[k] = {}
             for kh, vh in kwargs['headers'].items():
-                h_key = kh if isinstance(kh, bytes) else kh.encode('ascii')
-                h_val = vh if isinstance(kh, bytes) else vh.encode('ascii')
+                h_key = to_bytes(kh)
+                h_val = to_bytes(vh)
                 new_kwargs['headers'][h_key] = h_val
         else:
             new_kwargs[k] = v
@@ -507,16 +620,18 @@ def getPage(url, contextFactory=None, *args, **kwargs):
 
 
 def downloadPage(url, file, contextFactory=None, *args, **kwargs):
-    """Download a web page to a file.
-
-    @param file: path to file on filesystem, or file-like object.
-
-    See twisted.web.client.HTTPDownloader to see what extra args can
-    be passed.
     """
-    url_bytes = url
-    if not isinstance(url, bytes):
-        url_bytes = url.encode('ascii')
+    Download a web page to a file.
+
+    Args:
+        url (str or bytes): target url to download.
+        file (str or file-like object): path to file on filesystem, or a
+                                        file-like object.
+
+    .. note:: See `twisted.web.client.HTTPDownloader` to see what extra args
+              can be passed.
+    """
+    url_bytes = to_bytes(url)
 
     if 'headers' in kwargs and 'user-agent' in kwargs['headers']:
         kwargs['agent'] = kwargs['headers']['user-agent']
@@ -527,8 +642,8 @@ def downloadPage(url, file, contextFactory=None, *args, **kwargs):
         if k == 'headers':
             new_kwargs[k] = {}
             for kh, vh in kwargs['headers'].items():
-                h_key = kh if isinstance(kh, bytes) else kh.encode('ascii')
-                h_val = vh if isinstance(kh, bytes) else vh.encode('ascii')
+                h_key = to_bytes(kh)
+                h_val = to_bytes(vh)
                 new_kwargs['headers'][h_key] = h_val
         else:
             new_kwargs[k] = v
@@ -548,9 +663,13 @@ StaticFile = static.File
 
 
 class BufferFile(static.File):
-    """ taken from twisted.web.static and modified
-        accordingly to the patch by John-Mark Gurney
-        http://resnet.uoregon.edu/~gurney_j/jmpc/dist/twisted.web.static.patch
+    """
+    Custom implementation of `twisted.web.static.File` and modified accordingly
+    to the patch by John-Mark Gurney (http://resnet.uoregon.edu/~gurney_j/
+    jmpc/dist/twisted.web.static.patch)
+
+    .. note:: See `twisted.web.static.File` to see what extra args can be
+              passed.
     """
 
     def __init__(self, path, target_size=0, *args):
@@ -595,13 +714,9 @@ class BufferFile(static.File):
             request.setHeader(b'accept-ranges', b'bytes')
 
         if self.type:
-            request.setHeader(
-                b'content-type', self.type if isinstance(
-                    self.type, bytes) else self.type.encode('ascii'))
+            request.setHeader(b'content-type', to_bytes(self.type))
         if self.encoding:
-            request.setHeader(
-                b'content-encoding', self.encoding if isinstance(
-                    self.encoding, bytes) else self.encoding.encode('ascii'))
+            request.setHeader(b'content-encoding', to_bytes(self.encoding))
 
         try:
             f = self.openForReading()
@@ -730,6 +845,9 @@ import random
 
 
 class _tz(tzinfo):
+    """
+    Custom base class for time zone info classes.
+    """
     def utcoffset(self, dt):
         return self._offset
 
@@ -741,11 +859,17 @@ class _tz(tzinfo):
 
 
 class _CET(_tz):
+    """
+    Custom class for time zone representing Central European Time.
+    """
     _offset = timedelta(minutes=60)
     _name = 'CET'
 
 
 class _CEST(_tz):
+    """
+    Custom class for time zone representing Central European Summer Time.
+    """
     _offset = timedelta(minutes=120)
     _name = 'CEST'
 
@@ -759,6 +883,12 @@ _bdates = [datetime(1997, 2, 28, 17, 20, tzinfo=_CET()),  # Sebastian Oliver
 
 
 def datefaker():
+    """
+    Choose a random datetime from :attr:`~coherence.upnp.core.utils._bdates`
+
+    .. note:: Used inside class :class:`~coherence.upnp.core.DIDLLite.Object`,
+              method :meth:`~coherence.upnp.core.DIDLLite.Object.toElement`
+    """
     return random.choice(_bdates)
 
 
@@ -769,5 +899,9 @@ def cmp(x, y):
     Compare the two objects x and y and return an integer according to
     the outcome. The return value is negative if x < y, zero if x == y
     and strictly positive if x > y.
+
+    Args:
+        x (object): An object
+        y (object): Another object to compare with x
     """
     return (x > y) - (x < y)

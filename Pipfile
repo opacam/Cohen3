@@ -28,7 +28,6 @@ six = "==1.11.0"
 "zope.interface" = "==4.5.0"
 Automat = "==0.7.0"
 Louie-latest = "==1.3.1"
-Nevow = "==0.14.4"
 PyHamcrest = "==1.9.0"
 pyOpenSSL = "==18.0.0"
 Twisted = "==18.7.0"
@@ -40,6 +39,7 @@ dbus-python = "*"
 epsilon = {ref = "python3", git = "git://github.com/opacam/epsilon"}
 Axiom = {ref = "python3", git = "git://github.com/opacam/axiom"}
 travis-sphinx = "*"
+autobahn = "*"
 
 [dev-packages]
 pipenv = "==2018.7.1"

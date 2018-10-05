@@ -1,0 +1,70 @@
+<html xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1">
+<head profile="http://www.w3.org/2005/10/profile">
+    <title>COHEN3 - WEB-UI</title>
+    <link rel="stylesheet" type="text/css" href="styles/main.css" />
+    <link rel="icon" type="image/png" href="/server-images/coherence-icon.ico" />
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="js/coherence.js"></script>
+    <script type="text/javascript">
+        $(window).on("load", function(){
+            // Handler when all assets (including images) are loaded
+            console.log("window load ok");
+            openTab('home', $('#but-home'));
+        });
+    </script>
+</head>
+<header>
+    <div id="navbar_menu_box" class="navbar table">
+        <ul t:render="menu"></ul>
+    </div>
+</header>
+<body>
+    <div id="cohen-body">
+        <!-- The Tabs Containers-->
+        <div id="home" class="tabcontent">
+            <div class="row top-2">
+                <div class="text-center">
+                    <h5>dlna/UPnP framework</h5>
+                    <img id="logo-image" src="/server-images/coherence-icon.svg"/>
+                    <h5>for the Digital Living</h5>
+                </div>
+            </div>
+        </div>
+        <div id="devices" class="tabcontent top-0">
+            <h3 class="title-head-lines bottom-1">
+                <span>Devices</span>
+            </h3>
+            <div class="list ">
+                <ul  id="devices-list"></ul>
+            </div>
+            <div class="devices-box"></div>
+        </div>
+        <div id="logging" class="tabcontent top-0">
+            <h3 class="title-head-lines bottom-1">
+                <span>Logging</span>
+            </h3>
+            <div class="log-box"></div>
+        </div>
+        <div id="about" class="tabcontent top-0">
+            <h3 class="title-head-lines bottom-1">
+                <span>About</span>
+            </h3>
+            <div class="text-justify bottom-2">
+                <p>Cohen3 is a DLNA/UPnP Media Server written in Python 3,
+                   providing several UPnP MediaServers and MediaRenderers to make
+                   simple publishing and streaming different types of media content
+                    to your network.</p>
+            </div>
+            <div class="text-center">
+                <img id="logo-image" src="/server-images/coherence-icon.svg"/>
+            </div>
+            <div class="footer">
+                <p class="left-1">Cohen3 version: <p t:render="version"></p>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="js/redirect.js" class="js" id="jsredirect">
+</script>
+</html>

@@ -69,7 +69,7 @@ from coherence.upnp.core import utils
 try:
     from twisted.internet.inotify import (
         INotify, IN_CREATE, IN_DELETE, IN_MOVED_FROM, IN_MOVED_TO,
-        IN_ISDIR, IN_CHANGED)
+        IN_ISDIR, IN_CHANGED, _FLAG_TO_HUMAN)
 except Exception as msg:
     INotify = None
     no_inotify_reason = msg
@@ -638,7 +638,7 @@ class FSStore(BackendStore):
         louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
 
     def __repr__(self):
-        return str(self.__class__).split('.')[-1]
+        return self.__class__.__name__
 
     def release(self):
         if self.inotify is not None:
@@ -847,8 +847,8 @@ class FSStore(BackendStore):
 
     def notify(self, ignore, path, mask, parameter=None):
         self.info("Event %s on %s - parameter %r",
-                  ', '.join(self.inotify.flag_to_human(mask)), path.path,
-                  parameter)
+                  ', '.join([fl for fl in _FLAG_TO_HUMAN if fl[0] == mask][0]),
+                  path.path, parameter)
 
         if mask & IN_CHANGED:
             # FIXME react maybe on access right changes, loss of read rights?

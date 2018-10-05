@@ -9,6 +9,7 @@ from twisted.web import resource
 
 from coherence.upnp.core import service
 from coherence.upnp.core.soap_service import UPnPPublisher
+from coherence.upnp.core.utils import to_string
 
 
 class ScheduledRecordingControl(service.ServiceControl, UPnPPublisher):
@@ -38,15 +39,23 @@ class ScheduledRecordingServer(service.ServiceServer, resource.Resource):
         self.putChild(self.control_url, self.control)
 
     def listchilds(self, uri):
-        if isinstance(uri, bytes):
-            uri = uri.decode('utf-8')
+        uri = to_string(uri)
         cl = ''
         for c in self.children:
+            c = to_string(c)
             cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)
         return cl
 
     def render(self, request):
-        return \
-            '<html><p>root of the ScheduledRecording</p>' \
-            '<p><ul>%s</ul></p></html>' % self.listchilds(
-                request.uri.decode('utf-8'))
+        html = """\
+        <html>
+        <head>
+            <title>Cohen3 (ScheduledRecordingServer)</title>
+            <link rel="stylesheet" type="text/css" href="/styles/main.css" />
+        </head>
+        <h5>
+            <img class="logo-icon" src="/server-images/coherence-icon.svg">
+            </img>Root of the ScheduledRecording</h5>
+        <div class="list"><ul>%s</ul></div>
+        </html>""" % self.listchilds(request.uri)
+        return html.encode('ascii')

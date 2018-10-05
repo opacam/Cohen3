@@ -13,6 +13,7 @@ from twisted.internet import reactor
 
 import coherence.extern.louie as louie
 
+from coherence.upnp.core.utils import to_string
 from coherence import log
 
 
@@ -49,18 +50,29 @@ class DeviceHttpRoot(resource.Resource, log.LogAble):
         return ch
 
     def listchilds(self, uri):
-        if isinstance(uri, bytes):
-            uri = uri.decode('utf-8')
+        uri = to_string(uri)
         cl = ''
         for c in self.children:
+            c = to_string(c)
             cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)
         return cl
 
     def render(self, request):
-        return '<html><p>root of the %s %s</p><p><ul>%s</ul></p></html>' % (
-            self.server.backend.name,
-            self.server.device_type,
+        html = """\
+        <html>
+        <head>
+            <title>Cohen3 (DeviceHttpRoot)</title>
+            <link rel="stylesheet" type="text/css" href="/styles/main.css" />
+        </head>
+        <h5>
+            <img class="logo-icon" src="/server-images/coherence-icon.svg">
+            </img>Root of the %s %s
+        </h5>
+        <div class="list"><ul>%s</ul></div>
+        </html>""" % (
+            self.server.backend.name, self.server.device_type,
             self.listchilds(request.uri))
+        return html.encode('ascii')
 
 
 # class RootDeviceXML(static.Data):

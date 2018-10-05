@@ -1,3 +1,17 @@
+0.8.2 - Fixes and enhancements
+------------------------------
+
+General:
+    - Reintroduces WebUI
+    - Improve documentation
+    - Whole new design for web server html visualization
+
+Fixes:
+    - Fix Inotify events
+    - Fix test_dbus reactors conflict
+    - Fix some travis dependencies
+    - Fix wrong log level for init function of the log module
+
 0.8.1 - Fixes and enhancements
 ------------------------------
 

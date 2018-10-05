@@ -22,6 +22,7 @@ from coherence import log, __version__, __url__, __service_name__
 from coherence.upnp.core import xml_constants
 from coherence.upnp.core.utils import ReverseProxyResource
 from coherence.upnp.core.utils import StaticFile
+from coherence.upnp.core.utils import to_string
 from coherence.upnp.devices.basics import BasicDeviceMixin
 from coherence.upnp.services.servers.connection_manager_server import \
     ConnectionManagerServer
@@ -244,12 +245,10 @@ class MSRoot(resource.Resource, log.LogAble):
 
             def constructConfigData(backend):
                 msg = "<plugin active=\"yes\">"
-                msg += "<backend>" + backend_type.decode('utf-8') if \
-                    isinstance(backend_type, bytes) else \
-                    backend_type + "</backend>"
+                msg += "<backend>" + to_string(backend_type) + "</backend>"
                 for key, value in list(backend.config.items()):
-                    msg += "<" + key + ">" + value.decode('utf-8') if \
-                        isinstance(value, bytes) else value + "</" + key + ">"
+                    msg += "<" + to_string(key) + ">" + to_string(value) + \
+                           "</" + to_string(key) + ">"
                 msg += "</plugin>"
                 return msg.encode('ascii')
 
@@ -453,19 +452,28 @@ class MSRoot(resource.Resource, log.LogAble):
 
     def list_content(self, name, item, request):
         self.info('list_content %s %s %s', name, item, request)
-        page = b"""<html><head><title>%r</title></head><body><p>%r</p>""" % \
-               (item.get_name().encode('ascii', 'xmlcharrefreplace'),
-                item.get_name().encode('ascii', 'xmlcharrefreplace'))
+        page = """\
+        <html>
+            <head><link rel="stylesheet" type="text/css"
+            href="/styles/main.css" />
+                <title>Cohen3 (%s)</title>
+            </head>
+            <body>
+                <h5>
+                    <img class="logo-icon"
+                    src="/server-images/coherence-icon.svg"></img>%s
+                </h5>
+                """ % (item.get_name(), item.get_name())
 
         if (hasattr(item, 'mimetype') and item.mimetype in ['directory',
                                                             'root']):
-            uri = request.uri
-            if uri[-1] != b'/':
-                uri += b'/'
+            uri = to_string(request.uri)
+            if uri[-1] != '/':
+                uri += '/'
 
             def build_page(r, page):
                 # self.debug("build_page", r)
-                page += b"""<ul>"""
+                page += """<div class="list"><ul>"""
                 if r is not None:
                     for c in r:
                         if hasattr(c, 'get_url'):
@@ -475,31 +483,36 @@ class MSRoot(resource.Resource, log.LogAble):
                             #     'utf-8').encode('string_escape')
                             path = c.get_path()
                             if isinstance(path, str):
-                                path = path.encode(
-                                    'ascii', 'xmlcharrefreplace')
+                                pass
                             else:
-                                path = path.decode('utf-8').encode(
-                                    'ascii', 'xmlcharrefreplace')
+                                path = path.decode(
+                                    'utf-8', 'xmlcharrefreplace')
                         else:
-                            path = request.uri.split(b'/')
+                            path = request.uri.split('/')
                             path[-1] = str(c.get_id())
                             path = '/'.join(path)
                         title = c.get_name()
                         try:
                             if isinstance(title, str):
-                                title = title.encode('ascii',
-                                                     'xmlcharrefreplace')
+                                title = title
                             else:
-                                title = title.decode('utf-8').encode(
-                                    'ascii', 'xmlcharrefreplace')
+                                title = title.decode(
+                                    'utf-8', 'xmlcharrefreplace')
                         except (UnicodeEncodeError, UnicodeDecodeError):
                             title = c.get_name().encode('utf-8').encode(
                                 'string_escape')
-                        page += b'<li><a href="%r">%r</a></li>' % \
-                                (path, title)
-                page += b"""</ul>"""
-                page += b"""</body></html>"""
-                return static.Data(page, 'text/html')
+                        it_cls = ""
+                        if c.mimetype.startswith('video'):
+                            it_cls = 'class="item-video"'
+                        elif c.mimetype.startswith('audio'):
+                            it_cls = 'class="item-audio"'
+                        elif c.mimetype.startswith('image'):
+                            it_cls = 'class="item-image"'
+                        page += '<li><a %s href="%s">%s</a></li>' % \
+                                (it_cls, path, title)
+                page += """</ul></div>"""
+                page += """</body></html>"""
+                return static.Data(page.encode('ascii'), 'text/html')
 
             children = item.get_children()
             if isinstance(children, defer.Deferred):
@@ -514,8 +527,8 @@ class MSRoot(resource.Resource, log.LogAble):
             # path = item.get_path().encode('utf-8').encode('string_escape')
             path = urllib.parse.quote(item.get_path().encode('utf-8'))
             title = item.get_name().decode(
-                'utf-8').encode('ascii', 'xmlcharrefreplace')
-            page += """<p><img src="%s" alt="%s"></p>""" % \
+                'utf-8', 'xmlcharrefreplace')
+            page += """<p><img class="item-image" src="%s" alt="%s"></p>""" % \
                     (path, title)
         else:
             pass
@@ -523,14 +536,14 @@ class MSRoot(resource.Resource, log.LogAble):
         return static.Data(page.encode('ascii'), 'text/html')
 
     def listchilds(self, uri):
-        if isinstance(uri, bytes):
-            uri = uri.decode('utf-8')
+        uri = to_string(uri)
         self.info('listchilds %s', uri)
         if uri[-1] != '/':
             uri += '/'
-        cl = '<p><a href=%s0>content</a></p>' % uri
-        cl += '<li><a href=%sconfig>config</a></li>' % uri
+        cl = '<li><a href=%s0>Content</a></li>' % uri
+        cl += '<li><a href=%sconfig>Config</a></li>' % uri
         for c in self.children:
+            c = to_string(c)
             cl += '<li><a href=%s%s>%s</a></li>' % (uri, c, c)
         return cl
 
@@ -540,10 +553,21 @@ class MSRoot(resource.Resource, log.LogAble):
                         'text/html')
 
     def render(self, request):
-        return \
-            '<html><p>root of the %s MediaServer</p>' \
-            '<p><ul>%s</ul></p></html>' % (
-                self.server.backend, self.listchilds(request.uri))
+        html = """\
+        <html>
+        <head>
+            <title>Cohen3 (MSRoot)</title>
+            <link rel="stylesheet" type="text/css" href="/styles/main.css" />
+        </head>
+        <h5>
+            <img class="logo-icon" src="/server-images/coherence-icon.svg">
+            </img>Root of the %s MediaServer</h5>
+        <div class="list">
+            <ul>%s</ul>
+        </div>
+        </html>""" % (self.server.backend,
+                      self.listchilds(request.uri))
+        return html.encode('ascii')
 
 
 class RootDeviceXML(static.Data):

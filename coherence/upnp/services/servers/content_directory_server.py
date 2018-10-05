@@ -15,6 +15,7 @@ from coherence.upnp.core import service
 from coherence.upnp.core.DIDLLite import DIDLElement
 from coherence.upnp.core.soap_service import UPnPPublisher
 from coherence.upnp.core.soap_service import errorCode
+from coherence.upnp.core.utils import to_string
 
 
 class ContentDirectoryControl(service.ServiceControl, UPnPPublisher):
@@ -47,18 +48,26 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         self.set_variable(0, 'ContainerUpdateIDs', '')
 
     def listchilds(self, uri):
-        if isinstance(uri, bytes):
-            uri = uri.decode('utf-8')
+        uri = to_string(uri)
         cl = ''
         for c in self.children:
+            c = to_string(c)
             cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)
         return cl
 
     def render(self, request):
-        return \
-            '<html><p>root of the ContentDirectory</p>' \
-            '<p><ul>%s</ul></p></html>' % self.listchilds(
-                request.uri.decode('utf-8'))
+        html = """\
+        <html>
+        <head>
+            <title>Cohen3 (ContentDirectoryServer)</title>
+            <link rel="stylesheet" type="text/css" href="/styles/main.css" />
+        </head>
+        <h5>
+            <img class="logo-icon" src="/server-images/coherence-icon.svg">
+            </img>Root of the ContentDirectory</h5>
+        <div class="list"><ul>%s</ul></div>
+        </html>""" % self.listchilds(request.uri)
+        return html.encode('ascii')
 
     def upnp_Search(self, *args, **kwargs):
         ContainerID = kwargs['ContainerID']
