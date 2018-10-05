@@ -50,8 +50,8 @@ script:
   - travis-sphinx build -n --source=docs
 after_success:
   - travis-sphinx deploy
-  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
   - coveralls --data_file=.coverage --config_file=.coveragerc
+  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 #deploy:
 #  provider: pypi
 #  distributions: sdist bdist_wheel

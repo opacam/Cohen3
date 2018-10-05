@@ -2,15 +2,45 @@ Cohen3
 ======
 Simple DLNA/UPnP Media Server
 
-.. image:: http://img.shields.io/pypi/v/Cohen3.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/Cohen3
-
-.. image:: http://img.shields.io/pypi/dm/Cohen3.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/Cohen3
-
 .. image:: https://travis-ci.com/opacam/Cohen3.svg?branch=master
     :target: https://travis-ci.com/opacam/Cohen3
 
+.. image:: https://img.shields.io/pypi/status/Cohen3.svg
+    :target: https://pypi.python.org/pypi/Cohen3/
+
+.. image:: https://coveralls.io/repos/github/opacam/Cohen3/badge.svg?branch=master
+    :target: https://coveralls.io/github/opacam/Cohen3?branch=master
+
+.. image:: https://codecov.io/gh/opacam/Cohen3/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/opacam/Cohen3
+
+.. image:: http://img.shields.io/pypi/v/Cohen3.svg?style=flat
+    :target: https://pypi.python.org/pypi/Cohen3
+
+.. image:: https://img.shields.io/github/tag/opacam/Cohen3.svg
+    :alt: GitHub tag
+
+.. image:: https://img.shields.io/github/release/opacam/Cohen3.svg
+    :alt: GitHub release
+
+.. image:: https://img.shields.io/packagist/dm/doctrine/orm.svg?style=flat
+    :alt: Packagist
+    :target: https://pypi.python.org/pypi/Cohen3
+
+.. image:: http://hits.dwyl.io/opacam/Cohen3.svg
+    :target: http://hits.dwyl.io/opacam/Cohen3
+
+.. image:: https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat
+    :target: https://github.com/opacam/Cohen3/issues
+
+.. image:: https://img.shields.io/github/commits-since/opacam/Cohen3/latest.svg
+    :alt: Github commits (since latest release)
+
+.. image:: https://img.shields.io/github/last-commit/opacam/Cohen3.svg
+    :alt: GitHub last commit
+
+.. image:: https://img.shields.io/github/license/opacam/Cohen3.svg
+    :target: https://github.com/opacam/Cohen3/blob/master/LICENSE
 
 Overview
 --------

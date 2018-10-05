@@ -1,19 +1,26 @@
 [paths]
 source = coherence
-
 [run]
 omit =
-    */tests*
-
+    */tests/*
+    */misc/*
+    */docs/*
+    */coherence/backends/*
+    */coherence/extern/*
 [report]
+ignore_errors = True
+omit =
+    */python?.?/*
+    */site-packages/nose/*
+    *__init__*
+    */tests/*
+    */misc/*
+    */docs/*
+    */coherence/backends/*
+    */coherence/extern/*
 exclude_lines =
     pragma: no cover
     def __repr__
     raise NotImplementedError
     if __name__ == .__main__.:
     def parse_args
-ignore_errors = True
-omit =
-    */python?.?/*
-    */site-packages/nose/*
-    *__init__*
