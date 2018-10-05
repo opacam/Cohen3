@@ -1,8 +1,7 @@
 [nosetests]
 cover-package=coherence
 verbosity=3
-with-xunit=1
-xunit-file=xunit.xml
 with-coverage=1
 cover-html=1
-where=tests
+cover-xml=1
+cover-xml-file=coverage.xml
