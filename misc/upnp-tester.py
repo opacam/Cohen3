@@ -37,7 +37,8 @@ try:
 
     class SMTPClient(smtp.ESMTPClient):
 
-        """ build an email message and send it to our googlemail account
+        """
+        Build an email message and send it to our google mail account
         """
 
         def __init__(self, mail_from, mail_to, mail_subject, mail_file, *args,
@@ -99,49 +100,86 @@ from twisted.internet import reactor, defer
 from twisted.web import client
 
 from coherence.base import Coherence
+from os import linesep
 
 
 class UI(basic.LineReceiver):
+    """
+    A basic command line utility to interact with Cohen 3.
+
+    The available commands are::
+
+        $ help
+        $ list
+        $ extract <uuid>
+        $ send <uuid>
+        $ quit <uuid>
+
+    Example::
+
+        from twisted.internet import reactor
+        from twisted.internet import stdio
+        from coherence.base import Coherence
+
+        c = Coherence({'logmode': 'none'})
+        ui = UI()
+        ui.coherence = c
+
+        stdio.StandardIO(ui)
+
+        reactor.run()
+    """
+    delimiter = linesep.encode("ascii")
 
     def connectionMade(self):
         self.print_prompt()
 
+    def rawDataReceived(self, data):
+        pass
+
     def lineReceived(self, line):
+        # print('lineReceived', line)
+        self.sendLine(b'UI: ' + line)
         args = line.strip().split()
+
         if args:
-            cmd = args[0].lower()
+            cmd = args[0].lower().decode('ascii')
+            print(cmd)
             if hasattr(self, 'cmd_%s' % cmd):
                 getattr(self, 'cmd_%s' % (cmd))(args[1:])
-            elif cmd == "?":
+            elif cmd == b"?":
                 self.cmd_help(args[1:])
             else:
-                self.transport.write("""Unknown command '%s'\n""" % (cmd))
+                self.transport.write(b"""Unknown command '%r'\n""" % (cmd))
         self.print_prompt()
 
     def cmd_help(self, args):
         "help -- show help"
         methods = set([getattr(self, x) for x in dir(self) if x[:4] == "cmd_"])
-        self.transport.write("Commands:\n")
+        self.transport.write(b"Commands:\n")
         for method in methods:
             if hasattr(method, '__doc__'):
-                self.transport.write("%s\n" % (method.__doc__))
+                self.transport.write(b"%r\n" % method.__doc__)
 
     def cmd_list(self, args):
         "list -- list devices"
-        self.transport.write("Devices:\n")
+        self.transport.write(b"Devices:\n")
         for d in self.coherence.get_devices():
-            self.transport.write(str("%s %s [%s/%s/%s]\n" % (
-            d.friendly_name, ':'.join(d.device_type.split(':')[3:5]), d.st,
-            d.usn.split(':')[1], d.host)))
+            self.transport.write(
+                ("%s %s [%s/%s/%s]\n" % (
+                    d.friendly_name, ':'.join(
+                        d.device_type.split(':')[3:5]),
+                    d.st,
+                    d.usn.split(':')[1], d.host)).encode('ascii'))
 
     def cmd_extract(self, args):
         "extract <uuid> -- download xml files from device"
         device = self.coherence.get_device_with_id(args[0])
         if device is None:
-            self.transport.write("device %s not found - aborting\n" % args[0])
+            self.transport.write(b"device %s not found - aborting\n" % args[0])
         else:
-            self.transport.write(str("extracting from %s @ %s\n" % (
-            device.friendly_name, device.host)))
+            self.transport.write(b"extracting from %r @ %r\n" % (
+                device.friendly_name, device.host))
             try:
                 l = []
 
@@ -156,18 +194,20 @@ class UI(basic.LineReceiver):
                     for service in workdevice.services:
                         d = client.downloadPage(
                             service.get_scpd_url(),
-                            os.path.join(tmp_dir, '%s-description.xml' %
-                                         service.service_type.split(':', 3)[3]))
+                            os.path.join(
+                                tmp_dir,
+                                '%s-description.xml' %
+                                service.service_type.split(':', 3)[3]))
                         l.append(d)
 
                     for ed in workdevice.devices:
                         device_extract(ed, tmp_dir)
 
                 def finished(result):
-                    self.transport.write(str(
-                        "\nextraction of device %s finished\n"
-                        "files have been saved to /tmp/%s\n" % (
-                            args[0], args[0])))
+                    self.transport.write(
+                        b"\nextraction of device %sr finished\n"
+                        b"files have been saved to /tmp/%r\n" % (
+                            args[0], args[0]))
                     self.print_prompt()
 
                 device_extract(device, '/tmp')
@@ -179,8 +219,11 @@ class UI(basic.LineReceiver):
                     str("problem creating download directory %s\n" % msg))
 
     def cmd_send(self, args):
-        "send <uuid> -- send before extracted xml files to the Coherence home base"
-        if os.path.isdir(os.path.join('/tmp', args[0])) == 1:
+        """
+        send <uuid> -- send before extracted xml files to the Coherence
+        home base
+        """
+        if os.path.isdir(os.path.join('/tmp', args[0].decode('utf-8'))) == 1:
             cwd = os.getcwd()
             os.chdir('/tmp')
             import tarfile
@@ -204,7 +247,7 @@ class UI(basic.LineReceiver):
                     import pwd
                     import socket
                     reactor.connectTCP(
-                        str(mx_list[0].payload.name), 25,
+                        mx_list[0].payload.name, 25,
                         SMTPClientFactory('@'.join(
                             (pwd.getpwuid(posix.getuid())[0],
                              socket.gethostname())),
