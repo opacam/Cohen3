@@ -847,8 +847,8 @@ class FSStore(BackendStore):
 
     def notify(self, ignore, path, mask, parameter=None):
         self.info("Event %s on %s - parameter %r",
-                  ', '.join(_FLAG_TO_HUMAN(mask)), path.path,
-                  parameter)
+                  ', '.join([fl for fl in _FLAG_TO_HUMAN if fl[0] == mask][0]),
+                  path.path, parameter)
 
         if mask & IN_CHANGED:
             # FIXME react maybe on access right changes, loss of read rights?
