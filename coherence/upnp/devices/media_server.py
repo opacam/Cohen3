@@ -502,11 +502,12 @@ class MSRoot(resource.Resource, log.LogAble):
                             title = c.get_name().encode('utf-8').encode(
                                 'string_escape')
                         it_cls = ""
-                        if c.mimetype.startswith('video'):
+                        has_mime = hasattr(c, 'mimetype')
+                        if has_mime and c.mimetype.startswith('video'):
                             it_cls = 'class="item-video"'
-                        elif c.mimetype.startswith('audio'):
+                        elif has_mime and c.mimetype.startswith('audio'):
                             it_cls = 'class="item-audio"'
-                        elif c.mimetype.startswith('image'):
+                        elif has_mime and c.mimetype.startswith('image'):
                             it_cls = 'class="item-image"'
                         page += '<li><a %s href="%s">%s</a></li>' % \
                                 (it_cls, path, title)
