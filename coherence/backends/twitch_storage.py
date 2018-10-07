@@ -137,7 +137,7 @@ class GamesContainer(TwitchLazyContainer):
         self.description = description
 
         self.children_url = '%s/games/top' % TWITCH_API_URL
-        self.sorting_method = sort_by_viewers
+        self.sorting_method = 'viewers'
         self.children_limit = children_limit
 
     def result_handler(self, result, **kwargs):
@@ -166,7 +166,7 @@ class StreamsContainer(TwitchLazyContainer):
 
         self.children_url = streams_url % TWITCH_API_URL
         self.cover_url = cover_url
-        self.sorting_method = sort_by_viewers
+        self.sorting_method = 'viewers'
 
     def result_handler(self, result, **kwargs):
         for stream in result['streams']:
@@ -310,10 +310,6 @@ class TwitchStore(AbstractBackendStore):
                 title=settings.get('name', 'Top Streams'),
                 limit=settings.get('limit', 25))
             root_item.add_child(games_dir)
-
-
-def sort_by_viewers(x, y):
-    return cmp_to_key(y.viewers, x.viewers)
 
 
 def json_loads(data):

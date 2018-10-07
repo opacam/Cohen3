@@ -311,23 +311,9 @@ class IRadioStore(AbstractBackendStore):
                                     self.retrieveItemsForGenre,
                                     genres=same_genres, per_page=1)
 
-        # we will use a specific child items sorter
+        # TODO: Use a specific get_child items sorter
         # in order to get the sub-genre containers first
-        def childs_sort(x, y):
-            if x.__class__ == y.__class__:
-                # same class, we compare the names
-                return utils.cmp(x.name, y.name)
-            else:
-                # the IRadioItem is deemed the lowest item class,
-                # other classes are compared by name (as usual)
-                if isinstance(x, IRadioItem):
-                    return 1
-                elif isinstance(y, IRadioItem):
-                    return -1
-                else:
-                    return utils.cmp(x.name, y.name)
-
-        family_item.sorting_method = childs_sort
+        family_item.sorting_method = 'name'
 
         parent.add_child(family_item, external_id=genre)
         return family_item

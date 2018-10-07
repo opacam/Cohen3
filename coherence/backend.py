@@ -4,7 +4,7 @@
 # http://opensource.org/licenses/mit-license.php
 
 import time
-from functools import cmp_to_key
+from operator import attrgetter
 from abc import ABCMeta, abstractmethod
 
 # Copyright 2007,, Frank Scholz <coherence@beebits.net>
@@ -355,10 +355,7 @@ class Container(BackendItem):
 
         self.sorted = False
 
-        def childs_sort(x, y):
-            return cmp_to_key(x.name, y.name)
-
-        self.sorting_method = childs_sort
+        self.sorting_method = 'name'
 
     def register_child(self, child, external_id=None):
         id = self.store.append_item(child)
@@ -389,7 +386,8 @@ class Container(BackendItem):
     def get_children(self, start=0, end=0):
         if not self.sorted:
             self.children = sorted(
-                self.children.sort, key=cmp_to_key(self.sorting_method))
+                self.children,
+                key=attrgetter(self.sorting_method))
             self.sorted = True
         if end != 0:
             return self.children[start:end]

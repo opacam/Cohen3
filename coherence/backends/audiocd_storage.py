@@ -167,13 +167,7 @@ class AudioCDStore(AbstractBackendStore):
         self.name = self.disc_title
 
         root_item = Container(None, self.disc_title)
-
-        # we will sort the item by "track_number"
-        def childs_sort(x, y):
-            return cmp_to_key(x.track_number, y.track_number)
-
-        root_item.sorting_method = childs_sort
-
+        root_item.sorting_method = "track_number"
         self.set_root_item(root_item)
 
         for number, title in list(tracks.items()):
