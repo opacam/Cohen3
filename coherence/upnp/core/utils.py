@@ -106,21 +106,16 @@ def to_bytes(x):
 
     .. versionadded:: 0.8.2
 
-    .. note:: If the argument passed is not of type str or bytes,
-              it will be ignored, cause some twisted.web operations has the
-              capability to extract the needed bytes string from the object
-              itself via the render method.
-
-    .. warning:: This is similar to :meth:`~coherence.upnp.core.utils.
-                 to_string` but with the difference that the returned result
-                 it could be an object.
+    .. note:: If the argument passed is not of type str or bytes, it will be
+              converted to his string representation and then it will be
+              converted into bytes.
     """
     if isinstance(x, bytes):
         return x
     elif isinstance(x, str):
         return x.encode('ascii')
     else:
-        return x
+        return str(x).encode('ascii')
 
 
 def means_true(value):
