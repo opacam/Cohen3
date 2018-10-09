@@ -390,7 +390,6 @@ class Request(server.Request):
                 resrc.addCallback(deferred_rendering)
                 resrc.addErrback(self.processingFailed)
             else:
-                resrc = to_bytes(resrc)
                 self.render(resrc)
 
         except Exception as e:
