@@ -209,8 +209,8 @@ class Resource(object):
     """An object representing a resource."""
 
     def __init__(self, data=None, protocol_info=None):
-        if isinstance(data, bytes):
-            data = str(data)
+        if not isinstance(data, bytes):
+            data = utils.to_bytes(data)
         self.data = data
         self.protocolInfo = protocol_info
         self.bitrate = None
