@@ -47,9 +47,6 @@ class SOAPProxy(log.LogAble):
 
         self.info("callRemote %r %r %r %r", self.soapaction, soapmethod,
                   self.namespace, self.action)
-        self.debug('\t- arguments: {}'.format(arguments))
-        self.debug('\t- action: {}'.format(self.action))
-        self.debug('\t- namespace: {}'.format(self.namespace))
 
         headers = {'content-type': 'text/xml ;charset="utf-8"',
                    'SOAPACTION': '"{}"'.format(soapaction), }
@@ -57,25 +54,23 @@ class SOAPProxy(log.LogAble):
             headers.update(arguments['headers'])
             del arguments['headers']
 
-        payload = soap_lite.build_soap_call(self.action, arguments,
-                                            ns=self.namespace[1])
-        self.debug('\t- payload: {}'.format(payload))
-
-        self.info("callRemote soapaction:  %s %s", self.action, self.url)
-        self.debug("callRemote payload:  %s", payload)
+        payload = soap_lite.build_soap_call(
+            self.action, arguments, ns=self.namespace[1])
+        self.debug("callRemote payload is:  %s", payload)
 
         def gotError(error, url):
-            self.warning("error requesting url %r", url)
+            self.error("callRemote error requesting url %r" % url)
             self.debug(error)
             try:
-                self.error('\t-> SOAPProxy.callRemote: {}'.format(
-                    error.value.response))
+                self.error('\t-> error.value.response is: %r' %
+                           error.value.response)
                 try:
                     tree = etree.fromstring(error.value.response)
                 except Exception:
                     self.warning(
-                        'SOAPProxy: error on parsing soap result, probably has'
-                        ' encoding declaration, trying with another method...')
+                        'callRemote: error on parsing soap result, probably'
+                        ' has encoding declaration, trying with another'
+                        ' method...')
                     tree = parse_with_lxml(
                         error.value.response, encoding='utf-8')
                 body = tree.find(
