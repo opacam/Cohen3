@@ -22,7 +22,7 @@ from coherence import log, __version__, __url__, __service_name__
 from coherence.upnp.core import xml_constants
 from coherence.upnp.core.utils import ReverseProxyResource
 from coherence.upnp.core.utils import StaticFile
-from coherence.upnp.core.utils import to_string
+from coherence.upnp.core.utils import to_string, to_bytes
 from coherence.upnp.devices.basics import BasicDeviceMixin
 from coherence.upnp.services.servers.connection_manager_server import \
     ConnectionManagerServer
@@ -250,7 +250,7 @@ class MSRoot(resource.Resource, log.LogAble):
                     msg += "<" + to_string(key) + ">" + to_string(value) + \
                            "</" + to_string(key) + ">"
                 msg += "</plugin>"
-                return msg.encode('ascii')
+                return to_bytes(msg)
 
             if request.method in (b'GET', b'HEAD'):
                 # the client wants to retrieve the
@@ -513,7 +513,7 @@ class MSRoot(resource.Resource, log.LogAble):
                                 (it_cls, path, title)
                 page += """</ul></div>"""
                 page += """</body></html>"""
-                return static.Data(page.encode('ascii'), 'text/html')
+                return static.Data(to_bytes(page), 'text/html')
 
             children = item.get_children()
             if isinstance(children, defer.Deferred):
@@ -534,7 +534,7 @@ class MSRoot(resource.Resource, log.LogAble):
         else:
             pass
         page += """</body></html>"""
-        return static.Data(page.encode('ascii'), 'text/html')
+        return static.Data(to_bytes(page), 'text/html')
 
     def listchilds(self, uri):
         uri = to_string(uri)
