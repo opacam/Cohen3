@@ -150,10 +150,9 @@ class Action(log.LogAble):
     def got_results(self, results, instance_id, name):
         instance_id = int(instance_id)
         out_arguments = self.get_out_arguments()
-        self.info("call %s (instance %d) returns %d arguments: %r", name,
+        self.info("call %s (instance %d) returns %d arguments", name,
                   instance_id,
-                  len(out_arguments),
-                  results)
+                  len(out_arguments))
 
         # XXX A_ARG_TYPE_ arguments probably don't need a variable update
         # if len(out_arguments) == 1:

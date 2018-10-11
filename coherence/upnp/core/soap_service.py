@@ -108,7 +108,6 @@ class UPnPPublisher(resource.Resource, log.LogAble):
             self.warning(
                 'UPnPPublisher.render: error on parsing soap result, probably'
                 ' has encoding declaration, trying with another method...')
-            self.warning(data)
             tree = parse_with_lxml(data, encoding='utf-8')
 
         body = tree.find('{http://schemas.xmlsoap.org/soap/envelope/}Body')

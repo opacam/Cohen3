@@ -1146,8 +1146,7 @@ class ServiceControl(log.LogAble):
                     if no:  get StateVariable values and
                         add them to result dict
         """
-        self.debug('get_action_results %s', result)
-        # print 'get_action_results', action, instance
+        self.debug('get_action_results %s %s', action.name, result)
         r = result
         notify = []
         for argument in action.get_out_arguments():
@@ -1169,14 +1168,12 @@ class ServiceControl(log.LogAble):
             self.service.propagate_notification(  # pylint: disable=no-member
                 notify)
 
-        self.info('action_results unsorted %s %s', action.name, r)
         if len(r) == 0:
             return r
 
         ordered_result = OrderedDict()
         for argument in action.get_out_arguments():
             ordered_result[argument.name] = r[argument.name]
-        self.info('action_results sorted %s %s', action.name, ordered_result)
         return ordered_result
 
     def soap__generic(self, *args, **kwargs):
