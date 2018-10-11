@@ -109,16 +109,37 @@ def to_bytes(x):
 
     .. versionadded:: 0.8.2
 
+    .. versionchanged:: 0.8.3
+       Errors will be bypassed with a warning
+
     .. note:: If the argument passed is not of type str or bytes, it will be
               converted to his string representation and then it will be
               converted into bytes.
+
+    .. warning:: If, while encoding, some error is encountered, it will be
+                 bypassed and user will be notified with a log warning. The
+                 conflicting character will be replaced for the symbol "?"
+                 (U+FFFD)
     """
     if isinstance(x, bytes):
         return x
-    elif isinstance(x, str):
-        return x.encode('ascii')
-    else:
+
+    if isinstance(x, str):
+        try:
+            return x.encode('ascii')
+        except UnicodeEncodeError:
+            new_x = x.encode(
+                'ascii', errors='replace')
+    try:
         return str(x).encode('ascii')
+    except UnicodeEncodeError:
+        new_x = str(x).encode(
+            'ascii', errors='replace')
+
+    logger.warning(
+        'to_bytes: Some characters could not be encoded to bytes...those will '
+        'be replaced by the symbol "?" [string before encode is: %r]' % x)
+    return new_x
 
 
 def means_true(value):
