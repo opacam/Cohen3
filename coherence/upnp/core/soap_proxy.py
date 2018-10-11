@@ -7,7 +7,7 @@ from twisted.python import failure
 
 from coherence import log
 from coherence.upnp.core import soap_lite
-from coherence.upnp.core.utils import getPage
+from coherence.upnp.core.utils import getPage, parse_with_lxml
 
 
 class SOAPProxy(log.LogAble):
@@ -68,12 +68,16 @@ class SOAPProxy(log.LogAble):
             self.warning("error requesting url %r", url)
             self.debug(error)
             try:
-                # TODO: Must deal with error handling
-                self.error('\t-> callRemote [type: {}]: {} => {}'.format(
-                    type(error.value.__traceback__),
-                    'error.value.__traceback__',
-                    error.value.__traceback__))
-                tree = etree.fromstring(error.value.__traceback__)
+                self.error('\t-> SOAPProxy.callRemote: {}'.format(
+                    error.value.response))
+                try:
+                    tree = etree.fromstring(error.value.response)
+                except Exception:
+                    self.warning(
+                        'SOAPProxy: error on parsing soap result, probably has'
+                        ' encoding declaration, trying with another method...')
+                    tree = parse_with_lxml(
+                        error.value.response, encoding='utf-8')
                 body = tree.find(
                     '{http://schemas.xmlsoap.org/soap/envelope/}Body')
                 return failure.Failure(Exception("%s - %s" % (

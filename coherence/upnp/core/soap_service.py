@@ -10,6 +10,7 @@ from twisted.web import server, resource
 import coherence.extern.louie as louie
 from coherence import log, SERVER_ID
 from coherence.upnp.core import soap_lite
+from coherence.upnp.core.utils import parse_with_lxml
 
 
 class errorCode(Exception):
@@ -99,7 +100,16 @@ class UPnPPublisher(resource.Resource, log.LogAble):
                 print(c, c.tag)
                 print_c(c)
 
-        tree = etree.fromstring(data)
+        if data == b'':
+            return b'<p>No content to show</p>'
+        try:
+            tree = etree.fromstring(data)
+        except Exception:
+            self.warning(
+                'UPnPPublisher.render: error on parsing soap result, probably'
+                ' has encoding declaration, trying with another method...')
+            self.warning(data)
+            tree = parse_with_lxml(data, encoding='utf-8')
 
         body = tree.find('{http://schemas.xmlsoap.org/soap/envelope/}Body')
         method = body.getchildren()[0]

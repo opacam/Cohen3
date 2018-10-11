@@ -47,6 +47,9 @@ his functionality:
 
 """
 import xml.etree.ElementTree as ET
+from lxml import etree
+from io import BytesIO
+
 from urllib.parse import urlsplit, urlparse
 
 from twisted.internet import reactor, defer, abstract
@@ -151,7 +154,7 @@ def parse_xml(data, encoding="utf-8", dump_invalid_data=False):
     """
     Takes an xml string and returns an XML element hierarchy
     """
-    parser = ET.XMLParser()
+    parser = ET.XMLParser(encoding=encoding)
 
     # my version of twisted.web returns page_infos as a dictionary in
     # the second item of the data list
@@ -159,10 +162,7 @@ def parse_xml(data, encoding="utf-8", dump_invalid_data=False):
     if isinstance(data, (list, tuple)):
         data = data[0]
 
-    try:
-        data = data.encode(encoding)
-    except UnicodeDecodeError:
-        pass
+    data = to_bytes(data)
 
     # Guess from who we're getting this?
     data = data.replace(b'\x00', b'')
@@ -175,6 +175,32 @@ def parse_xml(data, encoding="utf-8", dump_invalid_data=False):
         raise
     else:
         return ET.ElementTree(parser.close())
+
+
+def parse_with_lxml(data, encoding='utf-8'):
+    """
+    Takes an xml string or a response as argument and returns a root tree.
+    This method is similar to :meth:`~coherence.upnp.core.utils.parse_xml` but
+    here we use the lxml module and a custom parser method to return an
+    lxml's ElementTree object.
+
+    .. versionadded:: 0.8.3
+
+    .. note:: This parser allow us to parse successfully some responses which
+              contain encoding defined (ex: soap messages) and also has the
+              ability to parse a broken xml. This method could be useful to
+              parse some small pieces of html code into an xml tree in order
+              to extract some info.
+    """
+    if isinstance(data, (list, tuple)):
+        data = data[0]
+
+    data = to_bytes(data)
+
+    parser = etree.XMLParser(
+        recover=True, encoding=encoding)
+    tree = etree.parse(BytesIO(data), parser)
+    return tree
 
 
 def parse_http_response(data):
