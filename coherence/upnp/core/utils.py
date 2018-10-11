@@ -423,8 +423,7 @@ class Request(server.Request):
             self.postpath = list(i.encode('ascii') for i in raw_p)
         try:
             def deferred_rendering(r):
-                rb = to_bytes(r)
-                self.render(rb)
+                self.render(r)
 
             resrc = self.site.getResourceFor(self)
             if resrc is None:
