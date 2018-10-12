@@ -524,7 +524,7 @@ class ReverseProxyResource(proxy.ReverseProxyResource):
 
     def getChild(self, path, request):
         return ReverseProxyResource(
-            self.host, self.port, self.path + '/' + path)
+            self.host, self.port, self.path + b'/' + path)
 
     def render(self, request):
         """
@@ -533,15 +533,16 @@ class ReverseProxyResource(proxy.ReverseProxyResource):
         # RFC 2616 tells us that we can omit the port if it's the default port,
         # but we have to provide it otherwise
         if self.port == 80:
-            request.received_headers['host'] = self.host
+            host = self.host
         else:
-            request.received_headers['host'] = "%s:%d" % (self.host, self.port)
+            host = self.host + b":" + to_bytes(self.port)
+        request.requestHeaders.setRawHeaders(b"host", [host])
         request.content.seek(0, 0)
         qs = urlparse(request.uri)[4]
-        if qs == '':
+        if qs == b'':
             qs = self.qs
         if qs:
-            rest = self.path + '?' + qs
+            rest = self.path + b'?' + qs
         else:
             rest = self.path
         clientFactory = self.proxyClientFactoryClass(
@@ -561,27 +562,27 @@ class ReverseProxyUriResource(ReverseProxyResource):
     uri = None
 
     def __init__(self, uri, reactor=reactor):
-        self.uri = uri
-        _, host_port, path, params, _ = urlsplit(uri)
-        if host_port.find(':') != -1:
-            host, port = tuple(host_port.split(':'))
+        self.uri = to_bytes(uri)
+        _, host_port, path, params, _ = urlsplit(self.uri)
+        if host_port.find(b':') != -1:
+            host, port = tuple(host_port.split(b':'))
             port = int(port)
         else:
             host = host_port
             port = 80
-        if path == '':
-            path = '/'
-        if params == '':
+        if path == b'':
+            path = b'/'
+        if params == b'':
             rest = path
         else:
-            rest = '?'.join((path, params))
+            rest = b'?'.join((path, params))
         ReverseProxyResource.__init__(self, host, port, rest, reactor)
 
     def resetUri(self, uri):
         self.uri = uri
         _, host_port, path, params, _ = urlsplit(uri)
-        if host_port.find(':') != -1:
-            host, port = tuple(host_port.split(':'))
+        if host_port.find(b':') != -1:
+            host, port = tuple(host_port.split(b':'))
             port = int(port)
         else:
             host = host_port
