@@ -484,9 +484,11 @@ class MSRoot(resource.Resource, log.LogAble):
                             path = c.get_path()
                             if isinstance(path, str):
                                 pass
-                            else:
+                            elif isinstance(path, bytes):
                                 path = path.decode(
                                     'utf-8', 'xmlcharrefreplace')
+                            elif isinstance(path, ReverseProxyResource):
+                                path = to_string(c.url)
                         else:
                             path = request.uri.split('/')
                             path[-1] = str(c.get_id())
