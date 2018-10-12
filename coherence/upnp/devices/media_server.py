@@ -329,7 +329,7 @@ class MSRoot(resource.Resource, log.LogAble):
         self.info("finished, remove %d from connection table", id)
         self.info("finished, sentLength: %d chunked: %d code: %d",
                   request.sentLength, request.chunked, request.code)
-        self.info("finished %r", request.headers)
+        self.info("finished %r", request.responseHeaders)
         self.server.connection_manager_server.remove_connection(id)
 
     def import_file(self, name, request):
