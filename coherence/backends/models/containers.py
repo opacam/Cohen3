@@ -5,8 +5,8 @@
 
 # Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 '''
-Backend Container Models
-------------------------
+Backend models for Container
+----------------------------
 
 Backend container to be used as a container for backend items, used by backend
 store :class:`~coherence.backends.models.stores.BackendBaseStore`.

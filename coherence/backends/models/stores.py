@@ -5,8 +5,8 @@
 
 # Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 '''
-Backend Store Models
---------------------
+Backend models for BackendStore
+-------------------------------
 
 Backend stores to be subclassed. The base class `BackendBaseStore` inherits
 from :class:`~coherence.backend.BackendStore`. The

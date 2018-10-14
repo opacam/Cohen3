@@ -5,8 +5,8 @@
 
 # Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 '''
-Backend Model Items
--------------------
+Backend models for BackendItem
+------------------------------
 
 Backend items to be used directly or subclassed. This classes inherits from
 :class:`~coherence.backend.BackendItem`. This classes should cover the most
