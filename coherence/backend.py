@@ -3,11 +3,12 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
+# Copyright 2007, Frank Scholz <coherence@beebits.net>
+
 import time
 from operator import attrgetter
 from abc import ABCMeta, abstractmethod
 
-# Copyright 2007,, Frank Scholz <coherence@beebits.net>
 from lxml import etree
 
 import coherence.extern.louie as louie
