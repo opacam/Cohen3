@@ -229,9 +229,14 @@ class BackendBaseStore(BackendStore):
             item_id = item_id.split('@', 1)[0]
         elif isinstance(item_id, bytes):
             item_id = item_id.decode('utf-8').split('@', 1)[0]
-        if int(item_id) == self.root_id:
-            return self.container
-        return self.items.get(item_id, None)
+        try:
+            int_id = int(item_id)
+            if int_id == self.root_id:
+                return self.container
+            else:
+                return self.items.get(int_id, None)
+        except Exception:
+            return None
 
     def upnp_init(self):
         '''
