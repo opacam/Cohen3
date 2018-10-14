@@ -12,8 +12,6 @@ Backend items to be used directly or subclassed. This classes inherits from
 :class:`~coherence.backend.BackendItem`. This classes should cover the most
 basic needs for different types of media and goes one step further from the
 :mod:`~coherence.backend` by initializing the corresponding DIDLLite object.
-The :class:`BackendBaseItem`: is the base class for all the backend items and
-depending you needs you may use:
 
 - For video backends:
     - :class:`BackendVideoItem`: item representing a video resource
@@ -25,6 +23,11 @@ depending you needs you may use:
 - For image/photo backends:
     - :class:`BackendImageItem`: item representing a image resource
     - :class:`BackendPhotoItem`: item representing a photo resource
+
+- For create a custom backend:
+    If the items described above does not meet your needs, you can subclass
+    them or you may use the base class :class:`BackendBaseItem`, used to
+    develop all those backend items described above.
 
 .. note:: To write this module, some of the the old backends has been taken
           as a reference:
