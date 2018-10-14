@@ -72,8 +72,8 @@ class BackendContainer(Container):
         self.store = kwargs.get('store', None)
         self.storage_id = kwargs.get('storage_id', None)
 
-        self.item = self.item_cls(id, parent_id, self.name)
-        self.item.childCount = None
+        self.item = self.item_cls(self.id, parent_id, self.name)
+        self.item.childCount = len(self.children)
 
     def __repr__(self):
         return \
