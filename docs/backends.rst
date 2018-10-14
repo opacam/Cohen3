@@ -8,6 +8,10 @@ if this is the case, please, create a new issue at
 `Cohen3 issue tracker <https://github.com/opacam/Cohen3/issues>`_, this way
 there is a chance that the problem could be solved.
 
+If you plan to create your own backend you should check the package
+:ref:`models <coherence.backends.models>` which describes some base classes
+that could help you to develop your own backend.
+
 The available plugins are:
 
     - :ref:`Ampache storage <coherence.backends.ampache>`: *Not tested*

@@ -3,8 +3,24 @@
 coherence.backends (package)
 ============================
 
+The backends package contains a sub package `models` which contains some base,
+classes mean to be used to create a custom Backend.
+
+Subpackages
+-----------
+
+Models to create a custom backend easier.
+
+.. toctree::
+
+    coherence.backends.models
+
 Submodules
 ----------
+
+All Cohen3 available backends. Most of them are BackendStores which allow to
+create a Media Server for specific situations. Check out each module for
+further documentation.
 
 .. _coherence.backends.ampache:
 
