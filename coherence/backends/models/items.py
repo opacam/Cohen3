@@ -63,12 +63,18 @@ class BackendBaseItem(BackendItem):
     '''If the item should be considered a ReverseProxyUriResource. This
     property is automatically set when the item is initialized'''
 
+    location = None
+    '''Represents a file path of our media file, or alternatively a FilePath or
+    a ReverseProxyResource object. It will be set automatically based on the
+    value of the class :attr:`proxy_cls` (if the property :attr:`is_proxy`
+    equals to True).'''
+
     proxy_cls = ReverseProxyUriResource
     '''Define a class inherited from
     :class:`~coherence.upnp.core.utils.ReverseProxyUriResource`. This property
     will only be used if the property :attr:`is_proxy` equals True.
 
-    .. warning:: ReverseProxyUriResource does not support htpps. If your
+    .. warning:: ReverseProxyResource does not support https. If your
                  resources point to a secure site, it's recommended to
                  not enable the :attr:`BackendBaseStore.proxy` (disabled
                  by default)
@@ -120,6 +126,12 @@ class BackendBaseItem(BackendItem):
 
     def get_name(self):
         return self.title
+
+    def get_children(self, start=0, request_count=0):
+        return []
+
+    def get_child_count(self):
+        return 0
 
     def get_path(self):
         if self.is_proxy:
