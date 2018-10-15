@@ -4,155 +4,151 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2008, Benjamin Kampmann <ben.kampmann@googlemail.com>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
-"""
-This is a Media Backend that allows you to access the Trailers from Apple.com
-"""
-from functools import cmp_to_key
+'''
+AppleTrailersStore
+------------------
 
-from lxml import etree
-from twisted.internet import task, reactor
-from twisted.web import client
+This is a Media Backend that allows you to access the Trailers from Apple.com.
 
-from coherence.backend import BackendItem, BackendStore
+Example to run from python script::
+
+    from coherence.base import Coherence
+    from twisted.internet import reactor
+
+    coherence = Coherence(
+        {'logmode': 'info',
+         'plugin': {'backend': 'AppleTrailersStore',
+                    'name': 'Cohen3 AppleTrailersStore',
+                    'proxy': 'no',
+                    },
+         }
+    )
+    reactor.run()
+
+Example to run from console::
+
+    cohen3 --plugin=backend:AppleTrailersStore,proxy:no
+
+.. note:: you need the cohen 3 package installed to run the plugin from
+          a console.
+
+.. versionchanged:: 0.8.3
+   The Container class has been removed
+'''
+
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.utils import ReverseProxyUriResource
-
-XML_URL = "http://www.apple.com/trailers/home/xml/current.xml"
-
-ROOT_ID = 0
+from coherence.backends.models.items import BackendVideoItem
+from coherence.backends.models.stores import BackendVideoStore
 
 
 class AppleTrailerProxy(ReverseProxyUriResource):
+    '''
+    Tha AppleTrailerProxy  ia a Resource that takes
+    care to render the result gotten from our server
+    :class:`~coherence.backends.appletrailers_storage.AppleTrailersStore`
+
+    .. warning:: The ReverseProxyUriResource is not able to handle https
+                 requests, so... better stick to non proxy until properly
+                 handled.
+    '''
 
     def __init__(self, uri):
-        ReverseProxyUriResource.__init__(self, uri)
+        super(AppleTrailerProxy, self).__init__(uri)
 
     def render(self, request):
-        request.received_headers[
-            'user-agent'] = \
-            'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)'
-        return ReverseProxyUriResource.render(self, request)
+        request.requestHeaders.setRawHeaders(
+            b"user-agent",
+            [b'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)'])
+        return super(AppleTrailerProxy, self).render(request)
 
 
-class Trailer(BackendItem):
+class Trailer(BackendVideoItem):
+    '''
+    A backend item object which represents an Apple Trailer.
+    This class will hold all information regarding the trailer.
 
-    def __init__(self, parent_id, urlbase, id=None, name=None, cover=None,
-                 url=None):
-        BackendItem.__init__(self)
-        self.parentid = parent_id
-        self.id = id
-        self.name = name
-        self.cover = cover
-        if len(urlbase) and urlbase[-1] != '/':
-            urlbase += '/'
-        self.url = urlbase + str(self.id)
-        self.location = AppleTrailerProxy(url)
-        self.item = DIDLLite.VideoItem(id, parent_id, self.name)
-        self.item.albumArtURI = self.cover
+    .. versionchanged:: 0.8.3
+       Refactored using the class
+       :class:`~coherence.backends.models.items.BackendVideoItem`
+    '''
+    is_proxy = False
+    proxy_cls = AppleTrailerProxy
+    mimetype = 'video/quicktime'
 
-    def get_path(self):
-        return self.url
+    def __init__(self, parent_id, item_id, urlbase, **kwargs):
+        super(Trailer, self).__init__(
+            parent_id, item_id, urlbase, **kwargs)
 
+        self.runtime = kwargs.get('runtime', None)
+        self.rating = kwargs.get('rating', None)
+        self.post_date = kwargs.get('post_date', None)
+        self.release_date = kwargs.get('release_date', None)
+        self.studio = kwargs.get('studio', None)
 
-class Container(BackendItem):
-    logCategory = 'apple_trailers'
-
-    def __init__(self, id, parent_id, name, store=None,
-                 children_callback=None):
-        BackendItem.__init__(self)
-        self.id = id
-        self.parent_id = parent_id
-        self.name = name
-        self.mimetype = 'directory'
-        self.update_id = 0
-        self.children = []
-
-        self.item = DIDLLite.Container(id, parent_id, self.name)
-        self.item.childCount = None  # self.get_child_count()
-
-    def get_children(self, start=0, end=0):
-        if (end - start > 25 or
-                start - end == start or
-                end - start == 0):
-            end = start + 25
-        if end != 0:
-            return self.children[start:end]
-        return self.children[start:]
-
-    def get_child_count(self):
-        return len(self.children)
-
-    def get_item(self):
-        return self.item
-
-    def get_name(self):
-        return self.name
-
-    def get_id(self):
-        return self.id
+        self.title = '{} [{}]'.format(
+            self.name, self.release_date)
 
 
-class AppleTrailersStore(BackendStore):
+class AppleTrailersStore(BackendVideoStore):
+    '''
+    The media server for Apple Trailers.
+
+    .. versionchanged:: 0.8.3
+       Refactored using the class
+       :class:`~coherence.backends.models.stores.BackendVideoStore`
+    '''
     logCategory = 'apple_trailers'
     implements = ['MediaServer']
 
-    def __init__(self, server, *args, **kwargs):
-        BackendStore.__init__(self, server, **kwargs)
-        self.next_id = 1000
-        self.name = kwargs.get('name', 'Apple Trailers')
-        self.refresh = int(kwargs.get('refresh', 8)) * (60 * 60)
+    upnp_protocols = [
+        'http-get:*:video/quicktime:*',
+        'http-get:*:video/mp4:*']
 
-        self.trailers = {}
+    root_url = b"http://www.apple.com/trailers/home/xml/current.xml"
+    root_find_items = './movieinfo'
+    root_id = 0
 
-        self.wmc_mapping = {'15': 0}
+    item_cls = Trailer
+    item_type = 'http-get:*:video/quicktime:*'
 
-        dfr = self.update_data()
-        # first get the first bunch of data before sending init_completed
-        dfr.addCallback(lambda x: self.init_completed())
+    def parse_item(self, item):
+        info_keys = {
+            'info/title': 'title',
+            'info/director': 'director',
+            'info/runtime': 'runtime',
+            'info/rating': 'rating',
+            'info/postdate': 'post_date',
+            'info/releasedate': 'release_date',
+            'info/studio': 'studio',
+            'info/description': 'description',
+            'poster/location': 'image',
+            'preview/large': 'url',
+            'cast/name': 'actors',
+            'genre/name': 'genres',
+        }
+        has_multiple_values = ['cast/name', 'genre/name']
 
-    def queue_update(self, result):
-        reactor.callLater(self.refresh, self.update_data)
-        return result
+        data = {'id': item.get('id')}
+        for search_key, key in info_keys.items():
+            v = None
+            if search_key not in has_multiple_values:
+                v = item.find('./{}'.format(search_key)).text
+            else:
+                lv = item.findall('./{}'.format(search_key))
+                if isinstance(lv, list):
+                    v = [e.text for e in lv]
+            if v not in [None, '']:
+                data[key] = v
 
-    def update_data(self):
-        dfr = client.getPage(XML_URL)
-        dfr.addCallback(etree.fromstring)
-        dfr.addCallback(self.parse_data)
-        dfr.addCallback(self.queue_update)
-        return dfr
-
-    def parse_data(self, root):
-
-        def iterate(root):
-            for item in root.findall('./movieinfo'):
-                trailer = self._parse_into_trailer(item)
-                yield trailer
-
-        return task.coiterate(iterate(root))
-
-    def _parse_into_trailer(self, item):
-        """
-        info = item.find('info')
-
-        for attr in ('title', 'runtime', 'rating', 'studio', 'postdate',
-                     'releasedate', 'copyright', 'director', 'description'):
-            setattr(trailer, attr, info.find(attr).text)
-        """
-
-        data = {}
-        data['id'] = item.get('id')
-        data['name'] = item.find('./info/title').text
-        data['cover'] = item.find('./poster/location').text
-        data['url'] = item.find('./preview/large').text
-
-        trailer = Trailer(ROOT_ID, self.urlbase, **data)
         duration = None
-        try:
+        if 'runtime' in data:
             hours = 0
             minutes = 0
             seconds = 0
-            duration = item.find('./info/runtime').text
+            duration = data['runtime']
             try:
                 hours, minutes, seconds = duration.split(':')
             except ValueError:
@@ -162,39 +158,31 @@ class AppleTrailersStore(BackendStore):
                     seconds = duration
             duration = "%d:%02d:%02d" % (
                 int(hours), int(minutes), int(seconds))
-        except Exception:
-            pass
-
+        data['duration'] = duration
         try:
-            trailer.item.director = item.find('./info/director').text
+            data['video_size'] = item.find(
+                './preview/large').get('filesize', None)
         except Exception:
-            pass
+            data['video_size'] = None
+        return data
 
-        try:
-            trailer.item.description = item.find('./info/description').text
-        except Exception:
-            pass
+    def add_item(self, data):
+        # print('add_item: {}'.format(data))
+        trailer = super(AppleTrailersStore, self).add_item(data)
 
-        res = DIDLLite.Resource(trailer.get_path(),
-                                'http-get:*:video/quicktime:*')
-        res.duration = duration
-        try:
-            res.size = item.find('./preview/large').get('filesize', None)
-        except Exception:
-            pass
-        trailer.item.res.append(res)
+        trailer.item.res.duration = data['duration']
 
+        # Todo: maybe this should be refactored into BackendVideoStore?
         if self.server.coherence.config.get('transcoding', 'no') == 'yes':
             dlna_pn = 'DLNA.ORG_PN=AVC_TS_BL_CIF15_AAC'
             dlna_tags = DIDLLite.simple_dlna_tags[:]
             dlna_tags[2] = 'DLNA.ORG_CI=1'
             url = self.urlbase + str(trailer.id) + '?transcoded=mp4'
             new_res = DIDLLite.Resource(
-                url,
-                'http-get:*:%s:%s' % (
+                url, 'http-get:*:%s:%s' % (
                     'video/mp4', ';'.join([dlna_pn] + dlna_tags)))
             new_res.size = None
-            res.duration = duration
+            new_res.duration = data['duration']
             trailer.item.res.append(new_res)
 
             dlna_pn = 'DLNA.ORG_PN=JPEG_TN'
@@ -212,35 +200,6 @@ class AppleTrailersStore(BackendStore):
             trailer.item.res.append(new_res)
             if not hasattr(trailer.item, 'attachments'):
                 trailer.item.attachments = {}
-            trailer.item.attachments['poster'] = data['cover']
+            trailer.item.attachments['poster'] = data['image']
 
-        self.trailers[trailer.id] = trailer
         return trailer
-
-    def get_by_id(self, id):
-        try:
-            if int(id) == 0:
-                return self.container
-            else:
-                return self.trailers.get(id, None)
-        except Exception:
-            return None
-
-    def upnp_init(self):
-        if self.server:
-            self.server.connection_manager_server.set_variable(
-                0, 'SourceProtocolInfo',
-                ['http-get:*:video/quicktime:*', 'http-get:*:video/mp4:*'])
-        self.container = Container(ROOT_ID, -1, self.name)
-        trailers = list(self.trailers.values())
-        # trailers.sort(cmp=lambda x, y: cmp(
-        #     x.get_name().lower(), y.get_name().lower()))
-        trailers = sorted(
-            trailers,
-            key=lambda x, y: cmp_to_key(
-                x.get_name().lower(),
-                y.get_name().lower()))
-        self.container.children = trailers
-
-    def __repr__(self):
-        return self.__class__.__name__
