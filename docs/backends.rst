@@ -15,11 +15,11 @@ that could help you to develop your own backend.
 The available plugins are:
 
     - :ref:`Ampache storage <coherence.backends.ampache>`: *Not tested*
-    - :ref:`Appletrailers storage <coherence.backends.appletrailers>`: *Not tested*
+    - :ref:`Appletrailers storage <coherence.backends.appletrailers>`: **WORKING**
     - :ref:`Audiocd storage <coherence.backends.audiocd>`: *Not tested*
     - :ref:`Axiscam storage <coherence.backends.axiscam>`: *Not tested*
     - :ref:`Banshee storage <coherence.backends.banshee>`: *Not tested*
-    - :ref:`BBC storage <coherence.backends.bbc>`: *Not tested*
+    - :ref:`BBC storage <coherence.backends.bbc>`: *NOT WORKING* (bbc shutdown rss service)
     - :ref:`Buzztard storage <coherence.backends.buzztard>`: *Not tested*
     - :ref:`DVBD storage <coherence.backends.dvbd>`: *Not tested*
     - :ref:`Elisa renderer <coherence.backends.elisarenderer>`: *Not tested* (see note 1)
@@ -31,14 +31,14 @@ The available plugins are:
     - :ref:`Gstreamer renderer <coherence.backends.gstreamer\_renderer>`: **WORKING**
     - :ref:`Iradio storage <coherence.backends.iradio>`: *Not tested*
     - :ref:`Itv storage <coherence.backends.itv>`: *Not tested*
-    - :ref:`LastFM storage <coherence.backends.lastfm>`: *Not tested*
+    - :ref:`LastFM storage <coherence.backends.lastfm>`: **NOT WORKING** (service moved to new api...needs update)
     - :ref:`Lolcats storage <coherence.backends.lolcats>`: *Not tested*
     - :ref:`Mediadb storage <coherence.backends.mediadb>`: *Not tested*
     - :ref:`Miroguide storage <coherence.backends.miroguide>`: *Not tested*
     - :ref:`Picasa storage <coherence.backends.picasa>`: **NOT WORKING** (google shutdown this service)
     - :ref:`Playlist storage <coherence.backends.playlist>`: **WORKING**
     - :ref:`SWR3 storage <coherence.backends.swr3>`: *Not tested*
-    - :ref:`Ted storage <coherence.backends.ted>`: *Not tested*
+    - :ref:`Ted storage <coherence.backends.ted>`: **WORKING**
     - :ref:`Test storage <coherence.backends.test>`: *Not tested*
     - :ref:`Tracker storage <coherence.backends.tracker>`: *Not tested*
     - :ref:`Twitch storage <coherence.backends.twitch>`: *Not tested*
