@@ -44,7 +44,7 @@ add_module_names = False
 
 autodoc_default_options = {
     'members': None,
-    'inherited-members': None,
+    # 'inherited-members': None,
     'private-members': None,
     'undoc-members': None,
     'show-inheritance': None
