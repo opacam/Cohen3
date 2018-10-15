@@ -25,8 +25,6 @@ coherence.backends.models.items (module)
 ----------------------------------------
 
 .. automodule:: coherence.backends.models.items
-    :members:
-    :show-inheritance:
 
 .. _coherence.backends.models.containers:
 
@@ -34,9 +32,6 @@ coherence.backends.models.containers (module)
 ---------------------------------------------
 
 .. automodule:: coherence.backends.models.containers
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 .. _coherence.backends.models.stores:
 
@@ -44,6 +39,3 @@ coherence.backends.models.stores (module)
 --------------------------------------------
 
 .. automodule:: coherence.backends.models.stores
-    :members:
-    :undoc-members:
-    :show-inheritance:
