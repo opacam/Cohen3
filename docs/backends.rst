@@ -32,7 +32,7 @@ The available plugins are:
     - :ref:`Iradio storage <coherence.backends.iradio>`: *Not tested*
     - :ref:`Itv storage <coherence.backends.itv>`: *Not tested*
     - :ref:`LastFM storage <coherence.backends.lastfm>`: **NOT WORKING** (service moved to new api...needs update)
-    - :ref:`Lolcats storage <coherence.backends.lolcats>`: *Not tested*
+    - :ref:`Lolcats storage <coherence.backends.lolcats>`: **WORKING**
     - :ref:`Mediadb storage <coherence.backends.mediadb>`: *Not tested*
     - :ref:`Miroguide storage <coherence.backends.miroguide>`: *Not tested*
     - :ref:`Picasa storage <coherence.backends.picasa>`: **NOT WORKING** (google shutdown this service)

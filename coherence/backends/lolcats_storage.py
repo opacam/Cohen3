@@ -4,8 +4,12 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2008, Benjamin Kampmann <ben.kampmann@googlemail.com>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
 """
+LolcatsStore
+------------
+
 This is a Media Backend that allows you to access the cool and cute pictures
 from lolcats.com. This is mainly meant as a Sample Media Backend to learn
 how to write a Media Backend.
@@ -17,23 +21,40 @@ Once again: This is a SIMPLE Media Backend. It does not contain any big
 requests, searches or even transcoding. The only thing we want to do in this
 simple example, is to fetch a rss link on startup, parse it, save it and
 restart the process one hour later again. Well, on top of this, we also want
-to provide these informations as a Media Server in the UPnP/DLNA
+to provide these information as a Media Server in the UPnP/DLNA
 Network of course ;) .
 
-Wow. You are still reading. You must be really interested. Then let's go.
+Wow. You are still reading. You must be really interested. Then let's go...
+check the source code for this backend line by line, you will see that all
+the code has been commented in order to make easier to understand how to
+write a backend: :mod:`coherence.backends.lolcats_storage`
+
+.. note:: For further instructions see the source code for
+          :mod:`coherence.backends.lolcats_storage`
+
+.. warning:: This module has been written commented, as a sample of how to
+             write a custom backend...so...if you plan to create a github pull
+             requests, check our guidelines and only comment stuff that really
+             needs to be noticed and be aware that this module has been written
+             this way in order to make it easier to document and to understand,
+             not as a sample model to create a pull request.
 """
 
-# NOTE:
-# Please don't complain about the coding style of this document - I know.
-# It is just this way to make it easier to document and to understand.
-
 # THE IMPORTS
-# And to parse the RSS-Data (which is XML), we use lxml.etree.fromstring
-from lxml.etree import fromstring
-
-# And we also import the reactor,
+# We import the reactor,
 # that allows us to specify an action to happen later
 from twisted.internet import reactor
+
+# We import the re module to clean up quotes in some html code
+import re
+
+# Import task in order no iterate over
+# items without blocking the application
+from twisted.internet import task
+
+# And to parse the RSS-Data (which is XML), we use
+# our custom function parse_with_lxml
+from coherence.upnp.core.utils import parse_with_lxml
 
 # The data itself is stored in BackendItems.
 # They are also the first things we are going to create.
@@ -44,6 +65,10 @@ from coherence.backend import BackendItem
 #  In this Example it can be understood as the 'Server', the object retrieving
 #  and serving the data.
 from coherence.backend import BackendStore
+
+# And we will store our items into a container which
+# will be the root for all our items
+from coherence.backends.models.containers import BackendContainer
 
 # To make the data 'renderable' we need to define the DIDLite-Class
 # of the Media we are providing. For that we have a bunch of helpers that we
@@ -63,12 +88,17 @@ from coherence.upnp.core.utils import getPage
 # THE MODELS
 # After the download and parsing of the data is done, we want to save it. In
 # this case, we want to fetch the images and store their URL and the title of
-# the image. That is the LolcatsImage class:
+# the image. That is the LolCatsImage class:
 
-class LolcatsImage(BackendItem):
-    # We inherit from BackendItem as it already contains a lot of
-    # helper methods and implementations. For this simple example,
-    #  we only have to fill the item with data.
+class LolCatsImage(BackendItem):
+    '''
+    We inherit from BackendItem as it already contains a lot of
+    helper methods and implementations. For this simple example,
+    we only have to fill the item with data.
+
+    .. versionchanged:: 0.8.3
+        Class has been renamed into camel-case format
+    '''
 
     def __init__(self, parent_id, id, title, url):
         BackendItem.__init__(self)
@@ -97,75 +127,23 @@ class LolcatsImage(BackendItem):
         self.item.res.append(res)
 
 
-class LolcatsContainer(BackendItem):
-    # The LolcatsContainer will hold the reference to all our LolcatsImages.
-    # This kind of BackenedItem is a bit different from the normal BackendItem,
-    # because it has 'children' (the lolcatsimages). Because of that we have
-    # some more stuff to do in here.
-
-    def __init__(self, parent_id, id):
-        BackendItem.__init__(self)
-        # the ids as above
-        self.parent_id = parent_id
-        self.id = id
-
-        # we never have a different name anyway
-        self.name = 'LOLCats'
-
-        # but we need to set it to a certain mimetype to explain it, that we
-        # contain 'children'.
-        self.mimetype = 'directory'
-
-        # As we are updating our data periodically, we increase this value so
-        # that our clients can check easier if something has changed
-        # since their last request.
-        self.update_id = 0
-
-        # that is where we hold the children
-        self.children = []
-
-        # and we need to give a DIDLLite again. This time we want to be
-        # understood as 'Container'.
-        self.item = DIDLLite.Container(id, parent_id, self.name)
-
-        self.item.childCount = None  # will be set as soon as we have images
-
-    def get_children(self, start=0, end=0):
-        # This is the only important implementation thing:
-        #     we have to return our list of children
-        if end != 0:
-            return self.children[start:end]
-        return self.children[start:]
-
-    # there is nothing special in here
-    # FIXME: move it to a base BackendContainer class
-    def get_child_count(self):
-        return len(self.children)
-
-    def get_item(self):
-        return self.item
-
-    def get_name(self):
-        return self.name
-
-    def get_id(self):
-        return self.id
-
-
 # THE SERVER
-# As already said before the implementation of the server is done in an
-# inheritance of a BackendStore. This is where the real code happens (usually).
-# In our case this would be: downloading the page, parsing the content, saving
-# it in the models and returning them on request.
-
 class LolcatsStore(BackendStore):
+    '''
+    The LolcatsStore is a media server. As already said before the
+    implementation of the server is done in an inheritance of a BackendStore.
+    This is where the real code happens (usually). In our case this would be:
+    downloading the page, parsing the content, saving it in the models and
+    returning them on request.
+    '''
+
     # this *must* be set. Because the (most used) MediaServer Coherence also
     # allows other kind of Backends (like remote lights).
     implements = ['MediaServer']
 
     # This is only for this implementation: the http link to the lolcats rss
     # feed that we want to read and parse:
-    rss_url = "http://feeds.feedburner.com/ICanHasCheezburger?format=xml"
+    rss_url = b"https://icanhas.cheezburger.com/lolcats/rss"
 
     # As we are going to build a (very small) tree with the items, we need to
     # define the first (the root) item:
@@ -179,7 +157,7 @@ class LolcatsStore(BackendStore):
         # arguments to the initialization. We receive it here as a dictionary
         # and allow some values to be set:
         #       the name of the MediaServer as it appears in the network
-        self.name = kwargs.get('name', 'Lolcats')
+        self.name = kwargs.get('name', 'LolCats')
 
         # timeout between updates in hours:
         self.refresh = int(kwargs.get('refresh', 1)) * (60 * 60)
@@ -196,7 +174,7 @@ class LolcatsStore(BackendStore):
         self.last_updated = None
 
         # initialize our lolcats container (no parent, this is the root)
-        self.container = LolcatsContainer(None, self.ROOT_ID)
+        self.container = BackendContainer(self.ROOT_ID, -1, self.name)
 
         # but as we also have to return them on 'get_by_id', we have our local
         # store of images per id:
@@ -271,7 +249,7 @@ class LolcatsStore(BackendStore):
     def update_loop(self):
         # in the loop we want to call update_data
         dfr = self.update_data()
-        # aftert it was done we want to take care about updating
+        # after it was done we want to take care about updating
         # the container
         dfr.addCallback(self._update_container)
         # in ANY case queue an update of the data
@@ -284,7 +262,7 @@ class LolcatsStore(BackendStore):
         dfr = getPage(self.rss_url)
 
         # push it through our xml parser
-        dfr.addCallback(fromstring)
+        dfr.addCallback(parse_with_lxml)
 
         # then parse the data into our models
         dfr.addCallback(self.parse_data)
@@ -306,35 +284,67 @@ class LolcatsStore(BackendStore):
         self.container.children = []
         self.images = {}
 
-        # Attention, as this is an example, this code is meant to be as simple
-        # as possible and not as efficient as possible. IMHO the following code
-        # pretty much sucks, because it is totally blocking
-        # (even though we have 'only' 20 elements)
+        def iterate(r):
+            for item in r.findall('./channel/item'):
+                lol_cat = self._parse_into_lol_cat(item)
+                if lol_cat is None:
+                    continue
+                yield lol_cat
 
         # we go through our entries and do something specific to the
-        # lolcats-rss-feed to fetch the data out of it
-        url_item = './{http://search.yahoo.com/mrss/}content'
-        for item in root.findall('./channel/item'):
-            title = item.find('./title').text
-            try:
-                url = item.findall(url_item)[1].get('url', None)
-            except IndexError:
-                continue
+        # lolcats-rss-feed to fetch the data out of it in a non-blocking way
+        return task.coiterate(iterate(root))
 
-            if url is None:
-                continue
+    def _parse_into_lol_cat(self, item):
+        '''
+        Convenient method to extract data from an item, create a LolCatsImage
+        instance and append this into the LolCatsContainer
 
-            image = LolcatsImage(self.ROOT_ID, self.next_id, title, url)
-            self.container.children.append(image)
-            self.images[self.next_id] = image
+        .. versionadded:: 0.8.3
+        '''
+        title = item.find('title').text
+        # Some titles contains non ascii quotes...we fix by replacing it
+        title = re.sub("(\u2018|\u2019)", "'", title)
 
-            # increase the next_id entry every time
-            self.next_id += 1
+        # We parse the html content of the item in order to extract
+        # the image link which is inside of the element parsed below
+        # into form of standard html, that is why we parse again.
+        try:
+            img_html = item.find(
+                '{http://purl.org/rss/1.0/modules/content/}encoded').text
+            img_xml = parse_with_lxml(img_html)
+        except Exception as e:
+            # Something happen when trying to find the link...
+            # so... we skip this item by returning None.
+            self.error('Error on searching lol cat image: {}'.format(e))
+            self.debug('\t - parser fails on:\n{}\n'.format(img_html))
+            return None
+
+        # Now gets the image tag and extract the src property
+        # from the parsed html block in the previous step.
+        url = img_xml.find('img').get('src', None)
+        if url is None:
+            # It seems that we can find the link...so...
+            # again we skip this item by returning None.
+            return None
+
+        # Create the LolCatsImage from the info we just extracted,
+        # we add it into our container and we register into our
+        # self.images dictionary.
+        image = LolCatsImage(self.ROOT_ID, self.next_id, title, url)
+        self.container.children.append(image)
+        self.images[self.next_id] = image
+
+        # increase the next_id entry every time
+        self.next_id += 1
 
         # and increase the container update id and the system update id
         # so that the clients can refresh with the new data
         self.container.update_id += 1
         self.update_id += 1
+
+        # Finally we return the image
+        return image
 
     def queue_update(self, error_or_failure):
         # We use the reactor to queue another updating of our data
