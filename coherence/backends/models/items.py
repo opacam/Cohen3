@@ -206,12 +206,13 @@ class BackendAudioItem(BackendBaseItem):
         self.item.albumArtURI = self.image
 
     def __repr__(self):
+        album = 'None' if not self.album else self.album.title
         return \
             '<BackendAudioItem {id} title="{title}" ' \
             'album={album}" genre="{genre}" artist="{artist}" ' \
             'path="{path}">'.format(
-                id=self.id, title=self.title, album=self.album.title,
-                genre=self.genre, artist=self.album.artist.name,
+                id=self.id, title=self.title, album=album,
+                genre=self.genre, artist=self.artist,
                 path=self.get_path())
 
 
@@ -230,13 +231,14 @@ class BackendMusicTrackItem(BackendAudioItem):
         self.item.originalTrackNumber = self.track_number
 
     def __repr__(self):
+        album = 'None' if not self.album else self.album.title
         return \
             '<BackendMusicTrackItem {id} title="{title}" ' \
             'track="{track}" album={album}" genre="{genre}" ' \
             'artist="{artist}" path="{path}">'.format(
                 id=self.id, title=self.title, track=self.track_number,
-                album=self.album.title, genre=self.genre,
-                artist=self.album.artist.name, path=self.get_path())
+                album=album, genre=self.genre,
+                artist=self.artist, path=self.get_path())
 
 
 class BackendImageItem(BackendBaseItem):
