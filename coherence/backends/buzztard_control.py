@@ -57,10 +57,10 @@ class BzFactory(protocol.ClientFactory, log.LogAble):
         self.backend = backend
 
     def clientConnectionFailed(self, connector, reason):
-        self.error('connection failed: %s', reason.getErrorMessage())
+        self.error(f'connection failed: {reason.getErrorMessage()}')
 
     def clientConnectionLost(self, connector, reason):
-        self.error('connection lost: %s', reason.getErrorMessage())
+        self.error(f'connection lost: {reason.getErrorMessage()}')
 
     def startFactory(self):
         self.messageQueue = []
@@ -138,7 +138,7 @@ class BuzztardItem(log.LogAble):
         self.child_count = 0
         self.children = []
 
-        if (len(urlbase) and urlbase[-1] != '/'):
+        if len(urlbase) and urlbase[-1] != '/':
             urlbase += '/'
 
         # self.url = urlbase + str(self.id)
@@ -147,19 +147,17 @@ class BuzztardItem(log.LogAble):
         if self.mimetype == 'directory':
             self.update_id = 0
         else:
-            res = Resource(self.url, 'internal:%s:%s:*' % (
-                host, self.mimetype))
+            res = Resource(self.url, f'internal:{host}:{self.mimetype}:*')
             res.size = None
             self.item.res.append(res)
             self.item.artist = self.parent.name
 
     def __del__(self):
-        self.debug("BuzztardItem __del__ %s %s", self.id, self.name)
+        self.debug(f'BuzztardItem __del__ {self.id} {self.name}')
         pass
 
     def remove(self, store):
-        self.debug("BuzztardItem remove %s %s %s", self.id, self.name,
-                   self.parent)
+        self.debug(f"BuzztardItem remove {self.id} {self.name} {self.parent}")
         while len(self.children) > 0:
             child = self.children.pop()
             self.remove_child(child)
@@ -181,8 +179,9 @@ class BuzztardItem(log.LogAble):
             self.update_id += 1
 
     def remove_child(self, child):
-        self.debug("remove_from %d (%s) child %d (%s)", self.id,
-                   self.get_name(), child.id, child.get_name())
+        self.debug(
+            f"remove_from {self.id:d} ({self.get_name()}) "
+            f"child {child.id:d} ({child.get_name()})")
         if child in self.children:
             self.child_count -= 1
             if isinstance(self.item, Container):
@@ -448,7 +447,7 @@ class BuzztardPlayer(log.LogAble):
         self.buzztard.connection.sendMessage('status')
 
     def load(self, uri, metadata=None):
-        self.debug("load %s %s", uri, metadata)
+        self.debug(f'load {uri} {metadata}')
         self.duration = None
         self.metadata = metadata
         connection_id = self.server.connection_manager_server.lookup_avt_id(
@@ -483,7 +482,7 @@ class BuzztardPlayer(log.LogAble):
         id = '0'
         if ':' in label_id:
             label, id = label_id.split(':')
-        self.buzztard.connection.sendMessage('play|%s' % id)
+        self.buzztard.connection.sendMessage(f'play|{id}')
 
     def pause(self):
         self.buzztard.connection.sendMessage('pause')
@@ -536,12 +535,12 @@ class BuzztardPlayer(log.LogAble):
             volume = 0
         if volume > 100:
             volume = 100
-        self.buzztard.connection.sendMessage('set|volume|%d' % volume)
+        self.buzztard.connection.sendMessage(f'set|volume|{volume:d}')
 
     def upnp_init(self):
         self.current_connection_id = None
         self.server.connection_manager_server.set_variable(
-            0, 'SinkProtocolInfo', ['internal:%s:audio/mpeg:*' % self.host],
+            0, 'SinkProtocolInfo', [f'internal:{self.host}:audio/mpeg:*'],
             default=True)
         self.server.av_transport_server.set_variable(
             0, 'TransportState', 'NO_MEDIA_PRESENT', default=True)
