@@ -69,7 +69,7 @@ class ElisaPlayer(log.LogAble, Plugin):
         self.poll_LC = LoopingCall(self.poll_player)
 
     def call_player(self, method, callback, *args):
-        self.debug('call player.%s%s', method, args)
+        self.debug(f'call player.{method}{args}')
         if self.host == 'internal':
             dfr = Deferred()
             dfr.addCallback(callback)
@@ -86,7 +86,7 @@ class ElisaPlayer(log.LogAble, Plugin):
     def poll_player(self):
 
         def got_result(result):
-            self.info("poll_player %r", result)
+            self.info(f"poll_player {result!r}")
             if self.server is not None:
                 connection_id = \
                     self.server.connection_manager_server.lookup_avt_id(
@@ -111,7 +111,7 @@ class ElisaPlayer(log.LogAble, Plugin):
 
     def query_position(self):
         def got_result(result):
-            self.info("query_position %s", result)
+            self.info(f"query_position {result}")
             position, duration = result
             if self.server is not None:
                 connection_id = \
@@ -126,10 +126,10 @@ class ElisaPlayer(log.LogAble, Plugin):
                 if self.server is not None:
                     self.server.av_transport_server.set_variable(
                         connection_id, 'RelativeTimePosition',
-                        '%02d:%02d:%02d' % (h, m, s))
+                        f'{h:02d}:{m:02d}:{s:02d}')
                     self.server.av_transport_server.set_variable(
                         connection_id, 'AbsoluteTimePosition',
-                        '%02d:%02d:%02d' % (h, m, s))
+                        f'{h:02d}:{m:02d}:{s:02d}')
 
             if duration is not None:
                 m, s = divmod(duration / 1000000000, 60)
@@ -138,18 +138,18 @@ class ElisaPlayer(log.LogAble, Plugin):
                 if self.server is not None:
                     self.server.av_transport_server.set_variable(
                         connection_id, 'CurrentTrackDuration',
-                        '%02d:%02d:%02d' % (h, m, s))
+                        f'{h:02d}:{m:02d}:{s:02d}')
                     self.server.av_transport_server.set_variable(
                         connection_id, 'CurrentMediaDuration',
-                        '%02d:%02d:%02d' % (h, m, s))
+                        f'{h:02d}:{m:02d}:{s:02d}')
 
                 if self.duration is None:
                     if self.metadata is not None:
                         elt = DIDLLite.DIDLElement.fromString(self.metadata)
                         for item in elt.getItems():
                             for res in item.findall('res'):
-                                res.attrib['duration'] = "%d:%02d:%02d" % (
-                                    h, m, s)
+                                res.attrib['duration'] = \
+                                    f"{h:d}:{m:02d}:{s:02d}"
                         self.metadata = elt.toString()
 
                         if self.server is not None:
@@ -250,7 +250,7 @@ class ElisaPlayer(log.LogAble, Plugin):
 
     def get_mute(self):
         def got_infos(result):
-            self.info("got_mute: %r", result)
+            self.info(f"got_mute: {result!r}")
             return result
 
         return self.call_player("get_mute", got_infos)
@@ -260,7 +260,7 @@ class ElisaPlayer(log.LogAble, Plugin):
         """
 
         def got_infos(result):
-            self.info("got_volume: %r", result)
+            self.info(f"got_volume: {result!r}")
             return result
 
         return self.call_player('get_volume', got_infos)
@@ -285,7 +285,7 @@ class ElisaPlayer(log.LogAble, Plugin):
         self.current_connection_id = None
         self.server.connection_manager_server.set_variable(
             0, 'SinkProtocolInfo',
-            ['internal:%s:*:*' % self.host, 'http-get:*:audio/mpeg:*'],
+            [f'internal:{self.host}:*:*', 'http-get:*:audio/mpeg:*'],
             default=True)
         self.server.av_transport_server.set_variable(
             0, 'TransportState', 'NO_MEDIA_PRESENT', default=True)
