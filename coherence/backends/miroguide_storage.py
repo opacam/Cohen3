@@ -122,7 +122,7 @@ class MiroGuideStore(AbstractBackendStore):
             if self.proxy_mode != 'redirect':
                 os.mkdir(self.cache_directory)
         except Exception as e:
-            self.error('MiroGuideStore.__init__: %r' % e)
+            self.error(f'MiroGuideStore.__init__: {e!r}')
         self.cache_maxsize = kwargs.get('cache_maxsize', 100000000)
         self.buffer_size = kwargs.get('buffer_size', 750000)
 
@@ -205,7 +205,7 @@ class MiroGuideStore(AbstractBackendStore):
         if self.server:
             self.server.connection_manager_server.set_variable(
                 0, 'SourceProtocolInfo',
-                ['http-get:*:%s:*' % 'video/'],
+                [f'http-get:*:{"video/"}:*'],
                 # FIXME put list of all possible video mimetypes
                 default=True)
 
@@ -219,16 +219,16 @@ class MiroGuideStore(AbstractBackendStore):
         if count == 0:
             limit = per_page
         uri = \
-            "https://www.miroguide.com/api/get_channels?" \
-            "limit=%d&offset=%d&filter=%s&filter_value=%s&sort=%s" % (
-                limit, offset, filter, filter_value, sort)
+            f"https://www.miroguide.com/api/get_channels?" \
+            f"limit={limit:d}&offset={offset:d}&filter={filter}&" \
+            f"filter_value={filter_value}&sort={sort}"
         # print uri
         d = utils.getPage(uri)
 
         def gotChannels(result):
             if result is None:
                 print(
-                    "Unable to retrieve channel for category %s" % filter)
+                    f"Unable to retrieve channel for category {filter}")
                 return
             data, header = result
             channels = eval(data)
@@ -248,18 +248,18 @@ class MiroGuideStore(AbstractBackendStore):
                 parent.childrenRetrievingNeeded = True
 
         def gotError(error):
-            print("ERROR: %s" % error)
+            print(f"ERROR: {error}")
 
         d.addCallbacks(gotChannels, gotError)
         return d
 
     def retrieveChannelItems(self, parent, channel_id):
-        uri = "https://www.miroguide.com/api/get_channel?id=%s" % channel_id
+        uri = f"https://www.miroguide.com/api/get_channel?id={channel_id}"
         d = utils.getPage(uri)
 
         def gotItems(result):
             if result is None:
-                print("Unable to retrieve items for channel %s" % channel_id)
+                print(f"Unable to retrieve items for channel {channel_id}")
                 return
             data, header = result
             channel = eval(data)
@@ -282,7 +282,7 @@ class MiroGuideStore(AbstractBackendStore):
                 parent.add_child(item, external_id=url)
 
         def gotError(error):
-            print("ERROR: %s" % error)
+            print(f"ERROR: {error}")
 
         d.addCallbacks(gotItems, gotError)
         return d
