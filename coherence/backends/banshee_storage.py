@@ -247,8 +247,9 @@ class Artist(BackendItem):
         return f"artist.{self.itemID:d}"
 
     def __repr__(self):
-        return f'<Artist {self.itemID:d} name="{self.name}" ' \
-               f'musicbrainz="{self.musicbrainz_id}">'
+        return \
+            f'<Artist {self.itemID:d} name="{self.name}" ' \
+            f'musicbrainz="{self.musicbrainz_id}">'
 
 
 class Album(BackendItem):
@@ -363,8 +364,9 @@ class BasePlaylist(BackendItem):
         return f"{self.id_type}.{self.db_id:d}"
 
     def __repr__(self):
-        return f'<{self.__class__.__name__} ' \
-               f'{self.db_id:d} title="{self.title}">'
+        return \
+            f'<{self.__class__.__name__} ' \
+            f'{self.db_id:d} title="{self.title}">'
 
     def get_children(self, start=0, request_count=0):
         tracks = []

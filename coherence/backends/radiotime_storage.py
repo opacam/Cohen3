@@ -93,9 +93,10 @@ class RadiotimeStore(AbstractBackendStore):
         else:
             identification_param = f"serial={self.serial}"
         formats_value = DEFAULT_FORMAT
-        root_url = f"{self.browse_url}?partnerId={self.partner_id}&" \
-                   f"{identification_param}&formats={formats_value}&" \
-                   f"locale={self.locale}"
+        root_url = \
+            f"{self.browse_url}?partnerId={self.partner_id}&" \
+            f"{identification_param}&formats={formats_value}&" \
+            f"locale={self.locale}"
 
         # set root item
         root_item = LazyContainer(None, "root", "root", self.refresh,

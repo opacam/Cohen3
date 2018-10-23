@@ -74,8 +74,9 @@ class FlickrAuthenticate(object):
         api_sig = ''.join(
             (api_secret, 'api_key', api_key, 'frob', frob, 'perms', perms))
         api_sig = md5(api_sig)
-        login_url = f"http://flickr.com/services/auth/?api_key={api_key}&" \
-                    f"perms={perms}&frob={frob}&api_sig={api_sig}"
+        login_url =\
+            f"http://flickr.com/services/auth/?api_key={api_key}&" \
+            f"perms={perms}&frob={frob}&api_sig={api_sig}"
         browser.open(login_url)
         browser.select_form(name='login_form')
         browser['login'] = userid

@@ -160,7 +160,7 @@ class AppleTrailersStore(BackendVideoStore):
         try:
             data['video_size'] = item.find(
                 './preview/large').get('filesize', None)
-        except Exception :
+        except Exception:
             data['video_size'] = None
         return data
 

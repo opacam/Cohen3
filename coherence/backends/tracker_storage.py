@@ -873,13 +873,13 @@ class TrackerStore(BackendStore):
                  'http-get:*:video/mpeg:*',
                  f'internal:{self.server.coherence.hostname}:video/mpeg:*',
                  'http-get:*:video/x-msvideo:*',
-                 f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',
+                 f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',  # noqa
                  'http-get:*:video/avi:*',
                  f'internal:{self.server.coherence.hostname}:video/avi:*',
                  'http-get:*:video/mp4:*',
                  f'internal:{self.server.coherence.hostname}:video/mp4:*',
                  'http-get:*:video/quicktime:*',
-                 f'internal:{self.server.coherence.hostname}:video/quicktime:*',
+                 f'internal:{self.server.coherence.hostname}:video/quicktime:*',  # noqa
                  'http-get:*:image/jpg:*',
                  f'internal:{self.server.coherence.hostname}:image/jpg:*',
                  'http-get:*:image/png:*',

@@ -177,7 +177,7 @@ class YamjStore(AbstractBackendStore):
                 0, 'SourceProtocolInfo',
                 [f'internal:{self.server.coherence.hostname}:video/mp4:*',
                  'http-get:*:video/mp4:*',
-                 f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',
+                 f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',  # noqa
                  'http-get:*:video/x-msvideo:*',
                  f'internal:{self.server.coherence.hostname}:video/mpeg:*',
                  'http-get:*:video/mpeg:*',
@@ -185,7 +185,7 @@ class YamjStore(AbstractBackendStore):
                  'http-get:*:video/avi:*',
                  f'internal:{self.server.coherence.hostname}:video/divx:*',
                  'http-get:*:video/divx:*',
-                 f'internal:{self.server.coherence.hostname}:video/quicktime:*',
+                 f'internal:{self.server.coherence.hostname}:video/quicktime:*',  # noqa
                  'http-get:*:video/quicktime:*'],
                 default=True)
             self.server.content_directory_server.set_variable(
@@ -241,8 +241,9 @@ class YamjStore(AbstractBackendStore):
             counter = 1
         else:
             counter = abs(offset / self.nbMoviesPerFile) + 1
-        fileUrl = f"{self.jukebox_url}/" \
-                  f"{urllib.parse.quote(root_name)}_{counter:d}.xml"
+        fileUrl = \
+            f"{self.jukebox_url}/{urllib.parse.quote(root_name)}" \
+            f"_{counter:d}.xml"
 
         def fail_readPage(f):
             self.warning(f"failure reading yamj index ({fileUrl}): "
