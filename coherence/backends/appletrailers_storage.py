@@ -88,8 +88,7 @@ class Trailer(BackendVideoItem):
         self.release_date = kwargs.get('release_date', None)
         self.studio = kwargs.get('studio', None)
 
-        self.title = '{} [{}]'.format(
-            self.name, self.release_date)
+        self.title = f'{self.name} [{self.release_date}]'
 
 
 class AppleTrailersStore(BackendVideoStore):
@@ -135,9 +134,9 @@ class AppleTrailersStore(BackendVideoStore):
         for search_key, key in info_keys.items():
             v = None
             if search_key not in has_multiple_values:
-                v = item.find('./{}'.format(search_key)).text
+                v = item.find(f'./{search_key}').text
             else:
-                lv = item.findall('./{}'.format(search_key))
+                lv = item.findall(f'./{search_key}')
                 if isinstance(lv, list):
                     v = [e.text for e in lv]
             if v not in [None, '']:
@@ -156,13 +155,12 @@ class AppleTrailersStore(BackendVideoStore):
                     minutes, seconds = duration.split(':')
                 except ValueError:
                     seconds = duration
-            duration = "%d:%02d:%02d" % (
-                int(hours), int(minutes), int(seconds))
+            duration = f"{int(hours):d}:{int(minutes):02d}:{int(seconds):02d}"
         data['duration'] = duration
         try:
             data['video_size'] = item.find(
                 './preview/large').get('filesize', None)
-        except Exception:
+        except Exception :
             data['video_size'] = None
         return data
 
@@ -179,8 +177,8 @@ class AppleTrailersStore(BackendVideoStore):
             dlna_tags[2] = 'DLNA.ORG_CI=1'
             url = self.urlbase + str(trailer.id) + '?transcoded=mp4'
             new_res = DIDLLite.Resource(
-                url, 'http-get:*:%s:%s' % (
-                    'video/mp4', ';'.join([dlna_pn] + dlna_tags)))
+                url,
+                f'http-get:*:{"video/mp4"}:{";".join([dlna_pn] + dlna_tags)}')
             new_res.size = None
             new_res.duration = data['duration']
             trailer.item.res.append(new_res)
@@ -192,9 +190,8 @@ class AppleTrailersStore(BackendVideoStore):
             url = self.urlbase + str(
                 trailer.id) + '?attachment=poster&transcoded=thumb&type=jpeg'
             new_res = DIDLLite.Resource(
-                url, 'http-get:*:%s:%s' % (
-                    'image/jpeg',
-                    ';'.join([dlna_pn] + dlna_tags)))
+                url,
+                f'http-get:*:{"image/jpeg"}:{";".join([dlna_pn] + dlna_tags)}')
             new_res.size = None
             # new_res.resolution = "160x160"
             trailer.item.res.append(new_res)
