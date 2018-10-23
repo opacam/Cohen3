@@ -40,9 +40,9 @@ class RedirectingReverseProxyUriResource(ReverseProxyUriResource):
     def follow_redirect(self, uri):
         netloc, path, query, fragment = urlsplit(uri)[1:]
         conn = http.client.HTTPConnection(netloc)
-        conn.request('HEAD', '%s?%s#%s' % (path, query, fragment))
+        conn.request('HEAD', f'{path}?{query}#{fragment}')
         res = conn.getresponse()
-        if (res.status == 301 or res.status == 302):
+        if res.status == 301 or res.status == 302:
             return self.follow_redirect(res.getheader('location'))
         else:
             return uri
@@ -92,15 +92,15 @@ class FeedEnclosure(BackendItem):
             mime_type = MIME_TYPES_EXTENTION_MAPPING[ext]
         else:
             mime_type = enclosure.type
-        if (enclosure.type.startswith('audio')):
+        if enclosure.type.startswith('audio'):
             self.item = DIDLLite.AudioItem(id, parent, self.name)
-        elif (enclosure.type.startswith('video')):
+        elif enclosure.type.startswith('video'):
             self.item = DIDLLite.VideoItem(id, parent, self.name)
-        elif (enclosure.type.startswith('image')):
+        elif enclosure.type.startswith('image'):
             self.item = DIDLLite.ImageItem(id, parent, self.name)
 
-        res = DIDLLite.Resource("%s%d" % (store.urlbase, id),
-                                'http-get:*:%s:*' % mime_type)
+        res = DIDLLite.Resource(f"{store.urlbase}{id:d}",
+                                f'http-get:*:{mime_type}:*')
 
         self.item.res.append(res)
 
@@ -120,10 +120,10 @@ class FeedStore(BackendStore):
             self.urlbase += '/'
         self.feed_urls = kwargs.get('feed_urls')
         self.opml_url = kwargs.get('opml_url')
-        if (not (self.feed_urls or self.opml_url)):
+        if not (self.feed_urls or self.opml_url):
             raise FeedStorageConfigurationException(
                 "either feed_urls or opml_url has to be set")
-        if (self.feed_urls and self.opml_url):
+        if self.feed_urls and self.opml_url:
             raise FeedStorageConfigurationException(
                 "only feed_urls OR opml_url can be set")
 
@@ -150,8 +150,8 @@ class FeedStore(BackendStore):
         try:
             self._update_data()
         except Exception as e:
-            self.error('error while updateing the feed contant for %s: %s',
-                       self.name, str(e))
+            self.error(f'error while updateing the feed '
+                       f'content for {self.name}: {str(e)}')
         self.init_completed()
 
     def get_by_id(self, id):
@@ -163,8 +163,8 @@ class FeedStore(BackendStore):
         try:
             return self.store[int(id)]
         except (ValueError, KeyError):
-            self.info("can't get item %d from %s feed storage", int(id),
-                      self.name)
+            self.info(
+                f"can't get item {int(id):d} from {self.name} feed storage")
         return None
 
     def _update_data(self):
@@ -183,11 +183,11 @@ class FeedStore(BackendStore):
         for feed_url in feed_urls:
             netloc, path, query, fragment = urlsplit(feed_url)[1:]
             conn = http.client.HTTPConnection(netloc)
-            conn.request('HEAD', '%s?%s#%s' % (path, query, fragment))
+            conn.request('HEAD', f'{path}?{query}#{fragment}')
             res = conn.getresponse()
             if res.status >= 400:
-                self.warning('error getting %s status code: %d', feed_url,
-                             res.status)
+                self.warning(
+                    f'error getting {feed_url} status code: {res.status:d}')
                 continue
             fp_dict = feedparser.parse(feed_url)
             name = fp_dict.feed.title
@@ -202,8 +202,8 @@ class FeedStore(BackendStore):
             for item in fp_dict.entries:
                 for enclosure in item.enclosures:
                     self.store[item_id] = FeedEnclosure(
-                        self, container_id, item_id, '%04d - %s' % (
-                            item_id, item.title), enclosure)
+                        self, container_id, item_id,
+                        f'{item_id:04d} - {item.title}', enclosure)
                     self.store[container_id].children.append(
                         self.store[item_id])
                     if enclosure.type.startswith('audio'):
