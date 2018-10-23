@@ -77,9 +77,8 @@ class BackendContainer(Container):
 
     def __repr__(self):
         return \
-            '<BackendContainer {id} {title}' \
-            ' [parent id: {parent_id}]>'.format(
-                id=self.id, title=self.name, parent_id=self.parent_id)
+            f'<BackendContainer {self.id} {self.get_name()} ' \
+            f'[parent id: {self.parent_id}]>'
 
 
 class BackendMusicAlbum(BackendContainer):
@@ -117,10 +116,9 @@ class BackendMusicAlbum(BackendContainer):
 
     def __repr__(self):
         return \
-            '<BackendMusicAlbum {id} title="{title}" ' \
-            'genre="{genre}" artist="{artist}" cover="{cover}">'.format(
-                id=self.id, title=self.title, artist=self.artist,
-                genre=self.genre, cover=self.cover)
+            f'<BackendMusicAlbum {self.id} title="{self.title}" ' \
+            f'genre="{self.genre}" artist="{self.artist}" ' \
+            f'cover="{self.cover}">'
 
 
 class BackendBasePlaylist(BackendContainer):
@@ -144,5 +142,4 @@ class BackendBasePlaylist(BackendContainer):
 
     def __repr__(self):
         return \
-            '<BackendBasePlaylist {id} title="{title}>'.format(
-                id=self.id, title=self.title)
+            f'<BackendBasePlaylist {self.id} title="{self.title}>'
