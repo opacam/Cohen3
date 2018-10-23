@@ -39,7 +39,7 @@ class BBCItem(BackendItem):
             self.item.description = self.description
 
             res = DIDLLite.Resource(self.location,
-                                    'http-get:*:%s:*' % self.mimetype)
+                                    f'http-get:*:{self.mimetype}:*')
             res.duration = self.duration
             res.size = self.size
             self.item.res.append(res)
@@ -179,7 +179,7 @@ class BBCStore(BackendStore):
                     seconds = seconds - hours * 3600
                     minutes = seconds / 60
                     seconds = seconds - minutes * 60
-                    duration = ("%d:%02d:%02d") % (hours, minutes, seconds)
+                    duration = f"{hours:d}:{minutes:02d}:{seconds:02d}"
                     for manifestation in version.findall(
                             './{http://uriplay.org/elements/}manifestedAs'):
                         encoding = manifestation.find(
