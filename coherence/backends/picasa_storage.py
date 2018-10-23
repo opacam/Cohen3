@@ -71,7 +71,7 @@ class PicasaPhotoItem(BackendItem):
             self.item = DIDLLite.Photo(
                 upnp_id, upnp_parent_id, self.name)
             res = DIDLLite.Resource(
-                self.url, 'http-get:*:%s:*' % self.mimetype)
+                self.url, f'http-get:*:{self.mimetype}:*')
             self.item.res.append(res)
         self.item.childCount = 0
         return self.item
@@ -189,7 +189,7 @@ class PicasaStore(AbstractBackendStore):
                 parent.add_child(item, external_id=album_id)
 
         def gotError(error):
-            print("ERROR: %s" % error)
+            print(f"ERROR: {error}")
 
         albums.addCallbacks(gotAlbums, gotError)
         return albums
@@ -200,7 +200,7 @@ class PicasaStore(AbstractBackendStore):
 
         def gotPhotos(photos):
             if photos is None:
-                print("Unable to retrieve photos for feed %s" % feed_uri)
+                print(f"Unable to retrieve photos for feed {feed_uri}")
                 return
             for photo in photos.entry:
                 photo_id = photo.gphoto_id.text
@@ -209,14 +209,14 @@ class PicasaStore(AbstractBackendStore):
                 parent.add_child(item, external_id=photo_id)
 
         def gotError(error):
-            print("ERROR: %s" % error)
+            print(f"ERROR: {error}")
 
         photos.addCallbacks(gotPhotos, gotError)
         return photos
 
     def retrieveAlbumPhotos(self, parent=None, album_id=''):
-        album_feed_uri = '/data/feed/api/user/%s/albumid/%s?kind=photo' % (
-            self.login, album_id)
+        album_feed_uri = \
+            f'/data/feed/api/user/{self.login}/albumid/{album_id}?kind=photo'
         return self.retrieveFeedPhotos(parent, album_feed_uri)
 
     def retrieveFeaturedPhotos(self, parent=None):
