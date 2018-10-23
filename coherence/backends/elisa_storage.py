@@ -86,7 +86,7 @@ class ElisaMediaStore(Plugin):
         if self.server:
             self.server.connection_manager_server.set_variable(
                 0, 'SourceProtocolInfo',
-                ['internal:%s:*:*' % self.host, 'http-get:*:audio/mpeg:*'])
+                [f'internal:{self.host}:*:*', 'http-get:*:audio/mpeg:*'])
 
     def upnp_Browse(self, *args, **kwargs):
         ObjectID = kwargs['ObjectID']
@@ -123,11 +123,11 @@ class ElisaMediaStore(Plugin):
                         pass
 
                     res = Resource(internal_url,
-                                   'internal:%s:*:*' % self.host)
+                                   f'internal:{self.host}:*:*')
                     res.size = size
                     upnp_item.res.append(res)
                     res = Resource(external_url,
-                                   'http-get:*:%s:*' % elisa_item['mimetype'])
+                                   f'http-get:*:{elisa_item["mimetype"]}:*')
                     res.size = size
                     upnp_item.res.append(res)
 
