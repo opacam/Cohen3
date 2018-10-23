@@ -51,15 +51,14 @@ class RadiotimeAudioItem(BackendItem):
             self.item = DIDLLite.AudioBroadcast(upnp_id, upnp_parent_id,
                                                 self.name)
             self.item.albumArtURI = self.image
+            protocols = ';'.join(
+                        ('DLNA.ORG_PN=MP3',
+                         'DLNA.ORG_CI=0',
+                         'DLNA.ORG_OP=01',
+                         'DLNA.ORG_FLAGS=01700000000000000000000000000000'))
             res = Resource(
                 self.stream_url,
-                'http-get:*:%s:%s' % (
-                    self.mimetype,
-                    ';'.join((
-                        'DLNA.ORG_PN=MP3',
-                        'DLNA.ORG_CI=0',
-                        'DLNA.ORG_OP=01',
-                        'DLNA.ORG_FLAGS=01700000000000000000000000000000'))))
+                f'http-get:*:{self.mimetype}:{protocols}')
             res.size = 0  # None
             self.item.res.append(res)
         return self.item
@@ -90,13 +89,13 @@ class RadiotimeStore(AbstractBackendStore):
 
         # construct URL for root menu
         if self.username is not None:
-            identification_param = "username=%s" % self.username
+            identification_param = f"username={self.username}"
         else:
-            identification_param = "serial=%s" % self.serial
+            identification_param = f"serial={self.serial}"
         formats_value = DEFAULT_FORMAT
-        root_url = "%s?partnerId=%s&%s&formats=%s&locale=%s" % (
-            self.browse_url, self.partner_id, identification_param,
-            formats_value, self.locale)
+        root_url = f"{self.browse_url}?partnerId={self.partner_id}&" \
+                   f"{identification_param}&formats={formats_value}&" \
+                   f"locale={self.locale}"
 
         # set root item
         root_item = LazyContainer(None, "root", "root", self.refresh,
@@ -130,7 +129,7 @@ class RadiotimeStore(AbstractBackendStore):
                 key = outline.get('key')
                 external_id = None
                 if external_id is None and key is not None:
-                    external_id = "%s_%s" % (parent.external_id, key)
+                    external_id = f"{parent.external_id}_{key}"
                 if external_id is None:
                     external_id = outline_url
                 item = Container(parent, text)
@@ -148,7 +147,7 @@ class RadiotimeStore(AbstractBackendStore):
                 guide_id = outline.get('guide_id')
                 external_id = guide_id
                 if external_id is None and key is not None:
-                    external_id = "%s_%s" % (parent.external_id, key)
+                    external_id = f"{parent.external_id}_{key}"
                 if external_id is None:
                     external_id = outline_url
                 item = LazyContainer(
@@ -161,8 +160,8 @@ class RadiotimeStore(AbstractBackendStore):
                 parent.add_child(item, external_id=item.preset_id)
 
         def got_page(result):
-            self.info('connection to Radiotime service successful for url %s',
-                      url)
+            self.info(
+                f'connection to Radiotime service successful for url {url}')
 
             outlines = result.findall('body/outline')
             for outline in outlines:
@@ -171,19 +170,19 @@ class RadiotimeStore(AbstractBackendStore):
             return True
 
         def got_error(error):
-            self.warning("connection to Radiotime service failed for url %s",
-                         url)
+            self.warning(
+                f"connection to Radiotime service failed for url {url}")
             self.debug("%r", error.getTraceback())
             parent.childrenRetrievingNeeded = True  # we retry
-            return Failure("Unable to retrieve items for url %s" % url)
+            return Failure(f"Unable to retrieve items for url {url}")
 
         def got_xml_error(error):
-            self.warning("Data received from Radiotime service is invalid: %s",
-                         url)
+            self.warning(
+                f"Data received from Radiotime service is invalid: {url}")
             # self.debug("%r", error.getTraceback())
             print(error.getTraceback())
             parent.childrenRetrievingNeeded = True  # we retry
-            return Failure("Unable to retrieve items for url %s" % url)
+            return Failure(f"Unable to retrieve items for url {url}")
 
         d = utils.getPage(url, )
         d.addCallback(etree.fromstring)
