@@ -142,8 +142,10 @@ class BackendBaseItem(BackendItem):
 
     def __repr__(self):
         return \
-            f'<BackendBaseItem {self.id} {self.title}' \
-            f' [parent id: {self.parent_id}]>'
+            '<BackendBaseItem {id} {title}' \
+            ' [parent id: {parent_id}]>'.format(
+                id=self.id, title=self.title,
+                parent_id=self.parent_id)
 
 
 class BackendVideoItem(BackendBaseItem):
@@ -170,8 +172,10 @@ class BackendVideoItem(BackendBaseItem):
 
     def __repr__(self):
         return \
-            f'<BackendVideoItem{self.id} title="{self.title}" ' \
-            f'genres="{", ".join(self.genres)}" director="{self.director}">'
+            '<BackendVideoItem {id} title="{title}" ' \
+            'genres="{genres}" director="{director}">'.format(
+                id=self.id, title=self.title,
+                genres=', '.join(self.genres), director=self.director)
 
 
 class BackendAudioItem(BackendBaseItem):
@@ -204,9 +208,12 @@ class BackendAudioItem(BackendBaseItem):
     def __repr__(self):
         album = 'None' if not self.album else self.album.title
         return \
-            f'<BackendAudioItem{self.id} title="{self.title}" ' \
-            f'album={self.album}" genre="{self.genre}" ' \
-            f'artist="{self.artist}" path="{self.get_path()}">'
+            '<BackendAudioItem {id} title="{title}" ' \
+            'album={album}" genre="{genre}" artist="{artist}" ' \
+            'path="{path}">'.format(
+                id=self.id, title=self.title, album=album,
+                genre=self.genre, artist=self.artist,
+                path=self.get_path())
 
 
 class BackendMusicTrackItem(BackendAudioItem):
@@ -226,10 +233,12 @@ class BackendMusicTrackItem(BackendAudioItem):
     def __repr__(self):
         album = 'None' if not self.album else self.album.title
         return \
-            f'<BackendMusicTrackItem{self.id} title="{self.title}" ' \
-            f'track="{self.track_number}" album={album}" ' \
-            f'genre="{self.genre}" artist="{self.artist}" ' \
-            f'path="{self.get_path()}">'
+            '<BackendMusicTrackItem {id} title="{title}" ' \
+            'track="{track}" album={album}" genre="{genre}" ' \
+            'artist="{artist}" path="{path}">'.format(
+                id=self.id, title=self.title, track=self.track_number,
+                album=album, genre=self.genre,
+                artist=self.artist, path=self.get_path())
 
 
 class BackendImageItem(BackendBaseItem):
@@ -255,8 +264,10 @@ class BackendImageItem(BackendBaseItem):
 
     def __repr__(self):
         return \
-            f'<BackendImageItem {self.id} artist="{self.artist}" ' \
-            f'rating="{self.rating}" publisher="{self.publisher}">'
+            '<BackendImageItem {id} artist="{artist}" ' \
+            'rating="{rating}" publisher="{publisher}">'.format(
+                id=self.id, artist=self.artist,
+                rating=self.rating, publisher=self.publisher)
 
 
 class BackendPhotoItem(BackendImageItem):
@@ -275,5 +286,7 @@ class BackendPhotoItem(BackendImageItem):
 
     def __repr__(self):
         return \
-            f'<BackendPhotoItem {self.id} artist="{self.artist}" ' \
-            f'album="{self.album}" rating="{self.rating}">'
+            '<BackendPhotoItem {id} artist="{artist}" ' \
+            'album="{album}" rating="{rating}">'.format(
+                id=self.id, artist=self.artist,
+                album=self.album, rating=self.rating)

@@ -106,8 +106,9 @@ class BackendBaseStore(BackendStore):
                 'root_url', 'root_find_items']:
             if prop in [None, '', [], {}]:
                 raise Exception(
-                    f'Error: The property for {self!r}.{prop}'
-                    f' cannot be empty')
+                    'Error: The property for {}.{}'
+                    ' cannot be empty'.format(
+                        self.__repr__(), prop))
 
         if 'name' in kwargs:
             self.name = kwargs.get('name')
@@ -145,7 +146,7 @@ class BackendBaseStore(BackendStore):
         self.info('BackendBaseStore.update_data: triggered')
 
         def deferred_fail(d):
-            self.error(f"BackendBaseStore.update_data: {d}")
+            self.error("BackendBaseStore.update_data: {}".format(d))
             self.debug(d.getTraceback())
             return d
 
@@ -162,7 +163,7 @@ class BackendBaseStore(BackendStore):
         Iterate over all items found inside the provided tree and parse each
         one of them.
         '''
-        self.info(f'BackendBaseStore.parse_data: {root}')
+        self.info('BackendBaseStore.parse_data: {}'.format(root))
 
         def iterate(r):
             for el in r.findall(self.root_find_items):
@@ -221,7 +222,7 @@ class BackendBaseStore(BackendStore):
         '''
         Get an item based on his id.
         '''
-        self.debug(f'BackendBaseStore.get_by_id: {item_id}')
+        self.debug('BackendBaseStore.get_by_id: {}'.format(item_id))
         if item_id in self.items:
             return self.items.get(item_id)
         if isinstance(item_id, str):
@@ -241,7 +242,8 @@ class BackendBaseStore(BackendStore):
         '''
         Define what kind of media content we do provide
         '''
-        self.info(f'BackendBaseStore.upnp_init: server => {self.server}')
+        self.info('BackendBaseStore.upnp_init: '
+                  'server => {}'.format(self.server))
         if self.server:
             self.server.connection_manager_server.set_variable(
                 0, 'SourceProtocolInfo',

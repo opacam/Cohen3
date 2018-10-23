@@ -303,35 +303,6 @@ class Plugins(log.LogAble):
 
 
 class Coherence(log.LogAble):
-    '''
-    The Main class of the Cohen3 project. The Coherence class controls all the
-    servers initialization depending on the configuration passed.
-    It is also capable of initialize the plugins defined in config variable or
-    by configuration file.
-    It supports the creation of multiple servers at once.
-
-    Examples
-    --------
-    Example of a simple server via plugin AppleTrailersStore::
-
-        from coherence.base import Coherence
-        from coherence.upnp.core.uuid import UUID
-        from twisted.internet import reactor
-        new_uuid = UUID()
-
-        coherence = Coherence(
-            {'logmode': 'info',
-             'controlpoint': 'yes',
-             'plugin': [{'backend': 'AppleTrailersStore',
-                        'name': 'Cohen3 Example FSStore',
-                        'uuid': new_uuid,
-                        }
-                        ]
-             }
-        )
-        reactor.run()
-    '''
-
     __instance = None  # Singleton
     __initialized = False
     __incarnations = 0
