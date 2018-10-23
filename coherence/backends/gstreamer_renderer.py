@@ -265,7 +265,7 @@ class Player(log.LogAble):
         struct = message.get_structure()
         if t == Gst.MessageType.ERROR:
             err, debug = message.parse_error()
-            self.warning("Gstreamer error: %s,%r", err.message, debug)
+            self.warning(f"Gstreamer error: {err.message},{debug!r}")
             if self.playing:
                 self.seek('-0')
             # self.player.set_state(Gst.State.READY)
@@ -275,13 +275,13 @@ class Player(log.LogAble):
             for x in range(taglist.n_tags()):
                 key = taglist.nth_tag_name(x)
                 val = taglist.get_string(key)[1]
-                # print('  %s: %s' % (key, val))
+                # print(f'  {key}: {val}')
                 self.tags[key] = val
         elif t == Gst.MessageType.STATE_CHANGED:
             if message.src == self.player:
                 old, new, pending = message.parse_state_changed()
-                # print("player (%s) state_change:" % (
-                #     message.src.get_path_string()), old, new, pending)
+                print(f"player ({message.src.get_path_string()}) "
+                      f"state_change: {old} {new} {pending}")
                 if new == Gst.State.PLAYING:
                     self.playing = True
                     self.update_LC.start(1, False)
@@ -342,7 +342,7 @@ class Player(log.LogAble):
         return r
 
     def load(self, uri, mimetype):
-        self.debug("load --> %r %r", uri, mimetype)
+        self.debug(f"load --> {uri} {mimetype}")
         _, state, _ = self.player.get_state(Gst.CLOCK_TIME_NONE)[1]
         if state == Gst.State.PLAYING or state == Gst.State.PAUSED:
             self.stop()
@@ -364,7 +364,7 @@ class Player(log.LogAble):
     def play(self):
         uri = self.get_uri()
         mimetype = self.mimetype
-        self.debug("play --> %r %r", uri, mimetype)
+        self.debug(f"play --> {uri} {mimetype}")
 
         if self.player.get_name() != 'player':
             if not self.player_clean:
@@ -381,16 +381,16 @@ class Player(log.LogAble):
         self.debug("play <--")
 
     def pause(self):
-        self.debug("pause --> %r", self.get_uri())
+        self.debug(f"pause --> {self.get_uri()}")
         self.player.set_state(Gst.State.PAUSED)
         self.debug("pause <--")
 
     def stop(self):
-        self.debug("stop --> %r", self.get_uri())
+        self.debug(f"stop --> {self.get_uri()}")
         self.seek('-0')
         self.player.set_state(Gst.State.READY)
         self.update(message=Gst.MessageType.EOS)
-        self.debug("stop <-- %r ", self.get_uri())
+        self.debug(f"stop <-- {self.get_uri()}")
 
     def seek(self, location):
         """
@@ -416,7 +416,7 @@ class Player(log.LogAble):
                 loc = position - (int(location[1:]) * Gst.SECOND)
                 loc = max(loc, 0)
 
-        self.debug("seeking to %r", loc)
+        self.debug(f"seeking to {loc}")
 
         # Standard seek mode
         # self.player.seek( 1.0, Gst.Format.TIME,
@@ -440,10 +440,10 @@ class Player(log.LogAble):
         event_send = self.player.send_event(event)
 
         if event_send:
-            print("seek to %r ok" % location)
+            print(f"seek to {location} ok")
             # self.player.set_start_time(0)
         elif location != '-0':
-            print("seek to %r failed" % location)
+            print(f"seek to {location} failed")
 
         if location == '-0':
             content_type, _ = self.mimetype.split("/")
@@ -526,7 +526,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
 
     def update(self, message=None):
         _, current, _ = self.player.get_state()
-        self.debug("update current %r", current)
+        self.debug(f"update current {current}")
         connection_manager = self.server.connection_manager_server
         av_transport = self.server.av_transport_server
         conn_id = connection_manager.lookup_avt_id(self.current_connection_id)
@@ -637,15 +637,15 @@ class GStreamerPlayer(log.LogAble, Plugin):
                                                   'CurrentTrackMetaData',
                                                   self.metadata)
 
-            self.info("%s %d/%d/%d - %d%%/%d%% - %s/%s/%s", state,
-                      int(position['raw']['position']) / Gst.SECOND,
-                      int(position['raw']['remaining']) / Gst.SECOND,
-                      int(position['raw']['duration']) / Gst.SECOND,
-                      position['percent']['position'],
-                      position['percent']['remaining'],
-                      position['human']['position'],
-                      position['human']['remaining'],
-                      position['human']['duration'])
+            self.info(
+                f"{state} {int(position['raw']['position']) / Gst.SECOND:d}/"
+                f"{int(position['raw']['remaining']) / Gst.SECOND:d}/"
+                f"{int(position['raw']['duration']) / Gst.SECOND:d} - "
+                f"{position['percent']['position']:d}%%/"
+                f"{position['percent']['remaining']:d}%% - "
+                f"{position['human']['position']}/"
+                f"{position['human']['remaining']}/"
+                f"{position['human']['duration']}")
 
             duration = int(position['raw']['duration'])
             formatted = self._format_time(duration)
@@ -673,7 +673,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
         return formatted
 
     def load(self, uri, metadata, mimetype=None):
-        self.info("loading: %r %r ", uri, mimetype)
+        self.info(f"loading: {uri} {mimetype} ")
         _, state, _ = self.player.get_state()
         connection_id = self.server.connection_manager_server.lookup_avt_id(
             self.current_connection_id)
@@ -779,7 +779,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
         self.play()
 
     def stop(self, silent=False):
-        self.info('Stopping: %r', self.player.get_uri())
+        self.info(f'Stopping: {self.player.get_uri()}')
         if self.player.get_uri() is None:
             return
         if self.player.get_state()[1] in [Gst.State.PLAYING, Gst.State.PAUSED]:
@@ -791,7 +791,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
                     'STOPPED')
 
     def play(self):
-        self.info("Playing: %r", self.player.get_uri())
+        self.info(f"Playing: {self.player.get_uri()}")
         if self.player.get_uri() is None:
             return
         self.player.play()
@@ -800,7 +800,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
                 self.current_connection_id), 'TransportState', 'PLAYING')
 
     def pause(self):
-        self.info('Pausing: %r', self.player.get_uri())
+        self.info(f'Pausing: {self.player.get_uri()}')
         self.player.pause()
         self.server.av_transport_server.set_variable(
             self.server.connection_manager_server.lookup_avt_id(
@@ -885,8 +885,8 @@ class GStreamerPlayer(log.LogAble, Plugin):
 
                 def browse_more(
                         starting_index, number_returned, total_matches):
-                    self.info("browse_more %s %s %s", starting_index,
-                              number_returned, total_matches)
+                    self.info(f"browse_more {starting_index} "
+                              f"{number_returned} {total_matches}")
                     try:
 
                         def handle_error(r):
@@ -907,12 +907,12 @@ class GStreamerPlayer(log.LogAble, Plugin):
                             self.info(
                                 "seems we have been returned only "
                                 "a part of the result")
-                            self.info("requested %d, starting at %d", 5,
-                                      starting_index)
-                            self.info("got %d out of %d", number_returned,
-                                      total_matches)
-                            self.info("requesting more starting now at %d",
-                                      starting_index + number_returned)
+                            self.info(f"requested {5:d}, "
+                                      f"starting at {starting_index:d}")
+                            self.info(f"got {number_returned:d} "
+                                      f"out of {total_matches:d}")
+                            self.info(f"requesting more starting now at "
+                                      f"{starting_index + number_returned:d}")
                             self.playcontainer[4]['StartingIndex'] = str(
                                 starting_index + number_returned)
                             d = self.playcontainer[3].call(
@@ -921,9 +921,8 @@ class GStreamerPlayer(log.LogAble, Plugin):
                                           starting_index + number_returned)
                             d.addErrback(handle_error)
                     except Exception as e1:
-                        self.error(
-                            'playcontainer_browse.handle_reply.browse_more: '
-                            '%r' % e1)
+                        self.error(f'playcontainer_browse.'
+                                   f'handle_reply.browse_more: {e1!r}')
                         import traceback
                         traceback.print_exc()
 
@@ -933,7 +932,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
                 if len(next_track) == 3:
                     return next_track
             except Exception as e2:
-                self.error('playcontainer_browse.handle_reply: %r' % e2)
+                self.error(f'playcontainer_browse.handle_reply: {e2!r}')
                 import traceback
                 traceback.print_exc()
 
@@ -970,7 +969,7 @@ class GStreamerPlayer(log.LogAble, Plugin):
             d.addErrback(handle_error)
             return d
         except Exception as e3:
-            self.error('playcontainer_browse: %r' % e3)
+            self.error(f'playcontainer_browse: {e3!r}')
             return failure.Failure(errorCode(714))
 
     def upnp_init(self):
@@ -978,31 +977,31 @@ class GStreamerPlayer(log.LogAble, Plugin):
         self.server.connection_manager_server.set_variable(
             0,
             'SinkProtocolInfo',
-            ['internal:%s:audio/mpeg:*' % self.server.coherence.hostname,
+            [f'internal:{self.server.coherence.hostname}:audio/mpeg:*',
              'http-get:*:audio/mpeg:*',
-             'internal:%s:audio/mp4:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:audio/mp4:*',
              'http-get:*:audio/mp4:*',
-             'internal:%s:application/ogg:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:application/ogg:*',
              'http-get:*:application/ogg:*',
-             'internal:%s:audio/ogg:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:audio/ogg:*',
              'http-get:*:audio/ogg:*',
-             'internal:%s:video/ogg:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:video/ogg:*',
              'http-get:*:video/ogg:*',
-             'internal:%s:application/flac:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:application/flac:*',
              'http-get:*:application/flac:*',
-             'internal:%s:audio/flac:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:audio/flac:*',
              'http-get:*:audio/flac:*',
-             'internal:%s:video/x-msvideo:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',
              'http-get:*:video/x-msvideo:*',
-             'internal:%s:video/mp4:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:video/mp4:*',
              'http-get:*:video/mp4:*',
-             'internal:%s:video/quicktime:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:video/quicktime:*',
              'http-get:*:video/quicktime:*',
-             'internal:%s:image/gif:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:image/gif:*',
              'http-get:*:image/gif:*',
-             'internal:%s:image/jpeg:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:image/jpeg:*',
              'http-get:*:image/jpeg:*',
-             'internal:%s:image/png:*' % self.server.coherence.hostname,
+             f'internal:{self.server.coherence.hostname}:image/png:*',
              'http-get:*:image/png:*',
              'http-get:*:*:*'],
             default=True)
