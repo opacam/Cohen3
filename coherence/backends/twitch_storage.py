@@ -26,7 +26,6 @@ import json
 import urllib.error
 import urllib.parse
 import urllib.request
-from functools import cmp_to_key
 
 import livestreamer
 from dateutil import parser as dateutil_parser
@@ -57,8 +56,8 @@ class LiveStreamerProxyResource(Resource, LogAble):
         self.content_type = content_type
 
     def render_GET(self, request):
-        self.debug("serving %s request from %s for %s", request.method,
-                   request.getClientIP(), request.uri)
+        self.debug(f"serving {request.method} request from "
+                   f"{request.getClientIP()} for {request.uri}")
 
         def stream_opened(fd):
             producer = NoRangeStaticProducer(request, fd)
@@ -66,17 +65,18 @@ class LiveStreamerProxyResource(Resource, LogAble):
 
         def got_streams(streams):
             if self.stream_id not in streams:
-                self.warning("stream not found for %s@%s", self.url,
-                             self.stream_id)
+                self.warning(f'stream not found for '
+                             f'{self.url}@{self.stream_id}')
                 request.setResponseCode(http.NOT_FOUND)
-                request.write('')
+                request.write(b'')
                 return
 
-            request.setHeader('Content-Type', self.content_type)
+            request.setHeader(b'Content-Type',
+                              self.content_type.encode('ascii'))
             request.setResponseCode(http.OK)
 
-            if request.method == 'HEAD':
-                request.write('')
+            if request.method == b'HEAD':
+                request.write(b'')
                 return
 
             d_open_stream = threads.deferToThread(streams[self.stream_id].open)
@@ -122,9 +122,9 @@ class TwitchLazyContainer(LazyContainer):
         return self.result_handler(result)
 
     def _got_error(self, error):
-        self.warning("connection to twitch.tv service failed: %s",
-                     self.children_url)
-        self.debug("%r", error.getTraceback())
+        self.warning(
+            f"connection to twitch.tv service failed: {self.children_url}")
+        self.debug(f"{error.getTraceback()!r}")
         self.childrenRetrievingNeeded = True  # we retry
         return Failure("Unable to retrieve game list")
 
@@ -136,7 +136,7 @@ class GamesContainer(TwitchLazyContainer):
                                              **kwargs)
         self.description = description
 
-        self.children_url = '%s/games/top' % TWITCH_API_URL
+        self.children_url = f'{TWITCH_API_URL}/games/top'
         self.sorting_method = 'viewers'
         self.children_limit = children_limit
 
@@ -150,7 +150,7 @@ class GamesContainer(TwitchLazyContainer):
                 cover_url=game_info['game']['box']['large'],
                 game=game_name,
                 limit=self.children_limit)
-            # item.description = "%d viewers" % game_info['viewers']
+            # item.description = f"{game_info['viewers']:d} viewers"
             self.add_child(item, external_id=game_info['game']['_id'])
         return True
 
@@ -178,7 +178,7 @@ class StreamsContainer(TwitchLazyContainer):
                 viewers=stream['viewers'],
                 preview_url=stream['preview']['medium'],
                 created_at=created_at)
-            self.add_child(item, external_id='stream%d' % stream['_id'])
+            self.add_child(item, external_id=f'stream{stream["_id"]:d}')
         return True
 
 
@@ -209,7 +209,7 @@ class TwitchStreamItem(BackendItem):
             self.item.date = self.created_at
             self.item.albumArtURI = self.preview_url
 
-            res = DIDLLite.Resource(self.url, 'http-get:*:%s:#' % MPEG_MIME)
+            res = DIDLLite.Resource(self.url, f'http-get:*:{MPEG_MIME}:#')
             self.item.res.append(res)
         return self.item
 
@@ -275,7 +275,7 @@ class TwitchStore(AbstractBackendStore):
         if self.server:
             self.server.connection_manager_server.set_variable(
                 0, 'SourceProtocolInfo',
-                ['http-get:*:%s:*' % MPEG_MIME],
+                [f'http-get:*:{MPEG_MIME}:*'],
                 default=True)
         # root item
         root_item = Container(None, self.name)
