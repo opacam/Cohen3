@@ -76,7 +76,7 @@ class Gallery2Item(BackendItem):
             self.update_id = 0
         else:
             res = Resource(self.gallery2_url,
-                           'http-get:*:%s:*' % self.mimetype)
+                           f'http-get:*:{self.mimetype}:*')
             res.size = None
             self.item.res.append(res)
 
