@@ -70,8 +70,8 @@ class TrackItem(BackendItem):
             self.item = DIDLLite.MusicTrack(
                 upnp_id, upnp_parent_id, self.title)
 
-            res = DIDLLite.Resource(url, 'http-get:*:%s:%s' % (
-                self.mimetype, self.fourth_field))
+            res = DIDLLite.Resource(
+                url, f'http-get:*:{self.mimetype}:{self.fourth_field}')
             # res.duration = self.duration
             # res.size = self.get_size()
             self.item.res.append(res)
@@ -130,8 +130,7 @@ class AudioCDStore(AbstractBackendStore):
         if self.server:
             self.server.connection_manager_server.set_variable(
                 0, 'SourceProtocolInfo',
-                ['http-get:*:%s:%s' % (
-                    TRACK_MIMETYPE, TRACK_FOURTH_FIELD)],
+                [f'http-get:*:{TRACK_MIMETYPE}:{TRACK_FOURTH_FIELD}'],
                 default=True)
             self.server.content_directory_server.set_variable(
                 0, 'SystemUpdateID', self.update_id)
@@ -151,17 +150,17 @@ class AudioCDStore(AbstractBackendStore):
             query_info = query_info[0]
         (read_status, read_info) = CDDB.read(query_info['category'],
                                              query_info['disc_id'])
-        #        print query_info['title']
-        #        print disc_id[1]
-        #        for i in range(disc_id[1]):
-        #            print "Track %.02d: %s" % (i, read_info['TTITLE' + `i`])
+        # print(query_info['title'])
+        # print(disc_id[1])
+        # for i in range(disc_id[1]):
+        #    print(f"Track {i:.02d}: {read_info['TTITLE' + repr(i)]}")
 
         track_count = disc_id[1]
         disc_id = query_info['disc_id']
         self.disc_title = query_info['title'].encode('utf-8')
         tracks = {}
         for i in range(track_count):
-            tracks[i + 1] = read_info['TTITLE' + repr(i)].decode(
+            tracks[i + 1] = read_info[f'TTITLE{repr(i)}'].decode(
                 'ISO-8859-1').encode('utf-8')
 
         self.name = self.disc_title
@@ -172,7 +171,7 @@ class AudioCDStore(AbstractBackendStore):
 
         for number, title in list(tracks.items()):
             item = TrackItem(self.device_name, number, "Unknown", title)
-            external_id = "%s_%d" % (disc_id, number)
+            external_id = f"{disc_id}_{number:d}"
             root_item.add_child(item, external_id=external_id)
 
         self.info('Sharing audio CD %s', self.disc_title)
@@ -185,8 +184,8 @@ class AudioCDStore(AbstractBackendStore):
             disc_id = DiscID.disc_id(self.cdrom)
             reactor.callLater(2, self.checkIfAudioCdStillPresent)
         except Exception:
-            self.warning('audio CD %s ejected: closing UPnP server!',
-                         self.disc_title)
+            self.warning(f'audio CD {self.disc_title} ejected:'
+                         f' closing UPnP server!')
             self.server.coherence.remove_plugin(self.server)
 
     def __repr__(self):
