@@ -73,8 +73,9 @@ class AxisCamItem(BackendItem):
             self.update_id += 1
 
     def remove_child(self, child):
-        self.info("remove_from %d (%s) child %d (%s)",
-                  self.id, self.get_name(), child.id, child.get_name())
+        self.info(
+            f"remove_from {self.id:d} {self.get_name():s} "
+            f"child {child.id:d} ({child.get_name():s})")
         if child in self.children:
             if isinstance(self.item, Container):
                 self.item.childCount -= 1
