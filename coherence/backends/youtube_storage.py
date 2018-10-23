@@ -41,7 +41,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
 
         self.id = id
         if isinstance(self.id, int):
-            self.id = '%d' % self.id
+            self.id = f'{self.id:d}'
         self.proxy_mode = proxy_mode
 
         self.cache_directory = cache_directory
@@ -62,24 +62,24 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
 
     def requestFinished(self, result):
         """ self.connection is set in utils.ReverseProxyResource.render """
-        self.info("ProxyStream requestFinished: %s", result)
+        self.info(f"ProxyStream requestFinished: {result}")
         if self.connection is not None:
             self.connection.transport.loseConnection()
 
     def render(self, request):
 
-        self.info("VideoProxy render %s %s %s", request, self.stream_url,
-                  self.video_url)
-        self.info("VideoProxy headers: %s", request.getAllHeaders())
-        self.info("VideoProxy id: %s", self.id)
+        self.info(
+            f"VideoProxy render {request} {self.stream_url} {self.video_url}")
+        self.info(f"VideoProxy headers: {request.getAllHeaders()}")
+        self.info(f"VideoProxy id: {self.id}")
 
         d = request.notifyFinish()
         d.addBoth(self.requestFinished)
 
         if self.stream_url is None:
 
-            web_url = "http://%s%s" % (self.host, self.path)
-            self.info("Web_url: %s", web_url)
+            web_url = f"http://{self.host}{self.path}"
+            self.info(f"Web_url: {web_url}")
 
             def got_real_urls(real_urls):
                 if len(real_urls) == 0:
@@ -89,7 +89,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
                     got_real_url(real_urls[0])
 
             def got_real_url(real_url):
-                self.info("Real URL is %s", real_url)
+                self.info(f"Real URL is {real_url}")
                 self.stream_url = real_url
                 if self.stream_url is None:
                     self.warning(
@@ -97,7 +97,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
                     return self.requestFinished(None)  # FIXME
                 self.stream_url = self.stream_url.encode('ascii', 'strict')
                 self.resetUri(self.stream_url)
-                self.info("Video URL: %s", self.stream_url)
+                self.info(f"Video URL: {self.stream_url}")
                 self.video_url = self.stream_url[:]
                 d = self.followRedirects(request)
                 d.addCallback(self.proxyURL)
@@ -115,12 +115,12 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
         return server.NOT_DONE_YET
 
     def followRedirects(self, request):
-        self.info("HTTP redirect  %s %s", request, self.stream_url)
+        self.info(f"HTTP redirect  {request} {self.stream_url}")
         d = utils.getPage(self.stream_url, method="HEAD", followRedirect=0)
 
         def gotHeader(result, request):
             data, header = result
-            self.info("finally got something %r", header)
+            self.info(f"finally got something {header}")
             # FIXME what do we do here if the headers aren't there?
             self.filesize = int(header['content-length'][0])
             self.mimetype = header['content-type'][0]
@@ -132,13 +132,13 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
 
             error_value = error.value
             if isinstance(error_value, PageRedirect):
-                self.info("got PageRedirect %r", error_value.location)
+                self.info(f"got PageRedirect {error_value.location}")
                 self.stream_url = error_value.location
                 self.resetUri(self.stream_url)
                 return self.followRedirects(request)
             else:
-                self.warning("Error while retrieving page header for URI  %s",
-                             self.stream_url)
+                self.warning(f"Error while retrieving page header "
+                             f"for URI  {self.stream_url}")
                 self.requestFinished(None)
                 return error
 
@@ -147,8 +147,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
         return d
 
     def proxyURL(self, request):
-        self.info("proxy_mode: %s, request %s",
-                  self.proxy_mode, request.method)
+        self.info(f"proxy_mode: {self.proxy_mode}, request {request.method}")
 
         if self.proxy_mode == 'redirect':
             # send stream url to client for redirection
@@ -217,7 +216,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
                     request.finish()
 
         else:
-            self.warning("Unsupported Proxy Mode: %s", self.proxy_mode)
+            self.warning(f"Unsupported Proxy Mode: {self.proxy_mode}")
             return self.requestFinished(None)
 
     def getMimetype(self):
@@ -227,7 +226,7 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
         return type
 
     def renderFile(self, request, filepath):
-        self.info('Cache file available %r %r ', request, filepath)
+        self.info(f'Cache file available {request} {filepath} ')
         downloadedFile = utils.StaticFile(filepath, self.mimetype)
         downloadedFile.type = self.getMimetype()
         downloadedFile.encoding = None
@@ -235,14 +234,14 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
 
     def renderBufferFile(self, request, filepath, buffer_size):
         # Try to render file(if we have enough data)
-        self.info("renderBufferFile %s", filepath)
+        self.info(f"renderBufferFile {filepath}")
         rendering = False
         if os.path.exists(filepath) is True:
             filesize = os.path.getsize(filepath)
             if (filesize >= buffer_size) or (filesize == self.filesize):
                 rendering = True
-                self.info("Render file %s %s %s %s", filepath, self.filesize,
-                          filesize, buffer_size)
+                self.info(f"Render file {filepath} {self.filesize} "
+                          f"{filesize} {buffer_size}")
                 bufferFile = utils.BufferFile(filepath, self.filesize,
                                               MPEG4_MIMETYPE)
                 bufferFile.type = self.getMimetype()
@@ -263,13 +262,13 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
         self.downloader = None
 
     def gotDownloadError(self, error, request):
-        self.info("Unable to download stream to file: %s", self.stream_url)
+        self.info(f"Unable to download stream to file: {self.stream_url}")
         self.info(request)
         self.info(error)
 
     def downloadFile(self, request, filepath, callback, *args):
         if self.downloader is None:
-            self.info("Proxy: download data to cache file %s", filepath)
+            self.info(f"Proxy: download data to cache file {filepath}")
             self.checkCacheSize()
             self.downloader = utils.downloadPage(self.stream_url, filepath,
                                                  supportPartial=1)
@@ -284,18 +283,19 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
 
         cache_size = 0
         for filename in cache_listdir:
-            path = "%s%s%s" % (self.cache_directory, os.sep, filename)
+            path = f"{self.cache_directory}{os.sep}{filename}"
             statinfo = os.stat(path)
             cache_size += statinfo.st_size
-        self.info("Cache size: %d (max is %s)", cache_size, self.cache_maxsize)
+        self.info(f"Cache size: {cache_size:d} (max is {self.cache_maxsize})")
 
         if cache_size > self.cache_maxsize:
             cache_targetsize = self.cache_maxsize * 2 / 3
-            self.info("Cache above max size: Reducing to %d", cache_targetsize)
+            self.info(
+                f"Cache above max size: Reducing to {cache_targetsize:d}")
 
             def compare_atime(filename1, filename2):
-                path1 = "%s%s%s" % (self.cache_directory, os.sep, filename1)
-                path2 = "%s%s%s" % (self.cache_directory, os.sep, filename2)
+                path1 = f"{self.cache_directory}{os.sep}{filename1}"
+                path2 = f"{self.cache_directory}{os.sep}{filename2}"
                 cmp = int(os.stat(path1).st_atime - os.stat(path2).st_atime)
                 return cmp
 
@@ -303,12 +303,12 @@ class TestVideoProxy(ReverseProxyUriResource, log.LogAble):
 
             while cache_size > cache_targetsize:
                 filename = cache_listdir.pop(0)
-                path = "%s%s%s" % (self.cache_directory, os.sep, filename)
+                path = f"{self.cache_directory}{os.sep}{filename}"
                 cache_size -= os.stat(path).st_size
                 os.remove(path)
-                self.info("removed %s", filename)
+                self.info(f"removed {filename}")
 
-            self.info("new cache size is %d", cache_size)
+            self.info(f"new cache size is {cache_size:d}")
 
 
 class YoutubeVideoItem(BackendItem):
@@ -387,7 +387,7 @@ class YoutubeVideoItem(BackendItem):
                 self.item.albumArtURI = thumbnail_url
 
             res = DIDLLite.Resource(
-                self.url, 'http-get:*:%s:*' % self.mimetype)
+                self.url, f'http-get:*:{self.mimetype}:*')
             res.duration = self.duration
             res.size = self.size
             self.item.res.append(res)
@@ -476,37 +476,32 @@ class YouTubeStore(AbstractBackendStore):
         self.set_root_item(rootItem)
 
         if self.showStandardFeeds:
-            standardfeeds_uri = \
-                'http://gdata.youtube.com/feeds/api/standardfeeds'
+            base_uri = 'http://gdata.youtube.com/feeds/api/standardfeeds'
             if self.locale is not None:
-                standardfeeds_uri += "/%s" % self.locale
-            standardfeeds_uri += "/%s"
-            self.appendFeed('Most Viewed', standardfeeds_uri % 'most_viewed',
-                            rootItem)
-            self.appendFeed('Top Rated', standardfeeds_uri % 'top_rated',
-                            rootItem)
-            self.appendFeed('Recently Featured',
-                            standardfeeds_uri % 'recently_featured', rootItem)
-            self.appendFeed('Watch On Mobile',
-                            standardfeeds_uri % 'watch_on_mobile', rootItem)
-            self.appendFeed('Most Discussed',
-                            standardfeeds_uri % 'most_discussed', rootItem)
-            self.appendFeed('Top Favorites',
-                            standardfeeds_uri % 'top_favorites', rootItem)
-            self.appendFeed('Most Linked', standardfeeds_uri % 'most_linked',
-                            rootItem)
-            self.appendFeed('Most Responded',
-                            standardfeeds_uri % 'most_responded', rootItem)
-            self.appendFeed('Most Recent', standardfeeds_uri % 'most_recent',
-                            rootItem)
+                base_uri += f"/{self.locale}"
+            self.appendFeed(
+                'Most Viewed', base_uri + '/most_viewed', rootItem)
+            self.appendFeed(
+                'Top Rated', base_uri + '/top_rated', rootItem)
+            self.appendFeed(
+                'Recently Featured', base_uri + '/recently_featured', rootItem)
+            self.appendFeed(
+                'Watch On Mobile', base_uri + '/watch_on_mobile', rootItem)
+            self.appendFeed(
+                'Most Discussed', base_uri + '/most_discussed', rootItem)
+            self.appendFeed(
+                'Top Favorites', base_uri + '/top_favorites', rootItem)
+            self.appendFeed(
+                'Most Linked', base_uri + '/most_linked', rootItem)
+            self.appendFeed(
+                'Most Responded', base_uri + '/most_responded', rootItem)
+            self.appendFeed(
+                'Most Recent', base_uri + '/most_recent', rootItem)
 
         if len(self.login) > 0:
-            userfeeds_uri = 'http://gdata.youtube.com/feeds/api/users/%s/%s'
-            self.appendFeed('My Uploads',
-                            userfeeds_uri % (self.login, 'uploads'), rootItem)
-            self.appendFeed('My Favorites',
-                            userfeeds_uri % (self.login, 'favorites'),
-                            rootItem)
+            user_uri = f'http://gdata.youtube.com/feeds/api/users/{self.login}'
+            self.appendFeed('My Uploads', user_uri + '/uploads', rootItem)
+            self.appendFeed('My Favorites', user_uri + '/favorites', rootItem)
             playlistsItem = LazyContainer(
                 rootItem, 'My Playlists', None,
                 self.refresh,
@@ -546,7 +541,7 @@ class YouTubeStore(AbstractBackendStore):
         if self.server:
             self.server.connection_manager_server.set_variable(
                 0, 'SourceProtocolInfo',
-                ['http-get:*:%s:*' % MPEG4_MIMETYPE],
+                [f'http-get:*:{MPEG4_MIMETYPE}:*'],
                 default=True)
 
         self.wmc_mapping = {'15': self.get_root_id()}
@@ -569,13 +564,13 @@ class YouTubeStore(AbstractBackendStore):
 
         def gotFeed(feed):
             if feed is None:
-                self.warning("Unable to retrieve feed %s", feed_uri)
+                self.warning(f"Unable to retrieve feed {feed_uri}")
                 return
             for entry in feed.entry:
                 self.appendVideoEntry(entry, parent)
 
         def gotError(error):
-            self.warning("ERROR: %s", error)
+            self.warning(f"ERROR: {error}")
 
         feed.addCallbacks(gotFeed, gotError)
         return feed
@@ -588,14 +583,14 @@ class YouTubeStore(AbstractBackendStore):
 
         def gotFeed(feed):
             if feed is None:
-                self.warning("Unable to retrieve playlist items for feed %s",
-                             feed)
+                self.warning(
+                    f"Unable to retrieve playlist items for feed {feed}")
                 return
             for entry in feed.entry:
                 self.appendVideoEntry(entry, parent)
 
         def gotError(error):
-            self.warning("ERROR: %s", error)
+            self.warning(f"ERROR: {error}")
 
         feed.addCallbacks(gotFeed, gotError)
         return feed
@@ -606,13 +601,13 @@ class YouTubeStore(AbstractBackendStore):
 
         def gotEntry(entry):
             if entry is None:
-                self.warning("Unable to retrieve subscription items %s", uri)
+                self.warning(f"Unable to retrieve subscription items {uri}")
                 return
             feed_uri = entry.feed_link[0].href
             return self.retrieveFeedItems(parent, feed_uri)
 
         def gotError(error):
-            self.warning("ERROR: %s", error)
+            self.warning(f"ERROR: {error}")
 
         entry.addCallbacks(gotEntry, gotError)
         return entry
@@ -637,7 +632,7 @@ class YouTubeStore(AbstractBackendStore):
                 parent.add_child(item, external_id=playlist_id)
 
         def gotError(error):
-            self.warning("ERROR: %s", error)
+            self.warning(f"ERROR: {error}")
 
         playlists_feed.addCallbacks(gotPlaylists, gotError)
         return playlists_feed
@@ -654,7 +649,7 @@ class YouTubeStore(AbstractBackendStore):
                 type = entry.GetSubscriptionType()
                 title = entry.title.text
                 uri = entry.id.text
-                name = "[%s] %s" % (type, title)
+                name = f"[{type}] {title}"
 
                 item = LazyContainer(parent, name, uri, self.refresh,
                                      self.retrieveSubscriptionFeedItems,
@@ -663,7 +658,7 @@ class YouTubeStore(AbstractBackendStore):
                 parent.add_child(item, external_id=uri)
 
         def gotError(error):
-            self.warning("ERROR: %s", error)
+            self.warning(f"ERROR: {error}")
 
         playlists_feed.addCallbacks(gotPlaylists, gotError)
         return playlists_feed
