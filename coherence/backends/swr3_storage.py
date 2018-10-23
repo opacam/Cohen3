@@ -40,7 +40,7 @@ class Item(BackendItem):
                 self.item.albumArtURI = self.parent.cover
 
             res = DIDLLite.Resource(self.location,
-                                    'http-get:*:%s:*' % self.mimetype)
+                                    f'http-get:*:{self.mimetype}:*')
             res.duration = self.duration
             res.size = self.size
             self.item.res.append(res)
@@ -122,7 +122,7 @@ class SWR3Store(BackendStore, BackendRssMixin):
 
     def parse_opml(self):
         def fail(f):
-            self.info("fail %r", f)
+            self.info(f"fail {f}")
             return f
 
         def create_containers(data):
