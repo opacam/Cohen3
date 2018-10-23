@@ -220,10 +220,10 @@ class Artist(item.Item, BackendItem):
             return children[start:request_count]
 
     def get_children(self, start=0, request_count=0):
-        all_id = 'artist_all_tracks_%d' % (self.storeID + 1000)
+        all_id = f'artist_all_tracks_{self.storeID + 1000:d}'
         self.store.containers[all_id] = \
             Container(all_id, self.storeID + 1000,
-                      'All tracks of %s' % self.name,
+                      f'All tracks of {self.name}',
                       children_callback=self.get_artist_all_tracks,
                       store=self.store, play_container=True)
 
@@ -251,9 +251,10 @@ class Artist(item.Item, BackendItem):
         return self.name
 
     def __repr__(self):
-        return '<Artist %d name="%s" musicbrainz="%s">' \
-               % (self.storeID, self.name.encode('ascii', 'ignore'),
-                  self.musicbrainz_id)
+        return \
+            f'<Artist {self.storeID:d} ' \
+            f'name="{self.name.encode("ascii", "ignore")}" ' \
+            f'musicbrainz="{self.musicbrainz_id}">'
 
 
 class Album(item.Item, BackendItem):
@@ -311,13 +312,12 @@ class Album(item.Item, BackendItem):
 
     def __repr__(self):
         return \
-            '<Album %d title="%s" artist="%s" #cds %d cover="%s" ' \
-            'musicbrainz="%s">' % (
-                self.storeID, self.title.encode('ascii', 'ignore'),
-                self.artist.name.encode('ascii', 'ignore'),
-                self.cd_count,
-                self.cover.encode('ascii', 'ignore'),
-                self.musicbrainz_id)
+            f'<Album {self.storeID:d} ' \
+            f'title="{self.title.encode("ascii", "ignore")}" ' \
+            f'artist="{self.artist.name.encode("ascii", "ignore")}" ' \
+            f'#cds {self.cd_count:d} ' \
+            f'cover="{self.cover.encode("ascii", "ignore")}" ' \
+            f'musicbrainz="{self.musicbrainz_id}">'
 
 
 class Track(item.Item, BackendItem):
@@ -372,7 +372,7 @@ class Track(item.Item, BackendItem):
         statinfo = os.stat(self.location)
 
         res = DIDLLite.Resource('file://' + self.location,
-                                'internal:%s:%s:*' % (host, mimetype))
+                                f'internal:{host}:{mimetype}:*')
         try:
             res.size = statinfo.st_size
         except Exception:
@@ -381,7 +381,7 @@ class Track(item.Item, BackendItem):
 
         url = self.store.urlbase + str(self.storeID + 1000) + ext
 
-        res = DIDLLite.Resource(url, 'http-get:*:%s:*' % mimetype)
+        res = DIDLLite.Resource(url, f'http-get:*:{mimetype}:*')
         try:
             res.size = statinfo.st_size
         except Exception:
@@ -437,12 +437,12 @@ class Track(item.Item, BackendItem):
 
     def __repr__(self):
         return \
-            '<Track %d title="%s" nr="%d" album="%s" artist="%s" path="%s">' \
-            % (self.storeID, self.title.encode('ascii', 'ignore'),
-               self.track_nr,
-               self.album.title.encode('ascii', 'ignore'),
-               self.album.artist.name.encode('ascii', 'ignore'),
-               self.location.encode('ascii', 'ignore'))
+            f'<Track {self.storeID:d} ' \
+            f'title="{self.title.encode("ascii", "ignore")}" ' \
+            f'nr="{self.track_nr:d}" ' \
+            f'album="{self.album.title.encode("ascii", "ignore")}" ' \
+            f'artist="{self.album.artist.name.encode("ascii", "ignore")}" ' \
+            f'path="{self.location.encode("ascii", "ignore")}">'
 
 
 class Playlist(item.Item, BackendItem):
@@ -560,8 +560,7 @@ class MediaStore(BackendStore):
                 dirname = str(os.path.dirname(file), 'utf-8')
                 album_ds.cover = check_for_cover_art(dirname)
                 if len(album_ds.cover) > 0:
-                    filename = "%s - %s" % (
-                        album_ds.artist.name, album_ds.title)
+                    filename = f"{album_ds.artist.name} - {album_ds.title}"
                     filename = sanitize(
                         filename + os.path.splitext(album_ds.cover)[1])
                     filename = os.path.join(dirname, filename)
@@ -630,15 +629,15 @@ class MediaStore(BackendStore):
                     sort=Track.title.ascending)):
             print(track.title, track.album.artist.name, track.track_nr)
             _, ext = os.path.splitext(track.path)
-            f = "%02d - %s - %s%s" % (track.track_nr, track.album.artist.name,
-                                      track.title, ext)
+            f = f"{track.track_nr:02d} - " \
+                f"{track.album.artist.name} - {track.title}{ext}"
             f = sanitize(f)
             print(f)
 
     def get_album_covers(self):
         for album in list(self.db.query(Album, Album.cover == '')):
             print("missing cover for:", album.artist.name, album.title)
-            filename = "%s - %s" % (album.artist.name, album.title)
+            filename = f"{album.artist.name} - {album.title}"
             filename = sanitize(filename)
 
             if self.coverlocation is not None:
@@ -659,7 +658,7 @@ class MediaStore(BackendStore):
                                 title=album.title)
 
     def get_by_id(self, id):
-        self.info("get_by_id %s", id)
+        self.info(f"get_by_id {id}")
         if isinstance(id, str):
             id = id.split('@', 1)[0]
         elif isinstance(id, bytes):
@@ -680,8 +679,8 @@ class MediaStore(BackendStore):
                 item = self.db.getItemByID(id - 1000)
             except Exception as e:
                 item = None
-                self.warning("get_by_id not found %r", e)
-        self.info("get_by_id found %s", item)
+                self.warning(f"get_by_id not found {e}")
+        self.info(f"get_by_id found {item}")
         return item
 
     def upnp_init(self):
@@ -731,10 +730,10 @@ class MediaStore(BackendStore):
             self.server.connection_manager_server.set_variable(
                 0,
                 'SourceProtocolInfo',
-                ['internal:%s:audio/mpeg:*' % self.server.coherence.hostname,
+                [f'internal:{self.server.coherence.hostname}:audio/mpeg:*',
                  'http-get:*:audio/mpeg:*',
-                 'internal:%s:application/ogg:*' %
-                 self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}'
+                 f':application/ogg:*',
                  'http-get:*:application/ogg:*'],
                 default=True)
 
