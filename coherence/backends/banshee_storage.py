@@ -66,8 +66,10 @@ def get_cover_path(artist_name, album_title):
         return escaped
 
     base_dir = os.path.expanduser("~/.cache/album-art")
-    return os.path.join(base_dir, "%s-%s.jpg" % (_escape_part(artist_name),
-                                                 _escape_part(album_title)))
+    return \
+        os.path.join(
+            base_dir,
+            f"{_escape_part(artist_name)}-{_escape_part(album_title)}.jpg")
 
 
 class SQLiteDB(LogAble):
@@ -105,10 +107,10 @@ class SQLiteDB(LogAble):
         t0 = time.time()
         debug_msg = request
         if params:
-            debug_msg = "%s params=%r" % (request, params)
+            debug_msg = f"{request} params={params!r}"
         debug_msg = ''.join(debug_msg.splitlines())
         if debug_msg:
-            self.debug('QUERY: %s', debug_msg)
+            self.debug(f'QUERY: {debug_msg}')
 
         cursor = self._db.cursor()
         result = []
@@ -118,7 +120,7 @@ class SQLiteDB(LogAble):
             result = db_row.getdict(all_rows, cursor.description)
         cursor.close()
         delta = time.time() - t0
-        self.log("SQL request took %s seconds", delta)
+        self.log(f'SQL request took {delta} seconds')
         return result
 
 
@@ -242,11 +244,11 @@ class Artist(BackendItem):
         return item
 
     def get_id(self):
-        return "artist.%d" % self.itemID
+        return f"artist.{self.itemID:d}"
 
     def __repr__(self):
-        return '<Artist %d name="%s" musicbrainz="%s">' % (
-            self.itemID, self.name, self.musicbrainz_id)
+        return f'<Artist {self.itemID:d} name="{self.name}" ' \
+               f'musicbrainz="{self.musicbrainz_id}">'
 
 
 class Album(BackendItem):
@@ -273,7 +275,7 @@ class Album(BackendItem):
         def query_db():
             q = "select * from CoreTracks where AlbumID=? order by TrackNumber"
             if request_count:
-                q += " limit %d" % request_count
+                q += f" limit {request_count:d}"
             rows = self._db.sql_execute(q, self.itemID)
             for row in rows:
                 track = Track(row, self._db, self)
@@ -324,13 +326,9 @@ class Album(BackendItem):
 
     def __repr__(self):
         return \
-            '<Album %d title="%s" artist="%s" #cds %d cover="%s" ' \
-            'musicbrainz="%s">' % (
-                self.itemID, self.title,
-                self.artist.name,
-                self.cd_count,
-                self.cover,
-                self.musicbrainz_id)
+            f'<Album {self.itemID:d} title="{self.title}" ' \
+            f'artist="{self.artist.name}" #cds {self.cd_count:d} ' \
+            f'cover="{self.cover}" musicbrainz="{self.musicbrainz_id}">'
 
 
 class BasePlaylist(BackendItem):
@@ -362,11 +360,11 @@ class BasePlaylist(BackendItem):
         return track
 
     def get_id(self):
-        return "%s.%d" % (self.id_type, self.db_id)
+        return f"{self.id_type}.{self.db_id:d}"
 
     def __repr__(self):
-        return '<%s %d title="%s">' % (self.__class__.__name__,
-                                       self.db_id, self.title)
+        return f'<{self.__class__.__name__} ' \
+               f'{self.db_id:d} title="{self.title}">'
 
     def get_children(self, start=0, request_count=0):
         tracks = []
@@ -422,7 +420,7 @@ class MusicPlaylist(BasePlaylist):
         q = "select * from CoreTracks where TrackID in (select TrackID " \
             "from CorePlaylistEntries where PlaylistID=?)"
         if request_count:
-            q += " limit %d" % request_count
+            q += f" limit {request_count:d}"
         return self._db.sql_execute(q, self.db_id)
 
 
@@ -437,7 +435,7 @@ class MusicSmartPlaylist(BasePlaylist):
         q = "select * from CoreTracks where TrackID in (select TrackID " \
             "from CoreSmartPlaylistEntries where SmartPlaylistID=?)"
         if request_count:
-            q += " limit %d" % request_count
+            q += f" limit {request_count:d}"
         return self._db.sql_execute(q, self.db_id)
 
 
@@ -487,7 +485,7 @@ class BaseTrack(BackendItem):
         ext = ext.lower()
 
         # FIXME: drop this hack when we switch to tagbin
-        mimetype, dummy = mimetypes.guess_type("dummy%s" % ext)
+        mimetype, dummy = mimetypes.guess_type(f"dummy{ext}")
         if not mimetype:
             mimetype = 'audio/mpeg'
             ext = "mp3"
@@ -495,7 +493,7 @@ class BaseTrack(BackendItem):
         statinfo = os.stat(self.get_path())
 
         res = DIDLLite.Resource(
-            self.location, 'internal:%s:%s:*' % (host, mimetype))
+            self.location, f'internal:{host}:{mimetype}:*')
         try:
             res.size = statinfo.st_size
         except Exception:
@@ -503,9 +501,9 @@ class BaseTrack(BackendItem):
 
         resources.append(res)
 
-        url = "%s%s%s" % (self._db.urlbase, self.get_id(), ext)
+        url = f"{self._db.urlbase}{self.get_id()}{ext}"
 
-        res = DIDLLite.Resource(url, 'http-get:*:%s:*' % mimetype)
+        res = DIDLLite.Resource(url, f'http-get:*:{mimetype}:*')
         try:
             res.size = statinfo.st_size
         except Exception:
@@ -530,10 +528,9 @@ class BaseTrack(BackendItem):
 
     def __repr__(self):
         return \
-            '<Track %d title="%s" nr="%d" album="%s" artist="%s" ' \
-            'path="%s">' % (
-                self.itemID, self.title, self.track_nr, self.album.title,
-                self.album.artist.name, self.location)
+            f'<Track {self.itemID:d} title="{self.title}" ' \
+            f'nr="{self.track_nr:d}" album="{self.album.title}" ' \
+            f'artist="{self.album.artist.name}" path="{self.location}">'
 
 
 class Track(BaseTrack):
@@ -858,9 +855,9 @@ class BansheeStore(BackendStore, BansheeDB):
         self.current_connection_id = None
         if self.server:
             hostname = self.server.coherence.hostname
-            source_protocol_info = ['internal:%s:audio/mpeg:*' % hostname,
+            source_protocol_info = [f'internal:{hostname}:audio/mpeg:*',
                                     'http-get:*:audio/mpeg:*',
-                                    'internal:%s:application/ogg:*' % hostname,
+                                    f'internal:{hostname}:application/ogg:*',
                                     'http-get:*:application/ogg:*']
 
             self.server.connection_manager_server.set_variable(
