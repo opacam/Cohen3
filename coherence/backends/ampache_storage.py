@@ -551,7 +551,7 @@ class Video(BackendItem):
 
     def get_item(self, parent_id=VIDEO_CONTAINER_ID):
 
-        self.debug(f'video get_item {self.id} @ {self.parent_id}')
+        self.debug(f'video get_item {self.id} @ {parent_id}')
 
         # create item
         item = DIDLLite.VideoItem(self.id, parent_id)
