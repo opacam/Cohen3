@@ -103,7 +103,7 @@ class Container(BackendItem):
         self.childCount += 1
 
     def get_children(self, start=0, end=0):
-        self.info("container.get_children %r %r", start, end)
+        self.info(f'container.get_children {start} {end}')
         if (end - start > 250 or
                 end - start == 0):
             end = start + 250
@@ -163,7 +163,7 @@ class Playlist(BackendItem):
         BackendItem.__init__(self)
         self.store = store
         self.ampache_id = element.get('id')
-        self.id = 'playlist.%d' % int(element.get('id'))
+        self.id = f'playlist.{int(element.get("id")):d}'
         self.title = element.find('name').text
         self.creator = element.find('owner').text
         self.tracks = int(element.find('items').text)
@@ -205,7 +205,7 @@ class Album(BackendItem):
         BackendItem.__init__(self)
         self.store = store
         self.ampache_id = element.get('id')
-        self.id = 'album.%d' % int(element.get('id'))
+        self.id = f'album.{int(element.get("id")):d}'
         self.title = element.find('name').text
         self.artist = element.find('artist').text
         self.tracks = int(element.find('tracks').text)
@@ -264,7 +264,7 @@ class Artist(BackendItem):
         BackendItem.__init__(self)
         self.store = store
         self.ampache_id = element.get('id')
-        self.id = 'artist.%d' % int(element.get('id'))
+        self.id = f'artist.{int(element.get("id")):d}'
 
         try:
             self.count_albums = int(element.find('albums').text)
@@ -312,7 +312,7 @@ class Genre(BackendItem):
         BackendItem.__init__(self)
         self.store = store
         self.ampache_id = element.get('id')
-        self.id = 'genre.%d' % int(element.get('id'))
+        self.id = f'genre.{int(element.get("id")):d}'
 
         try:
             self.count_albums = int(element.find('albums').text)
@@ -364,7 +364,7 @@ class Tag(BackendItem):
         BackendItem.__init__(self)
         self.store = store
         self.ampache_id = element.get('id')
-        self.id = 'tag.%d' % int(element.get('id'))
+        self.id = f'tag.{int(element.get("id")):d}'
 
         try:
             self.count_albums = int(element.find('albums').text)
@@ -413,8 +413,8 @@ class Track(BackendItem):
     def __init__(self, store, element):
         BackendItem.__init__(self)
         self.store = store
-        self.id = 'song.%d' % int(element.get('id'))
-        self.parent_id = 'album.%d' % int(element.find('album').get('id'))
+        self.id = f'song.{int(element.get("id")):d}'
+        self.parent_id = f'album.{int(element.find("album").get("id")):d}'
 
         self.url = element.find('url').text
 
@@ -461,7 +461,7 @@ class Track(BackendItem):
 
     def get_item(self, parent_id=None):
 
-        self.debug("Track get_item %r @ %r", self.id, self.parent_id)
+        self.debug(f'Track get_item {self.id} @ {self.parent_id}')
 
         # create item
         item = DIDLLite.MusicTrack(self.id, self.parent_id)
@@ -477,7 +477,7 @@ class Track(BackendItem):
 
         # add http resource
         res = DIDLLite.Resource(self.get_url(),
-                                'http-get:*:%s:*' % self.mimetype)
+                                f'http-get:*:{self.mimetype}:*')
         if self.size > 0:
             res.size = self.size
         if self.duration > 0:
@@ -510,7 +510,7 @@ class Video(BackendItem):
     def __init__(self, store, element):
         BackendItem.__init__(self)
         self.store = store
-        self.id = 'video.%d' % int(element.get('id'))
+        self.id = f'video.{int(element.get("id")):d}'
 
         self.url = element.find('url').text
 
@@ -520,7 +520,7 @@ class Video(BackendItem):
             seconds = seconds - hours * 3600
             minutes = seconds / 60
             seconds = seconds - minutes * 60
-            self.duration = ("%d:%02d:%02d") % (hours, minutes, seconds)
+            self.duration = f"{hours:d}:{minutes:02d}:{seconds:02d}"
         except Exception:
             self.duration = 0
 
@@ -534,7 +534,7 @@ class Video(BackendItem):
         except Exception:
             self.mimetype, _ = mimetypes.guess_type(self.url, strict=False)
         if self.mimetype is None:
-            self.mimetype = "video/avi"
+            self.mimetype = 'video/avi'
         try:
             self.size = int(element.find('size').text)
         except Exception:
@@ -551,7 +551,7 @@ class Video(BackendItem):
 
     def get_item(self, parent_id=VIDEO_CONTAINER_ID):
 
-        self.debug("video get_item %r @ %r", self.id, parent_id)
+        self.debug(f'video get_item {self.id} @ {self.parent_id}')
 
         # create item
         item = DIDLLite.VideoItem(self.id, parent_id)
@@ -561,7 +561,7 @@ class Video(BackendItem):
 
         # add http resource
         res = DIDLLite.Resource(self.get_url(),
-                                'http-get:*:%s:*' % self.mimetype)
+                                f'http-get:*:{self.mimetype}:*')
         if self.size > 0:
             res.size = self.size
         if self.duration > 0:
@@ -621,10 +621,10 @@ class AmpacheStore(BackendStore):
         self.get_token()
 
     def __repr__(self):
-        return "Ampache storage"
+        return 'Ampache storage'
 
     def get_by_id(self, id):
-        self.info("looking for id %r", id)
+        self.info(f'looking for id {id}')
         if isinstance(id, str):
             id = id.split('@', 1)[0]
         elif isinstance(id, bytes):
@@ -649,15 +649,15 @@ class AmpacheStore(BackendStore):
         return item
 
     def got_auth_response(self, response, renegotiate=False):
-        self.info("got_auth_response %r", response)
+        self.info(f'got_auth_response {response}')
         try:
             response = etree.fromstring(response)
         except SyntaxError as msg:
-            self.warning('error parsing ampache answer %r', msg)
-            raise SyntaxError('error parsing ampache answer %r' % msg)
+            self.warning(f'error parsing ampache answer {msg}')
+            raise SyntaxError(f'error parsing ampache answer {msg}')
         try:
             error = response.find('error').text
-            self.warning('error on token request %r', error)
+            self.warning(f'error on token request {error}')
             raise ValueError(error)
         except AttributeError:
             try:
@@ -683,10 +683,10 @@ class AmpacheStore(BackendStore):
                     self.videos = 0
                 self.info('ampache returned auth token %r', self.token)
                 self.info(
-                    'Songs: %d, Artists: %d, Albums: %d, Playlists %d, '
-                    'Genres %d, Tags %d, Videos %d', self.songs, self.artists,
-                    self.albums, self.playlists, self.genres,
-                    self.tags, self.videos)
+                    f'Songs: {self.songs:d}, Artists: {self.artists:d}, '
+                    f'Albums: {self.albums:d}, Playlists {self.playlists:d}, '
+                    f'Genres {self.genres:d}, Tags {self.tag:d}, '
+                    f'Videos {self.videos:d}')
 
                 if not renegotiate:
                     self.containers = {}
@@ -719,7 +719,7 @@ class AmpacheStore(BackendStore):
                 raise ValueError('no authorization token returned')
 
     def got_auth_error(self, e, renegotiate=False):
-        self.warning('error calling ampache %r', e)
+        self.warning(f'error calling ampache {e}')
         if not renegotiate:
             louie.send('Coherence.UPnP.Backend.init_failed',
                        None, backend=self, msg=e)
@@ -728,35 +728,35 @@ class AmpacheStore(BackendStore):
         """ ask Ampache for the authorization token """
         timestamp = int(time.time())
         if self.api_version < 350001:
-            passphrase = md5('%d%s' % (timestamp, self.key))
+            passphrase = md5(f'{timestamp:d}{self.key}')
         else:
-            passphrase = sha256('%d%s' % (timestamp, sha256(self.key)))
+            passphrase = sha256(f'{timestamp:d}{sha256(self.key)}')
         request = ''.join(
-            (self.url, '?action=handshake&auth=%s&timestamp=%d' %
-                (passphrase, timestamp)))
+            (self.url,
+             f'?action=handshake&auth={passphrase}&timestamp={timestamp:d}'))
         if self.user is not None:
-            request = ''.join((request, '&user=%s' % self.user))
+            request = ''.join((request, f'&user={self.user}'))
         if self.api_version is not None:
-            request = ''.join((request, '&version=%s' % str(self.api_version)))
-        self.info("auth_request %r", request)
+            request = ''.join((request, f'&version={str(self.api_version)}'))
+        self.info(f'auth_request {request}')
         d = utils.getPage(request)
         d.addCallback(self.got_auth_response, renegotiate)
         d.addErrback(self.got_auth_error, renegotiate)
         return d
 
     def got_error(self, e):
-        self.warning('error calling ampache %r', e)
+        self.warning(f'error calling ampache {e}')
         return e
 
     def got_response(self, response, query_item, request):
-        self.info("got a response for %r", query_item)
+        self.info(f'got a response for {query_item}')
         self.debug(response)
         response = etree.fromstring(response)
         items = []
         try:
             error = response.find('error')
-            self.warning('error on token request %r %r', error.attrib['code'],
-                         error.text)
+            self.warning(
+                f'error on token request {error.attrib["code"]} {error.text}')
             if error.attrib['code'] == '401':
                 # session error, we need to renegotiate our session
                 d = self.get_token(renegotiate=True)
@@ -767,10 +767,10 @@ class AmpacheStore(BackendStore):
                     for part in new_request:
                         if part.startswith('auth='):
                             new_request[new_request.index(
-                                part)] = 'auth=%s' % self.token
+                                part)] = f'auth={self.token}'
                             break
                     new_request = '&'.join(new_request)
-                    self.info("ampache_query %r", new_request)
+                    self.info(f'ampache_query {new_request}')
                     return utils.getPage(new_request)
 
                 d.addCallback(resend_request, request)
@@ -826,13 +826,12 @@ class AmpacheStore(BackendStore):
 
     def ampache_query(self, item, start=0, request_count=0, filter=None):
         request = ''.join(
-            (self.url, '?action=%s&auth=%s&offset=%d' % (
-                item, self.token, start)))
+            (self.url, f'?action={item}&auth={self.token}&offset={start:d}'))
         if request_count > 0:
-            request = ''.join((request, '&limit=%d' % request_count))
+            request = ''.join((request, f'&limit={request_count:d}'))
         if filter is not None:
-            request = ''.join((request, '&filter=%s' % filter))
-        self.info("ampache_query %r", request)
+            request = ''.join((request, f'&filter={filter}'))
+        self.info(f'ampache_query {request}')
         d = utils.getPage(request)
         d.addCallback(self.got_response, item, request)
         d.addErrback(self.got_error)
@@ -935,8 +934,8 @@ class AmpacheStore(BackendStore):
             ObjectID = kwargs['ObjectID']
         except Exception as e:
             self.debug(
-                "hmm, a Browse action and no ObjectID argument? "
-                "An XBox maybe?  [ERROR: %r]" % (e,))
+                f'hmm, a Browse action and no ObjectID argument? '
+                f'An XBox maybe?  [ERROR: {e}]')
             try:
                 ObjectID = kwargs['ContainerID']
             except Exception:
@@ -954,8 +953,8 @@ class AmpacheStore(BackendStore):
         else:
             requested_id = str(ObjectID)
 
-        self.info("upnp_Browse request %r %r %r %r", ObjectID, BrowseFlag,
-                  StartingIndex, RequestedCount)
+        self.info(f'upnp_Browse request {ObjectID} {BrowseFlag} '
+                  f'{StartingIndex} {RequestedCount}')
 
         didl = DIDLLite.DIDLElement(
             upnp_client=kwargs.get('X_UPnPClient', ''),
@@ -972,7 +971,7 @@ class AmpacheStore(BackendStore):
             r = {'Result': didl.toString(), 'TotalMatches': tm,
                  'NumberReturned': num_ret}
 
-            self.info("upnp_Browse response %r %r", num_ret, tm)
+            self.info(f'upnp_Browse response {num_ret} {tm}')
 
             if hasattr(item, 'update_id'):
                 r['UpdateID'] = item.update_id
@@ -1024,7 +1023,7 @@ class AmpacheStore(BackendStore):
         total = 0
         items = []
 
-        wmc_mapping = getattr(self, "wmc_mapping", None)
+        wmc_mapping = getattr(self, 'wmc_mapping', None)
         if (kwargs.get('X_UPnPClient', '') == 'XBox' and
                 wmc_mapping is not None and
                 ObjectID in wmc_mapping):
@@ -1083,7 +1082,7 @@ if __name__ == '__main__':
 
     def main():
         def got_result(result):
-            print("got_result")
+            print('got_result')
 
         def call_browse(ObjectID=0, StartingIndex=0, RequestedCount=0):
             r = f.backend.upnp_Browse(BrowseFlag='BrowseDirectChildren',
