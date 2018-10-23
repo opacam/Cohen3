@@ -31,32 +31,32 @@ IMAGE_ALL_CONTAINER_ID = 301
 BUS_NAME = 'org.freedesktop.Tracker'
 OBJECT_PATH = '/org/freedesktop/tracker'
 
-tracks_query = """
+tracks_query = '''
 <rdfq:Condition>\
 <rdfq:equals>\
 <rdfq:Property name="Audio:Title" />\
 <rdf:String>*</rdf:String>\
 </rdfq:equals>\
 </rdfq:Condition>\
-"""
+'''
 
-video_query = """
+video_query = '''
 <rdfq:Condition>\
 <rdfq:equals>\
 <rdfq:Property name="File:Name" />\
 <rdf:String>*</rdf:String>\
 </rdfq:equals>\
 </rdfq:Condition>\
-"""
+'''
 
-image_query = """
+image_query = '''
 <rdfq:Condition>\
 <rdfq:equals>\
 <rdfq:Property name="File:Name" />\
 <rdf:String>*</rdf:String>\
 </rdfq:equals>\
 </rdfq:Condition>\
-"""
+'''
 
 
 class Container(BackendItem):
@@ -90,7 +90,7 @@ class Container(BackendItem):
             self.item.childCount += 1
 
     def get_children(self, start=0, end=0):
-        self.info("container.get_children %r %r", start, end)
+        self.info(f'container.get_children {start} {end}')
 
         if callable(self.children):
             return self.children(start, end - start)
@@ -126,7 +126,7 @@ class Artist(BackendItem):
     def __init__(self, store, id, name):
         BackendItem.__init__(self)
         self.store = store
-        self.id = 'artist.%d' % int(id)
+        self.id = f'artist.{int(id):d}'
         self.name = name
         self.children = {}
         self.sorted_children = None
@@ -184,7 +184,7 @@ class Album(BackendItem):
     def __init__(self, store, id, title, artist):
         BackendItem.__init__(self)
         self.store = store
-        self.id = 'album.%d' % int(id)
+        self.id = f'album.{int(id):d}'
         self.name = str(title)
         self.artist = str(artist)
         self.cover = None
@@ -261,7 +261,7 @@ class Track(BackendItem):
         seconds = seconds - hours * 3600
         minutes = seconds / 60
         seconds = seconds - minutes * 60
-        self.duration = ("%d:%02d:%02d") % (hours, minutes, seconds)
+        self.duration = f'{hours:d}:{minutes:02d}:{seconds:02d}'
 
         self.bitrate = 0
 
@@ -288,7 +288,7 @@ class Track(BackendItem):
 
     def get_item(self, parent_id=None):
 
-        self.debug("Track get_item %r @ %r", self.id, self.parent_id)
+        self.debug(f'Track get_item {self.id} @ {self.parent_id}')
 
         # create item
         item = DIDLLite.MusicTrack(self.id, self.parent_id)
@@ -303,7 +303,7 @@ class Track(BackendItem):
         item.albumArtURI = self.cover
 
         # add http resource
-        res = DIDLLite.Resource(self.url, 'http-get:*:%s:*' % self.mimetype)
+        res = DIDLLite.Resource(self.url, f'http-get:*:{self.mimetype}:*')
         if self.size > 0:
             res.size = self.size
         if self.duration > 0:
@@ -331,8 +331,9 @@ class Track(BackendItem):
         #         item.res.append(new_res)
         #
         #         if self.mimetype != 'audio/mpeg':
-        #             new_res = DIDLLite.Resource(self.url+'?transcoded=mp3',
-        #                 'http-get:*:%s:*' % 'audio/mpeg')
+        #             new_res = DIDLLite.Resource(
+        #                 self.url+'?transcoded=mp3',
+        #                 f'http-get:*:{"audio/mpeg"}:*')
         #             new_res.size = None
         #             if self.duration > 0:
         #                 new_res.duration = str(self.duration)
@@ -363,7 +364,7 @@ class Video(BackendItem):
                  size, mimetype):
         BackendItem.__init__(self)
         self.store = store
-        self.id = 'video.%d' % int(id)
+        self.id = f'video.{int(id):d}'
         self.parent_id = parent_id
 
         self.path = str(file)
@@ -377,7 +378,7 @@ class Video(BackendItem):
         seconds = seconds - hours * 3600
         minutes = seconds / 60
         seconds = seconds - minutes * 60
-        self.duration = ("%d:%02d:%02d") % (hours, minutes, seconds)
+        self.duration = f'{hours:d}:{minutes:02d}:{seconds:02d}'
 
         self.title = str(title)
 
@@ -395,7 +396,7 @@ class Video(BackendItem):
 
     def get_item(self, parent_id=None):
 
-        self.debug("Video get_item %r @ %r", self.id, self.parent_id)
+        self.debug(f'Video get_item {self.id} @ {self.parent_id}')
 
         # create item
         item = DIDLLite.VideoItem(self.id, self.parent_id)
@@ -405,7 +406,7 @@ class Video(BackendItem):
         item.albumArtURI = self.cover
 
         # add http resource
-        res = DIDLLite.Resource(self.url, 'http-get:*:%s:*' % self.mimetype)
+        res = DIDLLite.Resource(self.url, f'http-get:*:{self.mimetype}:*')
         if self.size > 0:
             res.size = self.size
         if self.duration > 0:
@@ -437,7 +438,7 @@ class Image(BackendItem):
                  size, mimetype):
         BackendItem.__init__(self)
         self.store = store
-        self.id = 'image.%d' % int(id)
+        self.id = f'image.{int(id):d}'
         self.parent_id = parent_id
 
         self.path = str(file)
@@ -457,7 +458,7 @@ class Image(BackendItem):
         return 0
 
     def get_item(self, parent_id=None):
-        self.debug("Image get_item %r @ %r", self.id, self.parent_id)
+        self.debug(f'Image get_item {self.id} @ {self.parent_id}')
 
         # create item
         item = DIDLLite.ImageItem(self.id, self.parent_id)
@@ -465,7 +466,7 @@ class Image(BackendItem):
         item.title = self.title
 
         # add http resource
-        res = DIDLLite.Resource(self.url, 'http-get:*:%s:*' % self.mimetype)
+        res = DIDLLite.Resource(self.url, f'http-get:*:{self.mimetype}:*')
         if self.size > 0:
             res.size = self.size
         item.res.append(res)
@@ -486,11 +487,11 @@ class Image(BackendItem):
 
 
 class TrackerStore(BackendStore):
-    """ this is a backend to Meta Tracker
+    ''' this is a backend to Meta Tracker
         http://www.gnome.org/projects/tracker/index.html
 
 
-    """
+    '''
 
     implements = ['MediaServer']
     logCategory = 'tracker_store'
@@ -554,7 +555,7 @@ class TrackerStore(BackendStore):
             try:
                 ml.append(mapping[service]())
             except KeyError:
-                self.warning('Wrong Tracker service definition - %r', service)
+                self.warning(f'Wrong Tracker service definition - {service}')
         if len(ml) > 0:
             dl = defer.DeferredList(ml)
             dl.addCallback(queries_finished)
@@ -569,10 +570,10 @@ class TrackerStore(BackendStore):
                 msg='No Tracker service defined!')
 
     def __repr__(self):
-        return "TrackerStore"
+        return 'TrackerStore'
 
     def get_by_id(self, id):
-        self.info("looking for id %r", id)
+        self.info(f'looking for id {id}')
         if isinstance(id, str):
             id = id.split('@', 1)[0]
         elif isinstance(id, bytes):
@@ -668,7 +669,7 @@ class TrackerStore(BackendStore):
             return error
 
         def parse_images_query_result(resultlist):
-            print("images", resultlist)
+            print('images', resultlist)
             images = []
             for image in resultlist:
                 file, _, title, album, \
@@ -861,30 +862,28 @@ class TrackerStore(BackendStore):
                 0,
                 'SourceProtocolInfo',
                 ['http-get:*:audio/mpeg:*',
-                 'internal:%s:audio/mpeg:*' % self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}:audio/mpeg:*',
                  'http-get:*:application/ogg:*',
                  'internal:%s:application/ogg:*' %
                  self.server.coherence.hostname,
                  'http-get:*:audio/ogg:*',
-                 'internal:%s:audio/ogg:*' % self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}:audio/ogg:*',
                  'http-get:*:video/ogg:*',
-                 'internal:%s:video/ogg:*' % self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}:video/ogg:*',
                  'http-get:*:video/mpeg:*',
-                 'internal:%s:video/mpeg:*' % self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}:video/mpeg:*',
                  'http-get:*:video/x-msvideo:*',
-                 'internal:%s:video/x-msvideo:*' %
-                 self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',
                  'http-get:*:video/avi:*',
-                 'internal:%s:video/avi:*' % self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}:video/avi:*',
                  'http-get:*:video/mp4:*',
-                 'internal:%s:video/mp4:*' % self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}:video/mp4:*',
                  'http-get:*:video/quicktime:*',
-                 'internal:%s:video/quicktime:*' %
-                 self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}:video/quicktime:*',
                  'http-get:*:image/jpg:*',
-                 'internal:%s:image/jpg:*' % self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}:image/jpg:*',
                  'http-get:*:image/png:*',
-                 'internal:%s:image/png:*' % self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}:image/png:*',
                  'http-get:*:image/gif:*',
-                 'internal:%s:image/gif:*' % self.server.coherence.hostname,
+                 f'internal:{self.server.coherence.hostname}:image/gif:*',
                  ])
