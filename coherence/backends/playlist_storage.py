@@ -46,7 +46,7 @@ class PlaylistItem(BackendItem):
                 protocol = "rtsp-rtp-udp"
 
             res = Resource(self.stream_url,
-                           '%s:*:%s:*' % (protocol, self.mimetype))
+                           f'{protocol}:*:{self.mimetype}:*')
             res.size = None
             item.res.append(res)
 
@@ -191,8 +191,8 @@ class PlaylistStore(AbstractBackendStore):
             return items
 
         def gotError(error):
-            self.warning("Unable to retrieve playlist: %s", url)
-            print("Error: %s" % error)
+            self.warning(f"Unable to retrieve playlist: {url}")
+            print(f"Error: {error}")
             return None
 
         d = getPage(url)
