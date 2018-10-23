@@ -98,31 +98,31 @@ class ExternalProcessProtocol(protocol.ProcessProtocol):
         self.caller = caller
 
     def connectionMade(self):
-        print("pp connection made")
+        print('pp connection made')
 
     def outReceived(self, data):
-        print("outReceived with %d bytes!" % len(data))
+        print(f'outReceived with {len(data):d} bytes!')
         self.caller.write_data(data)
 
     def errReceived(self, data):
-        # print "errReceived! with %d bytes!" % len(data)
-        print("pp (err):", data.strip())
+        # print(f'errReceived! with {len(data):d} bytes!')
+        print('pp (err):', data.strip())
 
     def inConnectionLost(self):
-        # print "inConnectionLost! stdin is closed! (we probably did it)"
+        # print('inConnectionLost! stdin is closed! (we probably did it)')
         pass
 
     def outConnectionLost(self):
-        # print "outConnectionLost! The child closed their stdout!"
+        # print('outConnectionLost! The child closed their stdout!')
         pass
 
     def errConnectionLost(self):
-        # print "errConnectionLost! The child closed their stderr."
+        # print('errConnectionLost! The child closed their stderr.')
         pass
 
     def processEnded(self, status_object):
-        print("processEnded, status %d" % status_object.value.exitCode)
-        print("processEnded quitting")
+        print(f'processEnded, status {status_object.value.exitCode:d}')
+        print('processEnded quitting')
         self.caller.ended = True
         self.caller.write_data('')
 
@@ -138,7 +138,7 @@ class ExternalProcessPipeline(resource.Resource, log.LogAble):
         self.mimetype = mimetype
 
     def render(self, request):
-        print("ExternalProcessPipeline render")
+        print('ExternalProcessPipeline render')
         if self.mimetype:
             request.setHeader('content-type', self.mimetype)
 
@@ -162,19 +162,19 @@ class ExternalProcessProducer(log.LogAble):
 
     def write_data(self, data):
         if data:
-            print("write %d bytes of data" % len(data))
+            print(f'write {len(data):d} bytes of data')
             self.written += len(data)
             # this .write will spin the reactor, calling .doWrite and then
             # .resumeProducing again, so be prepared for a re-entrant call
             self.request.write(data)
         if self.request and self.ended:
-            print("closing")
+            print('closing')
             self.request.unregisterProducer()
             self.request.finish()
             self.request = None
 
     def resumeProducing(self):
-        print("resumeProducing", self.request)
+        print('resumeProducing', self.request)
         if not self.request:
             return
         if self.process is None:
@@ -189,7 +189,7 @@ class ExternalProcessProducer(log.LogAble):
         pass
 
     def stopProducing(self):
-        print("stopProducing", self.request)
+        print('stopProducing', self.request)
         self.request.unregisterProducer()
         self.process.loseConnection()
         self.request.finish()
@@ -217,7 +217,7 @@ class Item(BackendItem):
         self.item = None
 
     def get_item(self):
-        print("get_item %r" % self.item)
+        print(f'get_item {self.item!r}')
         if self.item is None:
             self.item = self.upnp_class(self.id, self.parent.id,
                                         self.get_name())
@@ -225,8 +225,7 @@ class Item(BackendItem):
             self.item.date = self.date
 
             res = DIDLLite.Resource(
-                self.url, 'http-get:*:%s:%s' % (
-                    self.mimetype, self.fourth_field))
+                self.url, f'http-get:*:{self.mimetype}:{self.fourth_field}')
             res.duration = self.duration
             res.size = self.get_size()
             self.item.res.append(res)
@@ -235,7 +234,7 @@ class Item(BackendItem):
     def get_name(self):
         if self.name is None:
             if isinstance(self.location, FilePath):
-                self.name = self.location.basename().decode("utf-8", "replace")
+                self.name = self.location.basename().decode('utf-8', 'replace')
             else:
                 self.name = 'item'
         return self.name
@@ -288,7 +287,7 @@ class Container(BackendItem):
         self.sorted = False
 
     def add_child(self, child):
-        print("ADD CHILD %r" % child)
+        print('ADD CHILD %r' % child)
         # id = child.id
         # if isinstance(child.id, basestring):
         #    _,id = child.id.split('.')
@@ -297,7 +296,7 @@ class Container(BackendItem):
         self.sorted = False
 
     def get_children(self, start=0, end=0):
-        print("GET CHILDREN")
+        print('GET CHILDREN')
         if not self.sorted:
             def childs_key_sort(x):
                 return x.name
@@ -328,7 +327,7 @@ class TestStore(BackendStore):
     implements = ['MediaServer']
 
     def __init__(self, server, *args, **kwargs):
-        print("TestStore kwargs", kwargs)
+        print('TestStore kwargs', kwargs)
         BackendStore.__init__(self, server, **kwargs)
         self.name = kwargs.get('name', 'TestServer')
         self.next_id = 1000
@@ -419,7 +418,7 @@ class TestStore(BackendStore):
         try:
             return DIDLLite.upnp_classes[name]
         except KeyError:
-            self.warning("upnp_class %r not found, trying fallback", name)
+            self.warning(f'upnp_class {name} not found, trying fallback')
             parts = name.split('.')
             parts.pop()
             while len(parts) > 1:
@@ -428,7 +427,7 @@ class TestStore(BackendStore):
                 except KeyError:
                     parts.pop()
 
-        self.warning("WTF - no fallback for upnp_class %r found ?!?", name)
+        self.warning('WTF - no fallback for upnp_class {name} found ?!?')
         return None
 
     def get_next_id(self):
@@ -436,7 +435,7 @@ class TestStore(BackendStore):
         return self.next_id
 
     def get_by_id(self, id):
-        print("GET_BY_ID %r" % id)
+        print(f'GET_BY_ID {id}')
         item = self.store.get(id, None)
         if item is None:
             if int(id) == 0:
