@@ -74,20 +74,20 @@ class LastFMUser(log.LogAble):
                 if len(tuple) == 2:
                     if tuple[0] == "session":
                         self.sessionid = tuple[1]
-                        self.info("Got new sessionid: %r", self.sessionid)
+                        self.info(f"Got new sessionid: {self.sessionid}")
                     if tuple[0] == "base_url":
                         if self.host != tuple[1]:
                             self.host = tuple[1]
-                            self.info("Got new host: %s", self.host)
+                            self.info(f"Got new host: {self.host}")
                     if tuple[0] == "base_path":
                         if self.basepath != tuple[1]:
                             self.basepath = tuple[1]
-                            self.info("Got new path: %s", self.basepath)
+                            self.info(f"Got new path: {self.basepath}")
             self.get_tracks()
 
         def got_error(error):
-            self.warning("Login to LastFM Failed! %r", error)
-            self.debug("%r", error.getTraceback())
+            self.warning(f"Login to LastFM Failed! {error}")
+            self.debug(f"{error.getTraceback()}")
 
         # This function might be GPL!
         # Found this code in some other Projects, too.
@@ -137,8 +137,8 @@ class LastFMUser(log.LogAble):
                 self.tracks.append(item)
 
         def got_error(error):
-            self.warning("Problem getting Tracks! %r", error)
-            self.debug("%r", error.getTraceback())
+            self.warning(f"Problem getting Tracks! {error}")
+            self.debug(f"{error.getTraceback()}")
             self.getting_tracks = False
 
         self.getting_tracks = True
@@ -182,11 +182,11 @@ class LFMProxyStream(utils.ReverseProxyResource, log.LogAble):
         if path == '':
             path = '/'
 
-        # print "ProxyStream init", host, port, path
+        # print(f"ProxyStream init {host} {port} {path}")
         utils.ReverseProxyResource.__init__(self, host, port, path)
 
     def render(self, request):
-        self.debug("render %r", request)
+        self.debug(f"render {request}")
         self.parent.store.LFM.update(self.parent)
         self.parent.played = True
         return utils.ReverseProxyResource.render(self, request)
@@ -236,14 +236,13 @@ class LastFMItem(log.LogAble):
         if self.mimetype == 'directory':
             self.update_id = 0
         else:
-            res = Resource(
-                self.url,
-                'http-get:*:%s:%s' % (
-                    obj.get('mimetype'), ';'.join(
-                        ('DLNA.ORG_PN=MP3',
+            protocols = ('DLNA.ORG_PN=MP3',
                          'DLNA.ORG_CI=0',
                          'DLNA.ORG_OP=01',
-                         'DLNA.ORG_FLAGS=01700000000000000000000000000000'))))
+                         'DLNA.ORG_FLAGS=01700000000000000000000000000000')
+            res = Resource(
+                self.url,
+                f'http-get:*:{obj.get("mimetype")}:{";".join(protocols)}')
             res.size = -1  # None
             self.item.res.append(res)
 
@@ -263,9 +262,8 @@ class LastFMItem(log.LogAble):
             self.update_id += 1
 
     def remove_child(self, child):
-        self.info("remove_from %d (%s) child %d (%s)",
-                  self.id, self.get_name(),
-                  child.id, child.get_name())
+        self.info(f"remove_from {self.id:d} ({self.get_name()}) "
+                  f"child {child.id:d} ({child.get_name()})")
         if child in self.children:
             self.child_count -= 1
             if isinstance(self.item, Container):
@@ -425,7 +423,7 @@ def main():
     f = LastFMStore(None)
 
     def got_upnp_result(result):
-        print("upnp", result)
+        print(f"upnp {result}")
 
     f.upnp_init()
 
