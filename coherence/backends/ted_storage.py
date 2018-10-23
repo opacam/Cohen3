@@ -83,12 +83,7 @@ class TEDStore(BackendVideoStore):
     item_cls = TedTalk
     item_type = 'http-get:*:video/mp4:*'
 
-    def __init__(self, server, *args, **kwargs):
-        super(TEDStore, self).__init__(server, **kwargs)
-
-        self.refresh = int(kwargs.get('refresh', 1)) * (60 * 60)
-
-        self.last_updated = None
+    last_updated = None
 
     def parse_data(self, root):
         pub_date = root.find('./channel/lastBuildDate').text
