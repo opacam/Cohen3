@@ -265,7 +265,7 @@ class ITVStore(BackendStore):
         if self.server:
             self.server.connection_manager_server.set_variable(
                 0, 'SourceProtocolInfo',
-                ['http-get:*:%s:*' % VIDEO_MIMETYPE, ],
+                [f'http-get:*:{VIDEO_MIMETYPE}:*', ],
                 default=True)
         rootItem = Container(ROOT_CONTAINER_ID, self, -1, self.name)
         self.store[ROOT_CONTAINER_ID] = rootItem
@@ -280,10 +280,9 @@ class ITVStore(BackendStore):
                 self.info("Connection to ShoutCast service "
                           "successful for TV listing")
             else:
-                self.warning(
-                    "Connection to ShoutCast service "
-                    "successful for TV listing after %d attempts.",
-                    self.retrieveList_attemptCount)
+                self.warning(f"Connection to ShoutCast service "
+                             f"successful for TV listing after "
+                             f"{self.retrieveList_attemptCount:d} attempts.")
             result = result[0]
             result = utils.parse_xml(result, encoding='utf-8')
 
@@ -330,7 +329,7 @@ class ITVStore(BackendStore):
         def got_error(error):
             self.warning(
                 "Connection to ShoutCast service failed. Will retry in 5s!")
-            self.debug("%r", error.getTraceback())
+            self.debug(f"{error.getTraceback()!r}")
             # will retry later
             self.retrieveList_attemptCount += 1
             reactor.callLater(5, self.retrieveList, parent=parent)
