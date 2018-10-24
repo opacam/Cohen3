@@ -1,6 +1,5 @@
 Cohen3
 ======
-Simple DLNA/UPnP Media Server
 
 .. image:: https://travis-ci.com/opacam/Cohen3.svg?branch=master
         :target: https://travis-ci.com/opacam/Cohen3
@@ -44,6 +43,14 @@ Simple DLNA/UPnP Media Server
 
 .. image:: https://img.shields.io/github/license/opacam/Cohen3.svg
         :target: https://github.com/opacam/Cohen3/blob/master/LICENSE
+
+.. raw:: html
+
+        <div style="text-align:center;">
+        <h5>Dlna/UPnP framework</h5>
+        <img style="width: 12.5em;" src="coherence/web/static/images/coherence-icon.png"></img>
+        <h5>For the Digital Living</h5>
+        </div>
 
 Overview
 --------
