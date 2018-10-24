@@ -59,10 +59,11 @@ version named `Cohen <https://github.com/unintended/Cohen>`_. Provides several
 UPnP MediaServers and MediaRenderers to make simple publishing and streaming
 different types of media content to your network.
 
-Cohen3 is actually a highly simplified and refreshed version of
+Cohen3 is the Python 3's version of the
 `Coherence Framework <https://github.com/coherence-project/Coherence>`_
-project by `Frank Scholz <mailto:dev@coherence-project.org>`_ which looks like
-no longer supported.
+project, originally created by `Frank Scholz <mailto:dev@coherence-project.org>`_.
+If you ever used the original Coherence project you could use Cohen3 like you
+do in the original Coherence project.
 
 - Documentation: https://opacam.github.io/Cohen3/
 - GitHub: https://github.com/opacam/Cohen3
@@ -72,7 +73,8 @@ no longer supported.
 
 Features
 --------
-Cohen3 is known to work with various clients
+The original `Coherence Framework` were know to work with different kind of
+dlna/UPnP clients and Cohen3 should also work for them:
 
     - Sony Playstation 3/4
     - XBox360/One
@@ -81,24 +83,153 @@ Cohen3 is known to work with various clients
     - Samsung TVs
     - Sony Bravia TVs
 
-And provides a lot of backends to fulfil your media streaming needs
+And provides a lot of backends to fulfil your media streaming needs:
 
     - Local file storage
-    - YouTube
-    - Twitch.tv
+    - Apple Trailers
+    - Lol Cats
+    - ShoutCast Radio
     - and much more...
 
 Project Status
 --------------
-Right now this project is in development mode...there is more work to do
-in order to recover the expected behaviour, but right now the basic functionality
-of the project (Create a DLNA/UpnP client or a server with the FSStore plugin)
-seems to work in our tests.
+Right now Cohen is in development mode. All the code has been refactored in order
+to work for Python 3, moreover, some additions has been made to make easier
+to create a custom Backend (check the
+`models documentation <https://opacam.github.io/Cohen3/source/coherence.backends.models.html>`_ for more information).
+The original Coherence project was unmaintained for a while and some of the
+backends has become obsolete. You can see the backends status in the below table.
 
-NOTE: All the dependencies of the setup.py file are the basic dependencies in
-order to run a media server. Should be mentioned that some of the backends
-needs more dependencies and some of them may not work as expected because there
-aren't tested yet, see the install instructions section for more information.
+.. list-table::
+   :widths: 25 15 60
+   :header-rows: 1
+
+   * - Backend Name
+     - Status
+     - Description/Notes
+   * - |question| AmpacheStore
+     - *Not tested*
+     -
+   * - |success| AppleTrailersStore
+     - **WORKING**
+     -
+   * - |question| AudioCDStore
+     - *Not tested*
+     -
+   * - |question| AxisCamStore
+     - *Not tested*
+     -
+   * - |question| BansheeStore
+     - *Not tested*
+     -
+   * - |fails| BBCStore
+     - *Not working*
+     - *BBC shutdown the uri service, this backend will not work*
+   * - |question| BuzztardStore
+     - *Not tested*
+     -
+   * - |question| DVBDStore
+     - *Not tested*
+     -
+   * - |question| ElisaPlayer
+     - *Not tested*
+     -
+   * - |question| ElisaMediaStore
+     - *Not tested*
+     -
+   * - |question| FeedStore
+     - *Not tested*
+     -
+   * - |question| FlickrStore
+     - *Not tested*
+     -
+   * - |success| FSStore
+     - **WORKING**
+     -
+   * - |question| Gallery2Store
+     - *Not tested*
+     -
+   * - |question| GStreamerPlayer
+     - *Not tested*
+     -
+   * - |success| IRadioStore (ShoutCast)
+     - **WORKING**
+     -
+   * - |question| ITVStore
+     - *Not tested*
+     -
+   * - |question| LastFMStore
+     - *Not tested*
+     -
+   * - |success| LolcatsStore
+     - **WORKING**
+     -
+   * - |question| MediaStore
+     - *Not tested*
+     -
+   * - |question| MiroGuideStore
+     - *Not tested*
+     -
+   * - |question| PicasaStore
+     - *partially tested*
+     - *May work until starting year 2019, where google will begin to shutdown
+       this service, the source code should be rewrite using the api for the new
+       service `Google Photos`*
+   * - |success| PlayListStore
+     - **WORKING**
+     -
+   * - |question| RadiotimeStore
+     - *Not tested*
+     -
+   * - |question| SWR3Store
+     - *Not tested*
+     -
+   * - |success| TEDStore
+     - **WORKING**
+     -
+   * - |question| TestStore
+     - *Not tested*
+     -
+   * - |question| TrackerStore
+     - *Not tested*
+     -
+   * - |question| TestStore
+     - *Not tested*
+     -
+   * - |fails| TwitchStore
+     - *Partially working, video play is not working*
+     -
+   * - |fails| YamjStore
+     - *Not tested*
+     -
+   * - |fails| YouTubeStore
+     - *can't work*
+     - *Google moved to new api...backend should be rewrite with new api in mind*
+
+Notes:
+
+    - Some of the listed backends it may be removed in a future releases...
+      depending on if the target service is still available, dependencies of the
+      backend, maintainability...keep in mind that the main goal of this project
+      is to have a working media server/client capable of serve local files into
+      a dlna/upnp network, all the backends are extra features wich may be handy
+      for some end-users and also may be useful as a reference of how to make
+      your own backend using the Cohen3's modules.
+
+.. |success| image:: misc/other-icons/checked.png
+   :align: middle
+   :height: 15
+   :width: 15
+
+.. |fails| image:: misc/other-icons/cross.png
+   :align: middle
+   :height: 15
+   :width: 15
+
+.. |question| image:: misc/other-icons/question.png
+   :align: middle
+   :height: 15
+   :width: 15
 
 Installation from source
 ------------------------
