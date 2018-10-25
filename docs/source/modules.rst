@@ -2,6 +2,7 @@
 
 coherence.backend (module)
 --------------------------
+    .. _coherence.backend:
 
 .. automodule:: coherence.backend
 
