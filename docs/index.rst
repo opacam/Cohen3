@@ -61,6 +61,7 @@ Table of Contents
     install
     cli
     backends
+    write_a_backend
     source/coherence
     contributing
     contributor_code_of_conduct
