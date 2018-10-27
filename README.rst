@@ -101,109 +101,109 @@ The original Coherence project was unmaintained for a while and some of the
 backends has become obsolete. You can see the backends status in the below table.
 
 .. list-table::
-   :widths: 25 10 65
+   :widths: 10 25 65
    :header-rows: 1
 
-   * - Backend Name
-     - Status
+   * - Status
+     - Backend Name
      - Description/Notes
-   * - AmpacheStore
-     - |question|
+   * - |question|
+     - AmpacheStore
      -
-   * - AppleTrailersStore
-     - |success|
+   * - |success|
+     - AppleTrailersStore
      -
-   * - AudioCDStore
-     - |question|
+   * - |question|
+     - AudioCDStore
      -
-   * - AxisCamStore
-     - |question|
+   * - |question|
+     - AxisCamStore
      -
-   * - BansheeStore
-     - |question|
+   * - |question|
+     - BansheeStore
      -
-   * - BBCStore
-     - |fails|
+   * - |fails|
+     - BBCStore
      - *BBC shutdown the uri service, this backend will not work*
-   * - BuzztardStore
-     - |question|
+   * - |question|
+     - BuzztardStore
      -
-   * - DVBDStore
-     - |question|
+   * - |question|
+     - DVBDStore
      -
-   * - ElisaPlayer
-     - |question|
+   * - |question|
+     - ElisaPlayer
      -
-   * - ElisaMediaStore
-     - |question|
+   * - |question|
+     - ElisaMediaStore
      -
-   * - FeedStore
-     - |question|
+   * - |question|
+     - FeedStore
      -
-   * - FlickrStore
-     - |question|
+   * - |question|
+     - FlickrStore
      -
-   * - FSStore
-     - |success|
+   * - |success|
+     - FSStore
      -
-   * - Gallery2Store
-     - |question|
+   * - |question|
+     - Gallery2Store
      -
-   * - GStreamerPlayer
-     - |question|
+   * - |question|
+     - GStreamerPlayer
      -
-   * - IRadioStore (ShoutCast)
-     - |success|
+   * - |success|
+     - IRadioStore (ShoutCast)
      -
-   * - ITVStore
-     - |question|
+   * - |question|
+     - ITVStore
      -
-   * - LastFMStore
-     - |fails|
+   * - |fails|
+     - LastFMStore
      - *service moved to new api...needs update*
-   * - LolcatsStore
-     - |success|
+   * - |success|
+     - LolcatsStore
      -
-   * - MediaStore
-     - |question|
+   * - |question|
+     - MediaStore
      -
-   * - MiroGuideStore
-     - |fails|
+   * - |fails|
+     - MiroGuideStore
      - The miroguide's api is not working anymore :(
-   * - PicasaStore
-     - |question|
+   * - |question|
+     - PicasaStore
      - *Partially tested, may work until starting year 2019, where google will
        begin to shutdown this service, the source code should be rewrite using
        the api for the new service `Google Photos`*
-   * - PlayListStore
-     - |success|
+   * - |success|
+     - PlayListStore
      -
-   * - RadiotimeStore
-     - |question|
+   * - |question|
+     - RadiotimeStore
      -
-   * - SWR3Store
-     - |question|
+   * - |question|
+     - SWR3Store
      -
-   * - TEDStore
-     - |success|
+   * - |success|
+     - TEDStore
      -
-   * - TestStore
-     - |question|
+   * - |question|
+     - TestStore
      -
-   * - TrackerStore
-     - |question|
+   * - |question|
+     - TrackerStore
      -
-   * - TestStore
-     - |question|
+   * - |question|
+     - TestStore
      -
-   * - TwitchStore
-     - |fails|
+   * - |fails|
+     - TwitchStore
      - *Partially working, video play is not working*
-   * - YamjStore
-     - |question|
+   * - |question|
+     - YamjStore
      -
-   * - YouTubeStore
-     - |fails|
+   * - |fails|
+     - YouTubeStore
      - *Google moved to new api...backend should be rewrite with new api in mind*
 
 Notes:
