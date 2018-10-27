@@ -101,109 +101,109 @@ The original Coherence project was unmaintained for a while and some of the
 backends has become obsolete. You can see the backends status in the below table.
 
 .. list-table::
-   :widths: 25 15 60
+   :widths: 25 10 65
    :header-rows: 1
 
    * - Backend Name
      - Status
      - Description/Notes
-   * - |question| AmpacheStore
-     - *Not tested*
+   * - AmpacheStore
+     - |question|
      -
-   * - |success| AppleTrailersStore
-     - **WORKING**
+   * - AppleTrailersStore
+     - |success|
      -
-   * - |question| AudioCDStore
-     - *Not tested*
+   * - AudioCDStore
+     - |question|
      -
-   * - |question| AxisCamStore
-     - *Not tested*
+   * - AxisCamStore
+     - |question|
      -
-   * - |question| BansheeStore
-     - *Not tested*
+   * - BansheeStore
+     - |question|
      -
-   * - |fails| BBCStore
-     - *Not working*
+   * - BBCStore
+     - |fails|
      - *BBC shutdown the uri service, this backend will not work*
-   * - |question| BuzztardStore
-     - *Not tested*
+   * - BuzztardStore
+     - |question|
      -
-   * - |question| DVBDStore
-     - *Not tested*
+   * - DVBDStore
+     - |question|
      -
-   * - |question| ElisaPlayer
-     - *Not tested*
+   * - ElisaPlayer
+     - |question|
      -
-   * - |question| ElisaMediaStore
-     - *Not tested*
+   * - ElisaMediaStore
+     - |question|
      -
-   * - |question| FeedStore
-     - *Not tested*
+   * - FeedStore
+     - |question|
      -
-   * - |question| FlickrStore
-     - *Not tested*
+   * - FlickrStore
+     - |question|
      -
-   * - |success| FSStore
-     - **WORKING**
+   * - FSStore
+     - |success|
      -
-   * - |question| Gallery2Store
-     - *Not tested*
+   * - Gallery2Store
+     - |question|
      -
-   * - |question| GStreamerPlayer
-     - *Not tested*
+   * - GStreamerPlayer
+     - |question|
      -
-   * - |success| IRadioStore (ShoutCast)
-     - **WORKING**
+   * - IRadioStore (ShoutCast)
+     - |success|
      -
-   * - |question| ITVStore
-     - *Not tested*
+   * - ITVStore
+     - |question|
      -
-   * - |question| LastFMStore
-     - *Not working*
+   * - LastFMStore
+     - |fails|
      - *service moved to new api...needs update*
-   * - |success| LolcatsStore
-     - **WORKING**
+   * - LolcatsStore
+     - |success|
      -
-   * - |question| MediaStore
-     - *Not tested*
+   * - MediaStore
+     - |question|
      -
-   * - |question| MiroGuideStore
-     - *Deprecated*
+   * - MiroGuideStore
+     - |fails|
      - The miroguide's api is not working anymore :(
-   * - |question| PicasaStore
-     - *partially tested*
-     - *May work until starting year 2019, where google will begin to shutdown
-       this service, the source code should be rewrite using the api for the new
-       service `Google Photos`*
-   * - |success| PlayListStore
-     - **WORKING**
+   * - PicasaStore
+     - |question|
+     - *Partially tested, may work until starting year 2019, where google will
+       begin to shutdown this service, the source code should be rewrite using
+       the api for the new service `Google Photos`*
+   * - PlayListStore
+     - |success|
      -
-   * - |question| RadiotimeStore
-     - *Not tested*
+   * - RadiotimeStore
+     - |question|
      -
-   * - |question| SWR3Store
-     - *Not tested*
+   * - SWR3Store
+     - |question|
      -
-   * - |success| TEDStore
-     - **WORKING**
+   * - TEDStore
+     - |success|
      -
-   * - |question| TestStore
-     - *Not tested*
+   * - TestStore
+     - |question|
      -
-   * - |question| TrackerStore
-     - *Not tested*
+   * - TrackerStore
+     - |question|
      -
-   * - |question| TestStore
-     - *Not tested*
+   * - TestStore
+     - |question|
      -
-   * - |fails| TwitchStore
+   * - TwitchStore
+     - |fails|
      - *Partially working, video play is not working*
-     - *Needs fixes*
-   * - |fails| YamjStore
-     - *Not tested*
+   * - YamjStore
+     - |question|
      -
-   * - |fails| YouTubeStore
-     - *can't work*
+   * - YouTubeStore
+     - |fails|
      - *Google moved to new api...backend should be rewrite with new api in mind*
 
 Notes:
@@ -212,24 +212,24 @@ Notes:
       depending on if the target service is still available, dependencies of the
       backend, maintainability...keep in mind that the main goal of this project
       is to have a working media server/client capable of serve local files into
-      a dlna/upnp network, all the backends are extra features wich may be handy
+      a dlna/upnp network, all the backends are extra features which may be handy
       for some end-users and also may be useful as a reference of how to make
       your own backend using the Cohen3's modules.
 
 .. |success| image:: misc/other-icons/checked.png
    :align: middle
-   :height: 15
-   :width: 15
+   :height: 10
+   :width: 10
 
 .. |fails| image:: misc/other-icons/cross.png
    :align: middle
-   :height: 15
-   :width: 15
+   :height: 10
+   :width: 10
 
 .. |question| image:: misc/other-icons/question.png
    :align: middle
-   :height: 15
-   :width: 15
+   :height: 10
+   :width: 10
 
 Installation from source
 ------------------------
