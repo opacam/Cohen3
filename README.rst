@@ -46,11 +46,11 @@ Cohen3
 
 .. raw:: html
 
-        <div style="text-align:center;">
-        <h5>Dlna/UPnP framework</h5>
-        <img style="width: 12.5em;" src="coherence/web/static/images/coherence-icon.png"></img>
-        <h5>For the Digital Living</h5>
-        </div>
+        <h5 align="center">Dlna/UPnP framework</h5>
+        <p align="center">
+        <img style="width: 12.5em;" src="coherence/web/static/images/coherence-icon.png">
+        </p>
+        <h5 align="center">For the Digital Living</h5>
 
 Overview
 --------
