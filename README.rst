@@ -218,18 +218,18 @@ Notes:
 
 .. |success| image:: misc/other-icons/checked.png
    :align: middle
-   :height: 10
-   :width: 10
+   :height: 5
+   :width: 5
 
 .. |fails| image:: misc/other-icons/cross.png
    :align: middle
-   :height: 10
-   :width: 10
+   :height: 5
+   :width: 5
 
 .. |question| image:: misc/other-icons/question.png
    :align: middle
-   :height: 10
-   :width: 10
+   :height: 5
+   :width: 5
 
 Installation from source
 ------------------------
