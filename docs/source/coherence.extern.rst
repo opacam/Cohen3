@@ -3,35 +3,31 @@
 coherence.extern (package)
 ==========================
 
-coherence.extern.covers\_by\_amazon (module)
---------------------------------------------
+The coherence.extern package contains some external dependencies included into
+this project. Those external dependencies are included because the source code
+may be slightly different from the original projects, don't have an installer,
+are unmaintained...
 
-.. automodule:: coherence.extern.covers_by_amazon
-
-coherence.extern.db\_row (module)
----------------------------------
-
-.. automodule:: coherence.extern.db_row
-
-coherence.extern.louie (module)
--------------------------------
-
-.. automodule:: coherence.extern.louie
-
-coherence.extern.simple\_plugin (module)
-----------------------------------------
-
-.. automodule:: coherence.extern.simple_plugin
-
-coherence.extern.xdg (module)
------------------------------
-
-.. automodule:: coherence.extern.xdg
-
-Subpackages
------------
+Some of this external dependencies may be replaced or removed depending on the
+status of the Cohen3 project.
 
 .. toctree::
 
-    coherence.extern.galleryremote
-    coherence.extern.youtubedl
+    extern/covers_by_amazon
+    extern/db_row
+    extern/louie
+    extern/simple_plugin
+    extern/xdg
+
+coherence.extern.galleryremote (package)
+----------------------------------------
+
+.. toctree::
+
+    extern/galleryremote/gallery
+
+coherence.extern.youtubedl (package)
+------------------------------------
+
+.. toctree::
+    extern/youtubedl/youtubedl

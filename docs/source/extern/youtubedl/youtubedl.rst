@@ -1,8 +1,5 @@
 .. _extern_youtubedl:
 
-coherence.extern.youtubedl (package)
-====================================
-
 coherence.extern.youtubedl.youtubedl (module)
 ---------------------------------------------
 
