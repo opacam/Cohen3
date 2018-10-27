@@ -3,12 +3,13 @@
 Witting a backend (the old way)
 ===============================
 Here you will learn  how to write a backend from the scratch using the Cohen3
-module :ref:`backend <coherence.backend>`. We will try to explain it step by step, using
-as a model the classic backend LolcatsStore. You must know that this way is not
-the best way to implement this kind of media server, you can achieve the same
-result by using the newer tools :ref:`models <coherence.backends.models>`, but...
-it's recommended to read this document, because you will get an idea of what is
-happening behind the new way, using the :ref:`models <coherence.backends.models>`
+module :ref:`backend <coherence.backend>`. We will try to explain it step by
+step, using as a model the classic backend LolcatsStore. You must know that
+this way is not the best way to implement this kind of media server, you can
+achieve the same result by using the newer tools
+:ref:`models <coherence.backends.models (package)>`, but... it's recommended to
+read this document, because you will get an idea of what is happening behind
+the new way, using the :ref:`models <coherence.backends.models (package)>`
 which, in matter fact, uses the tools from :ref:`backend <coherence.backend>`
 so, it will be useful to write more complex backends and to understand the
 basics of the Cohen3 Project.
@@ -19,7 +20,7 @@ This Media Backend will allow you to access the cool and cute pictures
 from lolcats.com. This is mainly meant as a Sample Media Backend to learn
 how to write a Media Backend using the backend tools directly. Be aware that
 this could be done more easily using the modules from
-:ref:`models <coherence.backends.models>`.
+:ref:`models <coherence.backends.models (package)>`.
 
 So. You are still reading which allows me to assume that you want to learn how
 to write a Media Backend for Coherence. NICE :) .

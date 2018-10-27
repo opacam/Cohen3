@@ -3,17 +3,18 @@
 Witting a backend (the new way)
 ===============================
 Here you will learn  how to write a backend from the scratch using the Cohen3
-tools :ref:`models <coherence.backends.models>`. We will try to explain it step by step,
-using as a model the classic backend LolcatsStore. This same example is also
-explained using the module :ref:`backend <coherence.backend>` and you will get the
-same result using one method or another, but with this newer method you will have
-less lines in your code and will be more maintainable...so...let's begin...
+tools :ref:`models <coherence.backends.models (package)>`. We will try to
+explain it step by step, using as a model the classic backend LolcatsStore.
+This same example is also explained using the module
+:ref:`backend <coherence.backend>` and you will get the same result using one
+method or another, but with this newer method you will have less lines in your
+code and will be more maintainable...so...let's begin...
 
 Introduction
 ------------
 This is a Media Backend that allows you to access the cool and cute pictures
 from lolcats.com, explained from scratch using the tools from
-:ref:`models <coherence.backends.models>`.
+:ref:`models <coherence.backends.models (package)>`.
 
 The imports
 -----------
