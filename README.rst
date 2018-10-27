@@ -159,8 +159,8 @@ backends has become obsolete. You can see the backends status in the below table
      - *Not tested*
      -
    * - |question| LastFMStore
-     - *Not tested*
-     -
+     - *Not working*
+     - *service moved to new api...needs update*
    * - |success| LolcatsStore
      - **WORKING**
      -
@@ -168,8 +168,8 @@ backends has become obsolete. You can see the backends status in the below table
      - *Not tested*
      -
    * - |question| MiroGuideStore
-     - *Not tested*
-     -
+     - *Deprecated*
+     - The miroguide's api is not working anymore :(
    * - |question| PicasaStore
      - *partially tested*
      - *May work until starting year 2019, where google will begin to shutdown
@@ -198,7 +198,7 @@ backends has become obsolete. You can see the backends status in the below table
      -
    * - |fails| TwitchStore
      - *Partially working, video play is not working*
-     -
+     - *Needs fixes*
    * - |fails| YamjStore
      - *Not tested*
      -
