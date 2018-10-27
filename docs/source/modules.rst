@@ -45,16 +45,3 @@ coherence.tube\_service (module)
 --------------------------------
 
 .. automodule:: coherence.tube_service
-
-
-.. toctree::
-
-    coherence.backend
-    coherence.base
-    coherence.dbus_constants
-    coherence.dbus_service
-    coherence.dispatcher
-    coherence.json_service
-    coherence.log
-    coherence.transcoder
-    coherence.tube_service
