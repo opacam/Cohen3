@@ -17,14 +17,11 @@ class Receiver(object):
         return self.callback(*args, **kw)
 
     def __repr__(self):
+        args = ', '.join([f'{x!r}' for x in self.arguments])
+        kwargs = ', '.join([f'{x}={y}' for x, y in self.keywords.items()])
         return \
-            "<Receiver %s for %s: %s (%s, %s)>" % \
-            (id(self), self.signal, self.callback,
-             ', '.join(
-                 ['%r' % x for x in self.arguments]),
-             ', '.join(
-                 ['%s=%s' % (x, y) for x, y in self.keywords.items()])
-             )
+            f"<Receiver {id(self)} for {self.signal}: " \
+            f"{self.callback} ({args}, {kwargs})>"
 
 
 class UnknownSignal(Exception):
@@ -56,7 +53,7 @@ class Dispatcher(object):
         except KeyError:
             raise UnknownSignal(receiver.signal)
         except AttributeError:
-            raise TypeError("'%r' is not a Receiver-like object" % receiver)
+            raise TypeError(f"'{receiver!r}' is not a Receiver-like object")
         except ValueError:
             # receiver not in the list, goal achieved
             pass
@@ -119,7 +116,7 @@ class SignalingProperty(object):
         self.signal = signal
 
         if var_name is None:
-            var_name = "__%s__val" % signal
+            var_name = f"__{signal}__val"
 
         self.var_name = var_name
 
