@@ -96,9 +96,11 @@ Project Status
 Right now Cohen is in development mode. All the code has been refactored in order
 to work for Python 3, moreover, some additions has been made to make easier
 to create a custom Backend (check the
-`models documentation <https://opacam.github.io/Cohen3/source/coherence.backends.models.html>`_ for more information).
-The original Coherence project was unmaintained for a while and some of the
-backends has become obsolete. You can see the backends status in the below table.
+`coherence.backends.models <https://opacam.github.io/Cohen3/source/coherence.
+backends.html#coherence-backends-models-package>`_ package documentation for more
+information). The original Coherence project was unmaintained for a while and
+some of the backends has become obsolete. You can see the backends status in
+the below table.
 
 .. list-table::
    :widths: 10 25 65
