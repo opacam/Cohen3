@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0e614cc63c6a3875932b709df53b4ae794e3ab2ac73fe64470d68e85720d53a7"
+            "sha256": "48bcbc6d86aa0fedf4bca3bb8c651b94e67171ed24928759658e0303c656d955"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -250,13 +250,6 @@
             ],
             "index": "pypi",
             "version": "==1.12.2"
-        },
-        "louie-latest": {
-            "hashes": [
-                "sha256:0dcd6009cdb4e3ccf7633b31329afb99c7cea6ff9f817671ddb9d398429969de"
-            ],
-            "index": "pypi",
-            "version": "==1.3.1"
         },
         "lxml": {
             "hashes": [
