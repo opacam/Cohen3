@@ -39,6 +39,7 @@ epsilon = {ref = "python3", git = "git://github.com/opacam/epsilon"}
 Axiom = {ref = "python3", git = "git://github.com/opacam/axiom"}
 travis-sphinx = "*"
 autobahn = "*"
+"403b5ad" = {file = "https://github.com/lobocv/eventdispatcher/archive/1.9.4.tar.gz"}
 
 [dev-packages]
 pipenv = "==2018.7.1"

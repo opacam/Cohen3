@@ -106,6 +106,7 @@ The basic dependencies for the package are:
     - Twisted >= 18.7
     - zope.interface
     - lxml
+    - eventdispatcher >= 1.9.4
     - python-dateutil
     - pyopenssl
 

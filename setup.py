@@ -20,6 +20,7 @@ deps = [
     'Twisted >= 18.7',
     'zope.interface',
     'lxml',
+    'eventdispatcher',
     'python-dateutil',
     'pyopenssl'
 ]
@@ -168,6 +169,7 @@ setup(name='Cohen3',
           'web': web_ui_require,
       },
       dependency_links=[
+          'git+git://github.com/lobocv/eventdispatcher@releases/tag/1.9.4#egg=eventdispatcher',
           'git+git://github.com/dvska/gdata-python3@master#egg=gdata',
           'git+git://github.com/fishstiqz/pycdb@master#egg=pycdb',
           'git+git://github.com/JonnyJD/python-discid@master#egg=discid',

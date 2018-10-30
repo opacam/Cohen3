@@ -8,6 +8,7 @@ configobj==5.0.6
 constantly==15.1.0
 cryptography==2.3
 futures==3.1.1
+git+git://github.com/lobocv/eventdispatcher@releases/tag/1.9.4#egg=eventdispatcher
 git+git://github.com/dvska/gdata-python3@master#egg=gdata
 hyperlink==18.0.0
 idna==2.7
