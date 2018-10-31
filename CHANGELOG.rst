@@ -1,3 +1,23 @@
+0.8.3 - Introduces Backend's models
+-----------------------------------
+
+General:
+    - Refactor some backends using the new module backends.models
+    - Introduces new module: backends.models
+    - Add backends status to README
+    - Better and cleaner documentation
+    - Python 3's f-Strings for backends modules
+    - Upgraded dependency for requests package (fix vulnerability)
+    - Split into several files the sphinx's documentation
+    - Migrate reports from coverage to codecov
+
+Fixes:
+    - Fix backend IRadioStore (ShoutCast Radio)
+    - Fix backend TEDStore
+    - Fix backend LolcatsStore
+    - Fix backend AppleTrailersStore
+    - Fix the parsing of the soap messages with encoding declared
+
 0.8.2 - Fixes and enhancements
 ------------------------------
 
