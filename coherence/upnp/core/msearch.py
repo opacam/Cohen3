@@ -3,6 +3,14 @@
 #
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+'''
+:class:`MSearch`
+----------------
+
+A class representing a protocol for datagram-oriented transport, e.g. UDP.
+'''
 
 import socket
 import time
@@ -11,20 +19,32 @@ from twisted.internet import reactor
 from twisted.internet import task
 from twisted.internet.protocol import DatagramProtocol
 
-import coherence.extern.louie as louie
+from eventdispatcher import EventDispatcher
+
 from coherence.upnp.core import utils
+from coherence import log
 
 SSDP_PORT = 1900
 SSDP_ADDR = '239.255.255.250'
 
-from coherence import log
 
+class MSearch(EventDispatcher, DatagramProtocol, log.LogAble):
+    '''
+    .. versionchanged:: 0.9.0
 
-class MSearch(DatagramProtocol, log.LogAble):
+        * Migrated from louie/dispatcher to EventDispatcher
+        * The emitted events changed:
+
+            - UPnP.SSDP.datagram_received => datagram_received
+    '''
     logCategory = 'msearch'
 
     def __init__(self, ssdp_server, test=False):
         log.LogAble.__init__(self)
+        EventDispatcher.__init__(self)
+        self.register_event(
+            'datagram_received',
+        )
         self.ssdp_server = ssdp_server
         if not test:
             self.port = reactor.listenUDP(0, self)
@@ -59,10 +79,10 @@ class MSearch(DatagramProtocol, log.LogAble):
 
         # make raw data available
         # send out the signal after we had a chance to register the device
-        louie.send('UPnP.SSDP.datagram_received', None, data, host, port)
+        self.dispatch_event('datagram_received', data, host, port)
 
     def double_discover(self):
-        " Because it's worth it (with UDP's reliability) "
+        '''Because it's worth it (with UDP's reliability)'''
         self.info('send out discovery for ssdp:all')
         self.discover()
         self.discover()
