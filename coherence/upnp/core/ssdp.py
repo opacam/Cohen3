@@ -5,9 +5,14 @@
 # Copyright 2006 John-Mark Gurney <gurney_j@resnet.uroegon.edu>
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006,2007,2008,2009 Frank Scholz <coherence@beebits.net>
-#
-# Implementation of a SSDP server under Twisted Python.
-#
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+'''
+:class:`SSDPServer`
+-------------------
+
+Implementation of a SSDP server under Twisted and EventDispatcher.
+'''
 
 import random
 import socket
@@ -19,7 +24,8 @@ from twisted.internet.protocol import DatagramProtocol
 from twisted.web.http import datetimeToString
 from twisted.test import proto_helpers
 
-import coherence.extern.louie as louie
+from eventdispatcher import EventDispatcher, ListProperty
+
 from coherence.upnp.core.utils import to_bytes, to_string
 from coherence import log, SERVER_ID
 
@@ -27,15 +33,42 @@ SSDP_PORT = 1900
 SSDP_ADDR = '239.255.255.250'
 
 
-class SSDPServer(DatagramProtocol, log.LogAble):
-    """A class implementing a SSDP server.  The notifyReceived and
-    searchReceived methods are called when the appropriate type of
-    datagram is received by the server."""
+class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
+    '''
+    A class implementing a SSDP server.
+
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * The emitted events changed:
+
+            - datagram_received => datagram_received
+            - Coherence.UPnP.SSDP.new_device => new_device
+            - Coherence.UPnP.SSDP.removed_device => removed_device
+            - Coherence.UPnP.Log => log
+
+        * Added new class variable `root_devices` which uses EventDispatcher's
+          properties
+
+    .. note:: The methods :meth:`notifyReceived` and :meth:`searchReceived`
+              are called when the appropriate type of datagram is received by
+              the server.
+    '''
     logCategory = 'ssdp'
+
+    root_devices = ListProperty([])
+    '''A list of the detected root devices'''
 
     def __init__(self, test=False, interface=''):
         # Create SSDP server
         log.LogAble.__init__(self)
+        EventDispatcher.__init__(self)
+        self.register_event(
+            'datagram_received',
+            'new_device',
+            'removed_device',
+            'log',
+        )
         self.known = {}
         self._callbacks = {}
         self.test = test
@@ -56,6 +89,8 @@ class SSDPServer(DatagramProtocol, log.LogAble):
         self.active_calls = []
 
     def shutdown(self):
+        '''Shutdowns the server :class:`SSDPServer` and sends out
+        the bye bye notifications via method :meth:`doByebye`.'''
         for call in reactor.getDelayedCalls():
             if call.func == self.send_it:
                 call.cancel()
@@ -64,13 +99,12 @@ class SSDPServer(DatagramProtocol, log.LogAble):
                 self.resend_notify_loop.stop()
             if self.check_valid_loop.running:
                 self.check_valid_loop.stop()
-            '''Make sure we send out the byebye notifications.'''
             for st in self.known:
                 if self.known[st]['MANIFESTATION'] == 'local':
                     self.doByebye(st)
 
     def datagramReceived(self, data, xxx_todo_changeme):
-        """Handle a received multicast datagram."""
+        '''Handle a received multicast datagram.'''
         self.debug('datagramReceived: {}'.format(data))
         (host, port) = xxx_todo_changeme
         data = to_string(data)
@@ -120,15 +154,15 @@ class SSDPServer(DatagramProtocol, log.LogAble):
 
         # make raw data available
         # send out the signal after we had a chance to register the device
-        louie.send('UPnP.SSDP.datagram_received', None, data, host, port)
+        self.dispatch_event('datagram_received', data, host, port)
 
     def register(self, manifestation, usn, st, location,
                  server=SERVER_ID,
                  cache_control='max-age=1800',
                  silent=False,
                  host=None):
-        """Register a service or device that this SSDP server will
-        respond to."""
+        '''Register a service or device that this SSDP server will
+        respond to.'''
 
         self.info('Registering {} ({}) -> {}'.format(
             st, location, manifestation))
@@ -155,9 +189,9 @@ class SSDPServer(DatagramProtocol, log.LogAble):
                 self.doNotify(usn)
 
             if st == 'upnp:rootdevice':
-                louie.send(
-                    'Coherence.UPnP.SSDP.new_device',
-                    None, device_type=st, infos=self.known[usn])
+                self.dispatch_event(
+                    'new_device', device_type=st, infos=self.known[usn])
+                self.root_devices.append((st, self.known[usn]))
                 # self.callback("new_device", st, self.known[usn])
             # print('\t - ok all')
         except Exception as err:
@@ -168,19 +202,19 @@ class SSDPServer(DatagramProtocol, log.LogAble):
         self.msg("Un-registering {}".format(usn))
         st = self.known[usn]['ST']
         if st == 'upnp:rootdevice':
-            louie.send(
-                'Coherence.UPnP.SSDP.removed_device',
-                None, device_type=st, infos=self.known[usn])
+            self.dispatch_event(
+                'removed_device', device_type=st, infos=self.known[usn])
             # self.callback("removed_device", st, self.known[usn])
 
+        self.root_devices.remove((st, self.known[usn]))
         del self.known[usn]
 
     def isKnown(self, usn):
         return usn in self.known
 
     def notifyReceived(self, headers, xxx_todo_changeme1):
-        """Process a presence announcement.  We just remember the
-        details of the SSDP service announced."""
+        '''Process a presence announcement.  We just remember the
+        details of the SSDP service announced.'''
         (host, port) = xxx_todo_changeme1
         self.info('Notification from ({},{}) for {}'.format(
             host, port, headers['nt']))
@@ -201,8 +235,8 @@ class SSDPServer(DatagramProtocol, log.LogAble):
         else:
             self.warning('Unknown subtype {} for notification type {}'.format(
                 headers['nts'], headers['nt']))
-        louie.send('Coherence.UPnP.Log', None, 'SSDP', host,
-                   'Notify %s for %s' % (headers['nts'], headers['usn']))
+        self.dispatch_event('log', 'SSDP', host,
+                            f'Notify {headers["nts"]} for {headers["usn"]}')
 
     def send_it(self, response, destination, delay, usn):
         self.info('send discovery response delayed by '
@@ -215,16 +249,15 @@ class SSDPServer(DatagramProtocol, log.LogAble):
                       '{}'.format(msg))
 
     def discoveryRequest(self, headers, xxx_todo_changeme2):
-        """Process a discovery request.  The response must be sent to
-        the address specified by (host, port)."""
+        '''Process a discovery request.  The response must be sent to
+        the address specified by (host, port).'''
         (host, port) = xxx_todo_changeme2
         self.info('Discovery request from ({},{}) for {}'.format(
             host, port, headers['st']))
         self.info('Discovery request for {}'.format(headers['st']))
 
-        louie.send(
-            'Coherence.UPnP.Log',
-            None, 'SSDP', host, 'M-Search for %s' % headers['st'])
+        self.dispatch_event('log', 'SSDP', host,
+                            f'M-Search for {headers["st"]}')
 
         # Do we know about this service?
         for i in list(self.known.values()):
@@ -253,7 +286,7 @@ class SSDPServer(DatagramProtocol, log.LogAble):
                     (host, port), delay, usn)
 
     def doNotify(self, usn):
-        """Do notification"""
+        '''Do notification'''
 
         if self.known[usn]['SILENT'] is True:
             return
@@ -291,7 +324,7 @@ class SSDPServer(DatagramProtocol, log.LogAble):
             self.info('failure sending out alive notification: {}'.format(msg))
 
     def doByebye(self, usn):
-        """Do byebye"""
+        '''Do byebye'''
 
         self.info('Sending byebye notification for %s', usn)
 
@@ -331,9 +364,10 @@ class SSDPServer(DatagramProtocol, log.LogAble):
                 self.doNotify(usn)
 
     def check_valid(self):
-        """ check if the discovered devices are still ok, or
-            if we haven't received a new discovery response
-        """
+        '''
+        Check if the discovered devices are still ok,
+        or if we haven't received a new discovery response
+        '''
         self.debug("Checking devices/services are still valid")
         removable = []
         for usn in self.known:
@@ -348,9 +382,9 @@ class SSDPServer(DatagramProtocol, log.LogAble):
                 if last_seen + expiry + 30 < now:
                     self.debug('Expiring: {}'.format(self.known[usn]))
                     if self.known[usn]['ST'] == 'upnp:rootdevice':
-                        louie.send(
-                            'Coherence.UPnP.SSDP.removed_device',
-                            None, device_type=self.known[usn]['ST'],
+                        self.dispatch_event(
+                            'removed_device',
+                            device_type=self.known[usn]['ST'],
                             infos=self.known[usn])
                     removable.append(usn)
         while len(removable) > 0:
