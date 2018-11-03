@@ -3,9 +3,18 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
-# Copyright 2010 Frank Scholz <dev@coherence-project.org>
+# Copyright 2010, Frank Scholz <dev@coherence-project.org>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
-import coherence.extern.louie as louie
+'''
+:class:`WANDeviceClient`
+------------------------
+
+A class representing an embedded device with a WAN client.
+'''
+
+from eventdispatcher import EventDispatcher, Property
+
 from coherence import log
 from coherence.upnp.devices.wan_connection_device_client import \
     WANConnectionDeviceClient
@@ -13,26 +22,58 @@ from coherence.upnp.services.clients.wan_common_interface_config_client import\
     WANCommonInterfaceConfigClient
 
 
-class WANDeviceClient(log.LogAble):
+class WANDeviceClient(EventDispatcher, log.LogAble):
+    '''
+    .. versionchanged:: 0.9.0
+
+        * Introduced inheritance from EventDispatcher
+        * The emitted events changed:
+
+            - Coherence.UPnP.EmbeddedDeviceClient.detection_completed =>
+              embedded_device_client_detection_completed
+
+        * Changed some class variable to benefit from the EventDispatcher's
+          properties:
+
+            - :attr:`embedded_device_detection_completed`
+            - :attr:`service_detection_completed`
+
+    '''
     logCategory = 'wan_device_client'
+
+    embedded_device_detection_completed = Property(False)
+    '''
+    To know whenever the embedded device detection has completed. Defaults to
+    `False` and it will be set automatically to `True` by the class method
+    :meth:`embedded_device_notified`.
+    '''
+
+    service_detection_completed = Property(False)
+    '''
+    To know whenever the service detection has completed. Defaults to `False`
+    and it will be set automatically to `True` by the class method
+    :meth:`service_notified`.
+    '''
 
     def __init__(self, device):
         log.LogAble.__init__(self)
+        EventDispatcher.__init__(self)
+        self.register_event(
+            'embedded_device_client_detection_completed',
+        )
+
         self.device = device
+        self.device.bind(
+            embedded_device_client_detection_completed=self.embedded_device_notified,  # noqa
+            service_notified=self.service_notified
+        )
         self.device_type = self.device.get_friendly_device_type()
+
         self.version = int(self.device.get_device_type_version())
         self.icons = device.icons
 
         self.wan_connection_device = None
         self.wan_common_interface_connection = None
-
-        self.embedded_device_detection_completed = False
-        self.service_detection_completed = False
-
-        louie.connect(
-            self.embedded_device_notified,
-            signal='Coherence.UPnP.EmbeddedDeviceClient.detection_completed',
-            sender=self.device)
 
         try:
             wan_connection_device = \
@@ -47,9 +88,6 @@ class WANDeviceClient(log.LogAble):
                 "the UPnP specification [ERROR: {}]".format(er))
             raise
 
-        louie.connect(self.service_notified,
-                      signal='Coherence.UPnP.DeviceClient.Service.notified',
-                      sender=self.device)
         for service in self.device.get_services():
             if service.get_type() in [
                     "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1"]:
@@ -73,10 +111,8 @@ class WANDeviceClient(log.LogAble):
         self.embedded_device_detection_completed = True
         if self.embedded_device_detection_completed is True and \
                 self.service_detection_completed is True:
-            louie.send(
-                'Coherence.UPnP.EmbeddedDeviceClient.detection_completed',
-                None,
-                self)
+            self.dispatch_event(
+                'embedded_device_client_detection_completed', self)
 
     def service_notified(self, service):
         self.info("Service %r sent notification", service)
@@ -92,7 +128,5 @@ class WANDeviceClient(log.LogAble):
         self.service_detection_completed = True
         if self.embedded_device_detection_completed is True and \
                 self.service_detection_completed is True:
-            louie.send(
-                'Coherence.UPnP.EmbeddedDeviceClient.detection_completed',
-                None,
-                self)
+            self.dispatch_event(
+                'embedded_device_client_detection_completed', self)
