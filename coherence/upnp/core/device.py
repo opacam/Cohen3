@@ -160,6 +160,8 @@ class Device(EventDispatcher, log.LogAble):
         for s in self.services:
             if not s.detection_completed:
                 return
+            self.dispatch_event(
+                'device_service_notified', service=s)
         if self.udn is None:
             return
         self.detection_completed = True
