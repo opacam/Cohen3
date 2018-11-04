@@ -27,7 +27,7 @@ class MediaRendererClient(EventDispatcher, log.LogAble):
     .. versionchanged:: 0.9.0
 
         * Introduced inheritance from EventDispatcher
-         * The emitted events changed:
+        * The emitted events changed:
 
             - Coherence.UPnP.DeviceClient.detection_completed =>
               device_client_detection_completed
