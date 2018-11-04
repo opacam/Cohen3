@@ -1,10 +1,35 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
-# Copyright 2007,2008,2009 - Frank Scholz <coherence@beebits.net>
+# Copyright 2007-2009, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
-""" DBUS service class
+"""
+DBUS service class
+==================
 
+Module to add dbus compatibility to Cohen3's project.
+
+:class:`DBusCDSService`
+-----------------------
+
+The DBus service for UPnP's CDS (Content Directory Service)
+
+:class:`DBusService`
+--------------------
+
+The generic DBus service for UPnP.
+
+:class:`DBusDevice`
+-------------------
+
+Class representing a DBus device.
+
+:class:`DBusPontoon`
+--------------------
+
+Used to initialize DBus from within the class
+:class:`~coherence.base.Coherence`.
 """
 import time
 import urllib.error
@@ -14,6 +39,8 @@ import urllib.request
 
 import dbus
 from lxml import etree
+
+from eventdispatcher import EventDispatcher
 
 if dbus.__version__ < '0.82.2':
     raise ImportError(
@@ -29,8 +56,8 @@ import dbus.service
 from coherence import __version__
 from coherence.upnp.core import DIDLLite
 from coherence.dbus_constants import *
-import coherence.extern.louie as louie
 from coherence import log
+
 from twisted.internet import reactor, task
 
 namespaces = {'{http://purl.org/dc/elements/1.1/}': 'dc:',
@@ -47,17 +74,22 @@ def un_namespace(text):
     return text
 
 
-class DBusCDSService(dbus.service.Object, log.LogAble):
+class DBusCDSService(EventDispatcher, dbus.service.Object, log.LogAble):
+    '''
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
     logCategory = 'dbus'
     NOT_FOR_THE_TUBES = True
 
     def __init__(self, service, dbus_device, bus):
         log.LogAble.__init__(self)
+        EventDispatcher.__init__(self)
         self.service = service
         self.dbus_device = dbus_device
 
-        self.type = self.service.service_type.split(':')[
-            3]  # get the service name
+        # get the service name
+        self.type = self.service.service_type.split(':')[3]
 
         bus_name = dbus.service.BusName(CDS_SERVICE, bus)
 
@@ -67,8 +99,8 @@ class DBusCDSService(dbus.service.Object, log.LogAble):
         dbus.service.Object.__init__(self, bus, bus_name=bus_name,
                                      object_path=self.path)
         self.debug("DBusService %r %r", service, self.type)
-        louie.connect(self.variable_changed, 'StateVariable.changed',
-                      sender=self.service)
+        if isinstance(self.service, EventDispatcher):
+            self.service.bind(state_variable_changed=self.variable_changed)
 
         self.subscribeStateVariables()
 
@@ -76,8 +108,8 @@ class DBusCDSService(dbus.service.Object, log.LogAble):
         self._release_thyself(suicide_mode=False)
 
     def _release_thyself(self, suicide_mode=True):
-        louie.disconnect(self.variable_changed, 'StateVariable.changed',
-                         sender=self.service)
+        if isinstance(self.service, EventDispatcher):
+            self.service.unbind(state_variable_changed=self.variable_changed)
         self.service = None
         self.dbus_device = None
         self.remove_from_connection()
@@ -503,6 +535,10 @@ class DBusCDSService(dbus.service.Object, log.LogAble):
 
 
 class DBusService(dbus.service.Object, log.LogAble):
+    '''
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
     logCategory = 'dbus'
     SUPPORTS_MULTIPLE_CONNECTIONS = True
 
@@ -537,9 +573,9 @@ class DBusService(dbus.service.Object, log.LogAble):
         dbus.service.Object.__init__(self, bus, bus_name=bus_name,
                                      object_path=self.path)
         self.debug("DBusService %r %r", service, self.type)
-        louie.connect(self.variable_changed,
-                      'Coherence.UPnP.StateVariable.changed',
-                      sender=self.service)
+        if isinstance(self.service, EventDispatcher):
+            self.service.bind(
+                state_variable_changed=self.variable_changed)
 
         self.subscribe()
         # interfaces = self._dbus_class_table[
@@ -559,9 +595,9 @@ class DBusService(dbus.service.Object, log.LogAble):
         self._release_thyself(suicide_mode=False)
 
     def _release_thyself(self, suicide_mode=True):
-        louie.disconnect(self.variable_changed,
-                         'Coherence.UPnP.StateVariable.changed',
-                         sender=self.service)
+        if isinstance(self.service, EventDispatcher):
+            self.service.unbind(
+                state_variable_changed=self.variable_changed)
         self.service = None
         self.dbus_device = None
         self.tube = None
@@ -856,6 +892,10 @@ class DBusDevice(dbus.service.Object, log.LogAble):
 
 
 class DBusPontoon(dbus.service.Object, log.LogAble):
+    '''
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
     logCategory = 'dbus'
     SUPPORTS_MULTIPLE_CONNECTIONS = True
 
@@ -886,38 +926,19 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
 
         for device in self.controlpoint.get_devices():
             self.devices[device.get_id()] = DBusDevice(device, self.bus_name)
-        # louie.connect(
-        #     self.cp_ms_detected,
-        #     'Coherence.UPnP.ControlPoint.MediaServer.detected', louie.Any)
-        # louie.connect(
-        #     self.cp_ms_removed,
-        #     'Coherence.UPnP.ControlPoint.MediaServer.removed', louie.Any)
-        # louie.connect(
-        #     self.cp_mr_detected,
-        #     'Coherence.UPnP.ControlPoint.MediaRenderer.detected', louie.Any)
-        # louie.connect(
-        #     self.cp_mr_removed,
-        #     'Coherence.UPnP.ControlPoint.MediaRenderer.removed', louie.Any)
-        # louie.connect(
-        #     self.remove_client,
-        #     'Coherence.UPnP.Device.remove_client', louie.Any)
 
-        louie.connect(
-            self._device_detected,
-            'Coherence.UPnP.Device.detection_completed', louie.Any)
-        louie.connect(
-            self._device_removed,
-            'Coherence.UPnP.Device.removed', louie.Any)
+        self.controlpoint.bind(
+            control_point_client_detected=self._device_detected)
+        self.controlpoint.bind(
+            control_point_client_removed=self._device_removed)
 
         self.debug("D-Bus pontoon started")
 
     def shutdown(self):
-        louie.disconnect(
-            self._device_detected,
-            'Coherence.UPnP.Device.detection_completed', louie.Any)
-        louie.disconnect(
-            self._device_removed,
-            'Coherence.UPnP.Device.removed', louie.Any)
+        self.controlpoint.unbind(
+            control_point_client_detected=self._device_detected)
+        self.controlpoint.unbind(
+            control_point_client_removed=self._device_removed)
         for device_id, device in self.devices.items():
             device.shutdown()
         self.devices = {}
