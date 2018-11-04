@@ -3,7 +3,32 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
-# Copyright 2008 Frank Scholz <coherence@beebits.net>
+# Copyright 2008, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+'''
+Basics
+======
+
+This module contains two classes which will be used as a base classes which
+will be useful to create our device classes: MediaRenderer and MediaServer.
+
+:class:`DeviceHttpRoot`
+-----------------------
+
+Inherits from :class:`twisted.web.resource.Resource` and is used as a a base
+class by class the :class:`~coherence.upnp.devices.media_renderer.HttpRoot`.
+
+:class:`BasicDeviceMixin`
+-------------------------
+
+This is an EventDispatcher object used as a base class by the classes
+:class:`~coherence.upnp.devices.media_renderer.MediaRenderer` and
+:class:`~coherence.upnp.devices.media_server.MediaServer`. It contains some
+methods that will help us to initialize the backend as well as the methods
+:meth:`BasicDeviceMixin.register` and :meth:`BasicDeviceMixin.unregister` which
+will take care to register/unregister our device.
+'''
 
 import os.path
 
@@ -11,7 +36,7 @@ from twisted.python import util
 from twisted.web import resource, static
 from twisted.internet import reactor
 
-import coherence.extern.louie as louie
+from eventdispatcher import EventDispatcher, Property
 
 from coherence.upnp.core.utils import to_string
 from coherence import log
@@ -217,9 +242,32 @@ class DeviceHttpRoot(resource.Resource, log.LogAble):
 #         static.Data.__init__(self, self.xml, 'text/xml')
 
 
-class BasicDeviceMixin(object):
+class BasicDeviceMixin(EventDispatcher):
+    '''
+    This is used as a base class for the following classes:
+
+        - :class:`~coherence.upnp.devices.media_renderer.MediaRenderer`
+        - :class:`~coherence.upnp.devices.media_server.MediaServer`
+
+    It contains some methods that will help us to initialize the backend
+    (:meth:`on_backend`, :meth:`init_complete` and :meth:`init_failed`). There
+    is no need to call those methods, because it will be automatically
+    triggered based on the backend status.
+
+    .. versionchanged:: 0.9.0
+
+       * Introduced inheritance from EventDispatcher
+       * Changed class variable :attr:`backend` to benefit from the
+         EventDispatcher's properties
+    '''
+
+    backend = Property(None)
+    '''The device's backend. When this variable is filled it will automatically
+    trigger the method :meth:`on_backend`.
+    '''
 
     def __init__(self, coherence, backend, **kwargs):
+        EventDispatcher.__init__(self)
         self.coherence = coherence
         if not hasattr(self, 'version'):
             self.version = int(
@@ -233,7 +281,6 @@ class BasicDeviceMixin(object):
             from coherence.upnp.core.uuid import UUID
             self.uuid = UUID()
 
-        self.backend = None
         urlbase = str(self.coherence.urlbase)
         if urlbase[-1] != '/':
             urlbase += '/'
@@ -248,11 +295,28 @@ class BasicDeviceMixin(object):
                 else:
                     self.icons = kwargs['icon']
 
-        louie.connect(self.init_complete,
-                      'Coherence.UPnP.Backend.init_completed', louie.Any)
-        louie.connect(self.init_failed, 'Coherence.UPnP.Backend.init_failed',
-                      louie.Any)
         reactor.callLater(0.2, self.fire, backend, **kwargs)
+
+    def on_backend(self, *arsg):
+        '''
+        This function is automatically triggered whenever the :attr:`backend`
+        class variable changes. Here we connect the backend initialization
+        with the device.
+
+        .. versionadded:: 0.9.0
+        '''
+        if self.backend is None:
+            return
+        if self.backend.init_completed:
+            self.init_complete(self.backend)
+        self.backend.bind(
+            backend_init_completed=self.init_complete,
+            backend_init_failed=self.init_failed,
+        )
+
+    def init_complete(self, backend):
+        # This must be overwritten in subclass
+        pass
 
     def init_failed(self, backend, msg):
         if self.backend != backend:
