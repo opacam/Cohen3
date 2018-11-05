@@ -15,7 +15,6 @@ import sys
 from twisted.internet.defer import Deferred
 from twisted.trial import unittest
 
-import coherence.extern.louie as louie
 from coherence import __version__
 from coherence.base import Coherence
 from coherence.upnp.core import uuid
@@ -82,7 +81,6 @@ class TestDBUS(unittest.TestCase):
                "a twisted.internet.gireactor.GIReactor"
 
     def setUp(self):
-        louie.reset()
         self.coherence = Coherence(
             {'unittest': 'yes', 'logmode': 'error', 'use_dbus': 'yes',
              'controlpoint': 'yes'})

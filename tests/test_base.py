@@ -13,14 +13,12 @@ from twisted.internet import reactor
 from twisted.internet.defer import Deferred
 from twisted.trial import unittest
 
-import coherence.extern.louie as louie
 from coherence.base import Coherence
 
 
 class TestCoherence(unittest.TestCase):
 
     def setUp(self):
-        louie.reset()
         self.coherence = Coherence({'unittest': 'yes', 'logmode': 'error'})
 
     def tearDown(self):

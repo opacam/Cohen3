@@ -17,7 +17,6 @@ from twisted.python.filepath import FilePath
 from twisted.trial import unittest
 
 from coherence.base import Coherence
-from coherence.extern import louie
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.uuid import UUID
 from coherence.upnp.devices.control_point import DeviceQuery
@@ -40,7 +39,6 @@ class TestContentDirectoryServer(unittest.TestCase):
         album.makedirs()
         album.child('track-1.ogg').touch()
         album.child('track-2.ogg').touch()
-        louie.reset()
         self.coherence = Coherence(
             {'unittest': 'yes',
              'logmode': 'critical',
