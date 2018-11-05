@@ -1,5 +1,6 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
+
 # Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
 '''
@@ -22,6 +23,7 @@ initializing :class:`~coherence.base.Coherence`
 
 Examples
 --------
+
 Example of a simple server with web-ui enabled::
 
     from coherence.base import Coherence
@@ -60,7 +62,6 @@ from autobahn.twisted.websocket import (
     WebSocketServerFactory, WebSocketServerProtocol)
 
 from coherence import __version__
-import coherence.extern.louie as louie
 from coherence import log
 
 TEMPLATES_DIR = join(dirname(__file__), 'templates')
@@ -86,6 +87,9 @@ class WSBroadcastServerProtocol(WebSocketServerProtocol):
     WSBroadcastServerProtocol deals with the async WebSocket client connection.
 
     .. versionadded:: 0.8.2
+
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
 
     .. note:: We can attach a callback into the variable message_callback, this
               callback will be triggered whenever onMessage is called.
@@ -265,10 +269,10 @@ class DevicesWatcher(log.LogAble):
                 # print(device.__dict__)
                 self.add_device(device)
 
-        louie.connect(self.add_device,
-                      'Coherence.UPnP.Device.detection_completed', louie.Any)
-        louie.connect(self.remove_device,
-                      'Coherence.UPnP.Device.removed', louie.Any)
+        self.coherence.bind(
+            coherence_device_detection_completed=self.add_device)
+        self.coherence.bind(
+            coherence_device_removed=self.remove_device)
 
 
 def format_log(message, *args, **kwargs):
