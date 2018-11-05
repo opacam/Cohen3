@@ -1,14 +1,46 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
-# Copyright 2006-2010 Frank Scholz <dev@coherence-project.org>
+# Copyright 2006-2010, Frank Scholz <dev@coherence-project.org>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+'''
+Control Point
+=============
+
+:class:`DeviceQuery`
+--------------------
+
+A convenient class that allow us to create request queries to control point.
+
+:class:`ControlPoint`
+---------------------
+
+Takes care of managing the different devices detected by our instance
+of class :class:`~coherence.base.Coherence`.
+
+:class:`XMLRPC`
+---------------
+
+A resource that implements XML-RPC.
+
+.. note::
+    XML-RPC is a remote procedure call (RPC) protocol which uses XML to encode
+    its calls and HTTP as a transport mechanism. "XML-RPC" also refers
+    generically to the use of XML for remote procedure call, independently
+    of the specific protocol.
+
+.. seealso::
+    XML-RPC information extracted from: https://en.wikipedia.org/wiki/XML-RPC
+'''
 
 import traceback
 
 from twisted.internet import reactor
 from twisted.web import xmlrpc, client
 
-import coherence.extern.louie as louie
+from eventdispatcher import EventDispatcher, Property, ListProperty
+
 from coherence import log
 from coherence.upnp.core import service
 from coherence.upnp.core.event import EventServer
@@ -18,23 +50,34 @@ from coherence.upnp.devices.media_renderer_client import MediaRendererClient
 from coherence.upnp.devices.media_server_client import MediaServerClient
 
 
-class DeviceQuery(object):
+class DeviceQuery(EventDispatcher):
+    '''
+    .. versionchanged:: 0.9.0
+
+       * Introduced inheritance from EventDispatcher
+       * Changed class variable :attr:`fired` to benefit from the
+         EventDispatcher's properties
+    '''
+    fired = Property(False)
 
     def __init__(self, type, pattern, callback, timeout=0, oneshot=True):
+        EventDispatcher.__init__(self)
         self.type = type
         self.pattern = pattern
         self.callback = callback
-        self.fired = False
         self.timeout = timeout
         self.oneshot = oneshot
         if self.type == 'uuid' and self.pattern.startswith('uuid:'):
             self.pattern = self.pattern[5:]
+        if isinstance(self.callback, str):
+            # print(f'DeviceQuery: register event {self.callback}')
+            self.register_event(self.callback)
 
     def fire(self, device):
         if callable(self.callback):
             self.callback(device)
         elif isinstance(self.callback, str):
-            louie.send(self.callback, None, device=device)
+            self.dispatch_event(self.callback, device=device)
         self.fired = True
 
     def check(self, device):
@@ -51,17 +94,43 @@ class DeviceQuery(object):
             self.fire(device)
 
 
-class ControlPoint(log.LogAble):
+class ControlPoint(EventDispatcher, log.LogAble):
+    '''
+    .. versionchanged:: 0.9.0
+
+        * Introduced inheritance from EventDispatcher, emitted events changed:
+
+            - Coherence.UPnP.ControlPoint.{client.device_type}.detected =>
+              control_point_client_detected'
+            - Coherence.UPnP.ControlPoint.{client.device_type}.removed =>
+              control_point_client_removed
+
+        * Changed class variable :attr:`queries` to benefit from the
+          EventDispatcher's properties
+    .. warning::
+        Be aware that some events are removed, with the new dispatcher we
+        remove the detection for specific device type in flavour of a global
+        detection.
+    '''
     logCategory = 'controlpoint'
+
+    queries = ListProperty([])
 
     def __init__(self, coherence, auto_client=None):
         log.LogAble.__init__(self)
+        EventDispatcher.__init__(self)
+        self.register_event(
+            'control_point_client_detected',
+            'control_point_client_removed',
+        )
 
         if not auto_client:
             auto_client = ['MediaServer', 'MediaRenderer']
         self.coherence = coherence
         self.auto_client = auto_client
-        self.queries = []
+        self.coherence.bind(
+            coherence_device_detection_completed=self.check_device,
+            coherence_device_removed=self.remove_client)
 
         self.info("Coherence UPnP ControlPoint starting...")
         self.event_server = EventServer(self)
@@ -71,26 +140,15 @@ class ControlPoint(log.LogAble):
             self.info('ControlPoint [check device]: {}'.format(device))
             self.check_device(device)
 
-        louie.connect(self.check_device,
-                      'Coherence.UPnP.Device.detection_completed',
-                      louie.Any)
-        louie.connect(self.remove_client,
-                      'Coherence.UPnP.Device.remove_client',
-                      louie.Any)
-        louie.connect(self.completed,
-                      'Coherence.UPnP.DeviceClient.detection_completed',
-                      louie.Any)
-
     def shutdown(self):
-        louie.disconnect(self.check_device,
-                         'Coherence.UPnP.Device.detection_completed',
-                         louie.Any)
-        louie.disconnect(self.remove_client,
-                         'Coherence.UPnP.Device.remove_client',
-                         louie.Any)
-        louie.disconnect(self.completed,
-                         'Coherence.UPnP.DeviceClient.detection_completed',
-                         louie.Any)
+        for device in self.get_devices():
+            self.coherence.unbind(
+                coherence_device_detection_completed=self.check_device,
+                coherence_device_removed=self.remove_client
+            )
+            if device.client is not None:
+                device.client.unbind(
+                    detection_completed=self.completed)
 
     def auto_client_append(self, device_type):
         if device_type in self.auto_client:
@@ -118,17 +176,79 @@ class ControlPoint(log.LogAble):
         else:
             self.queries.append(query)
 
-    def connect(self, receiver, signal=louie.signal.All,
-                sender=louie.sender.Any, weak=True):
-        """ wrapper method around louie.connect
-        """
-        louie.connect(receiver, signal=signal, sender=sender, weak=weak)
+    @staticmethod
+    def check_louie(receiver, signal, method='connect'):
+        '''
+        Check if the connect or disconnect method's arguments are valid in
+        order to automatically convert to EventDispatcher's bind method.
+        The old valid signals are:
 
-    def disconnect(self, receiver, signal=louie.signal.All,
-                   sender=louie.sender.Any, weak=True):
-        """ wrapper method around louie.disconnect
-        """
-        louie.disconnect(receiver, signal=signal, sender=sender, weak=weak)
+            - Coherence.UPnP.ControlPoint.MediaServer.detected
+            - Coherence.UPnP.ControlPoint.MediaServer.removed
+            - Coherence.UPnP.ControlPoint.MediaRenderer.detected
+            - Coherence.UPnP.ControlPoint.MediaRenderer.removed
+            - Coherence.UPnP.ControlPoint.InternetGatewayDevice.detected
+            - Coherence.UPnP.ControlPoint.InternetGatewayDevice.removed
+
+        .. versionadded:: 0.9.0
+        '''
+        if not callable(receiver):
+            raise Exception('The receiver should be callable in order to use'
+                            ' the method {method}')
+        if not signal:
+            raise Exception(
+                f'We need a signal in order to use method {method}')
+        if not signal.startswith('Coherence.UPnP.ControlPoint.'):
+            raise Exception('We need a signal an old signal starting with: '
+                            '"Coherence.UPnP.ControlPoint."')
+
+    def connect(self, receiver, signal=None, sender=None, weak=True):
+        '''
+        Wrapper method around the deprecated method louie.connect. It will
+        check if the passed signal is supported by executing the method
+        :meth:`check_louie`.
+
+        .. warning:: This will probably be removed at some point, if you use
+                     the connect method you should consider to migrate to the
+                     new event system EventDispatcher.
+
+        .. versionchanged:: 0.9.0
+            Added EventDispatcher's compatibility for some basic signals
+        '''
+        self.check_louie(receiver, signal, 'connect')
+        if signal.endswith('.detected'):
+            self.coherence.bind(
+                coherence_device_detection_completed=receiver)
+        elif signal.endswith('.removed'):
+            self.bind(
+                control_point_client_removed=receiver)
+        else:
+            raise Exception(
+                f'Unknown signal {signal}, we cannot bind that signal.')
+
+    def disconnect(self, receiver, signal=None, sender=None, weak=True):
+        '''
+        Wrapper method around the deprecated method louie.disconnect. It will
+        check if the passed signal is supported by executing the method
+        :meth:`check_louie`.
+
+        .. warning:: This will probably be removed at some point, if you use
+                     the disconnect method you should migrate to the new event
+                     system EventDispatcher.
+
+        .. versionchanged:: 0.9.0
+            Added EventDispatcher's compatibility for some basic signals
+        '''
+        self.check_louie(receiver, signal, 'disconnect')
+        if signal.endswith('.detected'):
+            self.coherence.unbind(
+                coherence_device_detection_completed=receiver)
+        elif signal.endswith('.removed'):
+            self.unbind(
+                control_point_client_removed=receiver)
+        else:
+            raise Exception(
+                f'Unknown signal {signal}, we cannot unbind that signal.')
 
     def get_devices(self):
         return self.coherence.get_devices()
@@ -155,26 +275,27 @@ class ControlPoint(log.LogAble):
                     client = MediaRendererClient(device)
                 if short_type == 'InternetGatewayDevice':
                     client = InternetGatewayDeviceClient(device)
-
+                client.bind(detection_completed=self.completed)
                 client.coherence = self.coherence
+
                 device.set_client(client)
 
+        if device.client.detection_completed:
+            self.completed(device.client)
         self.process_queries(device)
 
-    def completed(self, client, udn):
-        self.info('sending signal Coherence.UPnP.ControlPoint.%s.detected %r',
-                  client.device_type, udn)
-        louie.send(
-            'Coherence.UPnP.ControlPoint.%s.detected' % client.device_type,
-            None,
-            client=client, udn=udn)
+    def completed(self, client, *args):
+        self.info(f'sending signal Coherence.UPnP.ControlPoint.'
+                  f'{client.device_type}.detected {client.device.udn}')
+        self.dispatch_event(
+            'control_point_client_detected',
+            client=client, udn=client.device.udn)
 
     def remove_client(self, udn, client):
-        louie.send(
-            'Coherence.UPnP.ControlPoint.%s.removed' % client.device_type,
-            None, udn=udn)
-        self.info("removed %s %s", client.device_type,
-                  client.device.get_friendly_name())
+        self.dispatch_event(
+            'control_point_client_removed', udn=udn)
+        self.info(f"removed {client.device_type} "
+                  f"{client.device.get_friendly_name()}")
         client.remove()
 
     def propagate(self, event):
