@@ -10,7 +10,6 @@ import dbus.service
 from twisted.internet import defer
 from twisted.python import util
 
-import coherence.extern.louie as louie
 from coherence.backend import BackendItem, BackendStore
 from coherence.upnp.core import DIDLLite
 
@@ -487,10 +486,12 @@ class Image(BackendItem):
 
 
 class TrackerStore(BackendStore):
-    ''' this is a backend to Meta Tracker
+    '''
+    This is a backend to Meta Tracker:
         http://www.gnome.org/projects/tracker/index.html
 
-
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
     '''
 
     implements = ['MediaServer']
@@ -536,13 +537,11 @@ class TrackerStore(BackendStore):
             Container(ROOT_CONTAINER_ID, -1, self.name, store=self)
 
         def queries_finished(r):
-            louie.send('Coherence.UPnP.Backend.init_completed', None,
-                       backend=self)
+            self.init_completed = True
 
         def queries_failed(r):
-            error = ''
-            louie.send('Coherence.UPnP.Backend.init_failed',
-                       None, backend=self, msg=error)
+            error = 'Query failed'
+            self.on_init_failed(msg=error)
 
         services = kwargs.get('service', 'Music,Videos,Images')
         services = [x.strip().lower() for x in services.split(',')]
@@ -560,14 +559,10 @@ class TrackerStore(BackendStore):
             dl = defer.DeferredList(ml)
             dl.addCallback(queries_finished)
             dl.addErrback(
-                lambda x: louie.send(
-                    'Coherence.UPnP.Backend.init_failed', None,
-                    backend=self,
+                lambda x: self.on_init_failed(
                     msg='Connection to Tracker service(s) failed!'))
         else:
-            louie.send(
-                'Coherence.UPnP.Backend.init_failed', None, backend=self,
-                msg='No Tracker service defined!')
+            self.on_init_failed(msg='No Tracker service defined!')
 
     def __repr__(self):
         return 'TrackerStore'

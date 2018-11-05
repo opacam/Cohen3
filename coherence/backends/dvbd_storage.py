@@ -14,7 +14,6 @@ from twisted.internet import defer
 from twisted.python import failure, util
 from twisted.python.filepath import FilePath
 
-import coherence.extern.louie as louie
 from coherence.backend import BackendItem, BackendStore
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.soap_service import errorCode
@@ -221,9 +220,12 @@ class Recording(BackendItem):
 
 
 class DVBDStore(BackendStore):
-    """ this is a backend to the DVB Daemon
+    '''This is a backend to the DVB Daemon:
         http://www.k-d-w.org/node/42
-    """
+
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
 
     implements = ['MediaServer']
     logCategory = 'dvbd_store'
@@ -280,13 +282,11 @@ class DVBDStore(BackendStore):
             self.containers[CHANNEL_GROUPS_CONTAINER_ID])
 
         def query_finished(r):
-            louie.send('Coherence.UPnP.Backend.init_completed', None,
-                       backend=self)
+            self.init_completed = True
 
         def query_failed(error):
-            self.error(f'ERROR: {error}')
-            louie.send('Coherence.UPnP.Backend.init_failed',
-                       None, backend=self, msg=error)
+            self.error(f'DVBDStore error: {error}')
+            self.on_init_failed(msg=error)
 
         # get_device_groups is called after get_channel_groups,
         # because we need channel groups first

@@ -58,6 +58,10 @@ class PlaylistItem(BackendItem):
 
 
 class PlaylistStore(AbstractBackendStore):
+    '''
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
     logCategory = 'playlist_store'
 
     implements = ['MediaServer']
@@ -98,7 +102,7 @@ class PlaylistStore(AbstractBackendStore):
         )
         self.name = self.config.get('name', 'playlist')
 
-        self.init_completed()
+        self.init_completed = True
 
     def __repr__(self):
         return self.__class__.__name__

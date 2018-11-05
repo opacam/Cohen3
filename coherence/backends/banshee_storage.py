@@ -25,7 +25,6 @@ from datetime import datetime
 
 from twisted.internet import defer, task
 
-import coherence.extern.louie as louie
 from coherence.backend import BackendItem, BackendStore
 from coherence.extern import db_row
 from coherence.log import LogAble
@@ -787,6 +786,10 @@ class BansheeDB(LogAble):
 
 
 class BansheeStore(BackendStore, BansheeDB):
+    '''
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
     logCategory = 'banshee_store'
     implements = ['MediaServer']
 
@@ -799,7 +802,7 @@ class BansheeStore(BackendStore, BansheeDB):
         self.containers = {}
         self.containers[ROOT_CONTAINER_ID] = Container(
             ROOT_CONTAINER_ID, -1, self.name, store=self)
-        louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
+        self.init_completed = True
 
     def upnp_init(self):
         self.open_db()

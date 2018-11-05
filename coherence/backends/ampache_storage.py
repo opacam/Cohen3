@@ -1,10 +1,11 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
+# Copyright 2008, Frank Scholz <coherence@beebits.net>
+
 import mimetypes
 import time
 
-# Copyright 2008, Frank Scholz <coherence@beebits.net>
 from lxml import etree
 
 mimetypes.init()
@@ -35,8 +36,6 @@ from twisted.python import failure
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.soap_service import errorCode
 from coherence.upnp.core import utils
-
-import coherence.extern.louie as louie
 
 from coherence.backend import BackendItem, BackendStore
 
@@ -587,9 +586,11 @@ class Video(BackendItem):
 
 
 class AmpacheStore(BackendStore):
-    """ this is a backend to the Ampache Media DB
+    '''This is a backend to the Ampache Media DB
 
-    """
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
 
     implements = ['MediaServer']
     logCategory = 'ampache_store'
@@ -713,19 +714,17 @@ class AmpacheStore(BackendStore):
                          # all videos
                          })
 
-                    louie.send('Coherence.UPnP.Backend.init_completed', None,
-                               backend=self)
+                    self.init_completed = True
             except AttributeError:
                 raise ValueError('no authorization token returned')
 
     def got_auth_error(self, e, renegotiate=False):
         self.warning(f'error calling ampache {e}')
         if not renegotiate:
-            louie.send('Coherence.UPnP.Backend.init_failed',
-                       None, backend=self, msg=e)
+            self.on_init_failed(msg=e)
 
     def get_token(self, renegotiate=False):
-        """ ask Ampache for the authorization token """
+        '''Ask Ampache for the authorization token'''
         timestamp = int(time.time())
         if self.api_version < 350001:
             passphrase = md5(f'{timestamp:d}{self.key}')

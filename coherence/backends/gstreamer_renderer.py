@@ -24,9 +24,7 @@ gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 Gst.init(None)
 
-import coherence.extern.louie as louie
-
-from coherence.extern.simple_plugin import Plugin
+from coherence.backend import Backend
 
 from coherence import log
 
@@ -463,22 +461,27 @@ class Player(log.LogAble):
                 self.update()
 
 
-class GStreamerPlayer(log.LogAble, Plugin):
-    """ a backend with a GStreamer based audio player
+class GStreamerPlayer(Backend):
+    '''
+    A backend with a GStreamer based audio player.
 
-        needs gnomevfssrc from gst-plugins-base
-        unfortunately gnomevfs has way too much dependencies
+    needs gnomevfssrc from gst-plugins-base
+    unfortunately gnomevfs has way too much dependencies
 
-        # not working -> http://bugzilla.gnome.org/show_bug.cgi?id=384140
-        # needs the neonhttpsrc plugin from gst-plugins-bad
-        # tested with CVS version
-        # and with this patch applied
-        # --> http://bugzilla.gnome.org/show_bug.cgi?id=375264
-        # not working
+    # not working -> http://bugzilla.gnome.org/show_bug.cgi?id=384140
+    # needs the neonhttpsrc plugin from gst-plugins-bad
+    # tested with CVS version
+    # and with this patch applied
+    # --> http://bugzilla.gnome.org/show_bug.cgi?id=375264
+    # not working
 
-        and id3demux from gst-plugins-good CVS too
+    and id3demux from gst-plugins-good CVS too
 
-    """
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * Introduced :class:`~coherence.backend.Backend`'s inheritance
+    '''
 
     logCategory = 'gstreamer_player'
     implements = ['MediaRenderer']
@@ -488,10 +491,10 @@ class GStreamerPlayer(log.LogAble, Plugin):
             'A_ARG_TYPE_SeekMode': ('ABS_TIME', 'REL_TIME', 'TRACK_NR')}}
     vendor_range_defaults = {'RenderingControl': {'Volume': {'maximum': 100}}}
 
-    def __init__(self, device, **kwargs):
-        log.LogAble.__init__(self)
-        if (device.coherence.config.get('use_dbus', 'no') != 'yes' and
-                device.coherence.config.get('glib', 'no') != 'yes'):
+    def __init__(self, server, **kwargs):
+        Backend.__init__(self, server, **kwargs)
+        if (server.coherence.config.get('use_dbus', 'no') != 'yes' and
+                server.coherence.config.get('glib', 'no') != 'yes'):
             raise Exception(
                 'this media renderer needs use_dbus '
                 'enabled in the configuration')
@@ -513,13 +516,12 @@ class GStreamerPlayer(log.LogAble, Plugin):
 
         self.view = []
         self.tags = {}
-        self.server = device
 
         self.playcontainer = None
 
         self.dlna_caps = ['playcontainer-0-1']
 
-        louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
+        self.init_completed = True
 
     def __repr__(self):
         return str(self.__class__).split('.')[-1]

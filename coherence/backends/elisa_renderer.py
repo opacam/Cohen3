@@ -8,17 +8,19 @@ from twisted.internet.task import LoopingCall
 from twisted.python import failure
 from twisted.spread import pb
 
-import coherence.extern.louie as louie
-from coherence import log
-from coherence.extern.simple_plugin import Plugin
+from coherence.backend import Backend
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.soap_service import errorCode
 
 
-class ElisaPlayer(log.LogAble, Plugin):
-    """ a backend to the Elisa player
+class ElisaPlayer(Backend):
+    '''a backend to the Elisa player
 
-    """
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * Introduced :class:`~coherence.backend.Backend`'s inheritance
+    '''
     logCategory = 'elisa_player'
 
     implements = ['MediaRenderer']
@@ -26,8 +28,8 @@ class ElisaPlayer(log.LogAble, Plugin):
         'RenderingControl': {'A_ARG_TYPE_Channel': 'Master'}}
     vendor_range_defaults = {'RenderingControl': {'Volume': {'maximum': 100}}}
 
-    def __init__(self, device, **kwargs):
-        log.LogAble.__init__(self)
+    def __init__(self, server, **kwargs):
+        Backend.__init__(self, server, **kwargs)
         self.name = kwargs.get('name', 'Elisa MediaRenderer')
         self.host = kwargs.get('host', '127.0.0.1')
         self.player = None
@@ -37,8 +39,7 @@ class ElisaPlayer(log.LogAble, Plugin):
             try:
                 from elisa.core import common
                 self.player = common.get_application().get_player()
-                louie.send('Coherence.UPnP.Backend.init_completed', None,
-                           backend=self)
+                self.init_completed = True
             except ImportError:
                 self.warning("this works only from within Elisa")
                 raise ImportError
@@ -50,11 +51,11 @@ class ElisaPlayer(log.LogAble, Plugin):
 
             def result(player):
                 self.player = player
-                louie.send('Coherence.UPnP.Backend.init_completed', None,
-                           backend=self)
+                self.init_completed = True
 
             def got_error(error):
-                self.warning("connection to Elisa failed!")
+                self.warning('connection to Elisa failed!')
+                self.on_init_failed(msg=error)
 
             d.addCallback(lambda object: object.callRemote("get_player"))
             d.addCallback(result)
@@ -65,7 +66,6 @@ class ElisaPlayer(log.LogAble, Plugin):
         self.duration = None
         self.view = []
         self.tags = {}
-        self.server = device
         self.poll_LC = LoopingCall(self.poll_player)
 
     def call_player(self, method, callback, *args):

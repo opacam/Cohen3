@@ -2,26 +2,51 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
 from twisted.internet import protocol
 from twisted.internet.task import LoopingCall
 from twisted.protocols.basic import LineReceiver
 from twisted.python import failure
 
-import coherence.extern.louie as louie
+from eventdispatcher import EventDispatcher
+
 from coherence import log
-from coherence.extern.simple_plugin import Plugin
+from coherence.backend import Backend
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.DIDLLite import classChooser, Container, Resource
 from coherence.upnp.core.soap_service import errorCode
 
 
-class BzClient(LineReceiver, log.LogAble):
+class BzClient(LineReceiver, EventDispatcher, log.LogAble):
+    '''
+
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * The emitted events changed:
+
+            - Buzztard.Response.flush => response_flush
+            - Buzztard.Response.event => response_event
+            - Buzztard.Response.volume => response_volume
+            - Buzztard.Response.mute=> response_mute
+            - Buzztard.Response.repeat => response_repeat
+            - Buzztard.Response.browse => response_browse
+    '''
     logCategory = 'buzztard_client'
     factory = None
 
     def __init__(self, *args, **kwargs):
+        EventDispatcher.__init__(self)
         log.LogAble.__init__(self)
+        self.register_event(
+            'response_flush',
+            'response_event',
+            'response_volume',
+            'response_mute',
+            'response_repeat',
+            'response_browse',
+        )
 
     def connectionMade(self):
         self.info("connected to Buzztard")
@@ -35,20 +60,24 @@ class BzClient(LineReceiver, log.LogAble):
         self.debug("received: %s", line)
 
         if line == 'flush':
-            louie.send('Buzztard.Response.flush', None)
+            self.dispatch_event('response_flush')
         elif line.find('event') == 0:
-            louie.send('Buzztard.Response.event', None, line)
+            self.dispatch_event('response_event', line)
         elif line.find('volume') == 0:
-            louie.send('Buzztard.Response.volume', None, line)
+            self.dispatch_event('response_volume', line)
         elif line.find('mute') == 0:
-            louie.send('Buzztard.Response.mute', None, line)
+            self.dispatch_event('response_mute', line)
         elif line.find('repeat') == 0:
-            louie.send('Buzztard.Response.repeat', None, line)
+            self.dispatch_event('response_repeat', line)
         elif line.find('playlist') == 0:
-            louie.send('Buzztard.Response.browse', None, line)
+            self.dispatch_event('response_browse', line)
 
 
 class BzFactory(protocol.ClientFactory, log.LogAble):
+    '''
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
     logCategory = 'buzztard_factory'
     protocol = BzClient
 
@@ -68,8 +97,7 @@ class BzFactory(protocol.ClientFactory, log.LogAble):
 
     def clientReady(self, instance):
         self.info("clientReady")
-        louie.send('Coherence.UPnP.Backend.init_completed', None,
-                   backend=self.backend)
+        self.backend.init_completed = True
         self.clientInstance = instance
         for msg in self.messageQueue:
             self.sendMessage(msg)
@@ -89,8 +117,12 @@ class BzFactory(protocol.ClientFactory, log.LogAble):
 
 
 class BzConnection(log.LogAble):
-    """ a singleton class
-    """
+    '''
+    A singleton class
+
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
     logCategory = 'buzztard_connection'
     connection = None
 
@@ -99,14 +131,14 @@ class BzConnection(log.LogAble):
         self.debug("BzConnection __init__")
 
     def __new__(cls, *args, **kwargs):
-        cls.debug(cls, "BzConnection __new__")
+        print(cls, "BzConnection __new__")
         obj = getattr(cls, '_instance_', None)
         if obj is not None:
-            louie.send('Coherence.UPnP.Backend.init_completed', None,
-                       backend=kwargs['backend'])
+            if kwargs['backend']:
+                kwargs['backend'].init_completed = True
             return obj
         else:
-            obj = super(BzConnection, cls).__new__(cls, *args, **kwargs)
+            obj = super(BzConnection, cls).__new__(cls)
             cls._instance_ = obj
             obj.connection = BzFactory(kwargs['backend'])
             reactor.connectTCP(kwargs['host'], kwargs['port'], obj.connection)
@@ -174,6 +206,8 @@ class BuzztardItem(log.LogAble):
         self.children.append(child)
         self.child_count += 1
         if isinstance(self.item, Container):
+            if self.item.childCount is None:
+                self.item.childCount = 0
             self.item.childCount += 1
         if update:
             self.update_id += 1
@@ -232,12 +266,18 @@ class BuzztardItem(log.LogAble):
             self.child_count) + ' @ ' + self.url
 
 
-class BuzztardStore(log.LogAble, Plugin):
+class BuzztardStore(Backend):
+    '''
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * Introduced :class:`~coherence.backend.Backend`'s inheritance
+    '''
     logCategory = 'buzztard_store'
     implements = ['MediaServer']
 
     def __init__(self, server, **kwargs):
-        log.LogAble.__init__(self)
+        Backend.__init__(self, server, **kwargs)
         self.next_id = 1000
         self.config = kwargs
         self.name = kwargs.get('name', 'Buzztard')
@@ -254,9 +294,6 @@ class BuzztardStore(log.LogAble, Plugin):
         self.update_id = 0
         self.store = {}
         self.parent = None
-
-        louie.connect(self.add_content, 'Buzztard.Response.browse', louie.Any)
-        louie.connect(self.clear, 'Buzztard.Response.flush', louie.Any)
 
         self.buzztard = BzConnection(backend=self, host=self.host,
                                      port=self.port)
@@ -341,6 +378,10 @@ class BuzztardStore(log.LogAble, Plugin):
     def upnp_init(self):
         self.current_connection_id = None
         self.parent = self.append('Buzztard', 'directory', None)
+        self.buzztard.connection.protocol.bind(
+            response_browse=self.add_content)
+        self.buzztard.connection.protocol.bind(
+            response_browse=self.clear)
 
         source_protocols = ""
         if self.server:
@@ -351,6 +392,10 @@ class BuzztardStore(log.LogAble, Plugin):
 
 
 class BuzztardPlayer(log.LogAble):
+    '''
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
     logCategory = 'buzztard_player'
     implements = ['MediaRenderer']
     vendor_value_defaults = {
@@ -373,12 +418,16 @@ class BuzztardPlayer(log.LogAble):
 
         self.poll_LC = LoopingCall(self.poll_player)
 
-        louie.connect(self.event, 'Buzztard.Response.event', louie.Any)
-        louie.connect(self.get_volume, 'Buzztard.Response.volume', louie.Any)
-        louie.connect(self.get_mute, 'Buzztard.Response.mute', louie.Any)
-        louie.connect(self.get_repeat, 'Buzztard.Response.repeat', louie.Any)
-        self.buzztard = BzConnection(backend=self, host=self.host,
-                                     port=self.port)
+        self.buzztard = BzConnection(
+            backend=self, host=self.host, port=self.port)
+        self.buzztard.connection.protocol.bind(
+            response_event=self.event)
+        self.buzztard.connection.protocol.bind(
+            response_volume=self.get_volume)
+        self.buzztard.connection.protocol.bind(
+            response_mute=self.get_mute)
+        self.buzztard.connection.protocol.bind(
+            response_repeat=self.get_repeat)
 
     def event(self, line):
         infos = line.split('|')[1:]
@@ -488,11 +537,14 @@ class BuzztardPlayer(log.LogAble):
         self.buzztard.connection.sendMessage('pause')
 
     def seek(self, location):
-        """
-        @param location:    simple number = time to seek to, in seconds
-                            +nL = relative seek forward n seconds
-                            -nL = relative seek backwards n seconds
-        """
+        '''
+
+        Args:
+            location (int): time to seek to, in seconds:
+
+                               * +nL = relative seek forward n seconds
+                               * -nL = relative seek backwards n seconds
+        '''
 
     def mute(self):
         self.buzztard.connection.sendMessage('set|mute|on')
@@ -612,20 +664,23 @@ class BuzztardPlayer(log.LogAble):
         return {}
 
 
-def test_init_complete(backend):
+def on_init_complete(backend):
     print("Houston, we have a touchdown!")
     backend.buzztard.sendMessage('browse')
 
 
 def main():
-    louie.connect(test_init_complete, 'Coherence.UPnP.Backend.init_completed',
-                  louie.Any)
+    '''
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
 
     f = BuzztardStore(None)
+    f.bind(init_completed=on_init_complete)
 
     f.parent = f.append('Buzztard', 'directory', None)
     print(f.parent)
-    print(f.store)
+    print(f'f.store is: {f.store}')
     f.add_content('playlist|test label|start|stop')
     print(f.store)
     f.clear()
@@ -634,7 +689,7 @@ def main():
     print(f.store)
 
     # def got_upnp_result(result):
-    #    print "upnp", result
+    #    print("upnp", result)
 
     # f.upnp_init()
     # print f.store

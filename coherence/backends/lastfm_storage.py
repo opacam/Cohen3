@@ -33,10 +33,9 @@ ProxyClient handleStatus HTTP/1.1 403 Invalid ticket
 from hashlib import md5
 from urllib.parse import urlsplit
 
-import coherence.extern.louie as louie
 from coherence import log
-from coherence.extern.simple_plugin import Plugin
 from coherence.upnp.core import utils
+from coherence.backend import Backend
 from coherence.upnp.core.DIDLLite import classChooser, Container, Resource
 
 
@@ -310,13 +309,21 @@ class LastFMItem(log.LogAble):
         return 'id: ' + str(self.id) + ' @ ' + self.url + ' ' + self.name
 
 
-class LastFMStore(log.LogAble, Plugin):
+class LastFMStore(Backend):
+    '''
+    This is a backend to the LastFM.
+
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * Introduced :class:`~coherence.backend.Backend`'s inheritance
+    '''
     logCategory = 'lastFM_store'
 
     implements = ['MediaServer']
 
     def __init__(self, server, **kwargs):
-        log.LogAble.__init__(self)
+        Backend.__init__(self, server, **kwargs)
 
         self.next_id = 1000
         self.config = kwargs
@@ -329,7 +336,7 @@ class LastFMStore(log.LogAble, Plugin):
 
         self.wmc_mapping = {'4': 1000}
 
-        louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
+        self.init_completed = True
 
     def __repr__(self):
         return str(self.__class__).split('.')[-1]
