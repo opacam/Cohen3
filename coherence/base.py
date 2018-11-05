@@ -2,6 +2,47 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2006,2007,2008 Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+'''
+Base
+====
+
+The core of the project. Holds the class :class:`Coherence` intended to be used
+to manage all the resources of the project. Also contains some other classes
+which are vital to the project.
+
+:class:`SimpleRoot`
+-------------------
+
+A web resource representing a web site. Used to build the contents browser for
+our instance of a :class:`WebServer` or :class:`WebServerUi`.
+
+:class:`WebServer`
+------------------
+
+A class which takes care of dealing with the web representation of the running
+:class:`Coherence`'s instance. This is the default webserver used.
+
+:class:`WebServerUi`
+--------------------
+
+The default web server, :class:`WebServer`, can be replaced by this class which
+will do the same thing as the default web server, but with a more polished
+interface.
+
+:class:`Plugins`
+----------------
+
+Manage all the available plugins for the Cohen3 project.
+
+:class:`Coherence`
+------------------
+
+The Main class of the Cohen3 project. The Coherence class controls all the
+servers initialization depending on the configuration passed.
+
+'''
 
 import copy
 import logging
@@ -16,9 +57,11 @@ from twisted.internet.tcp import CannotListenError
 from twisted.web import resource, static
 from twisted.python.util import sibpath
 
+from eventdispatcher import (
+    EventDispatcher, ListProperty, DictProperty, Property)
+
 from coherence import __version__
 from coherence import log
-from coherence.extern import louie
 from coherence.upnp.core.device import Device, RootDevice
 from coherence.upnp.core.msearch import MSearch
 from coherence.upnp.core.ssdp import SSDPServer
@@ -302,7 +345,7 @@ class Plugins(log.LogAble):
             self._plugins[cls.__name__.split('.')[-1]] = cls
 
 
-class Coherence(log.LogAble):
+class Coherence(EventDispatcher, log.LogAble):
     '''
     The Main class of the Cohen3 project. The Coherence class controls all the
     servers initialization depending on the configuration passed.
@@ -310,9 +353,7 @@ class Coherence(log.LogAble):
     by configuration file.
     It supports the creation of multiple servers at once.
 
-    Examples
-    --------
-    Example of a simple server via plugin AppleTrailersStore::
+    **Example of a simple server via plugin AppleTrailersStore**::
 
         from coherence.base import Coherence
         from coherence.upnp.core.uuid import UUID
@@ -330,6 +371,32 @@ class Coherence(log.LogAble):
              }
         )
         reactor.run()
+
+    .. versionchanged:: 0.9.0
+
+        * Introduced inheritance from EventDispatcher
+        * The emitted events changed:
+
+            - Coherence.UPnP.Device.detection_completed =>
+              coherence_device_detection_completed
+            - Coherence.UPnP.Device.removed => coherence_device_removed
+            - Coherence.UPnP.RootDevice.removed =>
+              coherence_root_device_removed
+
+        * Changed some variables to benefit from the EventDispatcher's
+          properties:
+
+            - :attr:`devices`
+            - :attr:`children`
+            - :attr:`_callbacks`
+            - :attr:`active_backends`
+            - :attr:`ctrl`
+            - :attr:`dbus`
+            - :attr:`json`
+            - :attr:`msearch`
+            - :attr:`ssdp_server`
+            - :attr:`transcoder_manager`
+            - :attr:`web_server`
     '''
 
     __instance = None  # Singleton
@@ -338,6 +405,52 @@ class Coherence(log.LogAble):
     __cls = None
 
     logCategory = 'coherence'
+
+    devices = ListProperty([])
+    '''A list of the added devices.'''
+    children = DictProperty({})
+    '''A dict containing the web resources.'''
+    _callbacks = DictProperty({})
+    '''A dict containing the callbacks, used by the methods :meth:`subscribe`
+    and :meth:`unsubscribe`.'''
+    active_backends = DictProperty({})
+    '''A dict containing the active backends.'''
+
+    # Services/Devices
+    ctrl = Property(None)
+    '''A coherence's instance of class
+    :class:`~coherence.upnp.devices.control_point.ControlPoint`. This will be
+    enabled if we request it by config dict or configuration file via
+    keyword *controlpoint = yes*.'''
+    dbus = Property(None)
+    '''A coherence's instance of class
+    :class:`~coherence.dbus_service.DBusPontoon`. This will be
+    enabled if we request it by config dict or configuration file via
+    keyword *use_dbus = yes*.'''
+    json = Property(None)
+    '''A coherence's instance of class
+    :class:`~coherence.json_service.JsonInterface`. This will be
+    enabled if we request it by config dict or configuration file via
+    keyword *json = yes*.'''
+    msearch = Property(None)
+    '''A coherence's instance of class
+    :class:`~coherence.upnp.core.msearch.MSearch`. This is automatically
+    enabled when :class:`Coherence` is initialized'''
+    ssdp_server = Property(None)
+    '''A coherence's instance of class
+    :class:`~coherence.upnp.core.ssdp.SSDPServer`. This is automatically
+    enabled when :class:`Coherence` is initialized'''
+    transcoder_manager = Property(None)
+    '''A coherence's instance of class
+    :class:`~coherence.transcoder.TranscoderManager`. This will be
+    enabled if we request itby config dict or configuration file via
+    keyword *transcoding = yes*.'''
+    web_server = Property(None)
+    '''A coherence's instance of class
+    :class:`WebServer` or :class:`WebServerUi`. We can request our preference
+    by config dict or configuration file. If we use the keyword *web-ui = yes*,
+    then the class :class:`WebServerUi` will be used, otherwise, the enabled
+    web server will be of class :class:`WebServer`.'''
 
     def __new__(cls, *args, **kwargs):
         if cls.__instance is None:
@@ -357,32 +470,23 @@ class Coherence(log.LogAble):
 
         # supers
         log.LogAble.__init__(self)
+        EventDispatcher.__init__(self)
+        self.register_event(
+            'coherence_device_detection_completed',
+            'coherence_device_removed',
+            'coherence_root_device_removed',
+        )
 
         self.config = config or {}
 
-        self.devices = []
-        self.children = {}
-        self._callbacks = {}
-        self.active_backends = {}
         self.available_plugins = None
 
         self.external_address = None
         self.urlbase = None
         self.web_server_port = int(config.get('serverport', 8080))
 
-        """ Services """
-        self.ctrl = None
-        self.dbus = None
-        self.json = None
-        self.msearch = None
-        self.ssdp_server = None
-        self.transcoder_manager = None
-        self.web_server = None
-
-        """ initializes logsystem
-            a COHEN_DEBUG environment variable overwrites
-            all level settings here
-        """
+        # initializes log's system, a COHEN_DEBUG environment
+        # variable overwrites all level settings here.
         try:
             logmode = config.get('logging').get('level', 'warning')
         except (KeyError, AttributeError):
@@ -429,8 +533,7 @@ class Coherence(log.LogAble):
                 self.hostname = '127.0.0.1'
 
         if self.hostname.startswith('127.'):
-            """ use interface detection via routing table as last resort """
-
+            # use interface detection via routing table as last resort
             def catch_result(hostname):
                 self.hostname = hostname
                 self.setup_part2()
@@ -441,12 +544,14 @@ class Coherence(log.LogAble):
             self.setup_part2()
 
     def clear(self):
-        """ we do need this to survive multiple calls
-            to Coherence during trial tests
-        """
+        '''We do need this to survive multiple calls to Coherence
+        during trial tests'''
+        self.unbind_all()
         self.__cls.__instance = None
 
     def setup_part2(self):
+        '''Initializes the basic and optional services/devices and the enabled
+        plugins (backends).'''
         self.info('running on host: %s', self.hostname)
         if self.hostname.startswith('127.'):
             self.warning('detection of own ip failed, using %s as own address,'
@@ -455,8 +560,6 @@ class Coherence(log.LogAble):
         unittest = self.config.get('unittest', 'no')
         unittest = False if unittest == 'no' else True
 
-        """ SSDP Server Initialization
-        """
         try:
             # TODO: add ip/interface bind
             self.ssdp_server = SSDPServer(test=unittest)
@@ -466,16 +569,13 @@ class Coherence(log.LogAble):
             reactor.stop()
             return
 
-        louie.connect(self.create_device, 'Coherence.UPnP.SSDP.new_device',
-                      louie.Any)
-        louie.connect(self.remove_device, 'Coherence.UPnP.SSDP.removed_device',
-                      louie.Any)
-        louie.connect(self.add_device,
-                      'Coherence.UPnP.RootDevice.detection_completed',
-                      louie.Any)
-        # louie.connect(self.receiver,
-        #               'Coherence.UPnP.Service.detection_completed',
-        #               louie.Any)
+        # maybe some devices are already notified, so we enforce
+        # to create the device, if it is not already added...and
+        # then we connect the signals for new detections.
+        for st, usn in self.ssdp_server.root_devices:
+            self.create_device(st, usn)
+        self.ssdp_server.bind(new_device=self.create_device)
+        self.ssdp_server.bind(removed_device=self.remove_device)
 
         self.ssdp_server.subscribe("new_device", self.add_device)
         self.ssdp_server.subscribe("removed_device", self.remove_device)
@@ -485,8 +585,7 @@ class Coherence(log.LogAble):
         reactor.addSystemEventTrigger('before', 'shutdown', self.shutdown,
                                       force=True)
 
-        """ Web Server Initialization
-        """
+        # Web Server Initialization
         try:
             # TODO: add ip/interface bind
             if self.config.get('web-ui', 'no') != 'yes':
@@ -506,6 +605,7 @@ class Coherence(log.LogAble):
         #     task.LoopingCall(self.check_devices)
         # self.renew_service_subscription_loop.start(20.0, now=False)
 
+        # Plugins Initialization
         try:
             plugins = self.config['plugin']
             if isinstance(plugins, dict):
@@ -553,26 +653,22 @@ class Coherence(log.LogAble):
         self.external_address = ':'.join(
             (self.hostname, str(self.web_server_port)))
 
-        """ Control Point Initialization
-        """
+        # Control Point Initialization
         if self.config.get('controlpoint', 'no') == 'yes' or self.config.get(
                 'json', 'no') == 'yes':
             self.ctrl = ControlPoint(self)
 
-        """ Json Interface Initialization
-        """
+        # Json Interface Initialization
         if self.config.get('json', 'no') == 'yes':
             from coherence.json_service import JsonInterface
             self.json = JsonInterface(self.ctrl)
 
-        """ Transcoder Initialization
-        """
+        # Transcoder Initialization
         if self.config.get('transcoding', 'no') == 'yes':
             from coherence.transcoder import TranscoderManager
             self.transcoder_manager = TranscoderManager(self)
 
-        """ DBus Initialization
-        """
+        # DBus Initialization
         if self.config.get('use_dbus', 'no') == 'yes':
             try:
                 from coherence import dbus_service
@@ -619,11 +715,12 @@ class Coherence(log.LogAble):
             self.debug(traceback.format_exc())
 
     def remove_plugin(self, plugin):
-        """
-        Removes a backend from Coherence
+        '''Removes a backend from Coherence
 
-        @:param plugin: is the object return by add_plugin or an UUID string
-        """
+        Args:
+            plugin (object): is the object return by add_plugin or
+                an UUID string.
+        '''
         if isinstance(plugin, str):
             try:
                 plugin = self.active_backends[plugin]
@@ -642,14 +739,12 @@ class Coherence(log.LogAble):
 
     @staticmethod
     def writeable_config():
-        """ do we have a new-style config file """
+        '''Do we have a new-style config file'''
         return False
 
     def store_plugin_config(self, uuid, items):
-        """ find the backend with uuid
-            and store in its the config
-            the key and value pair(s)
-        """
+        '''Find the backend with uuid and store in its the config the key
+        and value pair(s).'''
         plugins = self.config.get('plugin')
         if plugins is None:
             self.warning("storing a plugin config option is only possible"
@@ -689,7 +784,7 @@ class Coherence(log.LogAble):
             backend.unregister()
         self.active_backends = {}
 
-        """ send service unsubscribe messages """
+        # send service unsubscribe messages
         if self.web_server is not None:
             if hasattr(self.web_server, 'endpoint_listen'):
                 if self.web_server.endpoint_listen is not None:
@@ -718,6 +813,9 @@ class Coherence(log.LogAble):
 
         dev_l = []
         for root_device in self.get_devices():
+            if hasattr(root_device, 'root_device_detection_completed'):
+                root_device.unbind(
+                    root_device_detection_completed=self.add_device)
             for device in root_device.get_devices():
                 dd = device.unsubscribe_service_subscriptions()
                 dd.addCallback(device.remove)
@@ -727,14 +825,9 @@ class Coherence(log.LogAble):
             dev_l.append(rd)
 
         def homecleanup(result):
-            """anything left over"""
-            louie.disconnect(self.create_device,
-                             'Coherence.UPnP.SSDP.new_device', louie.Any)
-            louie.disconnect(self.remove_device,
-                             'Coherence.UPnP.SSDP.removed_device', louie.Any)
-            louie.disconnect(self.add_device,
-                             'Coherence.UPnP.RootDevice.detection_completed',
-                             louie.Any)
+            # cleans up anything left over
+            self.ssdp_server.unbind(new_device=self.create_device)
+            self.ssdp_server.unbind(removed_device=self.remove_device)
             self.ssdp_server.shutdown()
             if self.ctrl:
                 self.ctrl.shutdown()
@@ -746,9 +839,8 @@ class Coherence(log.LogAble):
         return dl
 
     def check_devices(self):
-        """
-        iterate over devices and their embedded ones and renew subscriptions
-        """
+        '''Iterate over devices and their embedded ones and renew
+        subscriptions.'''
         for root_device in self.get_devices():
             root_device.renew_service_subscriptions()
             for device in root_device.get_devices():
@@ -809,11 +901,35 @@ class Coherence(log.LogAble):
         #     [d for d in self.devices if d.manifestation == 'remote']))
         return [d for d in self.devices if d.manifestation == 'remote']
 
+    def is_device_added(self, infos):
+        '''
+        Check if the device exists in our list of created :attr:`devices`.
+
+        Args:
+            infos (dict): Information about the device
+
+        Returns:
+            True if the device exists in our list of :attr:`devices`,
+            otherwise, returns False.
+
+        .. versionadded:: 0.9.0
+        '''
+        for d in self.devices:
+            if d.st == infos['ST'] and d.usn == infos['USN']:
+                return True
+        return False
+
     def create_device(self, device_type, infos):
+        if self.is_device_added(infos):
+            self.warning(
+                f'No need to create the device, we already added device: '
+                f'{infos["ST"]} with usn {infos["USN"]}...!!')
+            return
         self.info("creating %r %r", infos['ST'], infos['USN'])
         if infos['ST'] == 'upnp:rootdevice':
             self.info('creating upnp:rootdevice  {}'.format(infos['USN']))
             root = RootDevice(infos)
+            root.bind(root_detection_completed=self.add_device)
         else:
             self.info('creating device/service  {}'.format(infos['USN']))
             root_id = infos['USN'][:-len(infos['ST']) - 2]
@@ -821,21 +937,23 @@ class Coherence(log.LogAble):
             # TODO: must check that this is working as expected
             device = Device(root, udn=infos['UDN'])
 
-    def add_device(self, device):
+    def add_device(self, device, *args):
         self.info('adding device {} {} {}'.format(
             device.get_id(), device.get_usn(), device.friendly_device_type))
         self.devices.append(device)
+        self.dispatch_event(
+            'coherence_device_detection_completed', device=device)
 
     def remove_device(self, device_type, infos):
         self.info('removed device {} %s{}'.format(infos['ST'], infos['USN']))
         device = self.get_device_with_usn(infos['USN'])
         if device:
-            louie.send('Coherence.UPnP.Device.removed', None, usn=infos['USN'])
+            self.dispatch_event('coherence_device_removed', usn=infos['USN'])
             self.devices.remove(device)
             device.remove()
             if infos['ST'] == 'upnp:rootdevice':
-                louie.send('Coherence.UPnP.RootDevice.removed', None,
-                           usn=infos['USN'])
+                self.dispatch_event(
+                    'coherence_root_device_removed', usn=infos['USN'])
                 self.callback("removed_device", infos['ST'], infos['USN'])
 
     def add_web_resource(self, name, sub):
@@ -849,15 +967,75 @@ class Coherence(log.LogAble):
             pass
 
     @staticmethod
-    def connect(receiver, signal=louie.signal.All, sender=louie.sender.Any,
-                weak=True):
-        """ wrapper method around louie.connect
-        """
-        louie.connect(receiver, signal=signal, sender=sender, weak=weak)
+    def check_louie(receiver, signal, method='connect'):
+        '''
+        Check if the connect or disconnect method's arguments are valid in
+        order to automatically convert to EventDispatcher's bind
+        The old valid signals are:
 
-    @staticmethod
-    def disconnect(receiver, signal=louie.signal.All, sender=louie.sender.Any,
-                   weak=True):
-        """ wrapper method around louie.disconnect
-        """
-        louie.disconnect(receiver, signal=signal, sender=sender, weak=weak)
+            - Coherence.UPnP.Device.detection_completed
+            - Coherence.UPnP.RootDevice.detection_completed
+            - Coherence.UPnP.Device.removed
+            - Coherence.UPnP.RootDevice.removed
+
+        .. versionadded:: 0.9.0
+        '''
+        if not callable(receiver):
+            raise Exception('The receiver should be callable in order to use'
+                            ' the method {method}')
+        if not signal:
+            raise Exception(
+                f'We need a signal in order to use method {method}')
+        if not (signal.startswith('Coherence.UPnP.Device.') or
+                signal.startswith('Coherence.UPnP.RootDevice.')):
+            raise Exception(
+                'We need a signal an old signal starting with: '
+                '"Coherence.UPnP.Device." or "Coherence.UPnP.RootDevice."')
+
+    def connect(self, receiver, signal=None, sender=None, weak=True):
+        '''
+        Wrapper method around the deprecated method louie.connect. It will
+        check if the passed signal is supported by executing the method
+        :meth:`check_louie`.
+
+        .. warning:: This will probably be removed at some point, if you use
+                     the connect method you should migrate to the new event
+                     system EventDispatcher.
+
+        .. versionchanged:: 0.9.0
+            Added EventDispatcher's compatibility for some basic signals
+        '''
+        self.check_louie(receiver, signal, 'connect')
+        if signal.endswith('.detection_completed'):
+            self.bind(coherence_device_detection_completed=receiver)
+        elif signal.endswith('.Device.removed'):
+            self.bind(coherence_device_removed=receiver)
+        elif signal.endswith('.RootDevice.removed'):
+            self.bind(coherence_root_device_removed=receiver)
+        else:
+            raise Exception(
+                f'Unknown signal {signal}, we cannot bind that signal.')
+
+    def disconnect(self, receiver, signal=None, sender=None, weak=True):
+        '''
+        Wrapper method around the deprecated method louie.disconnect. It will
+        check if the passed signal is supported by executing the method
+        :meth:`check_louie`.
+
+        .. warning:: This will probably be removed at some point, if you use
+                     the disconnect method you should migrate to the new event
+                     system EventDispatcher.
+
+        .. versionchanged:: 0.9.0
+            Added EventDispatcher's compatibility for some basic signals
+        '''
+        self.check_louie(receiver, signal, 'disconnect')
+        if signal.endswith('.detected'):
+            self.unbind(
+                coherence_device_detection_completed=receiver)
+        elif signal.endswith('.removed'):
+            self.unbind(
+                control_point_client_removed=receiver)
+        else:
+            raise Exception(
+                f'Unknown signal {signal}, we cannot unbind that signal.')
