@@ -74,6 +74,8 @@ class MediaRendererClient(EventDispatcher, log.LogAble):
                     "urn:schemas-upnp-org:service:AVTransport:1",
                     "urn:schemas-upnp-org:service:AVTransport:2"]:
                 self.av_transport = AVTransportClient(service)
+            if service.detection_completed:
+                self.service_notified(service)
         self.info("MediaRenderer %s", self.device.get_friendly_name())
         if self.rendering_control:
             self.info("RenderingControl available")

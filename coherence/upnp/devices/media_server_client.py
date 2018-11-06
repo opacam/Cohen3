@@ -80,6 +80,8 @@ class MediaServerClient(EventDispatcher, log.LogAble):
                     "urn:schemas-upnp-org:service:AVTransport:1",
                     "urn:schemas-upnp-org:service:AVTransport:2"]:
                 self.av_transport = AVTransportClient(service)
+            if service.detection_completed:
+                self.service_notified(service)
 
         self.info("MediaServer %s", self.device.get_friendly_name())
         if self.content_directory:
