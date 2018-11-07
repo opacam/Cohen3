@@ -122,7 +122,7 @@ class Backend(EventDispatcher, log.LogAble, Plugin):
 
     implements = []
     '''A list of the device classe like:
-    
+
         ['MediaServer','MediaRenderer']
     '''
 
