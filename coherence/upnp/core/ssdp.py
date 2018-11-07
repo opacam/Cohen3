@@ -191,7 +191,7 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
             if st == 'upnp:rootdevice':
                 self.dispatch_event(
                     'new_device', device_type=st, infos=self.known[usn])
-                self.root_devices.append((st, self.known[usn]))
+                self.root_devices.append(usn)
                 # self.callback("new_device", st, self.known[usn])
             # print('\t - ok all')
         except Exception as err:
@@ -205,8 +205,7 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
             self.dispatch_event(
                 'removed_device', device_type=st, infos=self.known[usn])
             # self.callback("removed_device", st, self.known[usn])
-
-        self.root_devices.remove((st, self.known[usn]))
+            self.root_devices.remove(usn)
         del self.known[usn]
 
     def isKnown(self, usn):
