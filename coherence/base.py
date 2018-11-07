@@ -948,12 +948,14 @@ class Coherence(EventDispatcher, log.LogAble):
         self.info('removed device {} %s{}'.format(infos['ST'], infos['USN']))
         device = self.get_device_with_usn(infos['USN'])
         if device:
-            self.dispatch_event('coherence_device_removed', usn=infos['USN'])
+            self.dispatch_event('coherence_device_removed',
+                                infos['USN'], device.client)
             self.devices.remove(device)
             device.remove()
             if infos['ST'] == 'upnp:rootdevice':
                 self.dispatch_event(
-                    'coherence_root_device_removed', usn=infos['USN'])
+                    'coherence_root_device_removed',
+                    infos['USN'], device.client)
                 self.callback("removed_device", infos['ST'], infos['USN'])
 
     def add_web_resource(self, name, sub):
