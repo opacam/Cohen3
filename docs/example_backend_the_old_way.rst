@@ -1,6 +1,6 @@
     .. _example_backend_the_old_way:
 
-Witting a backend (the old way)
+Writing a backend (the old way)
 ===============================
 Here you will learn  how to write a backend from the scratch using the Cohen3
 module :ref:`backend <coherence.backend>`. We will try to explain it step by
@@ -14,8 +14,8 @@ which, in matter fact, uses the tools from :ref:`backend <coherence.backend>`
 so, it will be useful to write more complex backends and to understand the
 basics of the Cohen3 Project.
 
-Introduction
-------------
+Introduction (the old way)
+--------------------------
 This Media Backend will allow you to access the cool and cute pictures
 from lolcats.com. This is mainly meant as a Sample Media Backend to learn
 how to write a Media Backend using the backend tools directly. Be aware that
@@ -37,8 +37,8 @@ check the source code for this backend line by line, you will see that all
 the code has been commented in order to make easier to understand how to
 write a backend. Let's start...
 
-The imports
------------
+The imports (the old way)
+-------------------------
 We import the reactor, that allows us to specify an action to happen later::
 
     from twisted.internet import reactor
@@ -90,8 +90,8 @@ twisted.web.client module to do our requests::
     from coherence.upnp.core.utils import getPage
 
 
-The models
-----------
+The models (the old way)
+------------------------
 After the download and parsing of the data is done, we want to save it. In
 this case, we want to fetch the images and store their URL and the title of
 the image. That is the LolCatsImage class. We inherit from BackendItem as it
@@ -131,8 +131,8 @@ example, we only have to fill the item with data::
             self.item.res.append(res)
 
 
-The server
-----------
+The server (the old way)
+------------------------
 The LolcatsStore is a media server. As already said before the implementation
 of the server is done in an inheritance of a BackendStore. This is where the
 real code happens (usually). In our case this would be: downloading the page,
@@ -369,8 +369,8 @@ parsing the content, saving it in the models and returning them on request::
             print(error_or_failure)
             reactor.callLater(self.refresh, self.update_loop)
 
-The testing
------------
+The testing (the old way)
+-------------------------
 Now you are ready to test your media backend, to do so you can dot it
 in different ways but you can tests it directly from the backend script,
 like so::

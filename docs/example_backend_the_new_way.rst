@@ -1,6 +1,6 @@
     .. _example_backend_the_new_way:
 
-Witting a backend (the new way)
+Writing a backend (the new way)
 ===============================
 Here you will learn  how to write a backend from the scratch using the Cohen3
 tools :ref:`models <coherence.backends.models (package)>`. We will try to
@@ -10,14 +10,14 @@ This same example is also explained using the module
 method or another, but with this newer method you will have less lines in your
 code and will be more maintainable...so...let's begin...
 
-Introduction
-------------
+Introduction (the new way)
+--------------------------
 This is a Media Backend that allows you to access the cool and cute pictures
 from lolcats.com, explained from scratch using the tools from
 :ref:`models <coherence.backends.models (package)>`.
 
-The imports
------------
+The imports (the new way)
+-------------------------
 We import the re module to clean up quotes in some html code::
 
     import re
@@ -58,8 +58,8 @@ It is a basic concept that you need to understand the following code. But why
 am I talking about it? Oh, right, because we use a http-client based on the
 twisted.web.client module to do our requests.
 
-The models
-----------
+The models (the new way)
+------------------------
 After the download and parsing of the data is done, we want to save it. In
 this case, we want to fetch the images and store their URL and the title of
 the image. That is the LolCatsImage class::
@@ -85,8 +85,8 @@ the image. That is the LolCatsImage class::
             res.size = None  # FIXME: we should have a size here
             self.item.res.append(res)
 
-The server
-----------
+The server (the new way)
+------------------------
 The LolcatsStore is a media server. As already said before the implementation
 of the server is done in an inheritance of a BackendImageStore. This is where the
 real code happens (usually). In our case this would be: downloading the page,
@@ -192,8 +192,8 @@ will be specific for your media server. Here is an example of how to proceed::
             }
             return data
 
-The testing
------------
+The testing (the new way)
+-------------------------
 Now you are ready to test your media backend, to do so you can do it
 in different ways but you can tests it directly from the backend script,
 like so::
