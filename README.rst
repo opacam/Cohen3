@@ -274,6 +274,21 @@ The config file can be placed anywhere, cohen looks by default for
 
   $ cohen3 -c /path/to/config/file
 
+For developers
+--------------
+Starting from version 0.9.0 the event system has changed from louie/dispatcher
+to EventDispatcher (external dependency). Here are the most important changes:
+
+    - The new event system is not a global dispatcher anymore
+    - All the signal/receivers are connected between them only if it is necessary.
+    - We don't connect/disconnect anymore, instead we will bind/unbind.
+    - The events has been renamed (this is necessary because the old event names
+      contains dots in his names, and this could cause troubles with the new
+      event system)
+
+Please, check the documentation for further details at
+`"The events system" <https://opacam.github.io/Cohen3/events.html>`_ section.
+
 Contributing
 ------------
 Report bugs at https://github.com/opacam/Cohen3/issues
