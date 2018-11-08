@@ -104,12 +104,8 @@ class SimpleRoot(resource.Resource, log.LogAble):
             return static.File(
                 self.coherence.dbus.pinboard[request.args['key'][0]])
 
-        if name in ['', None, '\'']:
+        if name in ['', None]:
             return self
-        if name.endswith('\''):
-            self.warning('\t modified wrong name from {} to {}'.format(
-                name, name[:-1]))
-            name = name[:-1]
 
         # at this stage, name should be a device UUID
         try:
