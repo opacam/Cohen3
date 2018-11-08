@@ -7,17 +7,19 @@ from twisted.internet import reactor
 from twisted.python import failure
 from twisted.spread import pb
 
-import coherence.extern.louie as louie
-from coherence.extern.simple_plugin import Plugin
+from coherence.backend import Backend
 from coherence.upnp.core.DIDLLite import classChooser, Container, Resource, \
     DIDLElement
 from coherence.upnp.core.soap_service import errorCode
 
 
-class ElisaMediaStore(Plugin):
-    """ this is a backend to the Elisa Media DB
+class ElisaMediaStore(Backend):
+    '''
+    This is a backend to the Elisa Media DB
 
-        Elisa needs to expose two methods
+    Elisa needs to expose two methods
+
+    .. code-block:: python
 
         get_root_id(media_type)
             if media_type == '*'
@@ -35,11 +37,17 @@ class ElisaMediaStore(Plugin):
             location = filesystem path if item is a file
             cover = url by which the cover image can be retrieved  (OPTIONAL)
             size = in bytes (OPTIONAL)
-    """
+
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * Introduced :class:`~coherence.backend.Backend`'s inheritance
+    '''
 
     implements = ['MediaServer']
 
     def __init__(self, server, **kwargs):
+        Backend.__init__(self, server, **kwargs)
         self.name = kwargs.get('name', 'Elisa')
         self.host = kwargs.get('host', '127.0.0.1')
         self.urlbase = kwargs.get('urlbase', '')
@@ -70,7 +78,7 @@ class ElisaMediaStore(Plugin):
 
     def set_root_id(self, id):
         self.root_id = id
-        louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
+        self.init_completed = True
 
     def get_root_id(self, media_type='audio'):
         """ ask Elisa to tell us the id of the top item

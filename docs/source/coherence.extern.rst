@@ -15,7 +15,6 @@ status of the Cohen3 project.
 
     extern/covers_by_amazon
     extern/db_row
-    extern/louie
     extern/simple_plugin
     extern/xdg
 

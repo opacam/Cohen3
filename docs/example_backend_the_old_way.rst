@@ -198,7 +198,19 @@ parsing the content, saving it in the models and returning them on request::
             # And we don't want that to happen as long as we don't have succeeded
             # in fetching some first data, so we delay this signaling after
             # the update is done:
-            dfr.addCallback(self.init_completed)
+            def init_completed(*args):
+                # by setting the following variable to value True, the event
+                # system will automatically emmit the corresponding event
+                self.init_completed = True
+
+            def init_failed(*args):
+                print(f'init_failed: {args}')
+                self.on_init_failed(*args, msg='Error on fetching data')
+
+            dfr.addCallback(init_completed)
+            dfr.addErrback(init_failed)
+
+            # Now we trigger a function to update the data
             dfr.addCallback(self.queue_update)
 
         def get_by_id(self, id):

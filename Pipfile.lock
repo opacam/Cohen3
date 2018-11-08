@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0e614cc63c6a3875932b709df53b4ae794e3ab2ac73fe64470d68e85720d53a7"
+            "sha256": "29fcbf5f3baa0a0949d7273a3e0a2a2bb3929846917db4c10cb441b9ae16c7ab"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,9 @@
         ]
     },
     "default": {
+        "403b5ad": {
+            "file": "https://github.com/lobocv/eventdispatcher/archive/1.9.4.tar.gz"
+        },
         "alabaster": {
             "hashes": [
                 "sha256:446438bdcca0e05bd45ea2de1668c1d9b032e1a9154c2c259092d77031ddd359",
@@ -250,13 +253,6 @@
             ],
             "index": "pypi",
             "version": "==1.12.2"
-        },
-        "louie-latest": {
-            "hashes": [
-                "sha256:0dcd6009cdb4e3ccf7633b31329afb99c7cea6ff9f817671ddb9d398429969de"
-            ],
-            "index": "pypi",
-            "version": "==1.3.1"
         },
         "lxml": {
             "hashes": [

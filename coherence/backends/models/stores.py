@@ -58,6 +58,8 @@ class BackendBaseStore(BackendStore):
                  Also be sure to overwrite the method
                  :meth:`~coherence.backend_models.BackendBaseStore.parse_item`
                  in your inherited class.
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
     '''
     logCategory = 'BackendBaseStore'
     implements = ['MediaServer']
@@ -132,7 +134,16 @@ class BackendBaseStore(BackendStore):
 
         dfr = self.update_data()
         # first get the first bunch of data before sending init_completed
-        dfr.addCallback(lambda x: self.init_completed())
+
+        def init_completed(*args):
+            self.init_completed = True
+
+        def init_failed(*args):
+            print(f'init_failed: {args}')
+            self.on_init_failed(*args)
+
+        dfr.addCallback(init_completed)
+        dfr.addErrback(init_failed)
 
     def queue_update(self, result):
         '''

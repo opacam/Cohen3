@@ -3,8 +3,19 @@
 
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+'''
+:class:`StateVariable`
+----------------------
+
+The :class:`StateVariable` implements an UPnP variable with the ability to
+emmit changes via EventDispatcher whenever some class variable changes.
+'''
 
 import time
+
+from eventdispatcher import EventDispatcher
 
 from coherence.upnp.core import utils
 
@@ -18,17 +29,57 @@ except ImportError:
 
 from coherence import log
 
-import coherence.extern.louie as louie
 
+class StateVariable(EventDispatcher, log.LogAble):
+    '''
+    Represents a UPnP variable. It has the ability to dispatch changes whenever
+    some class variable changes.
 
-class StateVariable(log.LogAble):
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * Added two more class variables:
+
+            - :attr:`StateVariable.dispatch_targets`
+            - :attr:`StateVariable.dispatch_events`
+
+        * The emitted events changed:
+
+            - Coherence.UPnP.StateVariable.changed =>
+              state_variable_changed
+            - Coherence.UPnP.StateVariable.{var name}.changed =>
+              state_variable_{var name}_changed
+
+    .. warning: This class is special regarding EventDispatcher, because we
+                initialize the event into the service and in the class,
+                and we only do that if the target service has inherited from
+                EventDispatcher, otherwise we only implements EventDispatcher
+                into this class.
+    '''
+
     logCategory = 'variable'
+
+    dispatch_targets = []
+    dispatch_events = []
 
     def __init__(self, upnp_service, name, implementation, instance,
                  send_events,
                  data_type, allowed_values):
         log.LogAble.__init__(self)
+        EventDispatcher.__init__(self)
+
         self.service = upnp_service
+
+        self.dispatch_events = [
+            f'state_variable_{name}_changed',
+            'state_variable_changed']
+        self.dispatch_targets = [self]
+        if isinstance(self.service, EventDispatcher):
+            self.dispatch_targets.append(self.service)
+        for target in self.dispatch_targets:
+            for evt in self.dispatch_events:
+                if evt not in target.event_dispatcher_event_callbacks:
+                    target.register_event(evt)
 
         self.name = name
         self.implementation = implementation
@@ -215,12 +266,10 @@ class StateVariable(log.LogAble):
                   self.value)
         # if self.old_value == '':
         #    return
-        louie.send(
-            signal='Coherence.UPnP.StateVariable.%s.changed' % self.name,
-            sender=self.service, variable=self)
-        louie.send(
-            signal='Coherence.UPnP.StateVariable.changed',
-            sender=self.service, variable=self)
+
+        for target in self.dispatch_targets:
+            for evt in self.dispatch_events:
+                target.dispatch_event(evt, variable=self)
         # print("CALLBACKS %s %r %r" % (
         #     self.name, self.instance, self._callbacks))
         for callback in self._callbacks:

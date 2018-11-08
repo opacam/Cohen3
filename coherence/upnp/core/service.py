@@ -1,6 +1,40 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
+# Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
+# Copyright 2006, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+'''
+Services
+========
+
+This module contains several classes related to services:
+
+:class:`Service`
+----------------
+
+Object representing a device's service.
+
+:class:`ServiceServer`
+----------------------
+
+A Service's server.
+
+:class:`scpdXML`
+----------------
+
+A `twisted.web.resource.Resource` representing xml's data for SCPD.
+
+.. note:: SCPD is a Service Control Point Definition, for defining the actions
+          offered by the various services in a UPnP's network.
+
+:class:`ServiceControl`
+-----------------------
+
+Object to control service's SOAP actions.
+'''
+
 import os
 import time
 from urllib.parse import urlparse
@@ -11,7 +45,8 @@ from twisted.internet import task
 from twisted.python import failure, util
 from twisted.web import static
 
-import coherence.extern.louie as louie
+from eventdispatcher import EventDispatcher, Property
+
 from coherence import log
 from coherence.upnp.core import action
 from coherence.upnp.core import event
@@ -20,8 +55,6 @@ from coherence.upnp.core import variable
 from coherence.upnp.core.event import EventSubscriptionServer
 from coherence.upnp.core.soap_proxy import SOAPProxy
 from coherence.upnp.core.soap_service import errorCode
-# Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
-# Copyright 2006, Frank Scholz <coherence@beebits.net>
 from coherence.upnp.core.xml_constants import UPNP_SERVICE_NS
 
 global subscribers
@@ -38,16 +71,67 @@ def unsubscribe(service):
     subscribers.pop(service.get_sid(), None)
 
 
-class Service(log.LogAble):
+class Service(EventDispatcher, log.LogAble):
+    '''
+    This class represents a Device's service. Emits events which will be
+    received by class :class:`~coherence.upnp.core.device.Device`.
+
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * The emitted events changed:
+
+            - Coherence.UPnP.Service.detection_completed =>
+              service_detection_completed
+            - Coherence.UPnP.Service.detection_failed =>
+              service_detection_failed
+            - Coherence.UPnP.DeviceClient.Service.Event.processed =>
+              service_event_processed
+            - Coherence.UPnP.DeviceClient.Service.notified =>
+              service_notified
+
+        * changed class variable :attr:`detection_completed` to benefit from
+          the EventDispatcher's properties
+
+    .. note:: This class initializes some events outside this class. This is
+              done this way to make easier to make connections between
+              this service and the module :mod:`~coherence.dbus_service`,
+              which uses some events triggered by
+              :class:`~coherence.upnp.core.variable.StateVariable`. The
+              mentioned events are (old => new):
+
+                  - Coherence.UPnP.StateVariable.changed =>
+                    state_variable_changed
+                  - Coherence.UPnP.StateVariable.{var name}.changed =>
+                    state_variable_{var name}_changed
+
+    .. warning:: This class is special regarding EventDispatcher, because some
+                events are initialized outside this class by the class
+                :class:`~coherence.upnp.core.variable.StateVariable`.
+    '''
+
     logCategory = 'service_client'
+
+    detection_completed = Property(False)
+    '''
+    To know whenever the service detection has completed. Defaults to `False`
+    and it will be set automatically to `True` by the class method
+    :meth:`parse_actions`.
+    '''
 
     def __init__(self, service_type, service_id, location, control_url,
                  event_sub_url, presentation_url, scpd_url, device):
         log.LogAble.__init__(self)
+        EventDispatcher.__init__(self)
+        self.register_event(
+            'service_detection_completed',
+            'service_detection_failed',
+            'service_event_processed',
+            'service_notified',
+        )
         self.debug('Service.__init__: ...')
 
         self.service_type = service_type
-        self.detection_completed = False
         self.id = service_id
         self.control_url = control_url if isinstance(location, bytes) else \
             control_url.encode('ascii') if control_url else None
@@ -287,11 +371,7 @@ class Service(log.LogAble):
             if callback is not None:
                 if signal:
                     callback(variable)
-                    louie.connect(
-                        callback,
-                        signal='Coherence.UPnP.StateVariable.%s.changed' %
-                               var_name,
-                        sender=self)
+                    variable.bind(state_variable_changed=callback)
                 else:
                     variable.subscribe(callback)
 
@@ -359,21 +439,21 @@ class Service(log.LogAble):
                                         var.attrib['val'])
                                     self.debug("updated 'attributed' var %r",
                                                var)
-                louie.send(
-                    'Coherence.UPnP.DeviceClient.Service.Event.processed',
-                    None, self, (var_name, var_value, event.raw))
+                self.dispatch_event(
+                    'service_event_processed',
+                    self, (var_name, var_value, event.raw))
             else:
                 self.get_state_variable(var_name, 0).update(var_value)
-                louie.send(
-                    'Coherence.UPnP.DeviceClient.Service.Event.processed',
-                    None, self, (var_name, var_value, event.raw))
+                self.dispatch_event(
+                    'service_event_processed',
+                    self, (var_name, var_value, event.raw))
         if self.last_time_updated is None:
             # The clients (e.g. media_server_client) check for last time
             # to detect whether service detection is complete so we need to
             # set it here and now to avoid a potential race condition
             self.last_time_updated = time.time()
-            louie.send('Coherence.UPnP.DeviceClient.Service.notified',
-                       sender=self.device, service=self)
+            self.dispatch_event(
+                'service_notified', sender=self.device, service=self)
             self.info('send signal '
                       'Coherence.UPnP.DeviceClient.Service.notified for '
                       '{}'.format(self))
@@ -417,10 +497,9 @@ class Service(log.LogAble):
                 name = var_node.findtext('{%s}name' % ns)
                 data_type = var_node.findtext('{%s}dataType' % ns)
                 values = []
-                """ we need to ignore this, as there we don't get there our
-                    {urn:schemas-beebits-net:service-1-0}X_withVendorDefines
-                    attibute there
-                """
+                # we need to ignore this, as there we don't get there our
+                # {urn:schemas-beebits-net:service-1-0}X_withVendorDefines
+                # attribute there
                 for allowed in var_node.findall('.//{%s}allowedValue' % ns):
                     values.append(allowed.text)
                 instance = 0
@@ -429,33 +508,31 @@ class Service(log.LogAble):
                     'n/a',
                     instance, send_events,
                     data_type, values)
-                """ we need to do this here, as there we don't get there our
-                    {urn:schemas-beebits-net:service-1-0}X_withVendorDefines
-                    attibute there
-                """
+                # we need to do this here, as there we don't get there our
+                # {urn:schemas-beebits-net:service-1-0}X_withVendorDefines
+                # attribute there
                 self._variables.get(instance)[name].has_vendor_values = True
 
             # print('service parse:', self, self.device)
             self.detection_completed = True
-            louie.send('Coherence.UPnP.Service.detection_completed',
-                       sender=self.device, device=self.device)
+            self.dispatch_event('service_detection_completed',
+                                sender=self.device, device=self.device)
             self.info('send signal '
                       'Coherence.UPnP.Service.detection_completed for'
                       ' {}'.format(self))
-            """
-            if (self.last_time_updated == None):
-                if( self.id.endswith('AVTransport') or
-                    self.id.endswith('RenderingControl')):
-                    louie.send('Coherence.UPnP.DeviceClient.Service.notified',
-                               sender=self.device, service=self)
-                    self.last_time_updated = time.time()
-            """
+
+            # if (self.last_time_updated == None):
+            #     if( self.id.endswith('AVTransport') or
+            #         self.id.endswith('RenderingControl')):
+            #         self.dispatch_event('service_notified',
+            #                             sender=self.device, service=self)
+            #         self.last_time_updated = time.time()
 
         def gotError(failure, url):
             self.warning('error requesting {}'.format(url))
             self.info('failure {}'.format(failure))
-            louie.send('Coherence.UPnP.Service.detection_failed', self.device,
-                       device=self.device)
+            self.dispatch_event('service_detection_failed',
+                                self.device, device=self.device)
 
         d = utils.getPage(self.get_scpd_url())
         d.addCallbacks(gotPage, gotError, None, None,
@@ -778,32 +855,37 @@ class ServiceServer(log.LogAble):
                                  allowed_values=None, has_vendor_values=False,
                                  allowed_value_range=None,
                                  moderated=False):
-        """
-        enables a backend to add an own,
-        vendor defined, StateVariable to the service
+        '''
+        Enables a backend to add an own, vendor defined,
+        :class:`coherence.upnp.core.variable.StateVariable` to the service.
 
-        @ivar name: the name of the new StateVariable
-        @ivar implementation: either 'optional' or 'required'
-        @ivar instance: the instance number of the service that variable
-            should be assigned to, usually '0'
-        @ivar evented: boolean, or the special keyword 'never' if the variable
-            doesn't show up in a LastChange event too
-        @ivar data_type: 'string','boolean','bin.base64' or
-            various number formats
-        @ivar dependant_variable: the name of another StateVariable that
-            depends on this one
-        @ivar default_value: the value this StateVariable should have by
-            default when created for another instance of in the service
-        @ivar allowed_values: a C{list} of values this StateVariable can have
-        @ivar has_vendor_values: boolean if there are values outside
-            the allowed_values list too
-        @ivar allowed_value_range: a C{dict} of 'minimum','maximum'
-            and 'step' values
-        @ivar moderated: boolean, True if this StateVariable should only be
-            evented via a LastChange event
+        Args:
+            name (str): the name of the new StateVariable
+            implementation (str): either 'optional' or 'required'
+            instance: the instance number of the service that variable
+                      should be assigned to, usually '0'
+            evented (str): boolean as string 'yes' 'no' or the special keyword
+                           'never' if the variable doesn't show up in a
+                           LastChange event too
+            data_type (str): `string`, `boolean`, `bin.base64` or
+                             various number formats
+            dependant_variable (object): the name of another StateVariable that
+                                         depends on this one
+            default_value (object): the value this StateVariable should have by
+                                    default when created for another instance
+                                    of in the service
+            allowed_values (list): a list of values this StateVariable can have
+            has_vendor_values (bool): if there are values outside the
+                                      allowed_values list too
+            allowed_value_range (dict): a dict of 'minimum','maximum' and
+                                        'step' values
+            moderated (bool): True if this StateVariable should only be evented
+                              via a LastChange event
 
-        """
-
+        Returns:
+            A new variable of class
+            :class:`coherence.upnp.core.variable.StateVariable`
+        '''
         # FIXME
         # we should raise an Exception when there as a
         # StateVariable with that name already
@@ -832,31 +914,34 @@ class ServiceServer(log.LogAble):
 
     def register_vendor_action(self, name, implementation, arguments=None,
                                needs_callback=True):
-        """
-        enables a backend to add an own, vendor defined, Action to the service
+        '''
+        Enables a backend to add an own, vendor defined, Action to the service.
 
-        @ivar name: the name of the new Action
-        @ivar implementation: either 'optional' or 'required'
-        @ivar arguments: a C{list} if argument C{tuples},
-            like (name,direction,relatedStateVariable)
-        @ivar needs_callback: this Action needs a method in the backend
-            or service class
-        """
-        # FIXME -  we should raise an Exception when there as an Action
-        # with that name already we should raise an Exception when there is no
-        # related StateVariable for an Argument
+        Args:
+            name (str): the name of the new Action
+            implementation (str): either 'optional' or 'required'
+            arguments (list): a C{list} if argument C{tuples},
+                              like (name,direction,relatedStateVariable)
+            needs_callback (bool): this Action needs a method in the backend
+                                   or service class
 
-        """ check for action in backend """
+        Returns:
+            An action of class :class:`coherence.upnp.core.action.Action`
+        '''
+        # FIXME: we should raise an Exception when there as an Action
+        # with that name already we should raise an Exception when there
+        #  is no related StateVariable for an Argument
+
+        # check for action in backend
         callback = getattr(self.backend, "upnp_%s" % name, None)
 
         if callback is None:
-            """ check for action in ServiceServer """
+            # check for action in ServiceServer
             callback = getattr(self, "upnp_%s" % name, None)
 
         if needs_callback and callback is None:
-            """ we have one or more 'A_ARG_TYPE_' variables
-                issue a warning for now
-            """
+            # we have one or more 'A_ARG_TYPE_'
+            # variables issue a warning for now
             if implementation == 'optional':
                 self.info(
                     '%s has a missing callback for %s action %s, '
@@ -919,17 +1004,16 @@ class ServiceServer(log.LogAble):
                    0:11] == 'A_ARG_TYPE_' and arg_direction == 'out':
                     needs_callback = True
 
-            """ check for action in backend """
+            # check for action in backend
             callback = getattr(self.backend, "upnp_%s" % name, None)
 
             if callback is None:
-                """ check for action in ServiceServer """
+                # check for action in ServiceServer
                 callback = getattr(self, "upnp_%s" % name, None)
 
             if needs_callback and callback is None:
-                """ we have one or more 'A_ARG_TYPE_' variables
-                    issue a warning for now
-                """
+                # we have one or more 'A_ARG_TYPE_'
+                # variables issue a warning for now
                 if implementation == 'optional':
                     self.info(
                         '%s has a missing callback for %s action %s, '
@@ -1138,14 +1222,30 @@ from twisted.python.util import OrderedDict
 class ServiceControl(log.LogAble):
 
     def get_action_results(self, result, action, instance):
-        """ check for out arguments
-            if yes: check if there are related ones to StateVariables with
-                non A_ARG_TYPE_ prefix
-                if yes: check if there is a call plugin method for this action
-                    if yes: update StateVariable values with call result
-                    if no:  get StateVariable values and
-                        add them to result dict
-        """
+        '''
+        check for out arguments if yes:
+
+            - check if there are related ones to StateVariables with non
+              `A_ARG_TYPE_` prefix:
+
+                if yes:
+
+                    - check if there is a call plugin method for this action:
+
+                        - if yes: update StateVariable values with call result
+                        - if no:  get StateVariable values and add them to
+                          result dict
+
+        Args:
+            result (object): The result from an action
+            action (object): An instance of class
+                :class:`coherence.upnp.core.action.Action`
+            instance (object): An instance of
+                :class:`coherence.upnp.core.variable.StateVariable`
+
+        Returns:
+            An `OrderedDict`.
+        '''
         self.debug('get_action_results %s %s', action.name, result)
         r = result
         notify = []
@@ -1177,10 +1277,11 @@ class ServiceControl(log.LogAble):
         return ordered_result
 
     def soap__generic(self, *args, **kwargs):
-        """ generic UPnP service control method,
-            which will be used if no soap_ACTIONNAME method
-            in the server service control class can be found
-        """
+        '''
+        Generic UPnP service control method, which will be used
+        if no soap_ACTIONNAME method in the server service control
+        class can be found
+        '''
         try:
             action = self.actions[  # pylint: disable=no-member
                 kwargs['soap_methodName']]

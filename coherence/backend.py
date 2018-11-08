@@ -4,6 +4,60 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+'''
+Backend
+=======
+
+A set of base classes related with backends.
+
+:class:`Backend`
+----------------
+
+The base class for all backends.
+
+:class:`BackendStore`
+---------------------
+
+The base class for all MediaServer backend stores.
+
+:class:`AbstractBackendStore`
+-----------------------------
+
+Inherits from :class:`BackendStore` and extends his capabilities.
+
+:class:`BackendItem`
+--------------------
+
+The base class for all MediaServer backend items.
+
+:class:`Container`
+------------------
+
+The base class for all containers. Actually his base class is the `BackendItem`
+with a few modifications which extends his capabilities to store backend items.
+
+:class:`LazyContainer`
+----------------------
+
+Inherits from :class:`Container` and extends his capabilities.
+
+:class:`BackendRssMixin`
+------------------------
+
+A base class intended to be implemented into a subclass which creates a
+deferred chain to retrieve a RDF file, parse it, extract the metadata and
+reschedule itself.
+
+.. note::
+    RDF (Resource Description Framework) is a family of World Wide Web
+    Consortium specifications originally designed as a metadata data model.
+
+.. seealso::
+    RDF extended information at wikipedia:
+    https://en.wikipedia.org/wiki/Resource_Description_Framework
+'''
 
 import time
 from operator import attrgetter
@@ -11,101 +65,159 @@ from abc import ABCMeta, abstractmethod
 
 from lxml import etree
 
-import coherence.extern.louie as louie
+from eventdispatcher import (
+    EventDispatcher, Property,
+    ListProperty, DictProperty,
+    StringProperty)
+
 from coherence import log
 from coherence.extern.simple_plugin import Plugin
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.utils import getPage
 
 
-class Backend(log.LogAble, Plugin):
-    """ the base class for all backends
+class Backend(EventDispatcher, log.LogAble, Plugin):
+    '''In the :class:`Backend` class we initialize the very basic stuff
+    needed to create a Backend and registers some basic events needed to
+    be successfully detected by our server.
 
-        if there are any UPnP service actions, that can't
-        be handled by the service classes itself, or need some
-        special adjustments for the backend, they need to be
-        defined here.
+    The init method for a backend, should probably most of the time be
+    overwritten when the init is done and send a signal to its device. We
+    can send this signal via two methods, depending on the nature of our
+    backend. For instance, if we want that the backend to be notified
+    without fetching any data we could simply set the attribute
+    :attr:`init_completed` equal to True at the end of our init method of
+    the backend, but in some cases, we will want to send this signal after
+    some deferred call returns a result...in that case we should process
+    slightly differently, you can see how to do that at the end of the
+    init method of the class
+    :class:`~coherence.backends.models.stores.BackendBaseStore`.
 
-        Like maybe upnp_Browse for the CDS Browse action.
-    """
+    After that, the device will then setup, announce itself and should
+    call to the backend's method :meth:`upnp_init`.
 
-    # list the device classes below, like ['MediaServer','MediaRenderer']
-    implements = []
+    .. versionchanged:: 0.9.0
+
+        * Introduced inheritance from EventDispatcher
+        * The emitted events changed:
+
+            - Coherence.UPnP.Backend.init_completed => backend_init_completed
+
+        * Added new event: backend_init_failed
+        * Added new method :meth:`on_init_failed`
+        * Moved class method `init_completed` to `on_init_completed` and added
+          class variable :attr:`init_completed`
+
+    .. note::
+        We can also use this init class to do whatever is necessary with
+        the stuff we can extract from the config dict, connect maybe to an
+        external data-source and start up the backend or if there are any UPnP
+        service actions (Like maybe upnp_Browse for the CDS Browse action),
+        that can't be handled by the service classes itself, or need some
+        special adjustments for the backend, they probably will need to be
+        defined into the method :meth:`__init__`.
+    '''
 
     logCategory = 'backend'
 
-    def __init__(self, server, **kwargs):
-        """ the init method for a backend,
-            should probably most of the time be overwritten
-            when the init is done, send a signal to its device
+    implements = []
+    '''A list of the device classe like:
 
-            the device will then setup and announce itself,
-            after that it calls the backends upnp_init method
-        """
+        ['MediaServer','MediaRenderer']
+    '''
+
+    init_completed = Property(False)
+    '''To know whenever the backend init has completed. This has to be done in
+    the actual backend, maybe it has to wait for an answer from an external
+    data-source first...so...the backend should set this variable to `True`,
+    then the method :meth:`on_init_completed` will be automatically
+    triggered dispatching an event announcing that the backend has been
+    initialized.'''
+
+    def __init__(self, server, *args, **kwargs):
+        '''
+        Args:
+            server (object): This usually should be an instance of our main
+                class :class:`~coherence.base.Coherence` (the UPnP device
+                that's hosting our backend).
+            *args (list): A list with extra arguments for the backend. This,
+                must be implemented into the subclass (if needed).
+            **kwargs (dict): An unpacked dictionary with the backend's
+                configuration.
+        '''
+
         self.config = kwargs
-        self.server = server  # the UPnP device that's hosting that backend
+        self.server = server
 
-        """ do whatever is necessary with the stuff we can
-            extract from the config dict,
-            connect maybe to an external data-source and
-            start up the backend
-            after that's done, tell Coherence about it
-        """
+        EventDispatcher.__init__(self)
         log.LogAble.__init__(self)
         Plugin.__init__(self)
+        self.register_event(
+            'backend_init_completed',
+            'backend_init_failed'
+        )
 
-        """ this has to be done in the actual backend, maybe it has
-            to wait for an answer from an external data-source first
-        """
-        # self.init_completed()
+    def on_init_completed(self, *args, **kwargs):
+        '''
+        Inform Coherence that this backend is ready for announcement. This
+        method just accepts any form of arguments as we don't under which
+        circumstances it is called.
+        '''
+        self.dispatch_event('backend_init_completed', backend=self, **kwargs)
 
-    def init_completed(self, *args, **kwargs):
-        """ inform Coherence that this backend is ready for
-            announcement
-            this method just accepts any form of arguments
-            as we don't under which circumstances it is called
-        """
-        louie.send('Coherence.UPnP.Backend.init_completed',
-                   None, backend=self)
+    def on_init_failed(self, *args, **kwargs):
+        '''
+        Inform Coherence that this backend has failed.
+
+        .. versionadded:: 0.9.0
+        '''
+        self.dispatch_event('backend_init_failed', backend=self, **kwargs)
 
     def upnp_init(self):
-        """ this method gets called after the device is fired,
-            here all initializations of service related state variables
-            should happen, as the services aren't available before that point
-        """
+        '''
+        This method gets called after the device is fired, here all
+        initializations of service related state variables should happen, as
+        the services aren't available before that point.
+        '''
         pass
 
 
 class BackendStore(Backend):
-    """ the base class for all MediaServer backend stores
-    """
+    '''
+    The base class for all MediaServer backend stores. Inherits from class
+    :class:`Backend` and extends his capabilities to make easy to create
+    a Backend Store by setting an initial wmc mapping, and defining some
+    attributes and methods needed by a Backend Store.
+    '''
+
     __metaclass__ = ABCMeta
 
     logCategory = 'backend_store'
 
     def __init__(self, server, *args, **kwargs):
-        """ the init method for a MediaServer backend,
-            should probably most of the time be overwritten
-            when the init is done, send a signal to its device
+        '''
+        Args:
+            server (object): This usually should be an instance of our main
+                class :class:`~coherence.base.Coherence` (the UPnP device
+                that's hosting our backend).
+            *args (list): A list with extra arguments for the backend. This,
+                must be implemented into the subclass (if needed).
+            **kwargs (dict): An unpacked dictionary with the backend's
+                configuration.
+        .. note::
+            In case we want so serve something via the MediaServer web backend,
+            the class :class:`BackendItem` should pass an URI assembled of
+            urlbase + '/' + id to the
+            :class:`~coherence.upnp.core.DIDLLite.Resource`.
 
-            the device will then setup and announce itself,
-            after that it calls the backends upnp_init method
-        """
-        Backend.__init__(self, server, *args)
-        self.config = kwargs
-        self.server = server  # the UPnP device that's hosting that backend
+        .. warning::
+            Remember to sent the event init_completed via setting to `True`
+            the attribute :attr:`init_completed`. Check the base class
+            :class:`Backend` for instructions about how to do it.
+        '''
+        Backend.__init__(self, server, *args, **kwargs)
         self.update_id = 0
 
-        """ do whatever is necessary with the stuff we can
-            extract from the config dict
-        """
-
-        """ in case we want so serve something via
-            the MediaServer web backend
-
-            the BackendItem should pass an URI assembled
-            of urlbase + '/' + id to the DIDLLite.Resource
-        """
         self.urlbase = kwargs.get('urlbase', '')
         if not self.urlbase.endswith('/'):
             self.urlbase += '/'
@@ -123,24 +235,16 @@ class BackendStore(Backend):
                                  'B': lambda: self._get_all_items(0),
                                  })
 
-        """ and send out the signal when ready
-        """
-        # louie.send('Coherence.UPnP.Backend.init_completed',
-        #            None, backend=self)
-
     def release(self):
-        """ if anything needs to be cleaned up upon
-            shutdown of this backend, this is the place
-            for it
-        """
+        '''If anything needs to be cleaned up upon shutdown of this backend,
+        this is the place for it. Should be overwritten in subclass.'''
         pass
 
     def _get_all_items(self, id):
-        """ a helper method to get all items as a response
-            to some XBox 360 UPnP Search action
-            probably never be used as the backend will overwrite
-            the wmc_mapping with more appropriate methods
-        """
+        '''A helper method to get all items as a response to some XBox 360
+        UPnP Search action probably never be used as the backend will overwrite
+        the wmc_mapping with more appropriate methods.
+        '''
         items = []
         item = self.get_by_id(id)
         if item is not None:
@@ -158,140 +262,170 @@ class BackendStore(Backend):
 
     @abstractmethod
     def get_by_id(self, id):
-        """ called by the CDS or the MediaServer web
+        '''
+        Args:
+            id (object): is the id property of our DIDLLite item
 
-            id is the id property of our DIDLLite item
-
-            if this MediaServer implements containers, that can
-            share their content, like 'all tracks', 'album' and
-            'album_of_artist' - they all have the same track item as content -
-            then the id may be passed by the CDS like this:
-
-            'id@container' or 'id@container@container@container...'
-
-            therefore a
-
-            if isinstance(id, basestring):
-                id = id.split('@',1)
-                id = id[0]
-
-            may be appropriate as the first thing to do
-            when entering this method
-
-            should return
-
+        Returns:
             - None when no matching item for that id is found,
             - a BackendItem,
             - or a Deferred
 
-        """
+        Called by the CDS or the MediaServer web.
 
+        .. note::
+            if this MediaServer implements containers that can share their
+            content, like 'all tracks', 'album' and 'album_of_artist' (they all
+            have the same track item as content), then the id may be passed by
+            the CDS like this:
+
+                'id@container' or 'id@container@container@container...'
+
+            therefore a
+
+            .. code-block:: python
+
+                if isinstance(id, basestring):
+                    id = id.split('@',1)
+                    id = id[0]
+
+            may be appropriate as the first thing to do when entering this
+            method.
+        '''
         return None
 
 
-class BackendItem(log.LogAble):
-    """ the base class for all MediaServer backend items
-    """
+class BackendItem(EventDispatcher, log.LogAble):
+    '''This is the base class for all MediaServer backend items.
+
+    Most of the time we collect the necessary data for an UPnP
+    ContentDirectoryService Container or Object and instantiate it into the
+    :meth:`__init__`
+
+    .. code-block:: python
+
+        self.item = DIDLLite.Container(id,parent_id,name,...)
+
+    or
+
+    .. code-block:: python
+
+        self.item = DIDLLite.MusicTrack(id,parent_id,name,...)
+
+    To make that a valid UPnP CDS Object it needs one or more
+    DIDLLite. :class:`~coherence.upnp.core.DIDLLite.Resource`
+
+    .. code-block:: python
+
+        self.item.res = []
+        res = DIDLLite.Resource(url, 'http-get:*:%s:*' % mimetype)
+        res.size = size
+        self.item.res.append(res)
+
+    .. note:: url should be the urlbase of our backend + '/' + our id.
+
+    .. versionchanged:: 0.9.0
+
+        * Introduced inheritance from EventDispatcher
+        * Moved class variable :attr:`update_id` to class
+          :attr:`Container.update_id`
+        * Added class variable :attr:`mimetype` to benefit from the
+          EventDispatcher's properties
+    '''
 
     logCategory = 'backend_item'
 
+    name = 'backend_item_name'
+    '''the basename of a file, the album title, the artists name...is expected
+    to be unicode'''
+
+    location = None
+    '''the filepath of our media file, or alternatively a FilePath or
+    a ReverseProxyResource object'''
+
+    cover = None
+    '''if we have some album art image, let's put the filepath or
+    link into here'''
+
+    store = None
+    '''The backend store.'''
+    storage_id = None
+    '''The id of the backend store.'''
+
+    item = None
+    '''Usually an atomic object from
+    :class:`~coherence.upnp.core.DIDLLite.Item` or derived.'''
+
+    mimetype = StringProperty('')
+    '''The mimetype variable describes the protocol info for the object.'''
+
     def __init__(self, *args, **kwargs):
-        """ most of the time we collect the necessary data for
-            an UPnP ContentDirectoryService Container or Object
-            and instantiate it here
-
-            self.item = DIDLLite.Container(id,parent_id,name,...)
-              or
-            self.item = DIDLLite.MusicTrack(id,parent_id,name,...)
-
-            To make that a valid UPnP CDS Object it needs one or
-            more DIDLLite.Resource(uri,protocolInfo)
-
-            self.item.res = []
-            res = DIDLLite.Resource(url, 'http-get:*:%s:*' % mimetype)
-
-                url : the urlbase of our backend + '/' + our id
-
-            res.size = size
-            self.item.res.append(res)
-        """
+        EventDispatcher.__init__(self)
         log.LogAble.__init__(self)
 
-        self.store = None
-        self.storage_id = None
-
-        # the basename of a file, the album title, the artists name...
-        # is expected to be unicode
-        self.name = 'my_name'
-        self.item = None
-        self.update_id = 0  # the update id of that item,
-        # when an UPnP ContentDirectoryService Container
-        # this should be incremented on every modification
-
-        # the filepath of our media file, or alternatively
-        # a FilePath or a ReverseProxyResource object
-        self.location = None
-
-        self.cover = None  # if we have some album art image, let's put
-        # the filepath or link into here
-
     def get_children(self, start=0, end=0):
-        """ called by the CDS and the MediaServer web
-            should return
+        '''
+        Called by the CDS and the MediaServer web.
 
-            - a list of its childs[start:end]
+        Args:
+            start (int): the start.
+            end (int): the end.
+
+        Returns:
+            - a list of its childs, from start to end.
             - or a Deferred
-
-            if end == 0, the request is for all childs
-            after start - childs[start:]
-        """
+        '''
         pass
 
     def get_child_count(self):
-        """ called by the CDS
-            should return
+        '''
+        Called by the CDS.
 
+        Returns:
             - the number of its childs - len(childs)
             - or a Deferred
-
-        """
+        '''
+        pass
 
     def get_item(self):
-        """ called by the CDS and the MediaServer web
-            should return
+        '''
+        Called by the CDS and the MediaServer web.
 
+        Returns:
             - an UPnP ContentDirectoryServer DIDLLite object
             - or a Deferred
-        """
+        '''
         return self.item
 
     def get_name(self):
-        """ called by the MediaServer web
-            should return
+        '''
+        Called by the MediaServer web.
 
-            - the name of the item,
-              it is always expected to be in unicode
-        """
+        Returns:
+            the name of the item, it is always expected to be in unicode.
+        '''
         return self.name
 
     def get_path(self):
-        """ called by the MediaServer web
-            should return
+        '''
+        Called by the MediaServer web.
 
-            - the filepath where to find the media file
-              that this item does refer to
-        """
+        Returns:
+            the filepath where to find the media file that this item does
+            refer to.
+        '''
         return self.location
 
     def get_cover(self):
-        """ called by the MediaServer web
-            should return
+        '''
+        Called by the MediaServer web.
 
-            - the filepath where to find the album art file
+        Returns:
+            the filepath where to find the album art file
 
-            only needed when we have created for that item
-            an albumArtURI property that does point back to us
-        """
+        .. note:: only needed when we have created for that item an
+            albumArtURI property that does point back to us.
+        '''
         return self.cover
 
     def __repr__(self):
@@ -304,9 +438,8 @@ class BackendRssMixin:
         pass
 
     def update_data(self, rss_url, container=None):
-        """ creates a deferred chain to retrieve the rdf file,
-            parse and extract the metadata and reschedule itself
-        """
+        '''Creates a deferred chain to retrieve the rdf file, parse and extract
+        the metadata and reschedule itself.'''
 
         def fail(f):
             # TODO fix loggable thing
@@ -323,8 +456,7 @@ class BackendRssMixin:
         return dfr
 
     def parse_data(self, xml_data, container):
-        """ extract media info and create BackendItems
-        """
+        '''Extract media info and create BackendItems'''
         pass
 
     def queue_update(self, error_or_failure, rss_url, container):
@@ -333,30 +465,58 @@ class BackendRssMixin:
 
 
 class Container(BackendItem):
+    '''
+    Represents a backend item which will contains backend items inside.
+
+    .. versionchanged:: 0.9.0
+
+        * Added static class variable :attr:`update_id`
+        * Changed some variables to benefit from the EventDispatcher's
+          properties:
+
+            - :attr:`children`
+            - :attr:`children_ids`
+            - :attr:`children_by_external_id`
+            - :attr:`parent`
+    '''
+
+    update_id = Property(0)
+    '''It represents the update id of thhe container. This should be
+    incremented on every modification of the UPnP ContentDirectoryService
+    Container, as we do in methods :meth:`add_child` and :meth:`remove_child`.
+    '''
+
+    children = ListProperty([])
+    '''A list of the backend items.'''
+    children_ids = DictProperty({})
+    '''A dictionary of the backend items by his id.'''
+    children_by_external_id = DictProperty({})
+    '''A dictionary of the backend items by his external id.'''
+
+    parent = Property(None)
+    '''The parent object for this class.'''
+    parent_id = -1
+    '''The id of the parent object. This will be automatically set whenever
+    we set the attribute :attr:`parent`.
+    '''
+
+    mimetype = 'directory'
+    '''The mimetype variable describes the protocol info for the object. In a
+    :class:`Container` this should be set to value `directory` or `root`.
+    '''
 
     def __init__(self, parent, title):
         BackendItem.__init__(self)
 
         self.parent = parent
-        if self.parent is not None:
-            self.parent_id = self.parent.get_id()
-        else:
-            self.parent_id = -1
-
         self.name = title
-        self.mimetype = 'directory'
-
-        self.children = []
-        self.children_ids = {}
-        self.children_by_external_id = {}
-
-        self.update_id = 0
-
-        self.item = None
 
         self.sorted = False
-
         self.sorting_method = 'name'
+
+    def on_parent(self, parent):
+        if self.parent is not None:
+            self.parent_id = self.parent.get_id()
 
     def register_child(self, child, external_id=None):
         id = self.store.append_item(child)

@@ -105,8 +105,8 @@ The basic dependencies for the package are:
     - ConfigObj >= 4.3
     - Twisted >= 18.7
     - zope.interface
-    - louie-latest
     - lxml
+    - eventdispatcher >= 1.9.4
     - python-dateutil
     - pyopenssl
 

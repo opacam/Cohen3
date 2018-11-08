@@ -2,8 +2,17 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
-import coherence.extern.louie as louie
+'''
+:class:`MediaRendererClient`
+----------------------------
+
+A class representing an media renderer client device.
+'''
+
+from eventdispatcher import EventDispatcher, Property
+
 from coherence import log
 from coherence.upnp.services.clients.av_transport_client import \
     AVTransportClient
@@ -13,24 +22,44 @@ from coherence.upnp.services.clients.rendering_control_client import \
     RenderingControlClient
 
 
-class MediaRendererClient(log.LogAble):
+class MediaRendererClient(EventDispatcher, log.LogAble):
+    '''
+    .. versionchanged:: 0.9.0
+
+        * Introduced inheritance from EventDispatcher
+        * The emitted events changed:
+
+            - Coherence.UPnP.DeviceClient.detection_completed =>
+              device_client_detection_completed
+
+        * Changed class variable :attr:`detection_completed` to benefit
+          from the EventDispatcher's properties
+    '''
     logCategory = 'mr_client'
+
+    detection_completed = Property(False)
+    '''
+    To know whenever the device detection has completed. Defaults to `False`
+    and it will be set automatically to `True` by the class method
+    :meth:`service_notified`.
+    '''
 
     def __init__(self, device):
         log.LogAble.__init__(self)
+        EventDispatcher.__init__(self)
+        self.register_event(
+            'device_client_detection_completed',
+        )
+
         self.device = device
+        self.device.bind(device_service_notified=self.service_notified)
         self.device_type = self.device.get_friendly_device_type()
+
         self.version = int(self.device.get_device_type_version())
         self.icons = device.icons
         self.rendering_control = None
         self.connection_manager = None
         self.av_transport = None
-
-        self.detection_completed = False
-
-        louie.connect(self.service_notified,
-                      signal='Coherence.UPnP.DeviceClient.Service.notified',
-                      sender=self.device)
 
         for service in self.device.get_services():
             if service.get_type() in [
@@ -45,6 +74,8 @@ class MediaRendererClient(log.LogAble):
                     "urn:schemas-upnp-org:service:AVTransport:1",
                     "urn:schemas-upnp-org:service:AVTransport:2"]:
                 self.av_transport = AVTransportClient(service)
+            if service.detection_completed:
+                self.service_notified(service)
         self.info("MediaRenderer %s", self.device.get_friendly_name())
         if self.rendering_control:
             self.info("RenderingControl available")
@@ -120,8 +151,9 @@ class MediaRendererClient(log.LogAble):
             if self.av_transport.service.last_time_updated is None:
                 return
         self.detection_completed = True
-        louie.send('Coherence.UPnP.DeviceClient.detection_completed', None,
-                   client=self, udn=self.device.udn)
+        self.dispatch_event(
+            'device_client_detection_completed',
+            client=self, udn=self.device.udn)
 
     def state_variable_change(self, variable):
         self.info('%(name)r changed from %(old_value)r to %(value)r',

@@ -3,13 +3,31 @@
 
 # Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+'''
+Devices
+=======
+
+This module contains two classes describing UPnP devices.
+
+:class:`Device`
+---------------
+
+The base class for all devices.
+
+:class:`RootDevice`
+-------------------
+
+A device representing a root device.
+'''
 
 import time
 
 from lxml import etree
+from eventdispatcher import EventDispatcher, Property, ListProperty
 from twisted.internet import defer
 
-import coherence.extern.louie as louie
 from coherence import log
 from coherence.upnp.core import utils
 from coherence.upnp.core.service import Service
@@ -18,29 +36,84 @@ from . import xml_constants
 ns = xml_constants.UPNP_DEVICE_NS
 
 
-class Device(log.LogAble):
+class Device(EventDispatcher, log.LogAble):
+    '''
+    Represents a UPnP's device, but this is not a root device, it's the base
+    class used for any device. See :class:`RootDevice` if you want a root
+    device.
+
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * The emitted events changed:
+
+            - Coherence.UPnP.Device.detection_completed =>
+              device_detection_completed
+            - Coherence.UPnP.Device.remove_client =>
+              device_remove_client
+
+        * New events: device_service_notified, device_got_client
+        * Changes some class variables to benefit from the EventDispatcher's
+          properties:
+
+            - :attr:`client`
+            - :attr:`devices`
+            - :attr:`services`
+            - :attr:`client`
+            - :attr:`detection_completed`
+    '''
     logCategory = 'device'
+
+    client = Property(None)
+    '''
+    Defined by :class:`~coherence.upnp.devices.controlpoint.ControlPoint`.
+    It should be one of:
+
+        - Initialized instance of a class
+          :class:`~coherence.upnp.devices.media_server_client.MediaServerClient`
+        - Initialized instance of a class
+          :class:`~coherence.upnp.devices.media_renderer_client.MediaRendererClient`
+        - Initialized instance of a class
+          :class:`~coherence.upnp.devices.internet_gateway_device_client.InternetGatewayDeviceClient`
+
+    Whenever a client is set an event will be sent notifying it by
+    :meth:`on_client`.
+    '''  # noqa
+
+    icons = ListProperty([])
+    '''A list of the device icons.'''
+
+    devices = ListProperty([])
+    '''A list of the device devices.'''
+
+    services = ListProperty([])
+    '''A list of the device services.'''
+
+    detection_completed = Property(False)
+    '''
+    To know whenever the device detection has completed. Defaults to `False`
+    and it will be set automatically to `True` by the class method
+    :meth:`receiver`.
+    '''
 
     def __init__(self, parent=None, udn=None):
         log.LogAble.__init__(self)
+        EventDispatcher.__init__(self)
+        self.register_event(
+            'device_detection_completed',
+            'device_remove_client',
+
+            'device_service_notified',
+            'device_got_client',
+        )
         self.parent = parent
         self.udn = udn
-        self.services = []
         # self.uid = self.usn[:-len(self.st)-2]
         self.friendly_name = ""
         self.device_type = ""
         self.upnp_version = "n/a"
         self.friendly_device_type = "[unknown]"
         self.device_type_version = 0
-        self.detection_completed = False
-        self.client = None
-        self.icons = []
-        self.devices = []
-
-        louie.connect(self.receiver,
-                      'Coherence.UPnP.Service.detection_completed', self)
-        louie.connect(self.service_detection_failed,
-                      'Coherence.UPnP.Service.detection_failed', self)
 
     def __repr__(self):
         return "embedded device %r %r, parent %r" % (
@@ -75,9 +148,8 @@ class Device(log.LogAble):
             self.debug("try to remove %r", service)
             service.remove()
         if self.client is not None:
-            louie.send(
-                'Coherence.UPnP.Device.remove_client',
-                None, self.udn, self.client)
+            self.dispatch_event(
+                'device_remove_client', self.udn, self.client)
             self.client = None
         # del self
         return True
@@ -88,6 +160,8 @@ class Device(log.LogAble):
         for s in self.services:
             if not s.detection_completed:
                 return
+            self.dispatch_event(
+                'device_service_notified', service=s)
         if self.udn is None:
             return
         self.detection_completed = True
@@ -95,17 +169,13 @@ class Device(log.LogAble):
             self.info(
                 'embedded device {} {} initialized, parent {}'.format(
                     self.friendly_name, self.device_type, self.parent))
-        louie.send(
-            'Coherence.UPnP.Device.detection_completed',
-            None, device=self)
+        self.dispatch_event('device_detection_completed', None, device=self)
         if self.parent is not None:
-            louie.send(
-                'Coherence.UPnP.Device.detection_completed',
-                self.parent, device=self)
+            self.dispatch_event(
+                'device_detection_completed', self.parent, device=self)
         else:
-            louie.send(
-                'Coherence.UPnP.Device.detection_completed',
-                self, device=self)
+            self.dispatch_event(
+                'device_detection_completed', self, device=self)
 
     def service_detection_failed(self, device):
         self.remove()
@@ -138,13 +208,31 @@ class Device(log.LogAble):
                 return service
 
     def add_service(self, service):
+        '''
+        Add a service to the device. Also we check if service already notified,
+        and trigger the callback if needed. We also connect the device to
+        service in case the service still not completed his detection in order
+        that the device knows when the service has completed his detection.
+
+        Args:
+            service (object): A service which should be an initialized instance
+                              of :class:`~coherence.upnp.core.service.Service`
+
+        '''
         self.debug('add_service {}'.format(service))
+        if service.detection_completed:
+            self.receiver(service)
+        service.bind(service_detection_completed=self.receiver,
+                     service_detection_failed=self.service_detection_failed)
         self.services.append(service)
 
     # :fixme: This fails as Service.get_usn() is not implemented.
     def remove_service_with_usn(self, service_usn):
         for service in self.services:
             if service.get_usn() == service_usn:
+                service.unbind(
+                    service_detection_completed=self.receiver,
+                    service_detection_failed=self.service_detection_failed)
                 self.services.remove(service)
                 service.remove()
                 break
@@ -180,6 +268,16 @@ class Device(log.LogAble):
 
     def get_client(self):
         return self.client
+
+    def on_client(self, *args):
+        '''
+        Automatically triggered whenever a client is set or changed. Emmit
+        an event notifying that the client has changed.
+
+        .. versionadded:: 0.9.0
+        '''
+        self.dispatch_event(
+            'device_got_client', self, client=self.client)
 
     def renew_service_subscriptions(self):
         """ iterate over device's services and renew subscriptions """
@@ -490,23 +588,42 @@ class Device(log.LogAble):
 
 
 class RootDevice(Device):
+    '''
+    Description for a root device.
+
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * The emitted events changed:
+
+            - Coherence.UPnP.RootDevice.detection_completed =>
+              root_device_detection_completed
+            - Coherence.UPnP.RootDevice.removed => root_device_removed
+    '''
+
+    root_detection_completed = Property(False)
+    '''
+    To know whenever the root device detection has completed. Defaults to
+    `False` and it will be set automatically to `True` by the class method
+    :meth:`device_detect`.
+    '''
 
     def __init__(self, infos):
         self.usn = infos['USN']
-        self.udn = infos.get('UDN', None)
+        self.udn = infos.get('UDN', '')
         self.server = infos['SERVER']
         self.st = infos['ST']
         self.location = infos['LOCATION']
         self.manifestation = infos['MANIFESTATION']
         self.host = infos['HOST']
-        self.root_detection_completed = False
         Device.__init__(self, None)
-        louie.connect(
-            self.device_detect,
-            'Coherence.UPnP.Device.detection_completed',
-            self)
+        self.register_event(
+            'root_device_detection_completed',
+            'root_device_removed',
+        )
+        self.bind(detection_completed=self.device_detect)
         # we need to handle root device completion
-        # these events could be ourself or our children.
+        # these events could be our self or our children.
         self.parse_description()
         self.debug('RootDevice initialized: %r' % self.location)
 
@@ -517,8 +634,7 @@ class RootDevice(Device):
 
     def remove(self, *args):
         result = Device.remove(self, *args)
-        louie.send('Coherence.UPnP.RootDevice.removed', self,
-                   usn=self.get_usn())
+        self.dispatch_event('root_device_removed', self, usn=self.get_usn())
         return result
 
     def get_usn(self):
@@ -552,6 +668,12 @@ class RootDevice(Device):
         return False
 
     def device_detect(self, *args, **kwargs):
+        '''
+        This method is automatically triggered whenever the property of the
+        base class :attr:`Device.detection_completed` is set to `True`. Here we
+        perform some more operations, before the :class:`RootDevice` emits
+        an event notifying that the root device detection has completed.
+        '''
         self.debug("device_detect %r", kwargs)
         self.debug("root_detection_completed %r",
                    self.root_detection_completed)
@@ -573,8 +695,8 @@ class RootDevice(Device):
         self.root_detection_completed = True
         self.info("rootdevice %r %r %r initialized, manifestation %r",
                   self.friendly_name, self.st, self.host, self.manifestation)
-        louie.send('Coherence.UPnP.RootDevice.detection_completed', None,
-                   device=self)
+        self.dispatch_event(
+            'root_device_detection_completed', device=self)
 
     def add_device(self, device):
         self.debug("RootDevice add_device %r", device)

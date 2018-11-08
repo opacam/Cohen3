@@ -52,7 +52,6 @@ from axiom import store, item, attributes
 from epsilon.extime import Time
 from twisted.internet import defer
 
-import coherence.extern.louie as louie
 from coherence.backend import BackendItem, BackendStore
 from coherence.extern.covers_by_amazon import CoverGetter
 from coherence.upnp.core import DIDLLite
@@ -465,6 +464,10 @@ class Playlist(item.Item, BackendItem):
 
 
 class MediaStore(BackendStore):
+    '''
+    .. versionchanged:: 0.9.0
+        Migrated from louie/dispatcher to EventDispatcher
+    '''
     logCategory = 'media_store'
     implements = ['MediaServer']
 
@@ -493,7 +496,7 @@ class MediaStore(BackendStore):
              # all artists
              })
 
-        louie.send('Coherence.UPnP.Backend.init_completed', None, backend=self)
+        self.init_completed = True
 
     def walk(self, path):
         # print "walk", path

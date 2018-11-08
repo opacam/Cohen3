@@ -2,12 +2,36 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2007 - Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+'''
+Soap Service
+============
+
+SOAP is a simple Object Access Protocol, for actually calling actions. This
+module contains  a class :class:`UPnPPublisher` which will manage SOAP's
+services.
+
+:class:`errorCode`
+------------------
+
+Custom exception for class :class:`UPnPPublisher`
+
+:class:`UPnPPublisher`
+----------------------
+
+A custom implementation of :class:`twisted.web.soap.SOAPPublisher`, but
+removing the SOAPpy dependency.
+'''
+
 from lxml import etree
+
 from twisted.internet import defer
 from twisted.python import failure
 from twisted.web import server, resource
 
-import coherence.extern.louie as louie
+from eventdispatcher import EventDispatcher
+
 from coherence import log, SERVER_ID
 from coherence.upnp.core import soap_lite
 from coherence.upnp.core.utils import parse_with_lxml
@@ -19,18 +43,30 @@ class errorCode(Exception):
         self.status = status
 
 
-class UPnPPublisher(resource.Resource, log.LogAble):
-    """ Based upon twisted.web.soap.SOAPPublisher and
-        extracted to remove the SOAPpy dependency
+class UPnPPublisher(EventDispatcher, resource.Resource, log.LogAble):
+    '''
+    Based upon twisted.web.soap.SOAPPublisher and extracted to remove the
+    SOAPpy dependency UPnP requires headers and OUT parameters to be returned
+    in a slightly different way than the SOAPPublisher class does.
 
-        UPnP requires headers and OUT parameters to be returned
-        in a slightly
-        different way than the SOAPPublisher class does.
-    """
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * The emitted events changed:
+
+            - UPnPTest.Control.Client.CommandReceived =>
+              control_client_command_received
+    '''
     logCategory = 'soap'
     isLeaf = 1
     encoding = "UTF-8"
     envelope_attrib = None
+
+    def __init__(self, *args, **kwargs):
+        EventDispatcher.__init__(self)
+        self.register_event(
+            'control_client_command_received'
+        )
 
     def _sendResponse(self, request, response, status=200):
         self.debug('_sendResponse %s %s', status, response)
@@ -92,8 +128,8 @@ class UPnPPublisher(resource.Resource, log.LogAble):
         self.info('soap_request: %s', headers)
 
         # allow external check of data
-        louie.send('UPnPTest.Control.Client.CommandReceived', None, headers,
-                   data)
+        self.dispatch_event(
+            'control_client_command_received', headers, data)
 
         def print_c(e):
             for c in e.getchildren():

@@ -21,11 +21,6 @@ coherence.dbus\_service (module)
 
 .. automodule:: coherence.dbus_service
 
-coherence.dispatcher (module)
------------------------------
-
-.. automodule:: coherence.dispatcher
-
 coherence.json\_service (module)
 --------------------------------
 

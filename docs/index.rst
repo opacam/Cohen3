@@ -62,6 +62,7 @@ Table of Contents
     cli
     backends
     write_a_backend
+    events
     source/coherence
     contributing
     contributor_code_of_conduct

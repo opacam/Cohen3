@@ -1,18 +1,55 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
+# Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
+# Copyright 2006,2007,2008,2009 Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
+
+'''
+Events
+======
+
+This module contains several classes related to UPnP events.
+
+:class:`EventServer`
+--------------------
+
+A class inherited from :class:`twisted.web.resource.Resource` representing an
+event's server with dispatch events capabilities via EventsDispatcher.
+
+:class:`EventSubscriptionServer`
+--------------------------------
+
+This class is the server part on the device side. It listens to subscribe
+requests and registering the subscriber to send event messages to the device.
+
+:class:`Event`
+--------------
+
+A dictionary representing an UPnP's Event.
+
+:class:`EventProtocol`
+----------------------
+
+The Event's Protocol.
+
+:class:`NotificationProtocol`
+-----------------------------
+
+The Notification protocol used to by :meth:`send_notification`.
+'''
+
 import time
 from urllib.parse import urlsplit
 
-# Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).
-# Copyright 2006,2007,2008,2009 Frank Scholz <coherence@beebits.net>
 from lxml import etree
 from twisted.internet import reactor, defer
 from twisted.internet.protocol import Protocol, ClientCreator, _InstanceFactory
 from twisted.web import resource
 from twisted.web.http import datetimeToString
 
-import coherence.extern.louie as louie
+from eventdispatcher import EventDispatcher
+
 from coherence import log, SERVER_ID
 from coherence.upnp.core import utils
 
@@ -21,12 +58,25 @@ hostname = None
 web_server_port = None
 
 
-class EventServer(resource.Resource, log.LogAble):
+class EventServer(EventDispatcher, resource.Resource, log.LogAble):
+    '''
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * The emitted events changed:
+
+            - UPnP.Event.Server.message_received =>
+              event_server_message_received
+    '''
     logCategory = 'event_server'
 
     def __init__(self, control_point):
         log.LogAble.__init__(self)
         resource.Resource.__init__(self)
+        EventDispatcher.__init__(self)
+        self.register_event(
+            'event_server_message_received'
+        )
         self.coherence = control_point.coherence
         self.control_point = control_point
         self.coherence.add_web_resource('events',
@@ -44,9 +94,9 @@ class EventServer(resource.Resource, log.LogAble):
 
         command = {'method': request.method, 'path': request.path}
         headers = request.responseHeaders
-        louie.send(
-            'UPnP.Event.Server.message_received',
-            None, command, headers, data)
+        self.dispatch_event(
+            'event_server_message_received',
+            command, headers, data)
 
         if request.code != 200:
             self.info("data: %s", data)
@@ -69,39 +119,54 @@ class EventServer(resource.Resource, log.LogAble):
         return ""
 
 
-class EventSubscriptionServer(resource.Resource, log.LogAble):
-    """
-    This class ist the server part on the device side. It listens
+class EventSubscriptionServer(EventDispatcher, resource.Resource, log.LogAble):
+    '''
+    This class is the server part on the device side. It listens
     to subscribe requests and registers the subscriber to send
     event messages to this device.
     If an unsubscribe request is received, the subscription is cancelled
     and no more event messages will be sent.
 
-    we receive a subscription request
-    {'callback':
-        '<http://192.168.213.130:9083/BYvZMzfTSQkjHwzOThaP/ConnectionManager>',
-     'host': '192.168.213.107:30020',
-     'nt': 'upnp:event',
-     'content-length': '0',
-     'timeout': 'Second-300'}
+    we receive a subscription request like::
 
-    modify the callback value
-    callback = callback[1:len(callback)-1]
-    and pack it into a subscriber dict
+        {'callback':
+            '<http://192.168.213.130:9083/BYvZMzfTSQkjHwzOThaP/ConnectionManager>',
+         'host': '192.168.213.107:30020',
+         'nt': 'upnp:event',
+         'content-length': '0',
+         'timeout': 'Second-300'}
 
-    {'uuid:oAQbxiNlyYojCAdznJnC':
-        {
-        'callback':
-        '<http://192.168.213.130:9083/BYvZMzfTSQkjHwzOThaP/ConnectionManager>',
-        'created': 1162374189.257338,
-        'timeout': 'Second-300',
-        'sid': 'uuid:oAQbxiNlyYojCAdznJnC'}}
-    """
+    modify the callback value::
+
+        callback = callback[1:len(callback)-1]
+
+    and pack it into a subscriber dict::
+
+        {'uuid:oAQbxiNlyYojCAdznJnC':
+            {
+            'callback':
+            '<http://192.168.213.130:9083/BYvZMzfTSQkjHwzOThaP/ConnectionManager>',
+            'created': 1162374189.257338,
+            'timeout': 'Second-300',
+            'sid': 'uuid:oAQbxiNlyYojCAdznJnC'}}
+
+    .. versionchanged:: 0.9.0
+
+        * Migrated from louie/dispatcher to EventDispatcher
+        * The emitted events changed:
+
+            - UPnP.Event.Client.message_received =>
+              event_client_message_received
+    '''  # noqa
     logCategory = 'event_subscription_server'
 
     def __init__(self, service):
         resource.Resource.__init__(self)
         log.LogAble.__init__(self)
+        EventDispatcher.__init__(self)
+        self.register_event(
+            'event_client_message_received'
+        )
         self.service = service
         self.subscribers = service.get_subscribers()
         try:
@@ -121,8 +186,9 @@ class EventSubscriptionServer(resource.Resource, log.LogAble):
 
         command = {'method': request.method, 'path': request.path}
         headers = request.responseHeaders
-        louie.send('UPnP.Event.Client.message_received',
-                   None, command, headers, data)
+        self.dispatch_event(
+            'event_client_message_received',
+            command, headers, data)
 
         if request.code != 200:
             self.debug("data: %s", data)
@@ -170,8 +236,9 @@ class EventSubscriptionServer(resource.Resource, log.LogAble):
 
         command = {'method': request.method, 'path': request.path}
         headers = request.responseHeaders
-        louie.send('UPnP.Event.Client.message_received',
-                   None, command, headers, data)
+        self.dispatch_event(
+            'event_client_message_received',
+            command, headers, data)
 
         if request.code != 200:
             self.debug("data: %s", data)

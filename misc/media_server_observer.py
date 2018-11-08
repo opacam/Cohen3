@@ -6,58 +6,65 @@
 #
 # Copyright 2009, Benjamin Kampmann <ben.kampmann@gmail.com>
 # Copyright 2014, Hartmut Goebel <h.goebel@crazy-compilers.com>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
 from twisted.internet import reactor
 
 from coherence.base import Coherence
 from coherence.upnp.core import DIDLLite
-from coherence.upnp.devices.control_point import ControlPoint
 
 
 # browse callback
 def process_media_server_browse(result, client):
-    print("browsing root of: {}".format(client.device.get_friendly_name()))
-    print("result contains: {}".format(result['NumberReturned']), end=' ')
-    print("out of: {} {}".format(result['TotalMatches'], "total matches."))
+    print(f"browsing root of: {client.device.get_friendly_name()}")
+    print(f"result contains: {result['NumberReturned']}", end=' ')
+    print(f"out of {result['TotalMatches']} total matches.")
 
     elt = DIDLLite.DIDLElement.fromString(result['Result'])
     for item in elt.getItems():
 
         if item.upnp_class.startswith("object.container"):
-            print("  container", item.title, "(%s)" % item.id, end=' ')
+            print("  container", item.title, f"({item.id})", end=' ')
             print("with", item.childCount, "items.")
 
         if item.upnp_class.startswith("object.item"):
-            print("  item", item.title, "(%s)." % item.id)
+            print("  item", item.title, f"({item.id}).")
 
 
 # called for each media server found
-def media_server_found(client, udn):
-    print("Media Server found: {}".format(client.device.get_friendly_name()))
+def media_server_found(device):
+    print(f"Media Server found: {device.get_friendly_name()}")
 
-    d = client.content_directory.browse(0,
-                                        browse_flag='BrowseDirectChildren',
-                                        process_result=False,
-                                        backward_compatibility=False)
-    d.addCallback(process_media_server_browse, client)
+    d = device.client.content_directory.browse(
+        0,
+        browse_flag='BrowseDirectChildren',
+        process_result=False,
+        backward_compatibility=False)
+    d.addCallback(process_media_server_browse, device.client)
 
 
 # sadly they sometimes get removed as well :(
-def media_server_removed(udn):
-    print("Media Server gone:", udn)
+def media_server_removed(*args):
+    print(f'Media Server gone: {args}')
 
 
 def start():
-    control_point = ControlPoint(Coherence({'logmode': 'warning'}),
-                                 auto_client=['MediaServer'])
-    control_point.connect(media_server_found,
-                          'Coherence.UPnP.ControlPoint.MediaServer.detected')
-    control_point.connect(media_server_removed,
-                          'Coherence.UPnP.ControlPoint.MediaServer.removed')
+    # Initialize coherence and make sure that
+    # at least we have one server to explore
+    coherence = Coherence(
+        {'logmode': 'warning',
+         'controlpoint': 'yes',
+         'plugin': [
+             {'backend': 'LolcatsStore',
+              'name': 'Cohen3 LolcatsStore',
+              'proxy': 'no',
+              },
+         ]
+         }
+    )
 
-    # now we should also try to discover the ones that are already there:
-    for device in control_point.coherence.devices:
-        print(device)
+    coherence.bind(coherence_device_detection_completed=media_server_found)
+    coherence.bind(coherence_device_removed=media_server_removed)
 
 
 if __name__ == "__main__":

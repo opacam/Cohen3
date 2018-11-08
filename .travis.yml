@@ -27,6 +27,7 @@ install:
   - pip install --upgrade cython
   - pip install pycairo
   - pip install pygobject
+  - pip install https://github.com/lobocv/eventdispatcher/archive/1.9.4.tar.gz
   - pip install -e git+https://github.com/freedesktop/dbus-python@master#egg=dbus-python --no-dependencies
   - pip install -e git+https://github.com/fishstiqz/pycdb@master#egg=pycdb --no-dependencies
   - pip install -e git+https://github.com/JonnyJD/python-discid@master#egg=discid --no-dependencies
