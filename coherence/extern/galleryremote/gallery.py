@@ -41,32 +41,39 @@ from coherence.upnp.core.utils import getPage
 
 
 class Gallery:
-    """
+    '''
     The Gallery class implements the Gallery Remote protocol as documented
     here:
     http://codex.gallery2.org/Gallery_Remote:Protocol
 
     The Gallery project is an open source web based photo album organizer
     written in php. Gallery's web site is:
-    http://gallery.menalto.com/
+
+     | http://gallery.menalto.com/
 
     This class is a 3rd party product which is not maintained by the
     creators of the Gallery project.
 
     Example usage:
-    from galleryremote import Gallery
-    my_gallery = Gallery('http://www.yoursite.com/gallery2', 2)
-    my_gallery.login('username','password')
-    albums = my_gallery.fetch_albums()
-    """
+
+        .. code-block:: python
+
+            from coherence.extern.galleryremote import Gallery
+            my_gallery = Gallery('http://www.yoursite.com/gallery2', 2)
+            my_gallery.login('username','password')
+            albums = my_gallery.fetch_albums()
+
+    '''
 
     def __init__(self, url, version=2):
-        """
+        '''
         Create a Gallery for remote access.
-        url - base address of the gallery
-        version - version of the gallery being connected to (default 2),
-                  either 1 for Gallery1 or 2 for Gallery2
-        """
+
+        Args:
+            url (str): base address of the gallery
+            version (int): version of the gallery being connected to
+                (default 2), either 1 for Gallery1 or 2 for Gallery2.
+        '''
         self.version = version  # Gallery1 or Gallery2
         if version == 1:
             self.url = url + '/gallery_remote2.php'
@@ -79,10 +86,10 @@ class Gallery:
         self.protocol_version = '2.5'
 
     def _do_request(self, request):
-        """
+        '''
         Send a request, encoded as described in the Gallery Remote protocol.
         request - a dictionary of protocol parameters and values
-        """
+        '''
         if self.auth_token is not None:
             request['g2_authToken'] = self.auth_token
 
@@ -90,7 +97,7 @@ class Gallery:
         if len(request) > 0:
             url += '?'
             for key, value in request.items():
-                url += '%s=%s&' % (key, value)
+                url += f'{key}={value}&'
         headers = {}
         if self.cookie != '':
             headers = {'Cookie': self.cookie}
@@ -112,8 +119,8 @@ class Gallery:
             return response
 
         def gotError(error):
-            print("Unable to process Gallery2 request: %s" % url)
-            print("Error: %s" % error)
+            print(f'Unable to process Gallery2 request: {url}')
+            print(f'Error: {error}')
             return None
 
         d = getPage(url, headers=headers)
@@ -122,11 +129,15 @@ class Gallery:
         return d
 
     def _parse_response(self, response):
-        """
-        Decode the response from a request, returning a request dict
-        response - The response from a gallery request, encoded according
-                   to the gallery remote protocol
-        """
+        '''
+        Decode the response from a request.
+
+        Args:
+            response (object): The response from a gallery request, encoded
+                according to the gallery remote protocol.
+        Returns:
+            A request dict.
+        '''
         my_str = io.StringIO(response)
 
         for line in my_str:
@@ -135,7 +146,7 @@ class Gallery:
 
         # make sure the 1st line is #__GR2PROTO__
         if line.find('#__GR2PROTO__') == -1:
-            raise Exception("Bad response: %r" % response)
+            raise Exception(f'Bad response: {response}')
 
         res_dict = {}
 
@@ -151,8 +162,8 @@ class Gallery:
         return res_dict
 
     def _get(self, response, kwd):
-        """
-        """
+        '''
+        '''
         try:
             retval = response[kwd]
         except KeyError:
@@ -161,11 +172,11 @@ class Gallery:
         return retval
 
     def login(self, username, password):
-        """
+        '''
         Establish an authenticated session to the remote gallery.
         username - A valid gallery user's username
         password - That valid user's password
-        """
+        '''
         if self.version == 1:
             request = {
                 'protocol_version': self.protocol_version,
@@ -184,8 +195,8 @@ class Gallery:
 
         def gotPage(result):
             if result is None:
-                print("Unable to login as %s to gallery2  server (%s)" % (
-                    username, self.url))
+                print(f'Unable to login as {username} '
+                      f'to gallery2  server ({self.url})')
                 return
             self.logged_in = 1
 
@@ -195,11 +206,11 @@ class Gallery:
         return d
 
     def fetch_albums(self):
-        """
+        '''
         Obtain a dict of albums contained in the gallery keyed by
         album name. In Gallery1, the name is alphanumeric. In Gallery2,
         the name is the unique identifying number for that album.
-        """
+        '''
         if self.version == 1:
             request = {
                 'protocol_version': self.protocol_version,
@@ -216,7 +227,7 @@ class Gallery:
 
         def gotResponse(response):
             if response is None:
-                print("Unable to retrieve list of albums!")
+                print('Unable to retrieve list of albums!')
                 return None
 
             albums = {}
@@ -252,7 +263,7 @@ class Gallery:
         return d
 
     def fetch_albums_prune(self):
-        """
+        '''
         Obtain a dict of albums contained in the gallery keyed by
         album name. In Gallery1, the name is alphanumeric. In Gallery2,
         the name is the unique identifying number for that album.
@@ -262,7 +273,7 @@ class Gallery:
         of all albums that the user can either write to, or that are
         visible to the user and contain a sub-album that is writable
         (including sub-albums several times removed)."
-        """
+        '''
         if self.version == 1:
             request = {
                 'protocol_version': self.protocol_version,
@@ -314,13 +325,13 @@ class Gallery:
         return d
 
     def add_item(self, album, filename, caption, description):
-        """
+        '''
         Add a photo to the specified album.
         album - album name / identifier
         filename - image to upload
         caption - string caption to add to the image
         description - string description to add to the image
-        """
+        '''
         file = open(filename)
         if self.version == 1:
             request = {
@@ -349,10 +360,10 @@ class Gallery:
         return d
 
     def album_properties(self, album):
-        """
+        '''
         Obtain album property information for the specified album.
         album - the album name / identifier to obtain information for
-        """
+        '''
         if self.version == 1:
             request = {
                 'protocol_version': self.protocol_version,
@@ -383,13 +394,13 @@ class Gallery:
         return d
 
     def new_album(self, parent, name=None, title=None, description=None):
-        """
+        '''
         Add an album to the specified parent album.
         parent - album name / identifier to contain the new album
         name - unique string name of the new album
         title - string title of the album
         description - string description to add to the image
-        """
+        '''
         if self.version == 1:
             request = {
                 'g2_controller': 'remote:GalleryRemote',
@@ -426,10 +437,10 @@ class Gallery:
         return d
 
     def fetch_album_images(self, album):
-        """
+        '''
         Get the image information for all images in the specified album.
         album - specifies the album from which to obtain image information
-        """
+        '''
         if self.version == 1:
             request = {
                 'protocol_version': self.protocol_version,
@@ -452,7 +463,7 @@ class Gallery:
 
         def gotResponse(response):
             if response is None:
-                print("Unable to retrieve list of item for album %s." % album)
+                print(f'Unable to retrieve list of item for album {album}.')
                 return None
 
             images = []
@@ -508,6 +519,6 @@ class Gallery:
         return d
 
     def get_URL_for_image(self, gallery2_id):
-        url = '%s/main.php?g2_view=core.DownloadItem&g2_itemId=%s' % (
-            self.url, gallery2_id)
-        return url
+        return \
+            f'{self.url}/main.php?g2_view=' \
+            f'core.DownloadItem&g2_itemId={gallery2_id}'
