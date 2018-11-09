@@ -1,10 +1,12 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2007-2009, Frank Scholz <coherence@beebits.net>
 # Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
-"""
+'''
 DBUS service class
 ==================
 
@@ -30,7 +32,7 @@ Class representing a DBus device.
 
 Used to initialize DBus from within the class
 :class:`~coherence.base.Coherence`.
-"""
+'''
 import time
 import urllib.error
 import urllib.parse
@@ -98,7 +100,7 @@ class DBusCDSService(EventDispatcher, dbus.service.Object, log.LogAble):
             OBJECT_PATH + '/devices/' + device_id + '/services/' + 'CDS'
         dbus.service.Object.__init__(self, bus, bus_name=bus_name,
                                      object_path=self.path)
-        self.debug("DBusService %r %r", service, self.type)
+        self.debug(f'DBusService {service} {self.type}')
         if isinstance(self.service, EventDispatcher):
             self.service.bind(state_variable_changed=self.variable_changed)
 
@@ -132,9 +134,9 @@ class DBusCDSService(EventDispatcher, dbus.service.Object, log.LogAble):
     @dbus.service.signal(CDS_SERVICE,
                          signature='sssv')
     def StateVariableChanged(self, udn, service, variable, value):
-        self.info("%s service %s signals StateVariable %s changed to %r",
-                  self.dbus_device.device.get_friendly_name(), self.type,
-                  variable, value)
+        self.info(f'{self.dbus_device.device.get_friendly_name()} service '
+                  f'{self.type} signals StateVariable {variable} '
+                  f'changed to {value}')
 
     @dbus.service.method(CDS_SERVICE, in_signature='', out_signature='as')
     def getAvailableActions(self):
@@ -552,7 +554,7 @@ class DBusService(dbus.service.Object, log.LogAble):
                 3]  # get the service name
             self.type = self.type.replace('-', '')
         else:
-            self.type = "from_the_tubes"
+            self.type = 'from_the_tubes'
 
         try:
             bus_name = dbus.service.BusName(SERVICE_IFACE, bus)
@@ -565,14 +567,14 @@ class DBusService(dbus.service.Object, log.LogAble):
         if self.dbus_device is not None:
             self.device_id = self.dbus_device.id
         else:
-            self.device_id = "dev_from_the_tubes"
+            self.device_id = 'dev_from_the_tubes'
         self.path = \
             OBJECT_PATH + '/devices/' + self.device_id + \
             '/services/' + self.type
 
         dbus.service.Object.__init__(self, bus, bus_name=bus_name,
                                      object_path=self.path)
-        self.debug("DBusService %r %r", service, self.type)
+        self.debug(f'DBusService {service} {self.type}')
         if isinstance(self.service, EventDispatcher):
             self.service.bind(
                 state_variable_changed=self.variable_changed)
@@ -583,7 +585,7 @@ class DBusService(dbus.service.Object, log.LogAble):
         # for (name, funcs) in interfaces.iteritems():
         #    print name, funcs
         #    if funcs.has_key('destroy_object'):
-        #        print """removing 'destroy_object'"""
+        #        print '''removing \'destroy_object\''''
         #        del funcs['destroy_object']
         #    for func in funcs.values():
         #        if getattr(func, '_dbus_is_method', False):
@@ -617,7 +619,7 @@ class DBusService(dbus.service.Object, log.LogAble):
                     print(func.__func__)
 
     def variable_changed(self, variable):
-        # print self.service, "got signal for change of", variable
+        # print self.service, 'got signal for change of', variable
         # print variable.name, variable.value
         # print type(variable.name), type(variable.value)
         self.StateVariableChanged(self.device_id, self.type, variable.name,
@@ -626,8 +628,8 @@ class DBusService(dbus.service.Object, log.LogAble):
     @dbus.service.signal(SERVICE_IFACE,
                          signature='sssv')
     def StateVariableChanged(self, udn, service, variable, value):
-        self.info("%s service %s signals StateVariable %s changed to %r",
-                  self.device_id, self.type, variable, value)
+        self.info(f'{self.device_id} service {self.type} signals '
+                  f'StateVariable {variable} changed to {value}')
 
     @dbus.service.method(SERVICE_IFACE, in_signature='', out_signature='s')
     def get_scpd_xml(self):
@@ -650,22 +652,22 @@ class DBusService(dbus.service.Object, log.LogAble):
                                           'dbus_async_err_cb'))
     def action(self, name, arguments, dbus_async_cb, dbus_async_err_cb):
 
-        # print "action", name, arguments
+        # print('action', name, arguments)
         def reply(data):
             dbus_async_cb(
                 dbus.Dictionary(data, signature='sv', variant_level=4))
 
         if self.service.client is not None:
-            # print "action", name
+            # print('action', name)
             func = getattr(self.service.client, name, None)
-            # print "action", func
+            # print('action', func)
             if callable(func):
                 kwargs = {}
                 try:
                     for k, v in list(arguments.items()):
                         kwargs[str(k)] = str(v)
                 except Exception as e:
-                    self.error('DBusService.action: %r' % e)
+                    self.error(f'DBusService.action: {e}')
                 d = func(**kwargs)
                 d.addCallback(reply)
                 d.addErrback(dbus_async_err_cb)
@@ -680,7 +682,7 @@ class DBusService(dbus.service.Object, log.LogAble):
     def call_action(self, name, arguments, dbus_async_cb, dbus_async_err_cb,
                     sender=None, connection=None):
 
-        print("call_action called by ", sender, connection, self.type,
+        print('call_action called by ', sender, connection, self.type,
               self.tube)
 
         def reply(data, name, connection):
@@ -698,7 +700,7 @@ class DBusService(dbus.service.Object, log.LogAble):
                                     remote_network == '*':
                                 quoted_url = 'mirabeau' + '/' + \
                                              urllib.parse.quote_plus(res.data)
-                                print("modifying", res.data)
+                                print('modifying', res.data)
                                 host_port = \
                                     ':'.join(
                                         (self.service.device.client.
@@ -708,8 +710,8 @@ class DBusService(dbus.service.Object, log.LogAble):
                                          )
                                     )
                                 res.data = urllib.parse.urlunsplit(
-                                    ('http', host_port, quoted_url, "", ""))
-                                print("--->", res.data)
+                                    ('http', host_port, quoted_url, '', ''))
+                                print('--->', res.data)
                                 new_res.append(res)
                                 changed = True
                         item.res = new_res
@@ -730,7 +732,7 @@ class DBusService(dbus.service.Object, log.LogAble):
                     for k, v in list(arguments.items()):
                         kwargs[str(k)] = str(v)
                 except Exception as e:
-                    self.error('DBusService.call_action: %r' % e)
+                    self.error(f'DBusService.call_action: {e}')
                 d = action.call(**kwargs)
                 d.addCallback(reply, name, connection)
                 d.addErrback(dbus_async_err_cb)
@@ -802,7 +804,7 @@ class DBusDevice(dbus.service.Object, log.LogAble):
             # we shouldn't need to do this, but ...
             self.id = self.id.replace('+', '')
         else:
-            self.id = "from_the_tubes"
+            self.id = 'from_the_tubes'
 
         try:
             bus_name = dbus.service.BusName(DEVICE_IFACE, bus)
@@ -818,7 +820,7 @@ class DBusDevice(dbus.service.Object, log.LogAble):
         self.services = []
         self.device = device
 
-        self.debug("DBusDevice %r %r", device, self.id)
+        self.debug(f'DBusDevice {device} {self.id}')
 
         if device is not None:
             for service in device.get_services():
@@ -847,7 +849,7 @@ class DBusDevice(dbus.service.Object, log.LogAble):
     @dbus.service.method(DEVICE_IFACE, in_signature='', out_signature='v')
     def get_info(self):
         services = [x.path for x in self.services
-                    if not getattr(x, "NOT_FOR_THE_TUBES", False)]
+                    if not getattr(x, 'NOT_FOR_THE_TUBES', False)]
         r = {'path': self.path(),
              'device_type': self.device.get_device_type(),
              'friendly_name': self.device.get_friendly_name(),
@@ -914,7 +916,7 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
         dbus.service.Object.__init__(self, self.bus, bus_name=self.bus_name,
                                      object_path=OBJECT_PATH)
 
-        self.debug("D-Bus pontoon %r %r %r", self, self.bus, self.bus_name)
+        self.debug(f'D-Bus pontoon {self} {self.bus} {self.bus_name}')
 
         self.devices = {}
         self.controlpoint = controlpoint
@@ -932,7 +934,7 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
         self.controlpoint.bind(
             control_point_client_removed=self._device_removed)
 
-        self.debug("D-Bus pontoon started")
+        self.debug('D-Bus pontoon started')
 
     def shutdown(self):
         self.controlpoint.unbind(
@@ -967,22 +969,22 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
         return self.controlpoint.coherence.urlbase + 'oob?key=' + key
 
     def remove_client(self, usn, client):
-        self.info("removed %s %s", client.device_type,
-                  client.device.get_friendly_name())
+        self.info(f'removed {client.device_type} '
+                  f'{client.device.get_friendly_name()}')
         try:
             getattr(self,
-                    str('UPnP_ControlPoint_%s_removed' % client.device_type))(
+                    str(f'UPnP_ControlPoint_{client.device_type}_removed'))(
                 usn)
         except Exception as e:
-            self.error('DBusPontoon.remove_client: %r' % e)
+            self.error(f'DBusPontoon.remove_client: {e}')
 
     def remove(self, udn):
-        # print "DBusPontoon remove", udn
-        # print "before remove", self.devices
+        # print 'DBusPontoon remove', udn
+        # print 'before remove', self.devices
         d = self.devices.pop(udn)
         d._release_thyself()
         del d
-        # print "after remove", self.devices
+        # print 'after remove', self.devices
 
     @dbus.service.method(BUS_NAME, in_signature='', out_signature='s')
     def version(self):
@@ -1048,11 +1050,11 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
         try:
             plugin = self.controlpoint.coherence.active_backends[uuid]
         except KeyError:
-            self.warning("no backend with the uuid %r found", uuid)
-            return ""
+            self.warning(f'no backend with the uuid {uuid} found')
+            return ''
         function = getattr(plugin.backend, method, None)
         if function is None:
-            return ""
+            return ''
         kwargs = {}
         for k, v in arguments.items():
             kwargs[str(k)] = str(v)
@@ -1112,7 +1114,7 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
 
     def _device_detected(self, device):
         id = device.get_id()
-        print("new_device_detected", device.get_usn(),
+        print('new_device_detected', device.get_usn(),
               device.friendly_device_type, id)
         if id not in self.devices:
             new_device = DBusDevice(device, self.bus)
@@ -1126,7 +1128,7 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
                 self.UPnP_ControlPoint_MediaRenderer_detected(info, id)
 
     def _device_removed(self, usn=''):
-        print("_device_removed", usn)
+        print('_device_removed', usn)
         id = usn.split('::')[0]
         device = self.devices[id]
         self.device_removed(id)
@@ -1138,7 +1140,7 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
         reactor.callLater(1, self.remove, id)
 
     def cp_ms_detected(self, client, udn=''):
-        print("cp_ms_detected", udn)
+        print('cp_ms_detected', udn)
         if client.device.get_id() not in self.devices:
             new_device = DBusDevice(client.device, self.bus)
             self.devices[client.device.get_id()] = new_device
@@ -1153,14 +1155,14 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
                 new_device.get_info(), udn)
 
     def cp_ms_removed(self, udn):
-        print("cp_ms_removed", udn)
+        print('cp_ms_removed', udn)
         self.UPnP_ControlPoint_MediaServer_removed(udn)
         # schedule removal of device from our cache after signal has
         # been called. Let's assume one second is long enough...
         reactor.callLater(1, self.remove, udn)
 
     def cp_mr_removed(self, udn):
-        # print "cp_mr_removed", udn
+        # print 'cp_mr_removed', udn
         self.UPnP_ControlPoint_MediaRenderer_removed(udn)
         # schedule removal of device from our cache after signal has
         # been called. Let's assume one second is long enough...
@@ -1169,35 +1171,35 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
     @dbus.service.signal(BUS_NAME,
                          signature='vs')
     def UPnP_ControlPoint_MediaServer_detected(self, device, udn):
-        self.info("emitting signal UPnP_ControlPoint_MediaServer_detected")
+        self.info('emitting signal UPnP_ControlPoint_MediaServer_detected')
 
     @dbus.service.signal(BUS_NAME,
                          signature='s')
     def UPnP_ControlPoint_MediaServer_removed(self, udn):
-        self.info("emitting signal UPnP_ControlPoint_MediaServer_removed")
+        self.info('emitting signal UPnP_ControlPoint_MediaServer_removed')
 
     @dbus.service.signal(BUS_NAME,
                          signature='vs')
     def UPnP_ControlPoint_MediaRenderer_detected(self, device, udn):
-        self.info("emitting signal UPnP_ControlPoint_MediaRenderer_detected")
+        self.info('emitting signal UPnP_ControlPoint_MediaRenderer_detected')
 
     @dbus.service.signal(BUS_NAME,
                          signature='s')
     def UPnP_ControlPoint_MediaRenderer_removed(self, udn):
-        self.info("emitting signal UPnP_ControlPoint_MediaRenderer_removed")
+        self.info('emitting signal UPnP_ControlPoint_MediaRenderer_removed')
 
     @dbus.service.signal(BUS_NAME,
                          signature='vs')
     def device_detected(self, device, udn):
-        self.info("emitting signal device_detected")
+        self.info('emitting signal device_detected')
 
     @dbus.service.signal(BUS_NAME,
                          signature='s')
     def device_removed(self, udn):
-        self.info("emitting signal device_removed")
+        self.info('emitting signal device_removed')
 
-    """ org.DLNA related methods and signals
-    """
+    ''' org.DLNA related methods and signals
+    '''
 
     @dbus.service.method(DLNA_BUS_NAME + '.DMC', in_signature='',
                          out_signature='av')
@@ -1218,19 +1220,19 @@ class DBusPontoon(dbus.service.Object, log.LogAble):
     @dbus.service.signal(BUS_NAME,
                          signature='vs')
     def DMS_added(self, device, udn):
-        self.info("emitting signal DMS_added")
+        self.info('emitting signal DMS_added')
 
     @dbus.service.signal(BUS_NAME,
                          signature='s')
     def DMS_removed(self, udn):
-        self.info("emitting signal DMS_removed")
+        self.info('emitting signal DMS_removed')
 
     @dbus.service.signal(BUS_NAME,
                          signature='vs')
     def DMR_added(self, device, udn):
-        self.info("emitting signal DMR_added")
+        self.info('emitting signal DMR_added')
 
     @dbus.service.signal(BUS_NAME,
                          signature='s')
     def DMR_removed(self, udn):
-        self.info("emitting signal DMR_detected")
+        self.info('emitting signal DMR_detected')
