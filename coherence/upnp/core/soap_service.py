@@ -59,7 +59,7 @@ class UPnPPublisher(EventDispatcher, resource.Resource, log.LogAble):
     '''
     logCategory = 'soap'
     isLeaf = 1
-    encoding = "UTF-8"
+    encoding = 'UTF-8'
     envelope_attrib = None
 
     def __init__(self, *args, **kwargs):
@@ -69,20 +69,20 @@ class UPnPPublisher(EventDispatcher, resource.Resource, log.LogAble):
         )
 
     def _sendResponse(self, request, response, status=200):
-        self.debug('_sendResponse %s %s', status, response)
+        self.debug(f'_sendResponse {status} {response}')
         if status == 200:
             request.setResponseCode(200)
         else:
             request.setResponseCode(500)
 
         if self.encoding is not None:
-            mimeType = b'text/xml; charset="%r"' % self.encoding
+            mimeType = f'text/xml; charset="{self.encoding}"'
         else:
-            mimeType = b"text/xml"
-        request.setHeader(b"Content-type", mimeType)
-        request.setHeader(b"Content-length", len(response))
-        request.setHeader(b"EXT", b'')
-        request.setHeader(b"SERVER", SERVER_ID.encode('ascii'))
+            mimeType = 'text/xml'
+        request.setHeader(b'Content-type', mimeType.encode('ascii'))
+        request.setHeader(b'Content-length', len(response))
+        request.setHeader(b'EXT', b'')
+        request.setHeader(b'SERVER', SERVER_ID.encode('ascii'))
         r = response if isinstance(response, bytes) else \
             response.encode('ascii')
         request.write(r)
@@ -93,14 +93,14 @@ class UPnPPublisher(EventDispatcher, resource.Resource, log.LogAble):
         self._sendResponse(request, response, status=401)
 
     def _gotResult(self, result, request, methodName, ns):
-        self.debug('_gotResult %s %s %s %s', result, request, methodName, ns)
+        self.debug(f'_gotResult {result} {request} {methodName} {ns}')
 
         response = soap_lite.build_soap_call(methodName, result, ns=ns,
                                              is_response=True)
         self._sendResponse(request, response)
 
     def _gotError(self, failure, request, methodName, ns):
-        self.info('_gotError %s %s', failure, failure.value)
+        self.info(f'_gotError {failure} {failure.value}')
         e = failure.value
         status = 500
 
@@ -113,19 +113,19 @@ class UPnPPublisher(EventDispatcher, resource.Resource, log.LogAble):
         self._sendResponse(request, response, status=status)
 
     def lookupFunction(self, functionName):
-        function = getattr(self, "soap_%s" % functionName, None)
+        function = getattr(self, f'soap_{functionName}', None)
         if not function:
-            function = getattr(self, "soap__generic", None)
+            function = getattr(self, 'soap__generic', None)
         if function:
-            return function, getattr(function, "useKeywords", False)
+            return function, getattr(function, 'useKeywords', False)
         else:
             return None, None
 
     def render(self, request):
-        """Handle a SOAP command."""
+        '''Handle a SOAP command.'''
         data = request.content.read()
         headers = request.getAllHeaders()
-        self.info('soap_request: %s', headers)
+        self.info(f'soap_request: {headers}')
 
         # allow external check of data
         self.dispatch_event(
@@ -171,7 +171,7 @@ class UPnPPublisher(EventDispatcher, resource.Resource, log.LogAble):
                 request, methodName, ns)
             return server.NOT_DONE_YET
 
-        self.debug('headers: %r', headers)
+        self.debug(f'headers: {headers}')
 
         l_function, use_keywords = self.lookupFunction(methodName)
         # print('function', function, 'keywords', useKeywords,
@@ -187,7 +187,7 @@ class UPnPPublisher(EventDispatcher, resource.Resource, log.LogAble):
                 keywords['X_UPnPClient'] = 'XBox'
             # if headers.has_key(b'user-agent') and \
             #         headers[b'user-agent'].startswith(
-            #             b"""Mozilla/4.0 (compatible; UPnP/1.0; Windows"""):
+            #             b'''Mozilla/4.0 (compatible; UPnP/1.0; Windows'''):
             #     keywords['X_UPnPClient'] = 'XBox'
             if (b'x-av-client-info' in headers and
                     headers[b'x-av-client-info'].find(b'"PLAYSTATION3') > 0):
@@ -198,8 +198,8 @@ class UPnPPublisher(EventDispatcher, resource.Resource, log.LogAble):
                 keywords['X_UPnPClient'] = 'Philips-TV'
             for k, v in list(kwargs.items()):
                 keywords[str(k)] = v
-            self.info('call %s %s', methodName, keywords)
-            if hasattr(l_function, "useKeywords"):
+            self.info(f'call {methodName} {keywords}')
+            if hasattr(l_function, 'useKeywords'):
                 d = defer.maybeDeferred(l_function, **keywords)
             else:
                 d = defer.maybeDeferred(l_function, *args, **keywords)
@@ -212,17 +212,17 @@ class UPnPPublisher(EventDispatcher, resource.Resource, log.LogAble):
         type = element.get('{http://www.w3.org/1999/XMLSchema-instance}type')
         if type is not None:
             try:
-                prefix, local = type.split(":")
+                prefix, local = type.split(':')
                 if prefix == 'xsd':
                     type = local
             except ValueError:
                 pass
 
-        if type == "integer" or type == "int":
+        if type == 'integer' or type == 'int':
             return int(element.text)
-        if type == "float" or type == "double":
+        if type == 'float' or type == 'double':
             return float(element.text)
-        if type == "boolean":
-            return element.text == "true"
+        if type == 'boolean':
+            return element.text == 'true'
 
-        return element.text or ""
+        return element.text or ''
