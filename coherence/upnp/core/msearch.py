@@ -58,13 +58,13 @@ class MSearch(EventDispatcher, DatagramProtocol, log.LogAble):
             data = data.decode('utf-8')
 
         cmd, headers = utils.parse_http_response(data)
-        self.info('datagramReceived from %s:%d, protocol %s code %s', host,
-                  port, cmd[0], cmd[1])
+        self.info(f'datagramReceived from {host}:{port:d}, '
+                  f'protocol {cmd[0]} code {cmd[1]}')
         if cmd[0].startswith('HTTP/1.') and cmd[1] == '200':
-            self.msg('for %r', headers['usn'])
+            self.msg(f'for {headers["usn"]}')
             if not self.ssdp_server.isKnown(headers['usn']):
-                self.info('register as remote %s, %s, %s', headers['usn'],
-                          headers['st'], headers['location'])
+                self.info(f'register as remote {headers["usn"]}, '
+                          f'{headers["st"]}, {headers["location"]}')
                 self.ssdp_server.register(
                     'remote',
                     headers['usn'], headers['st'],
@@ -75,7 +75,7 @@ class MSearch(EventDispatcher, DatagramProtocol, log.LogAble):
             else:
                 self.ssdp_server.known[headers['usn']][
                     'last-seen'] = time.time()
-                self.debug('updating last-seen for %r', headers['usn'])
+                self.debug(f'updating last-seen for {headers["usn"]}')
 
         # make raw data available
         # send out the signal after we had a chance to register the device
@@ -89,7 +89,7 @@ class MSearch(EventDispatcher, DatagramProtocol, log.LogAble):
 
     def discover(self):
         req = ['M-SEARCH * HTTP/1.1',
-               'HOST: %s:%d' % (SSDP_ADDR, SSDP_PORT),
+               f'HOST: {SSDP_ADDR}:{SSDP_PORT:d}',
                'MAN: "ssdp:discover"',
                'MX: 5',
                'ST: ssdp:all',
@@ -99,4 +99,4 @@ class MSearch(EventDispatcher, DatagramProtocol, log.LogAble):
         try:
             self.transport.write(req, (SSDP_ADDR, SSDP_PORT))
         except socket.error as msg:
-            self.info("failure sending out the discovery message: %r", msg)
+            self.info(f'failure sending out the discovery message: {msg}')
