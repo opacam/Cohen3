@@ -71,19 +71,17 @@ class ContentDirectoryClient:
 
         def got_process_result(result):
             # print(result)
-            r = {}
-            r['number_returned'] = result['NumberReturned']
-            r['total_matches'] = result['TotalMatches']
-            r['update_id'] = result['UpdateID']
-            r['items'] = {}
+            r = {'number_returned': result['NumberReturned'],
+                 'total_matches': result['TotalMatches'],
+                 'update_id': result['UpdateID'],
+                 'items': {}}
             elt = DIDLLite.DIDLElement.fromString(result['Result'])
             for item in elt.getItems():
                 # print('process_result', item)
-                i = {}
-                i['upnp_class'] = item.upnp_class
-                i['id'] = item.id
-                i['title'] = item.title
-                i['parent_id'] = item.parentID
+                i = {'upnp_class': item.upnp_class,
+                     'id': item.id,
+                     'title': item.title,
+                     'parent_id': item.parentID}
                 if hasattr(item, 'childCount'):
                     i['child_count'] = str(item.childCount)
                 if hasattr(item, 'date') and item.date:
