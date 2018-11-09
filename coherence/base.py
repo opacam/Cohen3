@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
@@ -91,16 +93,16 @@ class SimpleRoot(resource.Resource, log.LogAble):
 
         self.putChild(b'styles',
                       static.File(sibpath(__file__, 'web/static/styles'),
-                                  defaultType="text/css"))
+                                  defaultType='text/css'))
         self.putChild(b'server-images',
                       static.File(sibpath(__file__, 'web/static/images'),
-                                  defaultType="text/css"))
+                                  defaultType='text/css'))
 
     def getChild(self, name, request):
-        self.debug('SimpleRoot getChild %s, %s', name, request)
+        self.debug(f'SimpleRoot getChild {name}, {request}')
         name = to_string(name)
         if name == 'oob':
-            """ we have an out-of-band request """
+            ''' we have an out-of-band request '''
             return static.File(
                 self.coherence.dbus.pinboard[request.args['key'][0]])
 
@@ -111,16 +113,17 @@ class SimpleRoot(resource.Resource, log.LogAble):
         try:
             return self.coherence.children[name]
         except KeyError:
-            self.warning("Cannot find device for requested name: %r", name)
+            self.warning(f'Cannot find device for requested name: {name}')
             request.setResponseCode(404)
             return \
                 static.Data(
-                    b'<html><p>No device for requested UUID: %s</p></html>' %
-                    name.encode('ascii'), 'text/html')
+                    f'<html><p>No device for requested UUID: '
+                    f'{name.encode("ascii")}</p></html>'.encode('ascii'),
+                    'text/html')
 
     def listchilds(self, uri):
         uri = to_string(uri)
-        self.info('listchilds %s', uri)
+        self.info(f'listchilds {uri}')
         if uri[-1] != '/':
             uri += '/'
 
@@ -128,10 +131,12 @@ class SimpleRoot(resource.Resource, log.LogAble):
         for child in self.coherence.children:
             device = self.coherence.get_device_with_id(child)
             if device is not None:
-                cl.append('<li><a href=%s%s>%s:%s %s</a></li>' % (
-                    uri, child, device.get_friendly_device_type(),
-                    device.get_device_type_version(),
-                    device.get_friendly_name()))
+                cl.append(
+                    f'<li><a href={uri}{child}>'
+                    f'{device.get_friendly_device_type()}:'
+                    f'{device.get_device_type_version()} '
+                    f'{device.get_friendly_name()}'
+                    f'</a></li>')
 
         # We put in a blacklist the styles and server-images folders,
         # in order to avoid to appear into the generated html list
@@ -140,11 +145,11 @@ class SimpleRoot(resource.Resource, log.LogAble):
             c = to_string(c)
             if c in blacklist:
                 continue
-            cl.append('<li><a href=%s%s>%s</a></li>' % (uri, c, c))
-        return "".join(cl)
+            cl.append(f'<li><a href={uri}{c}>{c}</a></li>')
+        return ''.join(cl)
 
     def render(self, request):
-        html = """\
+        html = f'''\
         <html>
         <head profile="http://www.w3.org/2005/10/profile">
             <title>Cohen3 (SimpleRoot)</title>
@@ -166,10 +171,10 @@ class SimpleRoot(resource.Resource, log.LogAble):
                         Hosting:
                     </h6>
                 <div class="list">
-                    <ul>%s</ul>
+                    <ul>{self.listchilds(request.uri)}</ul>
                 </div>
             </div>
-        </body></html>""" % self.listchilds(request.uri)
+        </body></html>'''
         return html.encode('ascii')
 
 
@@ -190,8 +195,9 @@ class WebServer(log.LogAble):
             self.endpoint_port = p
             coherence.web_server_port = port
             self.warning(
-                "WebServer on ip http://%s:%r ready",
-                coherence.hostname, coherence.web_server_port)
+                f'WebServer on ip '
+                f'http://{coherence.hostname}:{coherence.web_server_port}'
+                f' ready')
 
         def clear(whatever):
             self.endpoint_listen = None
@@ -235,8 +241,9 @@ class WebServerUi(WebServer):
             self.endpoint_port = p
             coherence.web_server_port = port
             self.warning(
-                "WebServerUi on ip http://%s:%r ready",
-                coherence.hostname, coherence.web_server_port)
+                f'WebServerUi on ip '
+                f'http://{coherence.hostname}:{coherence.web_server_port}'
+                f' ready')
 
         def clear(whatever):
             self.endpoint_listen = None
@@ -262,10 +269,10 @@ class Plugins(log.LogAble):
     __instance = None  # Singleton
     __initialized = False
 
-    _valids = ("coherence.plugins.backend.media_server",
-               "coherence.plugins.backend.media_renderer",
-               "coherence.plugins.backend.binary_light",
-               "coherence.plugins.backend.dimmable_light")
+    _valids = ('coherence.plugins.backend.media_server',
+               'coherence.plugins.backend.media_renderer',
+               'coherence.plugins.backend.binary_light',
+               'coherence.plugins.backend.dimmable_light')
 
     _plugins = {}
 
@@ -291,7 +298,7 @@ class Plugins(log.LogAble):
                     # set a placeholder for lazy loading
                     self._plugins[entrypoint.name] = entrypoint
         else:
-            self.info("no pkg_resources, fallback to simple plugin handling")
+            self.info('no pkg_resources, fallback to simple plugin handling')
 
         if len(self._plugins) == 0:
             self._collect_from_module()
@@ -306,9 +313,8 @@ class Plugins(log.LogAble):
                 plugin = plugin.load(require=False)
             except (ImportError, AttributeError,
                     pkg_resources.ResolutionError) as msg:
-                self.warning(
-                    "Can't load plugin %s (%s), maybe missing dependencies...",
-                    plugin.name, msg)
+                self.warning(f'Can\'t load plugin {plugin.name} ({msg}), '
+                             f'maybe missing dependencies...')
                 self.info(traceback.format_exc())
                 del self._plugins[key]
                 raise KeyError
@@ -497,8 +503,8 @@ class Coherence(EventDispatcher, log.LogAble):
                         continue
                 except (KeyError, TypeError):
                     pass
-                self.info("setting log-level for subsystem %s to %s",
-                          subsystem['name'], subsystem['level'])
+                self.info(f'setting log-level for subsystem '
+                          f'{subsystem["name"]} to {subsystem["level"]}')
                 logging.getLogger(subsystem['name'].lower()).setLevel(
                     subsystem['level'].upper())
         except (KeyError, TypeError):
@@ -513,19 +519,18 @@ class Coherence(EventDispatcher, log.LogAble):
             logfile = config.get('logfile', None)
         log.init(logfile, logmode.upper())
 
-        self.warning(
-            "Coherence UPnP framework version {} starting"
-            " [log level: {}]...".format(__version__, logmode))
+        self.warning(f'Coherence UPnP framework version {__version__} '
+                     f'starting [log level: {logmode}]...')
 
         network_if = config.get('interface')
         if network_if:
-            self.hostname = get_ip_address('%s' % network_if)
+            self.hostname = get_ip_address(f'{network_if}')
         else:
             try:
                 self.hostname = socket.gethostbyname(socket.gethostname())
             except socket.gaierror:
-                self.warning("hostname can't be resolved, "
-                             "maybe a system misconfiguration?")
+                self.warning('hostname can\'t be resolved, '
+                             'maybe a system misconfiguration?')
                 self.hostname = '127.0.0.1'
 
         if self.hostname.startswith('127.'):
@@ -548,10 +553,10 @@ class Coherence(EventDispatcher, log.LogAble):
     def setup_part2(self):
         '''Initializes the basic and optional services/devices and the enabled
         plugins (backends).'''
-        self.info('running on host: %s', self.hostname)
+        self.info(f'running on host: {self.hostname}')
         if self.hostname.startswith('127.'):
-            self.warning('detection of own ip failed, using %s as own address,'
-                         ' functionality will be limited', self.hostname)
+            self.warning(f'detection of own ip failed, using {self.hostname} '
+                         f'as own address, functionality will be limited')
 
         unittest = self.config.get('unittest', 'no')
         unittest = False if unittest == 'no' else True
@@ -560,8 +565,8 @@ class Coherence(EventDispatcher, log.LogAble):
             # TODO: add ip/interface bind
             self.ssdp_server = SSDPServer(test=unittest)
         except CannotListenError as err:
-            self.error("Error starting the SSDP-server: %s", err)
-            self.debug("Error starting the SSDP-server", exc_info=True)
+            self.error(f'Error starting the SSDP-server: {err}')
+            self.debug('Error starting the SSDP-server', exc_info=True)
             reactor.stop()
             return
 
@@ -573,8 +578,8 @@ class Coherence(EventDispatcher, log.LogAble):
         self.ssdp_server.bind(new_device=self.create_device)
         self.ssdp_server.bind(removed_device=self.remove_device)
 
-        self.ssdp_server.subscribe("new_device", self.add_device)
-        self.ssdp_server.subscribe("removed_device", self.remove_device)
+        self.ssdp_server.subscribe('new_device', self.add_device)
+        self.ssdp_server.subscribe('removed_device', self.remove_device)
 
         self.msearch = MSearch(self.ssdp_server, test=unittest)
 
@@ -591,12 +596,12 @@ class Coherence(EventDispatcher, log.LogAble):
                 self.web_server = WebServerUi(
                     self.web_server_port, self, unittests=unittest)
         except CannotListenError:
-            self.error('port %r already in use, aborting!',
-                       self.web_server_port)
+            self.error(
+                f'port {self.web_server_port} already in use, aborting!')
             reactor.stop()
             return
 
-        self.urlbase = 'http://%s:%d/' % (self.hostname, self.web_server_port)
+        self.urlbase = f'http://{self.hostname}:{self.web_server_port:d}/'
         # self.renew_service_subscription_loop = \
         #     task.LoopingCall(self.check_devices)
         # self.renew_service_subscription_loop.start(20.0, now=False)
@@ -613,7 +618,7 @@ class Coherence(EventDispatcher, log.LogAble):
             plugins = self.config.get('plugins', None)
 
         if plugins is None:
-            self.info("No plugin defined!")
+            self.info('No plugin defined!')
         else:
             if isinstance(plugins, dict):
                 for plugin, arguments in list(plugins.items()):
@@ -622,8 +627,7 @@ class Coherence(EventDispatcher, log.LogAble):
                             arguments = {}
                         self.add_plugin(plugin, **arguments)
                     except Exception as msg:
-                        self.warning("Can't enable plugin, %s: %s!", plugin,
-                                     msg)
+                        self.warning(f'Can\'t enable plugin, {plugin}: {msg}!')
                         self.info(traceback.format_exc())
             else:
                 for plugin in plugins:
@@ -642,8 +646,7 @@ class Coherence(EventDispatcher, log.LogAble):
                                 plugin['uuid'] = str(backend.uuid)[5:]
                                 self.config.save()
                     except Exception as msg:
-                        self.warning("Can't enable plugin, %s: %s!", plugin,
-                                     msg)
+                        self.warning(f'Can\'t enable plugin, {plugin}: {msg}!')
                         self.info(traceback.format_exc())
 
         self.external_address = ':'.join(
@@ -673,11 +676,11 @@ class Coherence(EventDispatcher, log.LogAble):
                 self.ctrl.auto_client_append('InternetGatewayDevice')
                 self.dbus = dbus_service.DBusPontoon(self.ctrl)
             except Exception as msg:
-                self.warning("Unable to activate dbus sub-system: %r", msg)
+                self.warning(f'Unable to activate dbus sub-system: {msg}')
                 self.debug(traceback.format_exc())
 
     def add_plugin(self, plugin, **kwargs):
-        self.info("adding plugin %r", plugin)
+        self.info(f'adding plugin {plugin}')
 
         self.available_plugins = Plugins()
 
@@ -691,23 +694,21 @@ class Coherence(EventDispatcher, log.LogAble):
                     device_class = globals().get(device, None)
                     if device_class is None:
                         raise KeyError
-                    self.info("Activating %s plugin as %s...", plugin, device)
+                    self.info(f'Activating {plugin} plugin as {device}...')
                     new_backend = device_class(self, plugin_class, **kwargs)
                     self.active_backends[str(new_backend.uuid)] = new_backend
                     return new_backend
                 except KeyError:
-                    self.warning(
-                        "Can't enable %s plugin, sub-system %s not found!",
-                        plugin, device)
+                    self.warning(f'Can\'t enable {plugin} plugin, '
+                                 f'sub-system {device} not found!')
                 except Exception as e1:
-                    self.exception(
-                        "Can't enable %s plugin for sub-system %s "
-                        "[exception: %r]", plugin, device, e1)
+                    self.exception(f'Can\'t enable {plugin} plugin for '
+                                   f'sub-system {device} [exception: {e1}]')
                     self.debug(traceback.format_exc())
         except KeyError:
-            self.warning("Can't enable %s plugin, not found!", plugin)
+            self.warning(f'Can\'t enable {plugin} plugin, not found!')
         except Exception as e2:
-            self.warning("Can't enable %s plugin, %s!", plugin, e2)
+            self.warning(f'Can\'t enable {plugin} plugin, {e2}!')
             self.debug(traceback.format_exc())
 
     def remove_plugin(self, plugin):
@@ -721,17 +722,17 @@ class Coherence(EventDispatcher, log.LogAble):
             try:
                 plugin = self.active_backends[plugin]
             except KeyError:
-                self.warning("no backend with the uuid %r found", plugin)
-                return ""
+                self.warning(f'no backend with the uuid {plugin} found')
+                return ''
 
         try:
             del self.active_backends[str(plugin.uuid)]
-            self.info("removing plugin %r", plugin)
+            self.info(f'removing plugin {plugin}')
             plugin.unregister()
             return plugin.uuid
         except KeyError:
-            self.warning("no backend with the uuid %r found", plugin.uuid)
-            return ""
+            self.warning(f'no backend with the uuid {plugin.uuid} found')
+            return ''
 
     @staticmethod
     def writeable_config():
@@ -743,8 +744,8 @@ class Coherence(EventDispatcher, log.LogAble):
         and value pair(s).'''
         plugins = self.config.get('plugin')
         if plugins is None:
-            self.warning("storing a plugin config option is only possible"
-                         " with the new config file format")
+            self.warning('storing a plugin config option is only possible'
+                         ' with the new config file format')
             return
         if isinstance(plugins, dict):
             plugins = [plugins]
@@ -758,11 +759,10 @@ class Coherence(EventDispatcher, log.LogAble):
                         plugin[k] = v
                     self.config.save()
             except Exception as e:
-                self.warning('Coherence.store_plugin_config: %r' % e)
+                self.warning(f'Coherence.store_plugin_config: {e}')
         else:
-            self.info(
-                "storing plugin config option for %s failed, plugin not found",
-                uuid)
+            self.info(f'storing plugin config option '
+                      f'for {uuid} failed, plugin not found')
 
     def receiver(self, signal, *args, **kwargs):
         pass
@@ -871,8 +871,7 @@ class Coherence(EventDispatcher, log.LogAble):
         return found
 
     def get_device_with_id(self, device_id):
-        # print('get_device_with_id [{}]: {}'.format(
-        #     type(device_id), device_id))
+        # print(f'get_device_with_id [{type(device_id)}]: {device_id}')
         found = None
         for device in self.devices:
             id = device.get_id()
@@ -884,17 +883,17 @@ class Coherence(EventDispatcher, log.LogAble):
         return found
 
     def get_devices(self):
-        # print('get_devices: {}'.format(self.devices))
+        # print(f'get_devices: {self.devices}')
         return self.devices
 
     def get_local_devices(self):
-        # print('get_local_devices: {}'.format(
-        #     [d for d in self.devices if d.manifestation == 'local']))
+        # print(f'get_local_devices: '
+        #       f'{[d for d in self.devices if d.manifestation == "local"]}')
         return [d for d in self.devices if d.manifestation == 'local']
 
     def get_nonlocal_devices(self):
-        # print('get_nonlocal_devices: {}'.format(
-        #     [d for d in self.devices if d.manifestation == 'remote']))
+        # print(f'get_nonlocal_devices: '
+        #       f'{[d for d in self.devices if d.manifestation == "remote"]}')
         return [d for d in self.devices if d.manifestation == 'remote']
 
     def is_device_added(self, infos):
@@ -921,27 +920,27 @@ class Coherence(EventDispatcher, log.LogAble):
                 f'No need to create the device, we already added device: '
                 f'{infos["ST"]} with usn {infos["USN"]}...!!')
             return
-        self.info("creating %r %r", infos['ST'], infos['USN'])
+        self.info(f'creating {infos["ST"]} {infos["USN"]}')
         if infos['ST'] == 'upnp:rootdevice':
-            self.info('creating upnp:rootdevice  {}'.format(infos['USN']))
+            self.info(f'creating upnp:rootdevice  {infos["USN"]}')
             root = RootDevice(infos)
             root.bind(root_detection_completed=self.add_device)
         else:
-            self.info('creating device/service  {}'.format(infos['USN']))
+            self.info(f'creating device/service  {infos["USN"]}')
             root_id = infos['USN'][:-len(infos['ST']) - 2]
             root = self.get_device_with_id(root_id)
             # TODO: must check that this is working as expected
             device = Device(root, udn=infos['UDN'])
 
     def add_device(self, device, *args):
-        self.info('adding device {} {} {}'.format(
-            device.get_id(), device.get_usn(), device.friendly_device_type))
+        self.info(f'adding device {device.get_id()} {device.get_usn()} '
+                  f'{device.friendly_device_type}')
         self.devices.append(device)
         self.dispatch_event(
             'coherence_device_detection_completed', device=device)
 
     def remove_device(self, device_type, infos):
-        self.info('removed device {} %s{}'.format(infos['ST'], infos['USN']))
+        self.info(f'removed device {infos["ST"]} {infos["USN"]}')
         device = self.get_device_with_usn(infos['USN'])
         if device:
             self.dispatch_event('coherence_device_removed',
@@ -952,7 +951,7 @@ class Coherence(EventDispatcher, log.LogAble):
                 self.dispatch_event(
                     'coherence_root_device_removed',
                     infos['USN'], device.client)
-                self.callback("removed_device", infos['ST'], infos['USN'])
+                self.callback('removed_device', infos['ST'], infos['USN'])
 
     def add_web_resource(self, name, sub):
         self.children[name] = sub
@@ -961,7 +960,7 @@ class Coherence(EventDispatcher, log.LogAble):
         try:
             del self.children[name]
         except KeyError:
-            """ probably the backend init failed """
+            ''' probably the backend init failed '''
             pass
 
     @staticmethod
