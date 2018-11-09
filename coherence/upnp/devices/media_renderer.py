@@ -4,6 +4,7 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2006,2007 Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
 import os.path
 
@@ -34,9 +35,9 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
     def fire(self, backend, **kwargs):
 
         if not kwargs.get('no_thread_needed', False):
-            """ this could take some time, put it in a  thread to be sure
+            ''' this could take some time, put it in a  thread to be sure
                 it doesn't block as we can't tell for sure that every
-                backend is implemented properly """
+                backend is implemented properly '''
 
             from twisted.internet import threads
             d = threads.deferToThread(backend, self, **kwargs)
@@ -46,8 +47,8 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
 
             def backend_failure(x):
                 self.warning(
-                    'backend %s not installed, %s activation aborted - %s',
-                    backend, self.device_type, x.getErrorMessage())
+                    f'backend {backend} not installed, {self.device_type}'
+                    f' activation aborted - {x.getErrorMessage()}')
                 self.debug(x)
 
             d.addCallback(backend_ready)
@@ -68,24 +69,24 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
             self.connection_manager_server = ConnectionManagerServer(self)
             self._services.append(self.connection_manager_server)
         except LookupError as msg:
-            self.warning('ConnectionManagerServer %s', msg)
+            self.warning(f'ConnectionManagerServer {msg}')
             raise LookupError(msg)
 
         try:
             self.rendering_control_server = RenderingControlServer(self)
             self._services.append(self.rendering_control_server)
         except LookupError as msg:
-            self.warning('RenderingControlServer %s', msg)
+            self.warning(f'RenderingControlServer {msg}')
             raise LookupError(msg)
 
         try:
             self.av_transport_server = AVTransportServer(self)
             self._services.append(self.av_transport_server)
         except LookupError as msg:
-            self.warning('AVTransportServer %s', msg)
+            self.warning(f'AVTransportServer {msg}')
             raise LookupError(msg)
 
-        upnp_init = getattr(self.backend, "upnp_init", None)
+        upnp_init = getattr(self.backend, 'upnp_init', None)
         if upnp_init:
             upnp_init()
 
@@ -100,7 +101,7 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
         version = self.version
         while version > 0:
             self.web_resource.putChild(
-                b'description-%r.xml' % version,
+                f'description-{version}.xml'.encode('ascii'),
                 RootDeviceXML(
                     self.coherence.hostname,
                     str(self.uuid),
@@ -109,9 +110,8 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
                     version=version,
                     # presentation_url='/'+str(self.uuid)[5:],
                     friendly_name=self.backend.name,
-                    # model_description='Coherence UPnP A/V %s' %
-                    #                   self.device_type,
-                    # model_name='Coherence UPnP A/V %s' % self.device_type,
+                    # model_description=f'Coherence UPnP A/V {self.device_type}',  # noqa
+                    # model_name=f'Coherence UPnP A/V {self.device_type}',
                     services=self._services,
                     devices=self._devices,
                     icons=self.icons,
@@ -134,12 +134,12 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
                                        defaultType=icon['mimetype']))
                 elif icon['url'] == '.face':
                     face_path = os.path.abspath(
-                        os.path.join(os.path.expanduser('~'), ".face"))
+                        os.path.join(os.path.expanduser('~'), '.face'))
                     if os.path.exists(face_path):
-                        self.web_resource.putChild(b'face-icon.png',
-                                                   StaticFile(face_path,
-                                                              defaultType=icon[
-                                                                  'mimetype']))
+                        self.web_resource.putChild(
+                            b'face-icon.png',
+                            StaticFile(
+                                face_path, defaultType=icon['mimetype']))
                 else:
                     from pkg_resources import resource_filename
                     icon_path = os.path.abspath(
@@ -154,5 +154,5 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
                                        defaultType=icon['mimetype']))
 
         self.register()
-        self.warning("%s %s (%s) activated with %s", self.backend.name,
-                     self.device_type, self.backend, str(self.uuid)[5:])
+        self.warning(f'{self.backend.name} {self.device_type} '
+                     f'({self.backend}) activated with {str(self.uuid)[5:]}')
