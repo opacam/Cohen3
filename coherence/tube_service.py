@@ -1,11 +1,14 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2009 - Frank Scholz <coherence@beebits.net>
 
-""" TUBE service classes
-
-"""
+'''
+Tube service classes
+====================
+'''
 import urllib.error
 import urllib.parse
 import urllib.parse
@@ -40,10 +43,10 @@ class MirabeauProxy(resource.Resource, log.LogAble):
         self.isLeaf = 0
 
     def getChildWithDefault(self, path, request):
-        self.info('MiraBeau getChildWithDefault %s, %s, %s %s', request.method,
-                  path, request.uri, request.client)
+        self.info(f'MiraBeau getChildWithDefault {request.method}, '
+                  f'{path}, {request.uri} {request.client}')
         uri = urllib.parse.unquote_plus(path)
-        self.info('MiraBeau  uri %r', uri)
+        self.info(f'MiraBeau  uri {uri}')
         return ReverseProxyUriResource(uri)
 
 
@@ -57,15 +60,20 @@ class TubeServiceControl(UPnPPublisher):
         self.actions = server.get_actions()
 
     def get_action_results(self, result, action, instance):
-        """ check for out arguments
-            if yes: check if there are related ones to StateVariables with
-                non A_ARG_TYPE_ prefix
-                if yes: check if there is a call plugin method for this action
-                    if yes: update StateVariable values with call result
-                    if no:  get StateVariable values and
-                        add them to result dict
-        """
-        self.debug('get_action_results %s', result)
+        '''
+        Check for out arguments, if yes:
+
+            - check if there are related ones to StateVariables with
+              non `A_ARG_TYPE_ prefix`, if yes:
+
+                - check if there is a call plugin method for this action:
+
+                    - if yes => update StateVariable values with call result.
+                    - if no  => get StateVariable values and add them to
+                      the result dict.
+
+        '''
+        self.debug(f'get_action_results {result}')
         # print 'get_action_results', action, instance
         notify = []
         for argument in action.get_out_arguments():
@@ -82,7 +90,7 @@ class TubeServiceControl(UPnPPublisher):
                     notify.append(variable)
 
             self.service.propagate_notification(notify)
-        self.info('action_results unsorted %s %s', action.name, result)
+        self.info(f'action_results unsorted {action.name} {result}')
         if len(result) == 0:
             return result
         ordered_result = OrderedDict()
@@ -100,13 +108,13 @@ class TubeServiceControl(UPnPPublisher):
                         if remote_protocol == 'http-get' and \
                                 remote_network == '*':
                             quoted_url = urllib.parse.quote_plus(res.data)
-                            print("modifying", res.data)
+                            print('modifying', res.data)
                             res.data = urllib.parse.urlunsplit(
                                 ('http',
                                  self.service.device.external_address,
                                  'mirabeau',
-                                 quoted_url, ""))
-                            print("--->", res.data)
+                                 quoted_url, ''))
+                            print('--->', res.data)
                             new_res.append(res)
                             changed = True
                     item.res = new_res
@@ -120,14 +128,13 @@ class TubeServiceControl(UPnPPublisher):
             else:
                 ordered_result[argument.name] = result[argument.name].decode(
                     'utf-8').encode('utf-8')
-        self.info('action_results sorted %s %s', action.name, ordered_result)
+        self.info(f'action_results sorted {action.name} {ordered_result}')
         return ordered_result
 
     def soap__generic(self, *args, **kwargs):
-        """ generic UPnP service control method,
-            which will be used if no soap_ACTIONNAME method
-            in the server service control class can be found
-        """
+        '''Generic UPnP service control method, which will be used
+        if no soap_ACTIONNAME method in the server service control
+        class can be found.'''
         try:
             action = self.actions[kwargs['soap_methodName']]
         except KeyError:
@@ -138,7 +145,7 @@ class TubeServiceControl(UPnPPublisher):
         except (ValueError, KeyError):
             instance = 0
 
-        self.info("soap__generic %s %s %s", action, __name__, kwargs)
+        self.info(f'soap__generic {action} {__name__} {kwargs}')
         del kwargs['soap_methodName']
 
         in_arguments = action.get_in_arguments()
@@ -149,12 +156,12 @@ class TubeServiceControl(UPnPPublisher):
             if len(al) > 0:
                 in_arguments.remove(al[0])
             else:
-                self.critical('argument %s not valid for action %s', arg_name,
-                              action.name)
+                self.critical(
+                    f'argument {arg_name} not valid for action {action.name}')
                 return failure.Failure(errorCode(402))
         if len(in_arguments) > 0:
-            self.critical('argument %s missing for action %s',
-                          [a.get_name() for a in in_arguments], action.name)
+            self.critical(f'argument {[a.get_name() for a in in_arguments]} '
+                          f'missing for action {action.name}')
             return failure.Failure(errorCode(402))
 
         def got_error(x):
@@ -194,38 +201,41 @@ class TubeServiceProxy(service.ServiceServer, resource.Resource):
         self.device.web_resource.putChild(id, self)
 
     def init_var_and_actions(self):
-        """ retrieve all actions and create the Action
-            classes for our (proxy) server
+        '''
+        The method :meth:`init_var_and_actions` does two things:
 
-            retrieve all variables and create the StateVariable
-            classes for our (proxy) server
-        """
+            - retrieve all actions and create the Action classes for our
+              (proxy) server.
+
+            - retrieve all variables and create the StateVariable classes
+              for our (proxy) server.
+        '''
         xml = self.service.get_scpd_xml()
         tree = etree.fromstring(xml)
         ns = xml_constants.UPNP_SERVICE_NS
 
-        for action_node in tree.findall('.//{%s}action' % ns):
-            name = action_node.findtext('{%s}name' % ns)
+        for action_node in tree.findall(f'.//{{{ns}}}action'):
+            name = action_node.findtext(f'{{{ns}}}name')
             arguments = []
-            for argument in action_node.findall('.//{%s}argument' % ns):
-                arg_name = argument.findtext('{%s}name' % ns)
-                arg_direction = argument.findtext('{%s}direction' % ns)
+            for argument in action_node.findall(f'.//{{{ns}}}argument'):
+                arg_name = argument.findtext(f'{{{ns}}}name')
+                arg_direction = argument.findtext(f'{{{ns}}}direction')
                 arg_state_var = argument.findtext(
-                    '{%s}relatedStateVariable' % ns)
+                    f'{{{ns}}}relatedStateVariable')
                 arguments.append(action.Argument(arg_name, arg_direction,
                                                  arg_state_var))
             self._actions[name] = action.Action(self, name, 'n/a', arguments)
 
-        for var_node in tree.findall('.//{%s}stateVariable' % ns):
+        for var_node in tree.findall(f'.//{{{ns}}}stateVariable'):
             send_events = var_node.attrib.get('sendEvents', 'yes')
-            name = var_node.findtext('{%s}name' % ns)
-            data_type = var_node.findtext('{%s}dataType' % ns)
+            name = var_node.findtext(f'{{{ns}}}name')
+            data_type = var_node.findtext(f'{{{ns}}}dataType')
             values = []
-            """ we need to ignore this, as there we don't get there our
+            ''' we need to ignore this, as there we don't get there our
                 {urn:schemas-beebits-net:service-1-0}X_withVendorDefines
                 attibute there
-            """
-            for allowed in var_node.findall('.//{%s}allowedValue' % ns):
+            '''
+            for allowed in var_node.findall(f'.//{{{ns}}}allowedValue'):
                 values.append(allowed.text)
             instance = 0
             self._variables.get(instance)[name] = \
@@ -237,10 +247,10 @@ class TubeServiceProxy(service.ServiceServer, resource.Resource):
                     send_events,
                     data_type,
                     values)
-            """ we need to do this here, as there we don't get there our
+            ''' we need to do this here, as there we don't get there our
                 {urn:schemas-beebits-net:service-1-0}X_withVendorDefines
                 attibute there
-            """
+            '''
             self._variables.get(instance)[name].has_vendor_values = True
 
 
@@ -263,28 +273,27 @@ class TubeDeviceProxy(log.LogAble):
         self._devices = []
         self.icons = []
 
-        self.info("uuid: %s, name: %r, device type: %r, version: %r",
-                  self.uuid, self.friendly_name,
-                  self.device_type, self.version)
+        self.info(f'uuid: {self.uuid}, name: {self.friendly_name}, '
+                  f'device type: {self.device_type}, version: {self.version}')
 
-        """ create the http entrypoint """
+        ''' create the http entrypoint '''
 
         self.web_resource = DeviceHttpRoot(self)
         self.coherence.add_web_resource(str(self.uuid)[5:], self.web_resource)
 
-        """ create the Service proxy(s) """
+        ''' create the Service proxy(s) '''
 
         for service in self.device.services:
-            self.debug("Proxying service %r", service)
+            self.debug(f'Proxying service {service}')
             new_service = TubeServiceProxy(service, self)
             self._services.append(new_service)
 
-        """ create a device description xml file(s) """
+        ''' create a device description xml file(s) '''
 
         version = self.version
         while version > 0:
             self.web_resource.putChild(
-                'description-%d.xml' % version,
+                f'description-{version:d}.xml',
                 RootDeviceXML(
                     self.coherence.hostname,
                     str(self.uuid),
@@ -292,35 +301,35 @@ class TubeDeviceProxy(log.LogAble):
                     device_type=self.device_type,
                     version=version,
                     friendly_name=self.friendly_name,
-                    # model_description='Coherence UPnP %s' % self.device_type,
-                    # model_name='Coherence UPnP %s' % self.device_type,
+                    # model_description=f'Coherence UPnP {self.device_type}',
+                    # model_name=f'Coherence UPnP {self.device_type}',
                     services=self._services,
                     devices=self._devices,
                     icons=self.icons))
             version -= 1
 
-        """ and register with SSDP server """
+        ''' and register with SSDP server '''
         self.register()
 
     def register(self):
         s = self.coherence.ssdp_server
         uuid = str(self.uuid)
         host = self.coherence.hostname
-        self.msg('%s register', self.device_type)
+        self.msg(f'{self.device_type} register')
         # we need to do this after the children
         # are there, since we send notifies
         s.register('local',
-                   '%s::upnp:rootdevice' % uuid,
+                   f'{uuid}::upnp:rootdevice',
                    'upnp:rootdevice',
                    self.coherence.urlbase + uuid[5:] +
-                   '/' + 'description-%d.xml' % self.version,
+                   '/' + f'description-{self.version:d}.xml',
                    host=host)
 
         s.register('local',
                    uuid,
                    uuid,
                    self.coherence.urlbase + uuid[5:] +
-                   '/' + 'description-%d.xml' % self.version,
+                   '/' + f'description-{self.version:d}.xml',
                    host=host)
 
         version = self.version
@@ -329,15 +338,14 @@ class TubeDeviceProxy(log.LogAble):
                 silent = False
             else:
                 silent = True
-            s.register('local',
-                       '%s::urn:schemas-upnp-org:device:%s:%d' % (
-                           uuid, self.device_type, version),
-                       'urn:schemas-upnp-org:device:%s:%d' % (
-                           self.device_type, version),
-                       self.coherence.urlbase + uuid[5:] +
-                       '/' + 'description-%d.xml' % version,
-                       silent=silent,
-                       host=host)
+            s.register(
+                'local',
+                f'{uuid}::urn:schemas-upnp-org:device:{self.device_type}:{version:d}',  # noqa
+                f'urn:schemas-upnp-org:device:{self.device_type}:{version:d}',
+                self.coherence.urlbase + uuid[5:] +
+                '/' + f'description-{version:d}.xml',
+                silent=silent,
+                host=host)
             version -= 1
 
         for service in self._services:
@@ -353,19 +361,18 @@ class TubeDeviceProxy(log.LogAble):
                 except Exception:
                     namespace = 'schemas-upnp-org'
 
-                device_description_tmpl = 'description-%d.xml' % device_version
+                device_description_tmpl = f'description-{device_version:d}.xml'
                 if hasattr(service, 'device_description_tmpl'):
                     device_description_tmpl = service.device_description_tmpl
 
-                s.register('local',
-                           '%s::urn:%s:service:%s:%d' % (
-                               uuid, namespace, service.id, service_version),
-                           'urn:%s:service:%s:%d' % (
-                               namespace, service.id, service_version),
-                           self.coherence.urlbase + uuid[5:] +
-                           '/' + device_description_tmpl,
-                           silent=silent,
-                           host=host)
+                s.register(
+                    'local',
+                    f'{uuid}::urn:{namespace}:service:{service.id}:{service_version:d}',  # noqa
+                    f'urn:{namespace}:service:{service.id}:{service_version:d}',  # noqa
+                    self.coherence.urlbase + uuid[5:] +
+                    '/' + device_description_tmpl,
+                    silent=silent,
+                    host=host)
 
                 silent = True
                 service_version -= 1
