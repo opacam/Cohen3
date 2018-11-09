@@ -30,23 +30,22 @@ class JsonInterface(resource.Resource, log.LogAble):
         return d
 
     def getChildWithDefault(self, path, request):
-        self.info('getChildWithDefault, %r, %r, %r %r %r',
-                  request.method, path, request.uri,
-                  request.client, request.args)
+        self.info(f'getChildWithDefault, {request.method}, {path}, '
+                  f'{request.uri} {request.client} {request.args}')
         # return self.do_the_render(request)
         d = defer.maybeDeferred(self.do_the_render, request)
         return d
 
     def do_the_render(self, request):
-        self.warning('do_the_render, %r, %r, %r %r %r', request.method,
-                     request.path, request.uri, request.args, request.client)
-        msg = "Houston, we've got a problem"
+        self.warning(f'do_the_render, {request.method}, {request.path}, '
+                     f'{request.uri} {request.args} {request.client}')
+        msg = 'Houston, we\'ve got a problem'
         path = request.path
         if isinstance(path, bytes):
             path = path.decode('utf-8')
         path = request.path.split('/')
         path = path[2:]
-        self.warning('path %r', path)
+        self.warning(f'path {path}')
         if request.method in (b'GET', b'POST'):
             request.postpath = None
             if request.method == b'GET':
@@ -61,19 +60,19 @@ class JsonInterface(resource.Resource, log.LogAble):
                             if action is not None:
                                 return self.call_action(action, request)
                             else:
-                                msg = "action %r on service type %r " \
-                                      "for device %r not found" % \
-                                      (path[2], path[1], path[0])
+                                msg = f'action {path[2]} on service type ' \
+                                      f'{path[1]} for device {path[0]} ' \
+                                      f'not found'
                         else:
-                            msg = "service type %r for device %r not found" % (
-                                path[1], path[0])
+                            msg = f'service type {path[1]} for device ' \
+                                  f'{path[0]} not found'
 
                     else:
-                        msg = "device with id %r not found" % path[0]
+                        msg = f'device with id {path[0]} not found'
 
         request.setResponseCode(404, message=msg)
         return static.Data(
-            "<html><p>{}</p></html>".format(msg).encode('ascii'),
+            f'<html><p>{msg}</p></html>'.encode('ascii'),
             'text/html')
 
     def list_devices(self, request):
@@ -88,13 +87,13 @@ class JsonInterface(resource.Resource, log.LogAble):
             kwargs[entry] = str(value_list[0])
 
         def to_json(result):
-            self.warning("to_json")
+            self.warning('to_json')
             return static.Data(json.dumps(result), 'application/json')
 
         def fail(f):
             request.setResponseCode(404)
             return static.Data(
-                b"<html><p>Houston, we've got a problem</p></html>",
+                b'<html><p>Houston, we\'ve got a problem</p></html>',
                 'text/html')
 
         d = action.call(**kwargs)
