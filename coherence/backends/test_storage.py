@@ -49,10 +49,10 @@ The XML fragment has these elements:
     - upnp_class: the DIDLLite class the item shall have, object.item will
       be taken as default
     - fourth_field: value for the 4th field of the protocolInfo phalanx,
-      default is *'\*'*
+      default is '*'
     - pipeline: a GStreamer pipeline that has to end with a bin named 'enc',
       some pipelines do only work properly when we have a glib mainloop
-      running, so coherence needs to be started with *\-o glib\:yes*
+      running, so coherence needs to be started with *-o glib:yes*
     - command: the commandline for an external script to run, its output will
       be returned as the items content
 

@@ -15,7 +15,7 @@ add 'access_token' key into your config file:
      account:
 
      `Go twitch's 'get access token' page
-     <https://api.twitch.tv/kraken/oauth2/authorize\?response_type=token&
+     <https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&
      client_id=37684tuwyxmogmtduz6lz0jdtf0acob&redirect_uri=
      http://localhost&scope=user_read>`_
 
