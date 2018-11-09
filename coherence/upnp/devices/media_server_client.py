@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
@@ -69,42 +71,42 @@ class MediaServerClient(EventDispatcher, log.LogAble):
 
         for service in self.device.get_services():
             if service.get_type() in [
-                    "urn:schemas-upnp-org:service:ContentDirectory:1",
-                    "urn:schemas-upnp-org:service:ContentDirectory:2"]:
+                    'urn:schemas-upnp-org:service:ContentDirectory:1',
+                    'urn:schemas-upnp-org:service:ContentDirectory:2']:
                 self.content_directory = ContentDirectoryClient(service)
             if service.get_type() in [
-                    "urn:schemas-upnp-org:service:ConnectionManager:1",
-                    "urn:schemas-upnp-org:service:ConnectionManager:2"]:
+                    'urn:schemas-upnp-org:service:ConnectionManager:1',
+                    'urn:schemas-upnp-org:service:ConnectionManager:2']:
                 self.connection_manager = ConnectionManagerClient(service)
             if service.get_type() in [
-                    "urn:schemas-upnp-org:service:AVTransport:1",
-                    "urn:schemas-upnp-org:service:AVTransport:2"]:
+                    'urn:schemas-upnp-org:service:AVTransport:1',
+                    'urn:schemas-upnp-org:service:AVTransport:2']:
                 self.av_transport = AVTransportClient(service)
             if service.detection_completed:
                 self.service_notified(service)
 
-        self.info("MediaServer %s", self.device.get_friendly_name())
+        self.info(f'MediaServer {self.device.get_friendly_name()}')
         if self.content_directory:
-            self.info("ContentDirectory available")
+            self.info('ContentDirectory available')
         else:
             self.warning(
-                "ContentDirectory not available, device not implemented"
-                " properly according to the UPnP specification")
+                'ContentDirectory not available, device not implemented'
+                ' properly according to the UPnP specification')
             return
         if self.connection_manager:
-            self.info("ConnectionManager available")
+            self.info('ConnectionManager available')
         else:
             self.warning(
-                "ConnectionManager not available, device not implemented"
-                " properly according to the UPnP specification")
+                'ConnectionManager not available, device not implemented'
+                ' properly according to the UPnP specification')
             return
         if self.av_transport:
-            self.info("AVTransport (optional) available")
+            self.info('AVTransport (optional) available')
         if self.scheduled_recording:
-            self.info("ScheduledRecording (optional) available")
+            self.info('ScheduledRecording (optional) available')
 
     def remove(self):
-        self.info("removal of MediaServerClient started")
+        self.info('removal of MediaServerClient started')
         if self.content_directory is not None:
             self.content_directory.remove()
         if self.connection_manager is not None:
@@ -115,7 +117,7 @@ class MediaServerClient(EventDispatcher, log.LogAble):
             self.scheduled_recording.remove()
 
     def service_notified(self, service):
-        self.info('notified about %r', service)
+        self.info(f'notified about {service}')
         if self.detection_completed:
             return
         if self.content_directory is not None:
@@ -145,16 +147,16 @@ class MediaServerClient(EventDispatcher, log.LogAble):
         self.dispatch_event(
             'device_client_detection_completed',
             client=self, udn=self.device.udn)
-        self.info('detection_completed for %r', self)
+        self.info(f'detection_completed for {self}')
 
     def state_variable_change(self, variable, usn):
         self.info('%(name)r changed from %(old_value)r to %(value)r',
                   vars(variable))
 
     def print_results(self, results):
-        self.info("results= %s", results)
+        self.info(f'results= {results}')
 
     def process_meta(self, results):
         for k, v in results.items():
-            dfr = self.content_directory.browse(k, "BrowseMetadata")
+            dfr = self.content_directory.browse(k, 'BrowseMetadata')
             dfr.addCallback(self.print_results)
