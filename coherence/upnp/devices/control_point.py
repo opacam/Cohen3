@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
@@ -132,12 +134,12 @@ class ControlPoint(EventDispatcher, log.LogAble):
             coherence_device_detection_completed=self.check_device,
             coherence_device_removed=self.remove_client)
 
-        self.info("Coherence UPnP ControlPoint starting...")
+        self.info('Coherence UPnP ControlPoint starting...')
         self.event_server = EventServer(self)
         self.coherence.add_web_resource('RPC2', XMLRPC(self))
 
         for device in self.get_devices():
-            self.info('ControlPoint [check device]: {}'.format(device))
+            self.info(f'ControlPoint [check device]: {device}')
             self.check_device(device)
 
     def shutdown(self):
@@ -158,7 +160,7 @@ class ControlPoint(EventDispatcher, log.LogAble):
             self.check_device(device)
 
     def browse(self, device):
-        self.info('ControlPoint.browse: {}'.format(device))
+        self.info(f'ControlPoint.browse: {device}')
         device = self.coherence.get_device_with_usn(device.get_usn())
         if not device:
             return
@@ -261,13 +263,12 @@ class ControlPoint(EventDispatcher, log.LogAble):
 
     def check_device(self, device):
         if device.client is None:
-            self.info("found device %s of type %s - %r",
-                      device.get_friendly_name(),
-                      device.get_device_type(), device.client)
+            self.info(f'found device {device.get_friendly_name()} of type '
+                      f'{device.get_device_type()} - {device.client}')
             short_type = device.get_friendly_device_type()
             if short_type in self.auto_client and short_type is not None:
-                self.info("identified %s %r", short_type,
-                          device.get_friendly_name())
+                self.info(
+                    f'identified {short_type} {device.get_friendly_name()}')
 
                 if short_type == 'MediaServer':
                     client = MediaServerClient(device)
@@ -294,12 +295,12 @@ class ControlPoint(EventDispatcher, log.LogAble):
     def remove_client(self, udn, client):
         self.dispatch_event(
             'control_point_client_removed', udn=udn)
-        self.info(f"removed {client.device_type} "
-                  f"{client.device.get_friendly_name()}")
+        self.info(f'removed {client.device_type} '
+                  f'{client.device.get_friendly_name()}')
         client.remove()
 
     def propagate(self, event):
-        self.info('propagate: %r', event)
+        self.info(f'propagate: {event}')
         if event.get_sid() in service.subscribers:
             try:
                 service.subscribers[event.get_sid()].process_event(event)
@@ -313,18 +314,18 @@ class ControlPoint(EventDispatcher, log.LogAble):
             print(result)
 
         def got_error(result):
-            print("error", result)
+            print('error', result)
 
         try:
             f = open(path)
             data = f.read()
             f.close()
             headers = {
-                b"Content-Type": b"application/octet-stream",
-                b"Content-Length": bytes(str(len(data)), encoding='utf-8')
+                b'Content-Type': b'application/octet-stream',
+                b'Content-Length': bytes(str(len(data)), encoding='utf-8')
             }
             df = client.getPage(
-                url, method=b"POST",
+                url, method=b'POST',
                 headers=headers, postdata=data)
             df.addCallback(got_result)
             df.addErrback(got_error)
@@ -341,7 +342,7 @@ class XMLRPC(xmlrpc.XMLRPC):
         self.allowNone = True
 
     def xmlrpc_list_devices(self):
-        print("list_devices")
+        print('list_devices')
         r = []
         for device in self.control_point.get_devices():
             # print(device.get_friendly_name(), device.get_service_type(),
@@ -354,119 +355,119 @@ class XMLRPC(xmlrpc.XMLRPC):
         return r
 
     def xmlrpc_mute_device(self, device_id):
-        print("mute")
+        print('mute')
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
             client.rendering_control.set_mute(desired_mute=1)
-            return "Ok"
-        return "Error"
+            return 'Ok'
+        return 'Error'
 
     def xmlrpc_unmute_device(self, device_id):
-        print("unmute", device_id)
+        print('unmute', device_id)
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
             client.rendering_control.set_mute(desired_mute=0)
-            return "Ok"
-        return "Error"
+            return 'Ok'
+        return 'Error'
 
     def xmlrpc_set_volume(self, device_id, volume):
-        print("set volume")
+        print('set volume')
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
             client.rendering_control.set_volume(desired_volume=volume)
-            return "Ok"
-        return "Error"
+            return 'Ok'
+        return 'Error'
 
     def xmlrpc_play(self, device_id):
-        print("play")
+        print('play')
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
             client.av_transport.play()
-            return "Ok"
-        return "Error"
+            return 'Ok'
+        return 'Error'
 
     def xmlrpc_pause(self, device_id):
-        print("pause")
+        print('pause')
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
             client.av_transport.pause()
-            return "Ok"
-        return "Error"
+            return 'Ok'
+        return 'Error'
 
     def xmlrpc_stop(self, device_id):
-        print("stop")
+        print('stop')
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
             client.av_transport.stop()
-            return "Ok"
-        return "Error"
+            return 'Ok'
+        return 'Error'
 
     def xmlrpc_next(self, device_id):
-        print("next")
+        print('next')
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
             next(client.av_transport)
-            return "Ok"
-        return "Error"
+            return 'Ok'
+        return 'Error'
 
     def xmlrpc_previous(self, device_id):
-        print("previous")
+        print('previous')
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
             client.av_transport.previous()
-            return "Ok"
-        return "Error"
+            return 'Ok'
+        return 'Error'
 
     def xmlrpc_set_av_transport_uri(self, device_id, uri):
-        print("set_av_transport_uri")
+        print('set_av_transport_uri')
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
             client.av_transport.set_av_transport_uri(current_uri=uri)
-            return "Ok"
-        return "Error"
+            return 'Ok'
+        return 'Error'
 
     def xmlrpc_create_object(self, device_id, container_id, arguments):
-        print("create_object", arguments)
+        print('create_object', arguments)
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
             client.content_directory.create_object(container_id, arguments)
-            return "Ok"
-        return "Error"
+            return 'Ok'
+        return 'Error'
 
     def xmlrpc_import_resource(self, device_id, source_uri, destination_uri):
-        print("import_resource", source_uri, destination_uri)
+        print('import_resource', source_uri, destination_uri)
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
             client.content_directory.import_resource(source_uri,
                                                      destination_uri)
-            return "Ok"
-        return "Error"
+            return 'Ok'
+        return 'Error'
 
     def xmlrpc_put_resource(self, url, path):
-        print("put_resource", url, path)
+        print('put_resource', url, path)
         self.control_point.put_resource(url, path)
-        return "Ok"
+        return 'Ok'
 
     def xmlrpc_ping(self):
-        print("ping")
-        return "Ok"
+        print('ping')
+        return 'Ok'
 
 
 def startXMLRPC(control_point, port):
     from twisted.web import server
     r = XMLRPC(control_point)
-    print("XMLRPC-API on port %d ready" % port)
+    print(f'XMLRPC-API on port {port:d} ready')
     reactor.listenTCP(port, server.Site(r))
 
 
@@ -481,26 +482,26 @@ if __name__ == '__main__':
                         auto_client=[])
 
     def show_devices():
-        print("show_devices")
+        print('show_devices')
         for d in ctrl.get_devices():
             print(d, d.get_id())
 
     def the_result(r):
-        print("result", r, r.get_id())
+        print('result', r, r.get_id())
 
     def query_devices():
-        print("query_devices")
+        print('query_devices')
         ctrl.add_query(DeviceQuery('host', '192.168.0.1', the_result))
 
     def query_devices2():
-        print("query_devices with timeout")
+        print('query_devices with timeout')
         ctrl.add_query(
             DeviceQuery('host', '192.168.0.1', the_result, timeout=10,
                         oneshot=False))
 
     def stop_reactor(*args):
         reactor.stop()
-        print("Stoped reactor successfully")
+        print('Stoped reactor successfully')
 
     reactor.callLater(2, show_devices)
     reactor.callLater(3, query_devices)
