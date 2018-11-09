@@ -5,13 +5,14 @@
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
 # Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
-"""
+'''
 Utils
 =====
 
 Set of utilities to help process the data and the assets of the Cohen3 project.
 It includes several methods which covers different fields, here are grouped by
 his functionality:
+
     - encode/decode strings:
         - :meth:`~coherence.upnp.core.utils.to_string`
         - :meth:`~coherence.upnp.core.utils.to_bytes`
@@ -45,7 +46,7 @@ his functionality:
     - python 2to3 compatibility methods:
         - :meth:`~coherence.upnp.core.utils.cmp`
 
-"""
+'''
 import xml.etree.ElementTree as ET
 from lxml import etree
 from io import BytesIO
@@ -77,7 +78,7 @@ except ImportError:
 
 
 def to_string(x):
-    """
+    '''
     This method is a helper function that takes care of converting into a
     string any string or bytes string or integer. This is useful for
     decoding twisted responses into the default python 3 string encoding or
@@ -91,7 +92,7 @@ def to_string(x):
     .. warning:: This is similar to :meth:`~coherence.upnp.core.utils.to_bytes`
                  but with the difference that the returned result it will be
                  always a string.
-    """
+    '''
     if isinstance(x, str):
         return x
     elif isinstance(x, bytes):
@@ -101,7 +102,7 @@ def to_string(x):
 
 
 def to_bytes(x):
-    """
+    '''
     This method is a helper function that takes care of converting a string
     or string of bytes into bytes, needed for most of the write operations for
     twisted responses. It is useful when we don't know the type of the
@@ -120,7 +121,7 @@ def to_bytes(x):
                  bypassed and user will be notified with a log warning. The
                  conflicting character will be replaced for the symbol "?"
                  (U+FFFD)
-    """
+    '''
     if isinstance(x, bytes):
         return x
 
@@ -137,13 +138,13 @@ def to_bytes(x):
             'ascii', errors='replace')
 
     logger.warning(
-        'to_bytes: Some characters could not be encoded to bytes...those will '
-        'be replaced by the symbol "?" [string before encode is: %r]' % x)
+        f'to_bytes: Some characters could not be encoded to bytes...those will'
+        f' be replaced by the symbol "?" [string before encode is: {x}]')
     return new_x
 
 
 def means_true(value):
-    """
+    '''
     Transform a value representing a boolean into a boolean.
 
     The valid expressions are:
@@ -152,17 +153,17 @@ def means_true(value):
         - 'yes' or 'ok'
 
     .. note:: the string expressions are not case sensitive
-    """
+    '''
     value = to_string(value).lower()
     return value in [True, 1, '1', 'true', 'yes', 'ok']
 
 
 def generalise_boolean(value):
-    """ standardize the different boolean incarnations
+    ''' standardize the different boolean incarnations
 
-        transform anything that looks like a "True" into a '1',
+        transform anything that looks like a 'True' into a '1',
         and everything else into a '0'
-    """
+    '''
     if means_true(value):
         return '1'
     return '0'
@@ -171,10 +172,10 @@ def generalise_boolean(value):
 generalize_boolean = generalise_boolean
 
 
-def parse_xml(data, encoding="utf-8", dump_invalid_data=False):
-    """
+def parse_xml(data, encoding='utf-8', dump_invalid_data=False):
+    '''
     Takes an xml string and returns an XML element hierarchy
-    """
+    '''
     parser = ET.XMLParser(encoding=encoding)
 
     # my version of twisted.web returns page_infos as a dictionary in
@@ -199,7 +200,7 @@ def parse_xml(data, encoding="utf-8", dump_invalid_data=False):
 
 
 def parse_with_lxml(data, encoding='utf-8'):
-    """
+    '''
     Takes an xml string or a response as argument and returns a root tree.
     This method is similar to :meth:`~coherence.upnp.core.utils.parse_xml` but
     here we use the lxml module and a custom parser method to return an
@@ -212,7 +213,7 @@ def parse_with_lxml(data, encoding='utf-8'):
               ability to parse a broken xml. This method could be useful to
               parse some small pieces of html code into an xml tree in order
               to extract some info.
-    """
+    '''
     if isinstance(data, (list, tuple)):
         data = data[0]
 
@@ -225,13 +226,13 @@ def parse_with_lxml(data, encoding='utf-8'):
 
 
 def parse_http_response(data):
-    """
+    '''
      Takes a response as argument and returns a tuple: cmd, headers
 
      The first value of the tuple (cmd) will contain the server response and
      the second one the headers.
 
-     .. note:: don't try to get the body, there are responses without """
+     .. note:: don't try to get the body, there are responses without '''
     if isinstance(data, bytes):
         data = data.decode('utf-8')
     header = data.split('\r\n\r\n')[0]
@@ -242,14 +243,14 @@ def parse_http_response(data):
     lines = [x for x in lines if len(x) > 0]
 
     headers = [x.split(':', 1) for x in lines]
-    headers = dict([(x[0].lower().replace("'", ""),
-                     x[1].replace("'", "")) for x in headers])
+    headers = dict([(x[0].lower().replace("'", ''),
+                     x[1].replace("'", '')) for x in headers])
 
     return cmd, headers
 
 
 def get_ip_address(ifname):
-    """
+    '''
     Determine the IP address by interface name
 
     http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/439094
@@ -266,7 +267,7 @@ def get_ip_address(ifname):
     http://alastairs-place.net/netifaces/
 
     Thx Lawrence for that patch!
-    """
+    '''
 
     if have_netifaces:
         if ifname in netifaces.interfaces():
@@ -285,7 +286,7 @@ def get_ip_address(ifname):
     import struct
 
     system_type = uname()[0]
-    if system_type == "Linux":
+    if system_type == 'Linux':
         SIOCGIFADDR = 0x8915
     else:
         SIOCGIFADDR = 0xc0206921
@@ -299,15 +300,15 @@ def get_ip_address(ifname):
         )[20:24])
     except Exception:
         ip = '127.0.0.1'
-    # print('ip is: {}'.format(ip))
+    # print(f'ip is: {ip}')
     return ip
 
 
 def get_host_address():
-    """ try to get determine the interface used for
+    ''' try to get determine the interface used for
         the default route, as this is most likely
         the interface we should bind to (on a single homed host!)
-    """
+    '''
 
     import sys
     if sys.platform == 'win32':
@@ -330,7 +331,7 @@ def get_host_address():
                             route.close()
                             return get_ip_address(li[0])
         except IOError as msg:
-            """ fallback to parsing the output of netstat """
+            ''' fallback to parsing the output of netstat '''
             from twisted.internet import utils
 
             def result(r):
@@ -359,13 +360,13 @@ def get_host_address():
             import traceback
             traceback.print_exc()
 
-    """ return localhost if we haven't found anything """
+    ''' return localhost if we haven't found anything '''
     return '127.0.0.1'
 
 
 def de_chunk_payload(response):
     import io
-    """ This method takes a chunked HTTP data object and unchunks it."""
+    ''' This method takes a chunked HTTP data object and unchunks it.'''
     newresponse = io.StringIO()
     # chunked encoding consists of a bunch of lines with
     # a length in hex followed by a data chunk and a CRLF pair.
@@ -389,15 +390,15 @@ def de_chunk_payload(response):
 
 
 class Request(server.Request):
-    """
+    '''
     Custom implementation of twisted.web.server.Request which takes care of
     process data for our needs.
-    """
+    '''
 
     def process(self):
-        """
+        '''
         Process a request.
-        """
+        '''
 
         # get site from channel
         self.site = self.channel.site
@@ -405,18 +406,18 @@ class Request(server.Request):
         # set various default headers
         self.setHeader(b'server', SERVER_ID.encode('ascii'))
         self.setHeader(b'date', http.datetimeToString())
-        self.setHeader(b'content-type', b"text/html")
+        self.setHeader(b'content-type', b'text/html')
 
         # Resource Identification
         url = to_string(self.path)
 
-        # remove trailing "/", if ever
+        # remove trailing '/', if ever
         url = url.rstrip('/')
 
         scheme, netloc, path, query, fragment = urlsplit(url)
         clean_path = path[1:]
         self.prepath = []
-        if path == "":
+        if path == '':
             self.postpath = []
         else:
             raw_p = list(map(unquote, clean_path.split('/')))
@@ -429,8 +430,7 @@ class Request(server.Request):
             if resrc is None:
                 self.setResponseCode(
                     http.NOT_FOUND,
-                    "Error: No resource for path {}".format(
-                        path).encode('ascii'))
+                    f'Error: No resource for path {path}'.encode('ascii'))
                 self.finish()
             elif isinstance(resrc, defer.Deferred):
                 resrc.addCallback(deferred_rendering)
@@ -439,14 +439,12 @@ class Request(server.Request):
                 self.render(resrc)
 
         except Exception as e:
-            logger.error('Error on render Request: {}'.format(e))
+            logger.error(f'Error on render Request: {e}')
             self.processingFailed(failure.Failure())
 
 
 class Site(server.Site):
-    """
-    Custom implementation of twisted.web.server.Site.
-    """
+    '''Custom implementation of :obj:`twisted.web.server.Site`'''
     noisy = False
     requestFactory = Request
 
@@ -459,7 +457,7 @@ class ProxyClient(proxy.ProxyClient, log.LogAble):
 
     def __init__(self, command, rest, version, headers, data, father):
         log.LogAble.__init__(self)
-        # headers["connection"] = "close"
+        # headers['connection'] = 'close'
         self.send_data = 0
         proxy.ProxyClient.__init__(self, command, rest, version,
                                    headers, data, father)
@@ -468,7 +466,7 @@ class ProxyClient(proxy.ProxyClient, log.LogAble):
         if message:
             # Add a whitespace to message, this allows empty messages
             # transparently
-            message = " %s" % (message,)
+            message = f' {message}'
         if version == 'ICY':
             version = 'HTTP/1.1'
         proxy.ProxyClient.handleStatus(self, version, code, message)
@@ -489,21 +487,21 @@ class ProxyClientFactory(proxy.ProxyClientFactory):
 
 
 class ReverseProxyResource(proxy.ReverseProxyResource):
-    """
+    '''
     Resource that renders the results gotten from another server.
 
     Put this resource in the tree to cause everything below it to be relayed
     to a different server.
-    """
+    '''
 
     proxyClientFactoryClass = ProxyClientFactory
-    """
+    '''
     proxyClientFactoryClass (:obj:`twisted.web.proxy.ProxyClientFactory`):
     a proxy client factory class, used to create new connections.
-    """
+    '''
 
     def __init__(self, host, port, path, reactor=reactor):
-        """
+        '''
         Args:
           host (str): the host of the web server to proxy.
           port (int): the port of the web server to proxy.
@@ -514,7 +512,7 @@ class ReverseProxyResource(proxy.ReverseProxyResource):
                       B{/foo/bar}.
           reactor (:obj:`twisted.internet.interfaces.IReactorTCP`):
               the reactor used to create connections.
-        """
+        '''
         resource.Resource.__init__(self)
         self.host = host
         self.port = port
@@ -527,16 +525,16 @@ class ReverseProxyResource(proxy.ReverseProxyResource):
             self.host, self.port, self.path + b'/' + path)
 
     def render(self, request):
-        """
+        '''
         Render a request by forwarding it to the proxied server.
-        """
+        '''
         # RFC 2616 tells us that we can omit the port if it's the default port,
         # but we have to provide it otherwise
         if self.port == 80:
             host = self.host
         else:
-            host = self.host + b":" + to_bytes(self.port)
-        request.requestHeaders.setRawHeaders(b"host", [host])
+            host = self.host + b':' + to_bytes(self.port)
+        request.requestHeaders.setRawHeaders(b'host', [host])
         request.content.seek(0, 0)
         qs = urlparse(request.uri)[4]
         if qs == b'':
@@ -615,19 +613,19 @@ HeaderAwareHTTPDownloader = client.HTTPDownloader
 
 
 def getPage(url, contextFactory=None, *args, **kwargs):
-    """
+    '''
     Download a web page as a string.
 
     Download a page. Return a deferred, which will callback with a
     page (as a string) or errback with a description of the error.
 
-    See `twisted.web.client.HTTPClientFactory to see what extra args can be
-    passed.
+    See :obj:`twisted.web.client.HTTPClientFactory` to see what extra args
+    can be passed.
 
     .. note:: This function is like `twisted.web.client.getPage`, except it
               uses our HeaderAwareHTTPClientFactory instead of
               HTTPClientFactory and sets the user agent.
-    """
+    '''
 
     url_bytes = to_bytes(url)
     if args is None:
@@ -638,7 +636,7 @@ def getPage(url, contextFactory=None, *args, **kwargs):
     if 'headers' in kwargs and 'user-agent' in kwargs['headers']:
         kwargs['agent'] = kwargs['headers']['user-agent']
     elif 'agent' not in kwargs:
-        kwargs['agent'] = "Coherence PageGetter"
+        kwargs['agent'] = 'Coherence PageGetter'
     new_kwargs = {}
     for k, v in kwargs.items():
         if k == 'headers':
@@ -649,10 +647,10 @@ def getPage(url, contextFactory=None, *args, **kwargs):
                 new_kwargs['headers'][h_key] = h_val
         else:
             new_kwargs[k] = v
-    logger.info('getPage [url]: {} [type: {}]'.format(url, type(url)))
-    logger.debug('\t->[args]: {} [type: {}]'.format(args, type(args)))
-    logger.debug('\t->[kwargs]: {}'.format(kwargs))
-    logger.debug('\t->[new_kwargs]: {}]'.format(new_kwargs))
+    logger.info(f'getPage [url]: {url} [type: {type(url)}]')
+    logger.debug(f'\t->[args]: {args} [type: {type(args)}]')
+    logger.debug(f'\t->[kwargs]: {kwargs}')
+    logger.debug(f'\t->[new_kwargs]: {new_kwargs}]')
     return client._makeGetterFactory(
         url_bytes,
         HeaderAwareHTTPClientFactory,
@@ -661,7 +659,7 @@ def getPage(url, contextFactory=None, *args, **kwargs):
 
 
 def downloadPage(url, file, contextFactory=None, *args, **kwargs):
-    """
+    '''
     Download a web page to a file.
 
     Args:
@@ -671,13 +669,13 @@ def downloadPage(url, file, contextFactory=None, *args, **kwargs):
 
     .. note:: See `twisted.web.client.HTTPDownloader` to see what extra args
               can be passed.
-    """
+    '''
     url_bytes = to_bytes(url)
 
     if 'headers' in kwargs and 'user-agent' in kwargs['headers']:
         kwargs['agent'] = kwargs['headers']['user-agent']
     elif 'agent' not in kwargs:
-        kwargs['agent'] = "Coherence PageGetter"
+        kwargs['agent'] = 'Coherence PageGetter'
     new_kwargs = {}
     for k, v in kwargs.items():
         if k == 'headers':
@@ -688,10 +686,10 @@ def downloadPage(url, file, contextFactory=None, *args, **kwargs):
                 new_kwargs['headers'][h_key] = h_val
         else:
             new_kwargs[k] = v
-    logger.info('downloadPage [url]: {} [type: {}]'.format(url, type(url)))
-    logger.debug('\t->[args]: {} [type: {}]'.format(args, type(args)))
-    logger.debug('\t->[kwargs]: {}'.format(kwargs))
-    logger.debug('\t->[new_kwargs]: {}]'.format(new_kwargs))
+    logger.info(f'downloadPage [url]: {url} [type: {type(url)}]')
+    logger.debug(f'\t->[args]: {args} [type: {type(args)}]')
+    logger.debug(f'\t->[kwargs]: {kwargs}')
+    logger.debug(f'\t->[new_kwargs]: {new_kwargs}]')
     return client.downloadPage(
         url_bytes, file, contextFactory=contextFactory,
         *args, **new_kwargs)
@@ -704,14 +702,14 @@ StaticFile = static.File
 
 
 class BufferFile(static.File):
-    """
+    '''
     Custom implementation of `twisted.web.static.File` and modified accordingly
-    to the patch by John-Mark Gurney (http://resnet.uoregon.edu/~gurney_j/
-    jmpc/dist/twisted.web.static.patch)
+    to the patch by John-Mark Gurney (
+    http://resnet.uoregon.edu/~gurney_j/jmpc/dist/twisted.web.static.patch)
 
     .. note:: See `twisted.web.static.File` to see what extra args can be
               passed.
-    """
+    '''
 
     def __init__(self, path, target_size=0, *args):
         static.File.__init__(self, path, *args)
@@ -719,15 +717,15 @@ class BufferFile(static.File):
         self.upnp_retry = None
 
     def render(self, request):
-        # print ""
-        # print "BufferFile", request
+        # print ''
+        # print 'BufferFile', request
 
         # FIXME detect when request is REALLY finished
         if request is None or request.finished:
-            logger.info("No request to render!")
+            logger.info('No request to render!')
             return ''
 
-        """You know what you doing."""
+        '''You know what you doing.'''
         self.restat()
 
         if self.type is None:
@@ -772,14 +770,14 @@ class BufferFile(static.File):
         trans = True
 
         range = request.getHeader('range')
-        # print "StaticFile", range
+        # print 'StaticFile', range
 
         tsize = size
         if range is not None:
             # This is a request for partial data...
             bytesrange = range.split('=')
             assert bytesrange[0] == 'bytes', \
-                "Syntactically invalid http range header!"
+                'Syntactically invalid http range header!'
             start, end = bytesrange[1].split('-', 1)
             if start:
                 start = int(start)
@@ -789,15 +787,15 @@ class BufferFile(static.File):
                     # Retry later!
                     logger.info(bytesrange)
                     logger.info(
-                        "Requesting data beyond current scope -> "
-                        "postpone rendering!")
+                        'Requesting data beyond current scope -> '
+                        'postpone rendering!')
                     self.upnp_retry = reactor.callLater(
                         1.0, self.render, request)
                     return server.NOT_DONE_YET
 
                 f.seek(start)
                 if end:
-                    # print(":%s" % end)
+                    # print(f':{end}')
                     end = int(end)
                 else:
                     end = size - 1
@@ -820,9 +818,10 @@ class BufferFile(static.File):
                 trans = False
             else:
                 request.setResponseCode(http.PARTIAL_CONTENT)
-                request.setHeader(b'content-range', ("bytes %s-%s/%s " % (
-                    str(start), str(end), str(tsize))).encode('ascii'))
-                # print "StaticFile", start, end, tsize
+                request.setHeader(b'content-range', (
+                    f'bytes {str(start)}-{str(end)}/{str(tsize)} ').encode(
+                        'ascii'))
+                # print 'StaticFile', start, end, tsize
 
         request.setHeader('content-length', str(fsize))
 
@@ -831,7 +830,7 @@ class BufferFile(static.File):
             # won't be overwritten.
             request.method = b'HEAD'
             return ''
-        # print "StaticFile out", request.headers, request.code
+        # print 'StaticFile out', request.headers, request.code
 
         # return data
         # size is the byte position to stop sending, not how many bytes to send
@@ -842,9 +841,9 @@ class BufferFile(static.File):
 
 
 class BufferFileTransfer(object):
-    """
+    '''
     A class to represent the transfer of a file over the network.
-    """
+    '''
     request = None
 
     def __init__(self, file, size, request):
@@ -855,7 +854,7 @@ class BufferFileTransfer(object):
         request.registerProducer(self, 0)
 
     def resumeProducing(self):
-        # print "resumeProducing", self.request,self.size,self.written
+        # print 'resumeProducing', self.request,self.size,self.written
         if not self.request:
             return
         data = self.file.read(
@@ -874,7 +873,7 @@ class BufferFileTransfer(object):
         pass
 
     def stopProducing(self):
-        # print "stopProducing",self.request
+        # print 'stopProducing',self.request
         self.request.unregisterProducer()
         self.file.close()
         self.request.finish()
@@ -886,9 +885,9 @@ import random
 
 
 class _tz(tzinfo):
-    """
+    '''
     Custom base class for time zone info classes.
-    """
+    '''
     def utcoffset(self, dt):
         return self._offset
 
@@ -900,17 +899,17 @@ class _tz(tzinfo):
 
 
 class _CET(_tz):
-    """
+    '''
     Custom class for time zone representing Central European Time.
-    """
+    '''
     _offset = timedelta(minutes=60)
     _name = 'CET'
 
 
 class _CEST(_tz):
-    """
+    '''
     Custom class for time zone representing Central European Summer Time.
-    """
+    '''
     _offset = timedelta(minutes=120)
     _name = 'CEST'
 
@@ -924,17 +923,17 @@ _bdates = [datetime(1997, 2, 28, 17, 20, tzinfo=_CET()),  # Sebastian Oliver
 
 
 def datefaker():
-    """
+    '''
     Choose a random datetime from :attr:`~coherence.upnp.core.utils._bdates`
 
     .. note:: Used inside class :class:`~coherence.upnp.core.DIDLLite.Object`,
               method :meth:`~coherence.upnp.core.DIDLLite.Object.toElement`
-    """
+    '''
     return random.choice(_bdates)
 
 
 def cmp(x, y):
-    """
+    '''
     Replacement for built-in function cmp that was removed in Python 3
 
     Compare the two objects x and y and return an integer according to
@@ -944,5 +943,5 @@ def cmp(x, y):
     Args:
         x (object): An object
         y (object): Another object to compare with x
-    """
+    '''
     return (x > y) - (x < y)
