@@ -5,12 +5,11 @@
 
 # Copyright 2008, Frank Scholz <coherence@beebits.net>
 
-""" transcoder classes to be used in combination with
-    a Coherence MediaServer
-
-    using GStreamer pipelines for the actually work
-    and feeding the output into a http response
-"""
+'''
+Transcoder classes to be used in combination with a Coherence MediaServer,
+using GStreamer pipelines for the actually work and feeding the output into
+a http response.
+'''
 
 import gi
 gi.require_version('Gst', '1.0')
@@ -36,23 +35,21 @@ def get_transcoder_name(transcoder):
 
 
 class InternalTranscoder(object):
-    """ just a class to inherit from and
-        which we can look for upon creating our
-        list of available transcoders
-    """
+    '''Just a class to inherit from and which we can look
+    for upon creating our list of available transcoders.'''
 
 
 class FakeTransformer(Gst.Element, log.LogAble):
     logCategory = 'faker_datasink'
 
     _sinkpadtemplate = Gst.PadTemplate.new(
-        "sinkpadtemplate",
+        'sinkpadtemplate',
         Gst.PadDirection.SINK,
         Gst.PadPresence.ALWAYS,
         Gst.Caps.new_any())
 
     _srcpadtemplate = Gst.PadTemplate.new(
-        "srcpadtemplate",
+        'srcpadtemplate',
         Gst.PadDirection.SRC,
         Gst.PadPresence.ALWAYS,
         Gst.Caps.new_any())
@@ -61,9 +58,9 @@ class FakeTransformer(Gst.Element, log.LogAble):
         Gst.Element.__init__(self)
         log.LogAble.__init__(self)
         self.sinkpad = Gst.Pad.new_from_template(
-            self._sinkpadtemplate, "sink")
+            self._sinkpadtemplate, 'sink')
         self.srcpad = Gst.Pad.new_from_template(
-            self._srcpadtemplate, "src")
+            self._srcpadtemplate, 'src')
         self.add_pad(self.sinkpad)
         self.add_pad(self.srcpad)
 
@@ -78,8 +75,8 @@ class FakeTransformer(Gst.Element, log.LogAble):
     def get_fake_header(self):
         return \
             struct.pack(
-                ">L4s", 32, 'ftyp') + \
-            b"mp42\x00\x00\x00\x00mp42mp41isomiso2"
+                '>L4s', 32, 'ftyp') + \
+            b'mp42\x00\x00\x00\x00mp42mp41isomiso2'
 
     def chainfunc(self, pad, buffer):
         if self.proxy:
@@ -91,7 +88,7 @@ class FakeTransformer(Gst.Element, log.LogAble):
         if not self.buffer_size:
             try:
                 self.buffer_size, a_type = \
-                    struct.unpack(">L4s", self.buffer[:8])
+                    struct.unpack('>L4s', self.buffer[:8])
             except Exception:
                 return Gst.FlowReturn.OK
 
@@ -115,7 +112,7 @@ class DataSink(Gst.Element, log.LogAble):
     logCategory = 'transcoder_datasink'
 
     _sinkpadtemplate = Gst.PadTemplate.new(
-        "sinkpadtemplate",
+        'sinkpadtemplate',
         Gst.PadDirection.SINK,
         Gst.PadPresence.ALWAYS,
         Gst.Caps.new_any())
@@ -124,7 +121,7 @@ class DataSink(Gst.Element, log.LogAble):
         Gst.Element.__init__(self)
         log.LogAble.__init__(self)
         self.sinkpad = Gst.Pad.new_from_template(
-            self._sinkpadtemplate, "sink")
+            self._sinkpadtemplate, 'sink')
         self.add_pad(self.sinkpad)
 
         self.sinkpad.set_chain_function_full(self.chainfunc)
@@ -195,18 +192,18 @@ class GStreamerPipeline(resource.Resource, log.LogAble):
 
     def parse_pipeline(self):
         self.pipeline = Gst.parse_launch(self.pipeline_description)
-        self.appsink = Gst.ElementFactory.make("appsink", "sink")
+        self.appsink = Gst.ElementFactory.make('appsink', 'sink')
         self.appsink.set_property('emit-signals', True)
         self.pipeline.add(self.appsink)
-        enc = self.pipeline.get_by_name("enc")
+        enc = self.pipeline.get_by_name('enc')
         enc.link(self.appsink)
-        self.appsink.connect("new-preroll", self.new_preroll)
-        self.appsink.connect("new-buffer", self.new_buffer)
-        self.appsink.connect("eos", self.eos)
+        self.appsink.connect('new-preroll', self.new_preroll)
+        self.appsink.connect('new-buffer', self.new_buffer)
+        self.appsink.connect('eos', self.eos)
 
     def start(self, request=None):
-        self.info("GStreamerPipeline start %r %r", request,
-                  self.pipeline_description)
+        self.info(
+            f'GStreamerPipeline start {request} {self.pipeline_description}')
         self.requests.append(request)
         self.pipeline.set_state(Gst.State.PLAYING)
 
@@ -214,21 +211,21 @@ class GStreamerPipeline(resource.Resource, log.LogAble):
         d.addBoth(self.requestFinished, request)
 
     def new_preroll(self, appsink):
-        self.debug("new preroll")
+        self.debug('new preroll')
         buffer = appsink.emit('pull-preroll')
         if not self.streamheader:
             # check caps for streamheader buffer
             caps = buffer.get_caps()
             s = caps[0]
-            if "streamheader" in s:
-                self.streamheader = s["streamheader"]
-                self.debug("setting streamheader")
+            if 'streamheader' in s:
+                self.streamheader = s['streamheader']
+                self.debug('setting streamheader')
                 for r in self.requests:
-                    self.debug("writing streamheader")
+                    self.debug('writing streamheader')
                     for h in self.streamheader:
                         r.write(h.data)
         for r in self.requests:
-            self.debug("writing preroll")
+            self.debug('writing preroll')
             r.write(buffer.data)
 
     def new_buffer(self, appsink):
@@ -237,28 +234,28 @@ class GStreamerPipeline(resource.Resource, log.LogAble):
             # check caps for streamheader buffers
             caps = buffer.get_caps()
             s = caps[0]
-            if "streamheader" in s:
-                self.streamheader = s["streamheader"]
-                self.debug("setting streamheader")
+            if 'streamheader' in s:
+                self.streamheader = s['streamheader']
+                self.debug('setting streamheader')
                 for r in self.requests:
-                    self.debug("writing streamheader")
+                    self.debug('writing streamheader')
                     for h in self.streamheader:
                         r.write(h.data)
         for r in self.requests:
             r.write(buffer.data)
 
     def eos(self, appsink):
-        self.info("eos")
+        self.info('eos')
         for r in self.requests:
             r.finish()
         self.cleanup()
 
     def getChild(self, name, request):
-        self.info('getChild %s, %s', name, request)
+        self.info(f'getChild {name}, {request}')
         return self
 
     def render_GET(self, request):
-        self.info('render GET %r', request)
+        self.info(f'render GET {request}')
         request.setResponseCode(200)
         if hasattr(self, 'contentType'):
             request.setHeader(b'Content-Type', self.contentType)
@@ -270,7 +267,7 @@ class GStreamerPipeline(resource.Resource, log.LogAble):
             pass
         if self.requests:
             if self.streamheader:
-                self.debug("writing streamheader")
+                self.debug('writing streamheader')
                 for h in self.streamheader:
                     request.write(h.data)
             self.requests.append(request)
@@ -280,15 +277,14 @@ class GStreamerPipeline(resource.Resource, log.LogAble):
         return server.NOT_DONE_YET
 
     def render_HEAD(self, request):
-        self.info('render HEAD %r', request)
+        self.info(f'render HEAD {request}')
         request.setResponseCode(200)
         request.setHeader(b'Content-Type', self.contentType)
         request.write(b'')
 
     def requestFinished(self, result, request):
-        self.info("requestFinished %r", result)
-        """ we need to find a way to destroy the pipeline here
-        """
+        self.info(f'requestFinished {result}')
+        # TODO: we need to find a way to destroy the pipeline here
         # from twisted.internet import reactor
         # reactor.callLater(0, self.pipeline.set_state, Gst.State.NULL)
         self.requests.remove(request)
@@ -297,16 +293,16 @@ class GStreamerPipeline(resource.Resource, log.LogAble):
 
     def on_message(self, bus, message):
         t = message.type
-        print("on_message", t)
+        print('on_message', t)
         if t == Gst.Message.ERROR:
             # err, debug = message.parse_error()
-            # print "Error: %s" % err, debug
+            # print(f'Error: {err}', debug)
             self.cleanup()
         elif t == Gst.Message.EOS:
             self.cleanup()
 
     def cleanup(self):
-        self.info("pipeline cleanup")
+        self.info('pipeline cleanup')
         self.pipeline.set_state(Gst.State.NULL)
         self.requests = []
         self.streamheader = None
@@ -325,14 +321,14 @@ class BaseTranscoder(resource.Resource, log.LogAble):
         self.pipeline = None
         resource.Resource.__init__(self)
         log.LogAble.__init__(self)
-        self.info('uri %s %r', uri, type(uri))
+        self.info(f'uri {uri} {type(uri)}')
 
     def getChild(self, name, request):
-        self.info('getChild %s, %s', name, request)
+        self.info(f'getChild {name}, {request}')
         return self
 
     def render_GET(self, request):
-        self.info('render GET %r', request)
+        self.info(f'render GET {request}')
         request.setResponseCode(200)
         if self.contentType is not None:
             request.setHeader(b'Content-Type', self.contentType)
@@ -347,25 +343,25 @@ class BaseTranscoder(resource.Resource, log.LogAble):
         return server.NOT_DONE_YET
 
     def render_HEAD(self, request):
-        self.info('render HEAD %r', request)
+        self.info(f'render HEAD {request}')
         request.setResponseCode(200)
         request.setHeader(b'Content-Type', self.contentType)
         request.write(b'')
 
     def requestFinished(self, result):
-        self.info("requestFinished %r", result)
-        """ we need to find a way to destroy the pipeline here
-        """
+        self.info(f'requestFinished {result}')
+        ''' we need to find a way to destroy the pipeline here
+        '''
         # from twisted.internet import reactor
         # reactor.callLater(0, self.pipeline.set_state, Gst.State.NULL)
         GObject.idle_add(self.cleanup)
 
     def on_message(self, bus, message):
         t = message.type
-        print("on_message", t)
+        print('on_message', t)
         if t == Gst.Message.ERROR:
             # err, debug = message.parse_error()
-            # print "Error: %s" % err, debug
+            # print(f'Error: {err}', debug)
             self.cleanup()
         elif t == Gst.Message.EOS:
             self.cleanup()
@@ -374,8 +370,8 @@ class BaseTranscoder(resource.Resource, log.LogAble):
         self.pipeline.set_state(Gst.State.NULL)
 
     def start(self, request=None):
-        """This method should be sub classed for each
-        class which inherits from BaseTranscoder"""
+        '''This method should be sub classed for each
+        class which inherits from BaseTranscoder'''
         pass
 
 
@@ -384,17 +380,17 @@ class PCMTranscoder(BaseTranscoder, InternalTranscoder):
     name = 'lpcm'
 
     def start(self, request=None):
-        self.info("PCMTranscoder start %r %r", request, self.uri)
+        self.info(f'PCMTranscoder start {request} {self.uri}')
         self.pipeline = Gst.parse_launch(
-            "%s ! decodebin ! audioconvert name=conv" % self.uri)
+            f'{self.uri} ! decodebin ! audioconvert name=conv')
 
         conv = self.pipeline.get_by_name('conv')
         caps = Gst.Caps.from_string(
-            "audio/x-raw-int,rate=44100,endianness=4321,"
-            "channels=2,width=16,depth=16,signed=true")
+            'audio/x-raw-int,rate=44100,endianness=4321,'
+            'channels=2,width=16,depth=16,signed=true')
         # FIXME: UGLY. 'filter' is a python builtin!
-        filter = Gst.ElementFactory.make("capsfilter", "filter")
-        filter.set_property("caps", caps)
+        filter = Gst.ElementFactory.make('capsfilter', 'filter')
+        filter.set_property('caps', caps)
         self.pipeline.add(filter)
         conv.link(filter)
 
@@ -412,9 +408,9 @@ class WAVTranscoder(BaseTranscoder, InternalTranscoder):
     name = 'wav'
 
     def start(self, request=None):
-        self.info("start %r", request)
+        self.info(f'start {request}')
         self.pipeline = Gst.parse_launch(
-            "%s ! decodebin ! audioconvert ! wavenc name=enc" % self.uri)
+            f'{self.uri} ! decodebin ! audioconvert ! wavenc name=enc')
         enc = self.pipeline.get_by_name('enc')
         sink = DataSink(destination=self.destination, request=request)
         self.pipeline.add(sink)
@@ -432,9 +428,9 @@ class MP3Transcoder(BaseTranscoder, InternalTranscoder):
     name = 'mp3'
 
     def start(self, request=None):
-        self.info("start %r", request)
+        self.info(f'start {request}')
         self.pipeline = Gst.parse_launch(
-            "%s ! decodebin ! audioconvert ! lame name=enc" % self.uri)
+            f'{self.uri} ! decodebin ! audioconvert ! lame name=enc')
         enc = self.pipeline.get_by_name('enc')
         sink = DataSink(destination=self.destination, request=request)
         self.pipeline.add(sink)
@@ -446,17 +442,17 @@ class MP3Transcoder(BaseTranscoder, InternalTranscoder):
 
 
 class MP4Transcoder(BaseTranscoder, InternalTranscoder):
-    """ Only works if H264 inside Quicktime/MP4 container is input
+    ''' Only works if H264 inside Quicktime/MP4 container is input
         Source has to be a valid uri
-    """
+    '''
     contentType = 'video/mp4'
     name = 'mp4'
 
     def start(self, request=None):
-        self.info("start %r", request)
+        self.info(f'start {request}')
         self.pipeline = Gst.parse_launch(
-            "%s ! qtdemux name=d ! queue ! h264parse ! "
-            "mp4mux name=mux d. ! queue ! mux." % self.uri)
+            f'{self.uri} ! qtdemux name=d ! queue ! h264parse '
+            f'! mp4mux name=mux d. ! queue ! mux.')
         mux = self.pipeline.get_by_name('mux')
         sink = DataSink(destination=self.destination, request=request)
         self.pipeline.add(sink)
@@ -472,12 +468,12 @@ class MP2TSTranscoder(BaseTranscoder, InternalTranscoder):
     name = 'mpegts'
 
     def start(self, request=None):
-        self.info("start %r", request)
+        self.info(f'start {request}')
         # FIXME - mpeg2enc
         self.pipeline = Gst.parse_launch(
-            "mpegtsmux name=mux %s ! decodebin2 name=d ! queue ! "
-            "ffmpegcolorspace ! mpeg2enc ! queue ! mux. d. ! "
-            "queue ! audioconvert ! twolame ! queue ! mux." % self.uri)
+            f'mpegtsmux name=mux {self.uri} ! decodebin2 name=d ! queue '
+            f'! ffmpegcolorspace ! mpeg2enc ! queue ! mux. d. '
+            f'! queue ! audioconvert ! twolame ! queue ! mux.')
         enc = self.pipeline.get_by_name('mux')
         sink = DataSink(destination=self.destination, request=request)
         self.pipeline.add(sink)
@@ -489,15 +485,17 @@ class MP2TSTranscoder(BaseTranscoder, InternalTranscoder):
 
 
 class ThumbTranscoder(BaseTranscoder, InternalTranscoder):
-    """ should create a valid thumbnail according to the DLNA spec
-        neither width nor height must exceed 160px
-    """
+    '''
+    Should create a valid thumbnail according to the DLNA spec
+
+    .. warning:: Neither width nor height must exceed 160px
+    '''
     contentType = 'image/jpeg'
     name = 'thumb'
 
     def start(self, request=None):
-        self.info("start %r", request)
-        """
+        self.info(f'start {request}')
+        '''
         # what we actually want here is a pipeline that calls
         # us when it knows about the size of the original image,
         # and allows us now to adjust the caps-filter with the
@@ -513,22 +511,20 @@ class ThumbTranscoder(BaseTranscoder, InternalTranscoder):
         elif original_height > 160:
             new_width = \
                 int(float(original_width) * (160.0/float(original_height)))
-        """
+        '''
         try:
             type = request.args['type'][0]
         except IndexError:
             type = 'jpeg'
         if type == 'png':
             self.pipeline = Gst.parse_launch(
-                "%s ! decodebin2 ! videoscale ! "
-                "video/x-raw-yuv,width=160,height=160 ! pngenc name=enc" %
-                self.uri)
+                f'{self.uri} ! decodebin2 ! videoscale '
+                f'! video/x-raw-yuv,width=160,height=160 ! pngenc name=enc')
             self.contentType = 'image/png'
         else:
             self.pipeline = Gst.parse_launch(
-                "%s ! decodebin2 ! videoscale ! "
-                "video/x-raw-yuv,width=160,height=160 ! jpegenc name=enc" %
-                self.uri)
+                f'{self.uri} ! decodebin2 ! videoscale '
+                f'! video/x-raw-yuv,width=160,height=160 ! jpegenc name=enc')
             self.contentType = 'image/jpeg'
         enc = self.pipeline.get_by_name('enc')
         sink = DataSink(destination=self.destination, request=request)
@@ -541,23 +537,23 @@ class ThumbTranscoder(BaseTranscoder, InternalTranscoder):
 
 
 class GStreamerTranscoder(BaseTranscoder):
-    """ a generic Transcode based on GStreamer
+    '''
+    A generic Transcoder based on GStreamer.
+    '''
 
-        the pipeline which will be parsed upon
-        calling the start method, as to be set as
-        the attribute pipeline_description to the
-        instantiated class
-
-        same for the attribute contentType
-    """
     pipeline_description = None
+    '''
+    The pipeline which will be parsed upon calling the start method,
+    has to be set as the attribute :attr:`pipeline_description` to
+    the instantiated class.
+    '''
 
     def start(self, request=None):
         if self.pipeline_description is None:
             raise NotImplementedError(
-                "Warning: operation cancelled. You must set a value for "
-                "GStreamerTranscoder.pipeline_description")
-        self.info("start %r", request)
+                'Warning: operation cancelled. You must set a value for '
+                'GStreamerTranscoder.pipeline_description')
+        self.info(f'start {request}')
         self.pipeline = Gst.parse_launch(self.pipeline_description % self.uri)
         enc = self.pipeline.get_by_name('mux')
         sink = DataSink(destination=self.destination, request=request)
@@ -575,31 +571,31 @@ class ExternalProcessProtocol(protocol.ProcessProtocol):
         self.caller = caller
 
     def connectionMade(self):
-        print("pp connection made")
+        print('pp connection made')
 
     def outReceived(self, data):
-        # print "outReceived with %d bytes!" % len(data)
+        # print(f'outReceived with {len(data):d} bytes!')
         self.caller.write_data(data)
 
     def errReceived(self, data):
-        # print "errReceived! with %d bytes!" % len(data)
-        print("pp (err):", data.strip())
+        # print(f'errReceived! with {len(data):d} bytes!')
+        print('pp (err):', data.strip())
 
     def inConnectionLost(self):
-        # print "inConnectionLost! stdin is closed! (we probably did it)"
+        # print('inConnectionLost! stdin is closed! (we probably did it)')
         pass
 
     def outConnectionLost(self):
-        # print "outConnectionLost! The child closed their stdout!"
+        # print('outConnectionLost! The child closed their stdout!')
         pass
 
     def errConnectionLost(self):
-        # print "errConnectionLost! The child closed their stderr."
+        # print('errConnectionLost! The child closed their stderr.')
         pass
 
     def processEnded(self, status_object):
-        print("processEnded, status %d" % status_object.value.exitCode)
-        print("processEnded quitting")
+        print(f'processEnded, status {status_object.value.exitCode:d}')
+        print('processEnded quitting')
         self.caller.ended = True
         self.caller.write_data('')
 
@@ -618,19 +614,19 @@ class ExternalProcessProducer(object):
 
     def write_data(self, data):
         if data:
-            # print "write %d bytes of data" % len(data)
+            # print(f'write {len(data):d} bytes of data')
             self.written += len(data)
             # this .write will spin the reactor, calling .doWrite and then
             # .resumeProducing again, so be prepared for a re-entrant call
             self.request.write(data)
         if self.request and self.ended:
-            print("closing")
+            print('closing')
             self.request.unregisterProducer()
             self.request.finish()
             self.request = None
 
     def resumeProducing(self):
-        # print "resumeProducing", self.request
+        # print('resumeProducing', self.request)
         if not self.request:
             return
         if self.process is None:
@@ -645,7 +641,7 @@ class ExternalProcessProducer(object):
         pass
 
     def stopProducing(self):
-        print("stopProducing", self.request)
+        print('stopProducing', self.request)
         self.request.unregisterProducer()
         self.process.loseConnection()
         self.request.finish()
@@ -667,11 +663,11 @@ class ExternalProcessPipeline(resource.Resource, log.LogAble):
         return self
 
     def render(self, request):
-        print("ExternalProcessPipeline render")
+        print('ExternalProcessPipeline render')
         if self.pipeline_description is None:
             raise NotImplementedError(
-                "Warning: operation cancelled. You must set a value for "
-                "ExternalProcessPipeline.pipeline_description")
+                'Warning: operation cancelled. You must set a value for '
+                'ExternalProcessPipeline.pipeline_description')
         if self.contentType is not None:
             request.setHeader(b'Content-Type', self.contentType)
 
@@ -690,23 +686,22 @@ def transcoder_class_wrapper(klass, content_type, pipeline):
 
 
 class TranscoderManager(log.LogAble):
-    """ singleton class which holds information
-        about all available transcoders
+    '''
+    Singleton class which holds information about all available transcoders.
+    They are put into a transcoders dict with their id as the key.
 
-        they are put into a transcoders dict with
-        their id as the key
+    We collect all internal transcoders by searching for all subclasses of
+    InternalTranscoder, the class will be the value.
 
-        we collect all internal transcoders by searching
-        for all subclasses of InternalTranscoder, the class
-        will be the value
+    Transcoders defined in the config are parsed and stored as a dict in the
+    transcoders dict.
 
-        transcoders defined in the config are parsed and
-        stored as a dict in the transcoders dict
+    In the config, a transcoder description has to look like this:
 
-        in the config a transcoder description has to look like this:
+    *** preliminary, will be extended and
+    might even change without further notice ***
 
-        *** preliminary, will be extended and
-        might even change without further notice ***
+    .. code-block:: xml
 
         <transcoder>
             <pipeline>%s ...</pipeline> <!-- we need a %s here to insert the
@@ -722,13 +717,13 @@ class TranscoderManager(log.LogAble):
                                             '*' -->
         </transcoder>
 
-    """
+    '''
 
     logCategory = 'transcoder_manager'
     _instance_ = None  # Singleton
 
     def __new__(cls, *args, **kwargs):
-        """ creates the singleton """
+        '''Creates the singleton.'''
         if cls._instance_ is None:
             obj = super(TranscoderManager, cls).__new__(cls)
             if 'coherence' in kwargs:
@@ -737,12 +732,13 @@ class TranscoderManager(log.LogAble):
         return cls._instance_
 
     def __init__(self, coherence=None):
-        """ initializes the class
+        '''
+        Initializes the class :class:`TranscoderManager`.
 
-            it should be called at least once
-            with the main coherence class passed as an argument,
-            so we have access to the config
-        """
+        It should be called at least once with the main
+        :class:`~coherence.base.Coherence` class passed as an argument,
+        so we have access to the config.
+        '''
         log.LogAble.__init__(self)
         self.transcoders = {}
         for transcoder in InternalTranscoder.__subclasses__():
@@ -761,16 +757,16 @@ class TranscoderManager(log.LogAble):
                 # FIXME: is anyone checking if all keys are given ?
                 pipeline = transcoder['pipeline']
                 if '%s' not in pipeline:
-                    self.warning("Can't create transcoder %r:"
-                                 " missing placehoder '%%s' in 'pipeline'",
+                    self.warning('Can\'t create transcoder %r:'
+                                 ' missing placehoder \'%%s\' in \'pipeline\'',
                                  transcoder)
                     continue
 
                 try:
                     transcoder_name = transcoder['name']  # .decode('ascii')
                 except UnicodeEncodeError:
-                    self.warning("Can't create transcoder %r:"
-                                 " the 'name' contains non-ascii letters",
+                    self.warning('Can\'t create transcoder %r:'
+                                 ' the \'name\' contains non-ascii letters',
                                  transcoder)
                     continue
 
@@ -785,23 +781,24 @@ class TranscoderManager(log.LogAble):
                                                        transcoder['target'],
                                                        transcoder['pipeline'])
                 else:
-                    self.warning("unknown transcoder type %r", transcoder_type)
+                    self.warning(
+                        f'unknown transcoder type {transcoder_type}')
                     continue
 
                 self.transcoders[transcoder_name] = wrapped
 
         # FIXME reduce that to info later
-        self.warning("available transcoders %r", self.transcoders)
+        self.warning(f'available transcoders {self.transcoders}')
 
     def select(self, name, uri, backend=None):
         # FIXME:why do we specify the name when trying to get it?
 
         if backend is not None:
-            """ try to find a transcoder provided by the backend
+            ''' try to find a transcoder provided by the backend
                 and return that here,
                 if there isn't one continue with the ones
                 provided by the config or the internal ones
-            """
+            '''
             pass
 
         transcoder = self.transcoders[name](uri)
