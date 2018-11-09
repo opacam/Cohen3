@@ -23,10 +23,10 @@ initializing :class:`~coherence.base.Coherence`
 .. warning:: Don't create your web server into port 9000. This is reserved for
              the js WebSocket.
 
-Examples
---------
+WebUi Example
+-------------
 
-Example of a simple server with web-ui enabled::
+A simple server with *web-ui* enabled::
 
     from coherence.base import Coherence
     from coherence.upnp.core.uuid import UUID
@@ -426,7 +426,7 @@ class Web(object):
     Args:
         coherence (object): An instance of `~coherence.base.Coherence`
 
-     .. note:: See :class:`~coherence.base.WebServerUi' for usage.
+     .. note:: See :class:`~coherence.base.WebServerUi` for usage.
     '''
     def __init__(self, coherence):
         super(Web, self).__init__()
