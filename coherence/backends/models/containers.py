@@ -19,12 +19,13 @@ containers.
 We also provide some more containers:
 
     - :class:`BackendMusicAlbum`: Container which will contain audio items
-        from an album
+      from an album
     - :class:`BackendBasePlaylist`: Container which will contain items to be
-        played
+      played
 
 .. note:: To write this module, some of the the old backends has been taken
           as a reference:
+
               - :mod:`~coherence.backends.appletrailers_storage`
               - :mod:`~coherence.backends.lolcats_storage`
               - :mod:`~coherence.backends.banshee_storage`
@@ -47,6 +48,7 @@ class BackendContainer(Container):
     backend. It is almost the same as a :class:`~coherence.backend.Container`
     but with some slight differences that will make easier to create an
     inherited class form BackendContainer:
+
         - The arguments to initialize the BackendContainer are
         - When we initialize the BackendContainer we also create an attribute
           item whim will be of :class:`~coherence.upnp.core.DIDLLite.Container`

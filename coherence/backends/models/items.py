@@ -13,27 +13,33 @@ Backend items to be used directly or subclassed. This classes inherits from
 basic needs for different types of media and goes one step further from the
 :mod:`~coherence.backend` by initializing the corresponding DIDLLite object.
 
-- For video backends:
+* For video backends:
+
     - :class:`BackendVideoItem`: item representing a video resource
 
-- For audio backends:
+* For audio backends:
+
     - :class:`BackendAudioItem`: item representing a audio resource
     - :class:`BackendMusicTrackItem`: item representing an audio resource
 
-- For image/photo backends:
+* For image/photo backends:
+
     - :class:`BackendImageItem`: item representing a image resource
     - :class:`BackendPhotoItem`: item representing a photo resource
 
-- For create a custom backend:
-    If the items described above does not meet your needs, you can subclass
-    them or you may use the base class :class:`BackendBaseItem`, used to
-    develop all those backend items described above.
+* For create a custom backend:
 
-.. note:: To write this module, some of the the old backends has been taken
-          as a reference:
-              - :mod:`~coherence.backends.appletrailers_storage`
-              - :mod:`~coherence.backends.banshee_storage`
-              - :mod:`~coherence.backends.fs_storage`
+    - If the items described above does not meet your needs, you can subclass
+      them or you may use the base class :class:`BackendBaseItem`, used to
+      develop all those backend items described above.
+
+.. note::
+    To write this module, some of the the old backends has been taken
+    as a reference:
+
+        - :mod:`~coherence.backends.appletrailers_storage`
+        - :mod:`~coherence.backends.banshee_storage`
+        - :mod:`~coherence.backends.fs_storage`
 
 .. warning:: Be aware that we use super to initialize all the classes of this
              module in order to have a better MRO class resolution...so...take
