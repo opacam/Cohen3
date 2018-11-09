@@ -3,13 +3,144 @@
 
 # Copyright 2005, Tim Potter <tpot@samba.org>
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
-"""
-TODO:
+'''
+DIDLLite
+========
 
-- use more XPath expressions in fromElement() methods
+Different classes and methods used to represent atomic content objects for
+DIDL (Digital Item Declaration Language)
 
-"""
+.. note:: For more information about DIDL you can check the
+          `wikipedia entry <https://en.wikipedia.org/wiki/Digital_Item>`_.
+
+:class:`Resources`
+------------------
+A list of resources, always sorted after an append
+
+:class:`Resource`
+-----------------
+An object representing a resource.
+
+:class:`PlayContainerResource`
+------------------------------
+An object representing a DLNA play container resource.
+
+:class:`Object`
+---------------
+The root class of the entire content directory class hierarchy.
+
+:class:`~coherence.upnp.core.DIDLLite.Item`
+-------------------------------------------
+A class used to represent atomic (non-container) content objects.
+
+:class:`ImageItem`
+------------------
+An item class which represents a image.
+
+:class:`Photo`
+--------------
+An item class which represents a photo.
+
+:class:`AudioItem`
+------------------
+An item class which represents a audio.
+
+:class:`MusicTrack`
+-------------------
+An item class which represents a music track.
+
+:class:`AudioBroadcast`
+-----------------------
+An item class which represents a audio broadcast.
+
+:class:`AudioBook`
+------------------
+An item class which represents a audio book.
+
+:class:`VideoItem`
+------------------
+An item class which represents a video.
+
+:class:`Movie`
+--------------
+An item class which represents a movie.
+
+:class:`VideoBroadcast`
+-----------------------
+An item class which represents a video broadcast.
+
+:class:`MusicVideoClip`
+-----------------------
+An item class which represents a music video clip.
+
+:class:`PlayListItem`
+---------------------
+An item class which represents a play list.
+
+:class:`TextItem`
+-----------------
+An item class which represents a text.
+
+:class:`~coherence.upnp.core.DIDLLite.Container`
+------------------------------------------------
+An object that can contain other objects.
+
+:class:`Person`
+---------------
+An container class which represents a Person.
+
+:class:`MusicArtist`
+--------------------
+An container class which represents a Music Artist.
+
+:class:`PlaylistContainer`
+--------------------------
+An container class which represents a Play List.
+
+:class:`Album`
+--------------
+An container class which represents a generic Album.
+
+:class:`MusicAlbum`
+-------------------
+An container class which represents a Music Album.
+
+:class:`PhotoAlbum`
+-------------------
+An container class which represents a Photo Album.
+
+:class:`Genre`
+--------------
+An container class which represents a generic genre.
+
+:class:`MusicGenre`
+-------------------
+An container class which represents a Music genre.
+
+:class:`MovieGenre`
+-------------------
+An container class which represents a Movie genre.
+
+:class:`StorageSystem`
+----------------------
+An container class which represents a Storage System.
+
+:class:`StorageVolume`
+----------------------
+An container class which represents a Storage Volume.
+
+:class:`StorageFolder`
+----------------------
+An container class which represents a Storage Folder.
+
+:class:`DIDLElement`
+--------------------
+Our element for DIDL (Digital Item Declaration Language).
+'''
+# TODO: use more XPath expressions in fromElement() methods
+
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -26,14 +157,12 @@ from . import xml_constants
 def qname(tag, ns=None):
     if not ns:
         return tag
-    return "{%s}%s" % (ns, tag)
+    return f'{{{ns}}}{tag}'
 
 
 def is_audio(mimetype):
-    """ checks for type audio,
-        expects a mimetype or an UPnP
-        protocolInfo
-    """
+    '''Checks for type audio, expects a
+    mimetype or an UPnP protocolInfo.'''
     test = mimetype.split(':')
     if len(test) == 4:
         mimetype = test[2]
@@ -45,10 +174,8 @@ def is_audio(mimetype):
 
 
 def is_video(mimetype):
-    """ checks for type video,
-        expects a mimetype or an UPnP
-        protocolInfo
-    """
+    '''Checks for type video, expects a
+    mimetype or an UPnP protocolInfo.'''
     test = mimetype.split(':')
     if len(test) == 4:
         mimetype = test[2]
@@ -58,7 +185,7 @@ def is_video(mimetype):
 
 
 class Resources(list):
-    """ a list of resources, always sorted after an append """
+    '''A list of resources, always sorted after an append.'''
 
     def __init__(self):
         super(Resources, self).__init__()
@@ -69,11 +196,9 @@ class Resources(list):
         self.sort(key=cmp_to_key(self.p_sort))
 
     def p_sort(self, x, y):
-        """ we want the following order
-            http-get is always at the beginning
-            rtsp-rtp-udp the second
-            anything else after that
-        """
+        '''We want the following order: http-get is always
+        at the beginning, rtsp-rtp-udp the second and
+        anything else after that.'''
         if x.protocolInfo is None:
             return 1
         if y.protocolInfo is None:
@@ -101,10 +226,10 @@ class Resources(list):
         for res in self:
             if res.importUri is not None:
                 continue
-            # print "res", res.protocolInfo, res.data
+            # print('res', res.protocolInfo, res.data)
             remote_protocol, remote_network, remote_content_format, _ = \
                 res.protocolInfo.split(':')
-            # print("remote", remote_protocol,
+            # print('remote', remote_protocol,
             #       remote_network,remote_content_format)
             if (protocol_type is not None and
                     remote_protocol.lower() != protocol_type.lower()):
@@ -112,7 +237,7 @@ class Resources(list):
             for protocol_info in local_protocol_infos:
                 local_protocol, local_network, local_content_format, _ = \
                     protocol_info.split(':')
-                # print("local", local_protocol,
+                # print('local', local_protocol,
                 #       local_network,local_content_format)
                 if (remote_protocol == local_protocol or
                     remote_protocol == '*' or local_protocol == '*') and \
@@ -199,14 +324,14 @@ def build_dlna_additional_info(content_format, does_playcontainer=False):
                 _, bits = part.split('=')
                 bits = int(bits, 16)
                 bits |= 0x10000000000000000000000000000000
-                additional_info[i] = 'DLNA.ORG_FLAGS=%.32x' % bits
+                additional_info[i] = f'DLNA.ORG_FLAGS={bits:.32x}'
                 break
             i += 1
     return ';'.join(additional_info)
 
 
 class Resource(object):
-    """An object representing a resource."""
+    '''An object representing a resource.'''
 
     def __init__(self, data=None, protocol_info=None):
         if not isinstance(data, bytes):
@@ -241,9 +366,8 @@ class Resource(object):
         protocol, network, content_format, additional_info = \
             self.protocolInfo.split(':')
         if upnp_client in ('XBox', 'Philips-TV',):
-            """ we don't need the DLNA tags there,
-                and maybe they irritate these poor things anyway
-            """
+            # we don't need the DLNA tags there,
+            # and maybe they irritate these poor things anyway
             additional_info = '*'
         elif upnp_client in ('PLAYSTATION3',):
             if content_format.startswith('video/'):
@@ -348,7 +472,7 @@ class Resource(object):
         new_protocol_info = ':'.join(
             (protocol, network, content_format, additional_info))
 
-        new_res = Resource(self.data + '/transcoded/%s' % format,
+        new_res = Resource(self.data + f'/transcoded/{format}',
                            new_protocol_info)
         new_res.size = None
         new_res.duration = self.duration
@@ -357,7 +481,7 @@ class Resource(object):
 
 
 class PlayContainerResource(Resource):
-    """An object representing a DLNA playcontainer resource."""
+    '''An object representing a DLNA play container resource.'''
 
     def __init__(self, udn,
                  sid='urn:upnp-org:serviceId:ContentDirectory',
@@ -386,7 +510,7 @@ class PlayContainerResource(Resource):
 
 
 class Object(log.LogAble):
-    """The root class of the entire content directory class heirachy."""
+    '''The root class of the entire content directory class hierarchy.'''
 
     logCategory = 'didllite'
 
@@ -452,13 +576,13 @@ class Object(log.LogAble):
                 except IndexError:
                     pass
                 if kwargs.get('upnp_client', '') != 'XBox':
-                    self.info("Changing ID from %r to %r, with parentID %r",
-                              root.attrib['refID'], root.attrib['id'],
-                              root.attrib['parentID'])
+                    self.info(f'Changing ID from {root.attrib["refID"]} to '
+                              f'{root.attrib["id"]}, with parentID '
+                              f'{root.attrib["parentID"]}')
                 else:
-                    self.info("Changing ID from %r to %r, with parentID %r",
-                              self.id, root.attrib['id'],
-                              root.attrib['parentID'])
+                    self.info(
+                        f'Changing ID from {self.id} to {root.attrib["id"]}, '
+                        f'with parentID {root.attrib["parentID"]}')
         elif kwargs.get('parent_container', None):
             if (kwargs.get('parent_container') != '0' and
                     kwargs.get('parent_container') != root.attrib['parentID']):
@@ -469,16 +593,14 @@ class Object(log.LogAble):
                 root.attrib['parentID'] = kwargs.get('parent_container')
                 if kwargs.get('upnp_client', '') != 'XBox':
                     self.info(
-                        "Changing ID from %r to %r, "
-                        "with parentID from %r to %r",
-                        root.attrib['refID'], root.attrib['id'], self.parentID,
-                        root.attrib['parentID'])
+                        f'Changing ID from {root.attrib["refID"]} to '
+                        f'{root.attrib["id"]}, with parentID from '
+                        f'{self.parentID} to {root.attrib["parentID"]}')
                 else:
                     self.info(
-                        "Changing ID from %r to %r, "
-                        "with parentID from %r to %r",
-                        self.id, root.attrib['id'], self.parentID,
-                        root.attrib['parentID'])
+                        f'Changing ID from {self.id} to {root.attrib["id"]}, '
+                        f'with parentID from {self.parentID} to '
+                        f'{root.attrib["parentID"]}')
 
         etree.SubElement(
             root, qname('class', xml_constants.UPNP_NS)).text = self.upnp_class
@@ -569,11 +691,9 @@ class Object(log.LogAble):
                               encoding='utf-8').decode('utf-8')
 
     def fromElement(self, elt):
-        """
-        TODO:
-         * creator
-         * writeStatus
-        """
+        # TODO:
+        #  * creator
+        #  * writeStatus
         self.elementName = elt.tag
         self.id = elt.attrib.get('id', None)
         self.parentID = elt.attrib.get('parentID', None)
@@ -625,8 +745,8 @@ class Object(log.LogAble):
 
 
 class Item(Object):
-    """A class used to represent atomic (non-container) content
-    objects."""
+    '''A class used to represent atomic (non-container) content
+    objects.'''
 
     upnp_class = Object.upnp_class + '.item'
     elementName = 'item'
@@ -748,7 +868,7 @@ class Photo(ImageItem):
 
 
 class AudioItem(Item):
-    """A piece of content that when rendered generates some audio."""
+    '''A piece of content that when rendered generates some audio.'''
 
     upnp_class = Item.upnp_class + '.audioItem'
 
@@ -795,7 +915,7 @@ class AudioItem(Item):
 
 
 class MusicTrack(AudioItem):
-    """A discrete piece of audio that should be interpreted as music."""
+    '''A discrete piece of audio that should be interpreted as music.'''
 
     upnp_class = AudioItem.upnp_class + '.musicTrack'
 
@@ -851,7 +971,7 @@ class VideoItem(Item):
         for attr_name, ns in self.valid_attrs.items():
             value = getattr(self, attr_name, None)
             if value:
-                self.debug("Setting value {%s}%s=%s", ns, attr_name, value)
+                self.debug(f'Setting value {{{ns}}}{attr_name}={value}')
                 etree.SubElement(root, qname(attr_name, ns)).text = value
 
         return root
@@ -896,7 +1016,7 @@ class TextItem(Item):
 
 
 class Container(Object):
-    """An object that can contain other objects."""
+    '''An object that can contain other objects.'''
 
     upnp_class = Object.upnp_class + '.container'
 
@@ -1053,9 +1173,8 @@ class DIDLElement(log.LogAble):
         return self._items
 
     def toString(self):
-        """ sigh - having that optional preamble here
-            breaks some of the older ContentDirectoryClients
-        """
+        # sigh - having that optional preamble here
+        # breaks some of the older ContentDirectoryClients
         return etree.tostring(self.element, encoding='utf-8',
                               pretty_print=True).decode('utf-8')
 
@@ -1063,7 +1182,7 @@ class DIDLElement(log.LogAble):
         try:
             return upnp_classes[name]()
         except KeyError:
-            self.warning("upnp_class %r not found, trying fallback", name)
+            self.warning(f'upnp_class {name} not found, trying fallback')
             parts = name.split('.')
             parts.pop()
             while len(parts) > 1:
@@ -1072,7 +1191,7 @@ class DIDLElement(log.LogAble):
                 except KeyError:
                     parts.pop()
 
-        self.warning("WTF - no fallback for upnp_class %r found ?!?", name)
+        self.warning(f'WTF - no fallback for upnp_class {name} found ?!?')
         return None
 
     @classmethod
@@ -1081,7 +1200,7 @@ class DIDLElement(log.LogAble):
         elt = etree.fromstring(data)
         for node in elt.getchildren():
             upnp_class_name = node.findtext(
-                '{%s}class' % 'urn:schemas-upnp-org:metadata-1-0/upnp/')
+                '{urn:schemas-upnp-org:metadata-1-0/upnp/}class')
             upnp_class = instance.get_upnp_class(upnp_class_name.strip())
             new_node = upnp_class.fromString(etree.tostring(node))
             instance.addItem(new_node)
