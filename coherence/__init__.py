@@ -7,5 +7,5 @@ __service_name__ = 'Cohen3'
 
 SERVER_ID = ','.join([platform.system(),
                       platform.release(),
-                      'UPnP/1.0,%s' % __service_name__,
+                      f'UPnP/1.0,{__service_name__}',
                       __version__])
