@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
@@ -67,7 +69,7 @@ from coherence import log
 TEMPLATES_DIR = join(dirname(__file__), 'templates')
 TEMPLATE_INDEX = FilePath(join(TEMPLATES_DIR, 'template_index.xml'))
 
-template_menu_item = """\
+template_menu_item = '''\
 <ul class="text-center">
     <li class="nav-logo"></li>
     <li  xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1"
@@ -79,7 +81,7 @@ template_menu_item = """\
         </a>
     </li>
 </ul>
-"""
+'''
 
 
 class WSBroadcastServerProtocol(WebSocketServerProtocol):
@@ -128,7 +130,7 @@ class WSBroadcastServerFactory(WebSocketServerFactory):
         self.client_tracker.unregister(client)
 
     def broadcast(self, msg):
-        # print('WSBroadcastServerFactory: {}'.format(msg))
+        # print(f'WSBroadcastServerFactory: {msg}')
         for c in self.client_tracker.clients:
             c.sendMessage(msg.encode('utf8'), isBinary=False)
 
@@ -196,9 +198,9 @@ class MenuNavigationBar(Element):
             if el == 'cohen3':
                 link = 'home'
                 cls_active += 'active'
-            tag.fillSlots(menu_id="but-{}".format(link))
-            tag.fillSlots(menu_class="{}".format(cls_active))
-            tag.fillSlots(menu_click="openTab('{}', this)".format(link))
+            tag.fillSlots(menu_id=f'but-{link}')
+            tag.fillSlots(menu_class=f'{cls_active}')
+            tag.fillSlots(menu_click=f'openTab(\'{link}\', this)')
             yield MenuItemElement(TagLoader(tag), el)
 
 
@@ -224,19 +226,17 @@ class DevicesWatcher(log.LogAble):
         self.coherence = page.coherence
 
     def add_device(self, device):
-        self.info("DevicesWatcher found device %s %s of type %s",
-                  device.get_usn(),
-                  device.get_friendly_name(),
-                  device.get_device_type())
+        self.info(f'DevicesWatcher found device {device.get_usn()} '
+                  f'{device.get_friendly_name()} of type '
+                  f'{device.get_device_type()}')
         c = self.coherence
         if device.location:
             link = join(
                 dirname(device.get_location().decode('utf-8')),
                 '0')  # here we force to navigate into the Content folder
         else:
-            link = "http://{}:{}/{}".format(
-                device.host, c.web_server_port,
-                device.udn.replace('uuid:', '')),
+            link = f'http://{device.host}:{c.web_server_port}/' \
+                   f'{device.udn.replace("uuid:", "")}',
         dev = {'type': 'add-device',
                'name': device.get_markup_name(),
                'usn': device.get_usn(),
@@ -248,7 +248,7 @@ class DevicesWatcher(log.LogAble):
             self.factory.broadcast(json.dumps(dev))
 
     def remove_device(self, usn):
-        self.info("DevicesWatcher remove device %s", usn)
+        self.info(f'DevicesWatcher remove device {usn}')
         dev = {'type': 'remove-device',
                'usn': usn,
                }
@@ -337,7 +337,7 @@ class LogsWatcher(log.LogAble):
             webui_logger.exception = self.exception
 
     def going_live(self):
-        self.info("add a view to the LogsWatcher %s", self.coherence)
+        self.info(f'add a view to the LogsWatcher {self.coherence}')
         while len(self._messages) > 0:
             m = self._messages.pop(0)
             self.factory.broadcast(m)
@@ -345,10 +345,10 @@ class LogsWatcher(log.LogAble):
 
     def send_log(self, type, message, *args, **kwargs):
         msg = format_log(message, *args, **kwargs)
-        print('webui-{}: {}'.format(type, msg))
+        print(f'webui-{type}: {msg}')
         m = json.dumps(
-            {'type': 'log-{}'.format(type),
-             'data': '[{}] {}'.format(type, msg)})
+            {'type': f'log-{type}',
+             'data': f'[{type}] {msg}'})
         if self._ws_ready:
             self.factory.broadcast(m)
         else:
@@ -433,7 +433,7 @@ class Web(object):
 
 
 class WebUI(resource.Resource, log.LogAble):
-    """
+    '''
     A convenient html interface to browse the connected devices via preferred
     web browser. This interface could be enabled when initializing
     :class:`~coherence.base.Coherence` by setting "'web-ui': 'yes'" into your
@@ -447,7 +447,7 @@ class WebUI(resource.Resource, log.LogAble):
     .. warning:: Be aware that the browser should support Web Sockets and to
                  have js enabled. All modern browsers should have this features
                  integrated (tested with firefox and google chrome).
-    """
+    '''
     logCategory = 'webui'
 
     addSlash = True
@@ -469,27 +469,27 @@ class WebUI(resource.Resource, log.LogAble):
         # Enable resources
         self.putChild(b'styles',
                       static.File(util.sibpath(__file__, 'static/styles'),
-                                  defaultType="text/css"))
+                                  defaultType='text/css'))
         self.putChild(b'server-images',
                       static.File(util.sibpath(__file__, 'static/images'),
-                                  defaultType="text/css"))
+                                  defaultType='text/css'))
         self.putChild(b'js',
                       static.File(util.sibpath(__file__, 'static/js'),
-                                  defaultType="text/javascript"))
+                                  defaultType='text/javascript'))
 
         self.devices = DevicesWatcher(self)
         self.logging = LogsWatcher(self, 'yes')
         self.index = IndexResource(self)
 
     def on_ws_message(self, payload, isBinary):
-        self.info('on_ws_message: {}'.format(payload))
+        self.info(f'on_ws_message: {payload}')
         self.ws_recived.append(payload)
         if payload == b'WebSocket Ready':
             self.devices.going_live()
             self.logging.going_live()
 
     def render(self, request):
-        request.setHeader(b"content-type", b"text/html; charset=utf-8")
+        request.setHeader(b'content-type', b'text/html; charset=utf-8')
         return super(WebUI, self).render(request)
 
     def render_GET(self, request):
@@ -502,8 +502,8 @@ class WebUI(resource.Resource, log.LogAble):
         return server.NOT_DONE_YET
 
     def getChild(self, name, request):
-        self.info('WebUI getChild: %s', name)
-        if name in [b'', b"'"]:
+        self.info(f'WebUI getChild: {name}')
+        if name in [b'', b'\'']:
             return self
 
         def exist_child(key, children):
@@ -520,7 +520,7 @@ class WebUI(resource.Resource, log.LogAble):
         if isinstance(ch, resource.NoResource):
             self.warning('not found child, checking  static file: ', name)
             p = util.sibpath(__file__, name.decode('utf-8'))
-            self.warning('looking for file %s', p)
+            self.warning(f'looking for file {p}')
             if exists(p):
                 ch = static.File(p)
         return ch
