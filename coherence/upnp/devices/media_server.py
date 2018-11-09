@@ -2,7 +2,9 @@
 
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
+
 # Copyright 2006,2007 Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
 import os
 import re
@@ -35,9 +37,9 @@ from coherence.upnp.services.servers.media_receiver_registrar_server import \
 from coherence.upnp.services.servers.scheduled_recording_server import \
     ScheduledRecordingServer
 
-COVER_REQUEST_INDICATOR = re.compile(r".*?cover\.[A-Z|a-z]{3,4}$")
-ATTACHMENT_REQUEST_INDICATOR = re.compile(r".*?attachment=.*$")
-TRANSCODED_REQUEST_INDICATOR = re.compile(r".*/transcoded/.*$")
+COVER_REQUEST_INDICATOR = re.compile(r'.*?cover\.[A-Z|a-z]{3,4}$')
+ATTACHMENT_REQUEST_INDICATOR = re.compile(r'.*?attachment=.*$')
+TRANSCODED_REQUEST_INDICATOR = re.compile(r'.*/transcoded/.*$')
 
 
 class MSRoot(resource.Resource, log.LogAble):
@@ -50,18 +52,16 @@ class MSRoot(resource.Resource, log.LogAble):
         self.store = store
 
     def getChildWithDefault(self, path, request):
-        self.info('%s getChildWithDefault, %s, %s, %s %s',
-                  self.server.device_type, request.method,
-                  path, request.uri, request.client)
+        self.info(f'{self.server.device_type} getChildWithDefault, '
+                  f'{request.method}, {path}, {request.uri} {request.client}')
         headers = request.getAllHeaders()
-        self.debug('\t-> headers are: {}'.format(headers))
+        self.debug(f'\t-> headers are: {headers}')
         if not isinstance(path, bytes):
             path = path.encode('ascii')
         if path.endswith(b'\''):
-            self.warning('\t modified wrong path from {} to {}'.format(
-                path, path[:-1]))
+            self.warning(f'\t modified wrong path from {path} to {path[:-1]}')
             path = path[:-1]
-        self.debug('\t-> path is: {} [{}]'.format(path, type(path)))
+        self.debug(f'\t-> path is: {path} [{type(path)}]')
 
         try:
             if b'getcontentfeatures.dlna.org' in headers and \
@@ -72,12 +72,11 @@ class MSRoot(resource.Resource, log.LogAble):
                     b'getcontentFeatures.dlna.org</p></html>',
                     'text/html')
         except Exception as e1:
-            self.error(
-                'MSRoot.getChildWithDefault: %r' % e1)
+            self.error(f'MSRoot.getChildWithDefault: {e1}')
 
         if request.method == b'HEAD':
             if b'getcaptioninfo.sec' in headers:
-                self.warning("requesting srt file for id %r", path)
+                self.warning(f'requesting srt file for id {path}')
                 ch = self.store.get_by_id(path)
                 try:
                     location = ch.get_path()
@@ -89,7 +88,7 @@ class MSRoot(resource.Resource, log.LogAble):
                     return static.Data(b'', 'text/html')
                 except Exception as e2:
                     self.error(
-                        'MSRoot.getChildWithDefault (method: HEAD): %r' % e2)
+                        f'MSRoot.getChildWithDefault (method: HEAD): {e2}')
                     print(traceback.format_exc())
                     request.setResponseCode(404)
                     return static.Data(
@@ -104,14 +103,14 @@ class MSRoot(resource.Resource, log.LogAble):
         if request.method in (b'GET', b'HEAD'):
             if COVER_REQUEST_INDICATOR.match(
                     request.uri.decode('utf-8')):
-                self.info("request cover for id %r", path)
+                self.info(f'request cover for id {path}')
 
                 def got_item(ch):
                     if ch is not None:
                         request.setResponseCode(200)
                         file = ch.get_cover()
                         if file and os.path.exists(file):
-                            self.info("got cover %s", file)
+                            self.info(f'got cover {file}')
                             return StaticFile(file)
                     request.setResponseCode(404)
                     return static.Data(
@@ -125,19 +124,18 @@ class MSRoot(resource.Resource, log.LogAble):
 
             if ATTACHMENT_REQUEST_INDICATOR.match(
                     request.uri.decode('utf-8')):
-                self.info("request attachment %r for id %r",
-                          request.args, path)
+                self.info(f'request attachment {request.args} for id {path}')
 
                 def got_attachment(ch):
                     try:
                         # FIXME same as below
                         if 'transcoded' in request.args:
-                            if self.server.coherence.config.get('transcoding',
-                                                                'no') == 'yes':
+                            if self.server.coherence.config.get(
+                                    'transcoding', 'no') == 'yes':
                                 format = request.args['transcoded'][0]
                                 type = request.args['type'][0]
-                                self.info("request transcoding %r %r", format,
-                                          type)
+                                self.info(
+                                    f'request transcoding {format} {type}')
                                 try:
                                     from coherence.transcoder import \
                                         TranscoderManager
@@ -159,8 +157,8 @@ class MSRoot(resource.Resource, log.LogAble):
                             else:
                                 request.setResponseCode(404)
                                 return static.Data(
-                                    b"<html><p>This MediaServer "
-                                    b"doesn't support transcoding</p></html>",
+                                    b'<html><p>This MediaServer '
+                                    b'doesn\'t support transcoding</p></html>',
                                     'text/html')
                         else:
                             return ch.item.attachments[
@@ -180,8 +178,8 @@ class MSRoot(resource.Resource, log.LogAble):
         if request.method in (b'GET', b'HEAD') and \
                 TRANSCODED_REQUEST_INDICATOR.match(
                     request.uri.decode('utf-8')):
-            self.info("request transcoding to %r for id %r",
-                      request.uri.split(b'/')[-1], path)
+            self.info(f'request transcoding to '
+                      f'{request.uri.split(b"/")[-1]} for id {path}')
             if self.server.coherence.config.get('transcoding', 'no') == 'yes':
                 def got_stuff_to_transcode(ch):
                     # FIXME create a generic transcoder class
@@ -208,8 +206,8 @@ class MSRoot(resource.Resource, log.LogAble):
 
             request.setResponseCode(404)
             return static.Data(
-                b"<html><p>This MediaServer "
-                b"doesn't support transcoding</p></html>",
+                b'<html><p>This MediaServer '
+                b'doesn\'t support transcoding</p></html>',
                 'text/html')
 
         if request.method == b'POST' and request.uri.endswith(b'?import'):
@@ -223,7 +221,7 @@ class MSRoot(resource.Resource, log.LogAble):
         if (b'user-agent' in headers and
                 (headers[b'user-agent'].find(b'Xbox/') in [0, None] or  # XBox
                  headers[b'user-agent'].startswith(  # wmp11
-                     b"""Mozilla/4.0 (compatible; UPnP/1.0; Windows""")) and
+                     b'''Mozilla/4.0 (compatible; UPnP/1.0; Windows''')) and
                 path in [b'description-1.xml', b'description-2.xml']):
             self.info(
                 'XBox/WMP alert, we need to '
@@ -244,12 +242,12 @@ class MSRoot(resource.Resource, log.LogAble):
             backend_type = backend.__class__.__name__
 
             def constructConfigData(backend):
-                msg = "<plugin active=\"yes\">"
-                msg += "<backend>" + to_string(backend_type) + "</backend>"
+                msg = '<plugin active="yes">'
+                msg += '<backend>' + to_string(backend_type) + '</backend>'
                 for key, value in list(backend.config.items()):
-                    msg += "<" + to_string(key) + ">" + to_string(value) + \
-                           "</" + to_string(key) + ">"
-                msg += "</plugin>"
+                    msg += '<' + to_string(key) + '>' + to_string(value) + \
+                           '</' + to_string(key) + '>'
+                msg += '</plugin>'
                 return to_bytes(msg)
 
             if request.method in (b'GET', b'HEAD'):
@@ -285,38 +283,38 @@ class MSRoot(resource.Resource, log.LogAble):
                     element_tree = etree.fromstring(request.content.getvalue())
                     new_config = convert_elementtree_to_dict(element_tree)
                     self.server.coherence.remove_plugin(self.server)
-                    self.warning("%s %s (%s) with id %s desactivated",
-                                 backend.name, self.server.device_type,
-                                 backend, str(self.server.uuid)[5:])
+                    self.warning(
+                        f'{backend.name} {self.server.device_type} ({backend})'
+                        f' with id {str(self.server.uuid)[5:]} desactivated')
                     if new_config is None:
-                        msg = "<plugin active=\"no\"/>"
+                        msg = '<plugin active="no"/>'
                     else:
                         new_backend = self.server.coherence.add_plugin(
                             backend_type, **new_config)
                         if self.server.coherence.writeable_config():
                             self.server.coherence.store_plugin_config(
                                 new_backend.uuid, new_config)
-                            msg = "<html><p>Device restarted. Config file " \
-                                  "has been modified with posted data.</p>" \
-                                  "</html>"  # constructConfigData(new_backend)
+                            msg = '<html><p>Device restarted. Config file ' \
+                                  'has been modified with posted data.</p>' \
+                                  '</html>'  # constructConfigData(new_backend)
                         else:
-                            msg = "<html><p>Device restarted. " \
-                                  "Config file not modified</p>" \
-                                  "</html>"  # constructConfigData(new_backend)
+                            msg = '<html><p>Device restarted. ' \
+                                  'Config file not modified</p>' \
+                                  '</html>'  # constructConfigData(new_backend)
                     request.setResponseCode(202)
                     return static.Data(msg.encode('ascii'), 'text/html')
                 except SyntaxError as e:
                     request.setResponseCode(400)
                     return static.Data(
-                        "<html><p>Invalid data posted:<BR>{}</p>"
-                        "</html>".format(e).encode('ascii'),
+                        f'<html><p>Invalid data posted:<BR>{e}</p></html>'.
+                        encode('ascii'),
                         'text/html')
             else:
                 # invalid method requested
                 request.setResponseCode(405)
                 return static.Data(
-                    b"<html><p>This resource does not allow "
-                    b"the requested HTTP method</p></html>",
+                    b'<html><p>This resource does not allow '
+                    b'the requested HTTP method</p></html>',
                     'text/html')
 
         if path in self.children:
@@ -326,18 +324,17 @@ class MSRoot(resource.Resource, log.LogAble):
         return self.getChild(path, request)
 
     def requestFinished(self, result, id, request):
-        self.info("finished, remove %d from connection table", id)
-        self.info("finished, sentLength: %d chunked: %d code: %d",
-                  request.sentLength, request.chunked, request.code)
-        self.info("finished %r", request.responseHeaders)
+        self.info(f'finished, remove {id:d} from connection table')
+        self.info(f'finished, sentLength: {request.sentLength:d} '
+                  f'chunked: {request.chunked:d} code: {request.code:d}')
+        self.info(f'finished {request.responseHeaders}')
         self.server.connection_manager_server.remove_connection(id)
 
     def import_file(self, name, request):
-        self.info("import file, id %s", name)
-        print("import file, id %s" % name)
+        self.info(f'import file, id {name}')
 
         def got_file(ch):
-            print("ch", ch)
+            # self.debug('ch', ch)
             if ch is not None:
                 if hasattr(self.store, 'backend_import'):
                     response_code = self.store.backend_import(
@@ -356,7 +353,7 @@ class MSRoot(resource.Resource, log.LogAble):
     def prepare_connection(self, request):
         new_id, _, _ = self.server.connection_manager_server.add_connection(
             '', 'Output', -1, '')
-        self.info("startup, add %d to connection table", new_id)
+        self.info(f'startup, add {new_id:d} to connection table')
         d = request.notifyFinish()
         d.addBoth(self.requestFinished, new_id, request)
 
@@ -374,42 +371,37 @@ class MSRoot(resource.Resource, log.LogAble):
                 elif b'getcontentfeatures.dlna.org' in request.getAllHeaders():
                     request.setHeader(
                         b'contentFeatures.dlna.org',
-                        b"DLNA.ORG_OP=01;DLNA.ORG_CI=0;"
-                        b"DLNA.ORG_FLAGS=01500000000000000000000000000000")
+                        b'DLNA.ORG_OP=01;DLNA.ORG_CI=0;'
+                        b'DLNA.ORG_FLAGS=01500000000000000000000000000000')
 
     def process_child(self, ch, name, request):
-        self.debug('process_child: {} [child: {}, request: {}]'.format(
-            name, ch, request))
+        self.debug(f'process_child: {name} [child: {ch}, request: {request}]')
         if ch is not None:
-            self.info('Child found %s', ch)
+            self.info(f'Child found {ch}')
             if (request.method == b'GET' or
                     request.method == b'HEAD'):
                 headers = request.getAllHeaders()
                 if b'content-length' in headers:
                     self.warning(
-                        '%s request with content-length %r '
-                        'header - sanitizing',
-                        request.method, headers[b'content-length'])
+                        f'{request.method} request with content-length '
+                        f'{headers[b"content-length"]} header - sanitizing')
                     del request.received_headers[b'content-length']
                 self.debug('data', )
                 if len(request.content.getvalue()) > 0:
-                    """ shall we remove that?
-                        can we remove that?
-                    """
+                    # shall we remove that?
+                    # can we remove that?
                     self.warning(
-                        '%s request with %r bytes of message-body'
-                        ' - sanitizing',
-                        request.method,
-                        len(request.content.getvalue()))
+                        f'{request.method} request with '
+                        f'{len(request.content.getvalue())} '
+                        f'bytes of message-body - sanitizing')
                     request.content = StringIO()
 
-            if hasattr(ch, "location"):
-                self.debug("we have a location %s",
-                           isinstance(ch.location, resource.Resource))
+            if hasattr(ch, 'location'):
+                self.debug(f'we have a location '
+                           f'{isinstance(ch.location, resource.Resource)}')
                 if (isinstance(ch.location, ReverseProxyResource) or
                         isinstance(ch.location, resource.Resource)):
-                    # self.info('getChild proxy %s to %s' % (
-                    #     name, ch.location.uri))
+                    # self.info(f'getChild proxy {name} to {ch.location.uri}')
                     self.prepare_connection(request)
                     self.prepare_headers(ch, request)
                     return ch.location
@@ -418,32 +410,32 @@ class MSRoot(resource.Resource, log.LogAble):
             except TypeError:
                 return self.list_content(name, ch, request)
             except Exception as msg:
-                self.debug("error accessing items path %r", msg)
+                self.debug(f'error accessing items path {msg}')
                 self.debug(traceback.format_exc())
                 return self.list_content(name, ch, request)
             if p is not None and os.path.exists(p):
-                self.info("accessing path %r", p)
+                self.info(f'accessing path {p}')
                 self.prepare_connection(request)
                 self.prepare_headers(ch, request)
                 ch = StaticFile(p)
             else:
-                self.debug("accessing path %r failed", p)
+                self.debug(f'accessing path {p} failed')
                 return self.list_content(name, ch, request)
 
         if ch is None:
             p = util.sibpath(__file__.encode('ascii'), name)
-            self.debug('checking if msroot is file: %r', p)
+            self.debug(f'checking if msroot is file: {p}')
             if os.path.exists(p):
                 ch = StaticFile(p)
-        self.info('MSRoot ch %r', ch)
+        self.info(f'MSRoot ch {ch}')
         return ch
 
     def getChild(self, name, request):
-        self.info('getChild %s, %s', name, request)
+        self.info(f'getChild {name}, {request}')
         if not isinstance(name, bytes):
             name = name.encode('ascii')
         ch = self.store.get_by_id(name)
-        self.info('\t-child is: %r', ch)
+        self.info(f'\t-child is: {ch}')
         if isinstance(ch, defer.Deferred):
             ch.addCallback(self.process_child, name, request)
             # ch.addCallback(self.delayed_response, request)
@@ -451,19 +443,20 @@ class MSRoot(resource.Resource, log.LogAble):
         return self.process_child(ch, name, request)
 
     def list_content(self, name, item, request):
-        self.info('list_content %s %s %s', name, item, request)
-        page = """\
+        self.info(f'list_content {name} {item} {request}')
+        page = f'''\
         <html>
             <head><link rel="stylesheet" type="text/css"
             href="/styles/main.css" />
-                <title>Cohen3 (%s)</title>
+                <title>Cohen3 ({item.get_name()})</title>
             </head>
             <body>
                 <h5>
                     <img class="logo-icon"
-                    src="/server-images/coherence-icon.svg"></img>%s
+                    src="/server-images/coherence-icon.svg">
+                    </img>{item.get_name()}
                 </h5>
-                """ % (item.get_name(), item.get_name())
+                '''
 
         if (hasattr(item, 'mimetype') and item.mimetype in ['directory',
                                                             'root']):
@@ -472,8 +465,8 @@ class MSRoot(resource.Resource, log.LogAble):
                 uri += '/'
 
             def build_page(r, page):
-                # self.debug("build_page", r)
-                page += """<div class="list"><ul>"""
+                # self.debug('build_page', r)
+                page += '''<div class="list"><ul>'''
                 if r is not None:
                     for c in r:
                         if hasattr(c, 'get_url'):
@@ -503,7 +496,7 @@ class MSRoot(resource.Resource, log.LogAble):
                         except (UnicodeEncodeError, UnicodeDecodeError):
                             title = c.get_name().encode('utf-8').encode(
                                 'string_escape')
-                        it_cls = ""
+                        it_cls = ''
                         has_mime = hasattr(c, 'mimetype')
                         if has_mime and c.mimetype.startswith('video'):
                             it_cls = 'class="item-video"'
@@ -511,15 +504,15 @@ class MSRoot(resource.Resource, log.LogAble):
                             it_cls = 'class="item-audio"'
                         elif has_mime and c.mimetype.startswith('image'):
                             it_cls = 'class="item-image"'
-                        page += '<li><a %s href="%s">%s</a></li>' % \
-                                (it_cls, path, title)
-                page += """</ul></div>"""
-                page += """</body></html>"""
+                        page += \
+                            f'<li><a {it_cls} href="{path}">{title}</a></li>'
+                page += '''</ul></div>'''
+                page += '''</body></html>'''
                 return static.Data(to_bytes(page), 'text/html')
 
             children = item.get_children()
             if isinstance(children, defer.Deferred):
-                print("list_content, we have a Deferred", children)
+                print('list_content, we have a Deferred', children)
                 children.addCallback(build_page, page)
                 # children.addErrback(....) #FIXME
                 return children
@@ -531,32 +524,33 @@ class MSRoot(resource.Resource, log.LogAble):
             path = urllib.parse.quote(item.get_path().encode('utf-8'))
             title = item.get_name().decode(
                 'utf-8', 'xmlcharrefreplace')
-            page += """<p><img class="item-image" src="%s" alt="%s"></p>""" % \
-                    (path, title)
+            page += \
+                f'<p><img class="item-image" src="{path}" alt="{title}"></p>'
         else:
             pass
-        page += """</body></html>"""
+        page += '''</body></html>'''
         return static.Data(to_bytes(page), 'text/html')
 
     def listchilds(self, uri):
         uri = to_string(uri)
-        self.info('listchilds %s', uri)
+        self.info(f'listchilds {uri}')
         if uri[-1] != '/':
             uri += '/'
-        cl = '<li><a href=%s0>Content</a></li>' % uri
-        cl += '<li><a href=%sconfig>Config</a></li>' % uri
+        cl = f'<li><a href={uri}0>Content</a></li>'
+        cl += f'<li><a href={uri}config>Config</a></li>'
         for c in self.children:
             c = to_string(c)
-            cl += '<li><a href=%s%s>%s</a></li>' % (uri, c, c)
+            cl += f'<li><a href={uri}{c}>{c}</a></li>'
         return cl
 
     def import_response(self, result, id):
         return \
-            static.Data(b'<html><p>import of %r finished</p></html>' % id,
+            static.Data(f'<html><p>import of {id} finished</p></html>'.
+                        encode('ascii'),
                         'text/html')
 
     def render(self, request):
-        html = """\
+        html = f'''\
         <html>
         <head>
             <title>Cohen3 (MSRoot)</title>
@@ -564,12 +558,11 @@ class MSRoot(resource.Resource, log.LogAble):
         </head>
         <h5>
             <img class="logo-icon" src="/server-images/coherence-icon.svg">
-            </img>Root of the %s MediaServer</h5>
+            </img>Root of the {self.server.backend} MediaServer</h5>
         <div class="list">
-            <ul>%s</ul>
+            <ul>{self.listchilds(request.uri)}</ul>
         </div>
-        </html>""" % (self.server.backend,
-                      self.listchilds(request.uri))
+        </html>'''
         return html.encode('ascii')
 
 
@@ -587,8 +580,8 @@ class RootDeviceXML(static.Data):
         uuid = str(uuid)
         root = etree.Element(
             'root', nsmap={None: xml_constants.UPNP_DEVICE_NS})
-        device_type = 'urn:schemas-upnp-org:device:%s:%d' % (
-            device_type, int(version))
+        device_type = \
+            f'urn:schemas-upnp-org:device:{device_type}:{int(version):d}'
         e = etree.SubElement(root, 'specVersion')
         etree.SubElement(e, 'major').text = '1'
         etree.SubElement(e, 'minor').text = '0'
@@ -624,7 +617,7 @@ class RootDeviceXML(static.Data):
                         icon_path = icon['url'][7:]
                     elif icon['url'] == '.face':
                         icon_path = os.path.join(os.path.expanduser('~'),
-                                                 ".face")
+                                                 '.face')
                     else:
                         from pkg_resources import resource_filename
 
@@ -670,16 +663,15 @@ class RootDeviceXML(static.Data):
                 else:
                     v = version
 
-                etree.SubElement(
-                    s, 'serviceType').text = 'urn:%s:service:%s:%d' % \
-                                             (namespace, id, int(v))
+                etree.SubElement(s, 'serviceType').text = \
+                    f'urn:{namespace}:service:{id}:{int(v):d}'
                 try:
                     namespace = service.id_namespace
                 except AttributeError:
                     namespace = 'upnp-org'
 
                 etree.SubElement(s, 'serviceId').text = \
-                    'urn:%s:serviceId:%s' % (namespace, id)
+                    f'urn:{namespace}:serviceId:{id}'
                 etree.SubElement(s, 'SCPDURL').text = \
                     '/' + uuid[5:] + '/' + id + '/' + \
                     service.scpd_url.decode('utf-8')
@@ -738,10 +730,8 @@ class MediaServer(log.LogAble, BasicDeviceMixin):
                 self.backend = backend
 
             def backend_failure(x):
-                self.warning(
-                    'backend %s not installed, '
-                    'MediaServer activation aborted - %s',
-                    backend, x.getErrorMessage())
+                self.warning(f'backend {backend} not installed, MediaServer '
+                             f'activation aborted - {x.getErrorMessage()}')
                 self.debug(x)
 
             d.addCallback(backend_ready)
@@ -762,7 +752,7 @@ class MediaServer(log.LogAble, BasicDeviceMixin):
             self.connection_manager_server = ConnectionManagerServer(self)
             self._services.append(self.connection_manager_server)
         except LookupError as msg:
-            self.warning('ConnectionManagerServer %s', msg)
+            self.warning(f'ConnectionManagerServer {msg}')
             raise LookupError(msg)
 
         try:
@@ -773,7 +763,7 @@ class MediaServer(log.LogAble, BasicDeviceMixin):
                 ContentDirectoryServer(self, transcoding=transcoding)
             self._services.append(self.content_directory_server)
         except LookupError as msg:
-            self.warning('ContentDirectoryServer %s', msg)
+            self.warning(f'ContentDirectoryServer {msg}')
             raise LookupError(msg)
 
         try:
@@ -783,15 +773,15 @@ class MediaServer(log.LogAble, BasicDeviceMixin):
                     backend=FakeMediaReceiverRegistrarBackend())
             self._services.append(self.media_receiver_registrar_server)
         except LookupError as msg:
-            self.warning('MediaReceiverRegistrarServer (optional) %s', msg)
+            self.warning(f'MediaReceiverRegistrarServer (optional) {msg}')
 
         try:
             self.scheduled_recording_server = ScheduledRecordingServer(self)
             self._services.append(self.scheduled_recording_server)
         except LookupError as msg:
-            self.info('ScheduledRecordingServer %s', msg)
+            self.info(f'ScheduledRecordingServer {msg}')
 
-        upnp_init = getattr(self.backend, "upnp_init", None)
+        upnp_init = getattr(self.backend, 'upnp_init', None)
         if upnp_init:
             upnp_init()
 
@@ -801,7 +791,7 @@ class MediaServer(log.LogAble, BasicDeviceMixin):
         version = int(self.version)
         while version > 0:
             self.web_resource.putChild(
-                b'description-%r.xml' % version,
+                f'description-{version}.xml'.encode('ascii'),
                 RootDeviceXML(
                     self.coherence.hostname,
                     str(self.uuid),
@@ -813,7 +803,7 @@ class MediaServer(log.LogAble, BasicDeviceMixin):
                     icons=self.icons,
                     presentation_url=self.presentationURL))
             self.web_resource.putChild(
-                b'xbox-description-%r.xml' % version,
+                f'xbox-description-{version}.xml'.encode('ascii'),
                 RootDeviceXML(
                     self.coherence.hostname,
                     str(self.uuid),
@@ -831,10 +821,10 @@ class MediaServer(log.LogAble, BasicDeviceMixin):
                                    self.connection_manager_server)
         self.web_resource.putChild(b'ContentDirectory',
                                    self.content_directory_server)
-        if hasattr(self, "scheduled_recording_server"):
+        if hasattr(self, 'scheduled_recording_server'):
             self.web_resource.putChild(b'ScheduledRecording',
                                        self.scheduled_recording_server)
-        if hasattr(self, "media_receiver_registrar_server"):
+        if hasattr(self, 'media_receiver_registrar_server'):
             self.web_resource.putChild(b'X_MS_MediaReceiverRegistrar',
                                        self.media_receiver_registrar_server)
 
@@ -848,7 +838,7 @@ class MediaServer(log.LogAble, BasicDeviceMixin):
                                        defaultType=icon['mimetype']))
                 elif icon['url'] == '.face':
                     face_path = os.path.abspath(
-                        os.path.join(os.path.expanduser('~'), ".face"))
+                        os.path.join(os.path.expanduser('~'), '.face'))
                     if os.path.exists(face_path):
                         self.web_resource.putChild(
                             b'face-icon.png',
@@ -868,5 +858,5 @@ class MediaServer(log.LogAble, BasicDeviceMixin):
                                        defaultType=icon['mimetype']))
 
         self.register()
-        self.warning("%s %s (%s) activated with id %s", self.device_type,
-                     self.backend.name, self.backend, str(self.uuid)[5:])
+        self.warning(f'{self.device_type} {self.backend.name} ({self.backend})'
+                     f' activated with id {str(self.uuid)[5:]}')
