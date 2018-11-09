@@ -62,7 +62,7 @@ class ElisaMediaStore(Backend):
         self.get_root_id()
 
     def __repr__(self):
-        return "Elisa storage"
+        return 'Elisa storage'
 
     def get_store(self):
         factory = pb.PBClientFactory()
@@ -81,13 +81,13 @@ class ElisaMediaStore(Backend):
         self.init_completed = True
 
     def get_root_id(self, media_type='audio'):
-        """ ask Elisa to tell us the id of the top item
-            representing the media_type == 'something' collection """
+        ''' ask Elisa to tell us the id of the top item
+            representing the media_type == 'something' collection '''
         store = self.get_store()
         dfr = store.addCallback(lambda object:
                                 object.callRemote('get_cache_manager'))
         dfr.addCallback(lambda cache_mgr:
-                        cache_mgr.callRemote("get_media_root_id", media_type))
+                        cache_mgr.callRemote('get_media_root_id', media_type))
         dfr.addCallback(self.set_root_id)
 
     def upnp_init(self):
@@ -185,7 +185,7 @@ class ElisaMediaStore(Backend):
                                 object.callRemote('get_cache_manager'))
         dfr.addErrback(errback)
         dfr.addCallback(lambda cache_mgr:
-                        cache_mgr.callRemote("get_media_node_with_id", id))
+                        cache_mgr.callRemote('get_media_node_with_id', id))
         dfr.addCallback(got_result)
         return dfr
 

@@ -5,7 +5,7 @@
 
 # Copyright 2015, https://github.com/unintended
 
-"""
+'''
 A backend to access twitch.tv streams.
 
 To enable personalized features (e.g. 'Following' streams),
@@ -14,7 +14,7 @@ add 'access_token' key into your config file:
   1. Click the link below to automatically request an access token for your
      account:
 
-     `Go twitch's "get access token" page
+     `Go twitch's 'get access token' page
      <https://api.twitch.tv/kraken/oauth2/authorize\?response_type=token&
      client_id=37684tuwyxmogmtduz6lz0jdtf0acob&redirect_uri=
      http://localhost&scope=user_read>`_
@@ -28,7 +28,7 @@ add 'access_token' key into your config file:
   3. Copy the token and paste in TwitchStore section of your config file:
 
         access_token = <YOUR_ACCESS_TOKEN (step 2)>
-"""
+'''
 
 import json
 import urllib.error
@@ -64,8 +64,8 @@ class LiveStreamerProxyResource(Resource, LogAble):
         self.content_type = content_type
 
     def render_GET(self, request):
-        self.debug(f"serving {request.method} request from "
-                   f"{request.getClientIP()} for {request.uri}")
+        self.debug(f'serving {request.method} request from '
+                   f'{request.getClientIP()} for {request.uri}')
 
         def stream_opened(fd):
             producer = NoRangeStaticProducer(request, fd)
@@ -117,7 +117,7 @@ class TwitchLazyContainer(LazyContainer):
         kwargs.update({'limit': self.limit})
         kwargs = {k: v for k, v in list(kwargs.items()) if v is not None}
 
-        url = "%s?%s" % (self.children_url, urllib.parse.urlencode(
+        url = '%s?%s' % (self.children_url, urllib.parse.urlencode(
             kwargs)) if kwargs else self.children_url
 
         d = utils.getPage(url)
@@ -131,10 +131,10 @@ class TwitchLazyContainer(LazyContainer):
 
     def _got_error(self, error):
         self.warning(
-            f"connection to twitch.tv service failed: {self.children_url}")
-        self.debug(f"{error.getTraceback()!r}")
+            f'connection to twitch.tv service failed: {self.children_url}')
+        self.debug(f'{error.getTraceback()}')
         self.childrenRetrievingNeeded = True  # we retry
-        return Failure("Unable to retrieve game list")
+        return Failure('Unable to retrieve game list')
 
 
 class GamesContainer(TwitchLazyContainer):
@@ -158,7 +158,7 @@ class GamesContainer(TwitchLazyContainer):
                 cover_url=game_info['game']['box']['large'],
                 game=game_name,
                 limit=self.children_limit)
-            # item.description = f"{game_info['viewers']:d} viewers"
+            # item.description = f'{game_info["viewers"]:d} viewers'
             self.add_child(item, external_id=game_info['game']['_id'])
         return True
 

@@ -4,7 +4,7 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
-"""
+'''
 FSStore - filesystem media server
 ---------------------------------
 
@@ -32,7 +32,7 @@ The plugin is configured with::
       than once. -->
       <uuid>2f7f4096-cba3-4390-be7d-d1d07106a6f4</uuid>
     </plugin>
-"""
+'''
 import glob
 import mimetypes
 import os
@@ -91,16 +91,16 @@ def _natural_key(s):
 
 
 class NoThumbnailFound(Exception):
-    """no thumbnail found"""
+    '''no thumbnail found'''
 
 
 def _find_thumbnail(filename, thumbnail_folder='.thumbs'):
-    """ looks for a thumbnail file of the same basename
+    ''' looks for a thumbnail file of the same basename
         in a folder named '.thumbs' relative to the file
 
         returns the filename of the thumb, its mimetype and
         the correspondig DLNA PN string or throws an Exception otherwise
-    """
+    '''
     name, ext = os.path.splitext(os.path.basename(filename))
     pattern = os.path.join(os.path.dirname(filename), thumbnail_folder,
                            name + '.*')
@@ -163,8 +163,8 @@ class FSItem(BackendItem):
                 self.check_for_cover_art()
                 if getattr(self, 'cover', None):
                     _, ext = os.path.splitext(self.cover)
-                    """ add the cover image extension to help clients
-                        not reacting on the mimetype """
+                    ''' add the cover image extension to help clients
+                        not reacting on the mimetype '''
                     self.item.albumArtURI = \
                         ''.join((urlbase, str(self.id), '?cover', str(ext)))
         else:
@@ -173,8 +173,8 @@ class FSItem(BackendItem):
             if self.mimetype.startswith('audio/'):
                 if getattr(parent, 'cover', None):
                     _, ext = os.path.splitext(parent.cover)
-                    """ add the cover image extension to help clients
-                        not reacting on the mimetype """
+                    ''' add the cover image extension to help clients
+                        not reacting on the mimetype '''
                     self.item.albumArtURI = \
                         ''.join((urlbase, str(self.id), '?cover', ext))
 
@@ -218,7 +218,7 @@ class FSItem(BackendItem):
             res.size = size
             self.item.res.append(res)
 
-            """ if this item is of type audio and we want to add a transcoding
+            ''' if this item is of type audio and we want to add a transcoding
                 rule for it, this is the way to do it:
 
                 create a new Resource object, at least a 'http-get'
@@ -232,7 +232,7 @@ class FSItem(BackendItem):
                         ['DLNA.ORG_PN=JPEG_TN']+simple_dlna_tags))
                 res.size = None
                 self.item.res.append(res)
-            """
+            '''
 
             if (self.store.server and
                     self.store.server.coherence.config.get(
@@ -260,7 +260,7 @@ class FSItem(BackendItem):
                         new_res.size = None
                         # self.item.res.append(new_res)
 
-            """ if this item is an image and we want to add a thumbnail for it
+            ''' if this item is an image and we want to add a thumbnail for it
                 we have to follow these rules:
 
                 create a new Resource object, at least a 'http-get'
@@ -284,7 +284,7 @@ class FSItem(BackendItem):
                     self.item.attachments = {}
                 self.item.attachments[key] = utils.StaticFile(
                 filename_of_thumbnail)
-            """
+            '''
 
             if (self.mimetype in ('image/jpeg', 'image/png') or
                     self.mimetype.startswith('video/')):
@@ -338,21 +338,21 @@ class FSItem(BackendItem):
                 self.item.date = None
 
     def rebuild(self, urlbase):
-        # print "rebuild", self.mimetype
+        # print('rebuild', self.mimetype)
         if self.mimetype != 'item':
             return
-        # print "rebuild for", self.get_path()
+        # print('rebuild for', self.get_path())
         mimetype, _ = mimetypes.guess_type(self.get_path(), strict=False)
         if mimetype is None:
             return
         self.mimetype = mimetype
-        # print "rebuild", self.mimetype
+        # print('rebuild', self.mimetype)
         UPnPClass = classChooser(self.mimetype)
         self.item = UPnPClass(self.id, self.parent.id, self.get_name())
         if getattr(self.parent, 'cover', None):
             _, ext = os.path.splitext(self.parent.cover)
-            """ add the cover image extension to help clients not reacting on
-                the mimetype """
+            ''' add the cover image extension to help clients not reacting on
+                the mimetype '''
             self.item.albumArtURI = ''.join(
                 (urlbase, str(self.id), '?cover', ext))
 
@@ -388,10 +388,10 @@ class FSItem(BackendItem):
         self.parent.update_id += 1
 
     def check_for_cover_art(self):
-        """ let's try to find in the current directory some jpg file,
+        ''' let's try to find in the current directory some jpg file,
             or png if the jpg search fails, and take the first one
             that comes around
-        """
+        '''
         try:
             jpgs = [i.path for i in self.location.children() if
                     i.splitext()[1] in ('.jpg', '.JPG')]
@@ -406,12 +406,11 @@ class FSItem(BackendItem):
                     return
         except UnicodeDecodeError:
             self.warning(
-                "UnicodeDecodeError - "
-                "there is something wrong with a file located in %r",
-                self.location.path)
+                f'UnicodeDecodeError - there is something wrong with a '
+                f'file located in {self.location.path}')
 
     def remove(self):
-        # print "FSItem remove", self.id, self.get_name(), self.parent
+        # print('FSItem remove', self.id, self.get_name(), self.parent)
         if self.parent:
             self.parent.remove_child(self)
         del self.item
@@ -426,8 +425,8 @@ class FSItem(BackendItem):
         self.sorted = False
 
     def remove_child(self, child):
-        # print("remove_from %d (%s) child %d (%s)" % (
-        #     self.id, self.get_name(), child.id, child.get_name()))
+        # print(f'remove_from {self.id:d} ({self.get_name()}) '
+        #       f'child {child.id:d} ({child.get_name()})')
         if child in self.children:
             self.child_count -= 1
             if isinstance(self.item, Container):
@@ -520,7 +519,7 @@ class FSStore(BackendStore):
 
     implements = ['MediaServer']
 
-    description = """MediaServer exporting files from the file-system"""
+    description = '''MediaServer exporting files from the file-system'''
 
     options = [
         {'option': 'name', 'type': 'string', 'default': 'my media',
@@ -577,12 +576,12 @@ class FSStore(BackendStore):
                     self.inotify = INotify()
                     self.inotify.startReading()
                 except Exception as msg:
-                    self.error("inotify disabled: %s", msg)
+                    self.error(f'inotify disabled: {msg}')
                     self.inotify = None
             else:
-                self.info("%s", no_inotify_reason)
+                self.info(f'{no_inotify_reason}')
         else:
-            self.info("FSStore content auto-update disabled upon user request")
+            self.info('FSStore content auto-update disabled upon user request')
 
         if kwargs.get('enable_destroy', 'no') == 'yes':
             self.upnp_DestroyObject = self.hidden_upnp_DestroyObject
@@ -607,8 +606,8 @@ class FSStore(BackendStore):
                     id, parent, 'media', 'root',
                     self.urlbase, UPnPClass, update=True, store=self)
             except Exception as e:
-                self.error('Error on setting self.stor[id}, Error on FSItem: '
-                           '{}'.format(e))
+                self.error(
+                    f'Error on setting self.store[id], Error on FSItem: {e}')
                 exit(1)
 
         if self.import_folder is not None:
@@ -650,7 +649,7 @@ class FSStore(BackendStore):
         return len(self.store)
 
     def get_by_id(self, id):
-        # print "get_by_id", id, type(id)
+        # print('get_by_id', id, type(id))
         # we have referenced ids here when we are in WMC mapping mode
         if isinstance(id, str):
             id = id.split('@', 1)[0]
@@ -665,24 +664,24 @@ class FSStore(BackendStore):
 
         if id == '0':
             id = '1000'
-        # print "get_by_id 2", id
+        # print('get_by_id 2', id)
         try:
             r = self.store[id]
         except KeyError:
             r = None
-        # print "get_by_id 3", r
+        # print('get_by_id 3', r)
         return r
 
     def get_id_by_name(self, parent='0', name=''):
-        self.info(f'get_id_by_name {parent!r} ({type(parent)!r}) {name!r}')
+        self.info(f'get_id_by_name {parent} ({type(parent)}) {name}')
         try:
             parent = self.store[parent]
-            self.debug("%r %d", parent, len(parent.children))
+            self.debug(f'{parent} {len(parent.children):d}')
             for child in parent.children:
                 # if not isinstance(name, unicode):
-                #    name = name.decode("utf8")
-                self.debug("%r %r %r", child.get_name(), child.get_realpath(),
-                           name == child.get_realpath())
+                #    name = name.decode('utf8')
+                self.debug(f'{child.get_name()} {child.get_realpath()} '
+                           f'{name == child.get_realpath()}')
                 if name == child.get_realpath():
                     return child.id
         except Exception as e:
@@ -702,7 +701,7 @@ class FSStore(BackendStore):
         return self.store[id].url
 
     def update_config(self, **kwargs):
-        self.info(f"update_config: {kwargs}")
+        self.info(f'update_config: {kwargs}')
         if 'content' in kwargs:
             new_content = kwargs['content']
             new_content = set(
@@ -731,7 +730,7 @@ class FSStore(BackendStore):
             self.content.remove(path)
 
     def walk(self, path, parent=None, ignore_file_pattern=''):
-        self.debug(f"walk {path!r}")
+        self.debug(f'walk {path}')
         containers = []
         parent = self.append(path, parent)
         if parent is not None:
@@ -739,7 +738,7 @@ class FSStore(BackendStore):
         while len(containers) > 0:
             container = containers.pop()
             try:
-                self.debug('adding %r', container.location)
+                self.debug(f'adding {container.location!r}')
                 self.info(f'walk.adding: {container.location}')
                 for child in container.location.children():
                     if ignore_file_pattern.match(child.basename()) is not None:
@@ -749,12 +748,11 @@ class FSStore(BackendStore):
                         containers.append(new_container)
             except UnicodeDecodeError:
                 self.warning(
-                    "UnicodeDecodeError - "
-                    "there is something wrong with a file located in %r",
-                    container.get_path())
+                    f'UnicodeDecodeError - there is something wrong with a '
+                    f'file located in {container.get_path()!r}')
 
     def create(self, mimetype, path, parent):
-        self.debug(f"create  {mimetype} {path} {type(path)} {parent}")
+        self.debug(f'create  {mimetype} {path} {type(path)} {parent}')
         UPnPClass = classChooser(mimetype)
         if UPnPClass is None:
             return None
@@ -789,13 +787,13 @@ class FSStore(BackendStore):
 
     def append(self, bytes_path, parent):
         path = str(bytes_path)
-        self.debug(f"append  {path} {type(path)} {parent}")
+        self.debug(f'append  {path} {type(path)} {parent}')
         if not os.path.exists(path):
-            self.warning(f"path {path!r} not available - ignored")
+            self.warning(f'path {path!r} not available - ignored')
             return None
 
         if stat.S_ISFIFO(os.stat(path).st_mode):
-            self.warning(f"path {path!r} is a FIFO - ignored")
+            self.warning(f'path {path!r} is a FIFO - ignored')
             return None
 
         try:
@@ -819,10 +817,10 @@ class FSStore(BackendStore):
                         callbacks=[partial(self.notify, parameter=id)])
                 return self.store[id]
         except OSError as os_msg:
-            """
+            '''
             seems we have some permissions issues along the content path
-            """
-            self.warning("path %r isn't accessible, error %r", path, os_msg)
+            '''
+            self.warning(f'path {path} isn\'t accessible, error {os_msg}')
 
         return None
 
@@ -838,7 +836,7 @@ class FSStore(BackendStore):
                 if self.server:
                     self.server.content_directory_server.set_variable(
                         0, 'SystemUpdateID', self.update_id)
-                # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
+                # value = f'{parent.get_id():d},{parent_get_update_id():d}'
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
                     self.server.content_directory_server.set_variable(
@@ -848,14 +846,13 @@ class FSStore(BackendStore):
             pass
 
     def notify(self, ignore, path, mask, parameter=None):
-        self.info("Event %s on %s - parameter %r",
+        self.info('Event %s on %s - parameter %r',
                   ', '.join([fl for fl in _FLAG_TO_HUMAN if fl[0] == mask][0]),
                   path.path, parameter)
 
         if mask & IN_CHANGED:
             # FIXME react maybe on access right changes, loss of read rights?
-            # print('%s was changed, parent %d (%s)' % (
-            #     path, parameter, iwp.path))
+            # print(f'{path} was changed, parent {parameter:d} ({iwp.path})')
             pass
 
         if mask & IN_DELETE or mask & IN_MOVED_FROM:
@@ -896,7 +893,7 @@ class FSStore(BackendStore):
             item.rebuild(self.urlbase)
             return 200
         except IOError:
-            self.warning(f"import of file {item.get_path()} failed")
+            self.warning(f'import of file {item.get_path()} failed')
         except Exception as msg:
             import traceback
             self.warning(traceback.format_exc())
@@ -973,7 +970,7 @@ class FSStore(BackendStore):
             return failure.Failure(errorCode(718))
 
         def gotPage(headers):
-            # print "gotPage", headers
+            # print('gotPage', headers)
             content_type = headers.get('content-type', [])
             if not isinstance(content_type, list):
                 content_type = list(content_type)
@@ -997,7 +994,7 @@ class FSStore(BackendStore):
                                 0, 'ContainerUpdateIDs', value)
 
         def gotError(error, url):
-            self.warning(f"error requesting {url}")
+            self.warning(f'error requesting {url}')
             self.info(error)
             os.unlink(tmp_path)
             return failure.Failure(errorCode(718))
@@ -1014,7 +1011,7 @@ class FSStore(BackendStore):
         return {'TransferID': transfer_id}
 
     def upnp_CreateObject(self, *args, **kwargs):
-        # print(f"CreateObject {kwargs}")
+        # print(f'CreateObject {kwargs}')
         if kwargs['ContainerID'] == 'DLNA.ORG_AnyContainer':
             if self.import_folder is not None:
                 ContainerID = self.import_folder_id
@@ -1099,7 +1096,7 @@ class FSStore(BackendStore):
         if item is None:
             return failure.Failure(errorCode(701))
 
-        self.info(f"upnp_DestroyObject: {item.location}")
+        self.info(f'upnp_DestroyObject: {item.location}')
         try:
             item.location.remove()
         except Exception as msg:
@@ -1129,7 +1126,7 @@ if __name__ == '__main__':
     #     Filter='dc:title,upnp:artist',
     #     RequestedCount='1000',
     #     StartingIndex='0',
-    #     SearchCriteria='(upnp:class = "object.container.album.musicAlbum")',
+    #     SearchCriteria='(upnp:class = 'object.container.album.musicAlbum')',
     #     SortCriteria='+dc:title'))
 
     f.upnp_ImportResource(SourceURI='http://spiegel.de', DestinationURI='ttt')

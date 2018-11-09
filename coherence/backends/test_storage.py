@@ -5,7 +5,7 @@
 
 # Copyright 2008 Frank Scholz <coherence@beebits.net>
 
-"""
+'''
 A MediaServer backend to test Items.
 
 Item information can be passed on the commandline or in the config as an XML
@@ -17,20 +17,20 @@ fragment::
        item:<item><location>audio.ogg</location>\\
             <mimetype>audio/ogg</mimetype></item>
 
-    coherence --plugin="backend:TestStore,name:Test,\\
+    coherence --plugin='backend:TestStore,name:Test,\\
        item:<item><type>gstreamer</type>\\
             <pipeline>v4l2src num-buffers=1 ! video/x-raw-yuv,width=640,\\
             height=480 ! ffmpegcolorspace ! jpegenc name=enc</pipeline>\\
-            <mimetype>image/jpeg></mimetype></item>"
+            <mimetype>image/jpeg></mimetype></item>'
 
-"video/x-raw-yuv,width=640,height=480" won't work here as it is a delimiter
+'video/x-raw-yuv,width=640,height=480' won't work here as it is a delimiter
 for the plugin string, so if you need things like that in the pipeline,
 you need to use a config file::
 
-    coherence --plugin="backend:TestStore,name:Test,\\
+    coherence --plugin='backend:TestStore,name:Test,\\
         item:<item><type>process</type>\\
             <command>man date</command>\\
-            <mimetype>text/html</mimetype></item>"
+            <mimetype>text/html</mimetype></item>'
 
 The XML fragment has these elements:
 
@@ -60,7 +60,7 @@ In the config file the definition of this backend could look like this:
 
 .. code-block:: xml
 
-    <plugin active="yes">
+    <plugin active='yes'>
         <backend>TestStore</backend>
         <name>Test</name>
         <item>
@@ -73,7 +73,7 @@ In the config file the definition of this backend could look like this:
          </item>
     </plugin>
 
-"""
+'''
 import os
 
 from lxml import etree
@@ -385,8 +385,8 @@ class TestStore(BackendStore):
                             self.urlbase + str(item_id))
                     except NameError:
                         self.warning(
-                            "Can't enable GStreamerPipeline, "
-                            "probably pygst not installed")
+                            'Can\'t enable GStreamerPipeline, '
+                            'probably pygst not installed')
                         continue
 
                 elif type == 'process':

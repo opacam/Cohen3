@@ -75,8 +75,8 @@ class FlickrAuthenticate(object):
             (api_secret, 'api_key', api_key, 'frob', frob, 'perms', perms))
         api_sig = md5(api_sig)
         login_url =\
-            f"http://flickr.com/services/auth/?api_key={api_key}&" \
-            f"perms={perms}&frob={frob}&api_sig={api_sig}"
+            f'http://flickr.com/services/auth/?api_key={api_key}&' \
+            f'perms={perms}&frob={frob}&api_sig={api_sig}'
         browser.open(login_url)
         browser.select_form(name='login_form')
         browser['login'] = userid
@@ -184,18 +184,18 @@ class FlickrItem(log.LogAble):
                 self.debug(traceback.format_exc())
 
             self.real_url = \
-                f"http://farm{obj.get('farm')}.static.flickr.com/" \
-                f"{obj.get('server')}/{obj.get('id')}_{obj.get('secret')}.jpg"
+                f'http://farm{obj.get("farm")}.static.flickr.com/' \
+                f'{obj.get("server")}/{obj.get("id")}_{obj.get("secret")}.jpg'
 
             if proxy:
                 self.url = urlbase + str(self.id)
                 self.location = ProxyImage(self.real_url)
             else:
                 self.url = \
-                    f"http://farm{obj.get('farm').encode('utf-8')}.static." \
-                    f"flickr.com/{obj.get('server').encode('utf-8')}/" \
-                    f"{obj.get('id').encode('utf-8')}_" \
-                    f"{obj.get('secret').encode('utf-8')}.jpg"
+                    f'http://farm{obj.get("farm").encode("utf-8")}.static.' \
+                    f'flickr.com/{obj.get("server").encode("utf-8")}/' \
+                    f'{obj.get("id").encode("utf-8")}_' \
+                    f'{obj.get("secret").encode("utf-8")}.jpg'
 
         if parent is None:
             self.parent_id = -1
@@ -209,25 +209,25 @@ class FlickrItem(log.LogAble):
     def set_item_size_and_date(self):
 
         def gotPhoto(result):
-            self.debug(f"gotPhoto {result}")
+            self.debug(f'gotPhoto {result}')
             _, headers = result
             length = headers.get('content-length', None)
             modified = headers.get('last-modified', None)
             if length is not None:
                 self.item.res[0].size = int(length[0])
             if modified is not None:
-                """ Tue, 06 Feb 2007 15:56:32 GMT """
+                ''' Tue, 06 Feb 2007 15:56:32 GMT '''
                 self.item.date = datetime(*parsedate_tz(modified[0])[0:6])
 
         def gotError(failure, url):
-            self.warning(f"error requesting {failure} {url}")
+            self.warning(f'error requesting {failure} {url}')
             self.info(failure)
 
         getPage(self.real_url, method='HEAD', timeout=60).addCallbacks(
             gotPhoto, gotError, None, None, [self.real_url], None)
 
     def remove(self):
-        # print "FSItem remove", self.id, self.get_name(), self.parent
+        # print('FSItem remove', self.id, self.get_name(), self.parent)
         if self.parent:
             self.parent.remove_child(self)
         del self.item
@@ -238,8 +238,8 @@ class FlickrItem(log.LogAble):
             self.update_id += 1
 
     def remove_child(self, child):
-        self.info(f"remove_from {self.id:d} ({self.get_name()}) "
-                  f"child {child.id:d} ({child.get_name()})")
+        self.info(f'remove_from {self.id:d} ({self.get_name()}) '
+                  f'child {child.id:d} ({child.get_name()})')
         if child in self.children:
             self.children.remove(child)
             self.update_id += 1
@@ -525,10 +525,10 @@ class FlickrStore(BackendStore):
 
         def update_photo_details(result, photo):
             dates = result.find('dates')
-            self.debug(f"update_photo_details {dates.get('posted')} "
-                       f"{dates.get('taken')}")
+            self.debug(f'update_photo_details {dates.get("posted")} '
+                       f'{dates.get("taken")}')
             photo.item.date = datetime(
-                *time.strptime(dates.get('taken'), "%Y-%m-%d %H:%M:%S")[0:6])
+                *time.strptime(dates.get('taken'), '%Y-%m-%d %H:%M:%S')[0:6])
 
         # d = self.flickr_photos_getInfo(obj.get('id'),obj.get('secret'))
         # d.addCallback(update_photo_details, self.store[id])
@@ -587,10 +587,10 @@ class FlickrStore(BackendStore):
 
         def update_photo_details(result, photo):
             dates = result.find('dates')
-            self.debug(f"update_photo_details {dates.get('posted')} "
-                       f"{dates.get('taken')}")
+            self.debug(f'update_photo_details {dates.get("posted")} '
+                       f'{dates.get("taken")}')
             photo.item.date = datetime(
-                *time.strptime(dates.get('taken'), "%Y-%m-%d %H:%M:%S")[0:6])
+                *time.strptime(dates.get('taken'), '%Y-%m-%d %H:%M:%S')[0:6])
 
         # d = self.flickr_photos_getInfo(obj.get('id'),obj.get('secret'))
         # d.addCallback(update_photo_details, self.store[id])
@@ -674,8 +674,8 @@ class FlickrStore(BackendStore):
         for photo in result.getiterator('photo'):
             self.append(photo, parent)
             count += 1
-        self.info(f"initialized photo set "
-                  f"{parent.get_name()} with {count:d} images")
+        self.info(f'initialized photo set '
+                  f'{parent.get_name()} with {count:d} images')
 
     def append_flickr_photo_result(self, result, parent):
         count = 0
@@ -683,7 +683,7 @@ class FlickrStore(BackendStore):
             self.appendPhoto(photo, parent)
             count += 1
         self.info(
-            f"initialized photo set {parent.get_name()} with {count:d} images")
+            f'initialized photo set {parent.get_name()} with {count:d} images')
 
     def append_flickr_photoset_result(self, result, parent):
         photoset_count = 0
@@ -708,7 +708,7 @@ class FlickrStore(BackendStore):
         if isinstance(id, bytes):
             id = id.decode('utf-8')
         if isinstance(id, str) and id.startswith('upload.'):
-            self.info(f"get_by_id looking for {id}")
+            self.info(f'get_by_id looking for {id}')
             try:
                 item = self.uploads[id]
                 self.info(f'get_by_id found {item!r}')
@@ -735,16 +735,16 @@ class FlickrStore(BackendStore):
         return ret
 
     def got_error(self, error):
-        self.warning(f"trouble refreshing Flickr data {error!r}")
-        self.debug(f"{error.getTraceback()!r}")
+        self.warning(f'trouble refreshing Flickr data {error}')
+        self.debug(f'{error.getTraceback()}')
 
     def update_flickr_result(self, result, parent, element='photo'):
-        """ - is in in the store, but not in the update,
+        ''' - is in in the store, but not in the update,
               remove it from the store
             - the photo is already in the store, skip it
             - if in the update, but not in the store,
               append it to the store
-        """
+        '''
         old_ones = {}
         new_ones = {}
         for child in parent.get_children():
@@ -753,30 +753,30 @@ class FlickrStore(BackendStore):
             new_ones[photo.get('id')] = photo
         for id, child in list(old_ones.items()):
             if id in new_ones:
-                self.debug("%s already there", id)
+                self.debug('%s already there', id)
                 del new_ones[id]
             elif child.id != UNSORTED_CONTAINER_ID:
-                self.debug("%s needs removal", child.get_flickr_id())
+                self.debug('%s needs removal', child.get_flickr_id())
                 del old_ones[id]
                 self.remove(child.get_id())
-        self.info(f"refresh pass 1: old: {len(old_ones):d} "
-                  f"- new: {len(new_ones):d} - store: {len(self.store):d}")
+        self.info(f'refresh pass 1: old: {len(old_ones):d} '
+                  f'- new: {len(new_ones):d} - store: {len(self.store):d}')
         for photo in list(new_ones.values()):
             if element == 'photo':
                 self.appendPhoto(photo, parent)
             elif element == 'photoset':
                 self.appendPhotoset(photo, parent)
 
-        self.debug(f"refresh pass 2: old: {len(old_ones):d} "
-                   f"- new: {len(new_ones):d} - store: {len(self.store):d}")
+        self.debug(f'refresh pass 2: old: {len(old_ones):d} '
+                   f'- new: {len(new_ones):d} - store: {len(self.store):d}')
         if len(new_ones) > 0:
-            self.info(f"updated {parent.get_name()} "
-                      f"with {len(new_ones):d} new {element}s")
+            self.info(f'updated {parent.get_name()} '
+                      f'with {len(new_ones):d} new {element}s')
 
         if element == 'photoset':
-            """ now we need to check the childs of all photosets
+            ''' now we need to check the childs of all photosets
                 something that should be reworked imho
-            """
+            '''
             for child in parent.get_children():
                 if child.id == UNSORTED_CONTAINER_ID:
                     continue
@@ -785,7 +785,7 @@ class FlickrStore(BackendStore):
                 d.addErrback(self.got_error)
 
     def refresh_store(self):
-        self.debug("refresh_store")
+        self.debug('refresh_store')
 
         d = self.flickr_interestingness()
         d.addCallback(self.update_flickr_result, self.most_wanted)
@@ -811,14 +811,14 @@ class FlickrStore(BackendStore):
 
     def flickr_call(self, method, **kwargs):
         def got_result(result, method):
-            self.debug(f'flickr_call {method!r} result {result!r}')
+            self.debug(f'flickr_call {method} result {result}')
             result = parse_xml(result, encoding='utf-8')
             return result
 
         def got_error(error, method):
             self.warning(
-                f"connection to Flickr {method!r} service failed! {error!r}")
-            self.debug(f"{error.getTraceback()!r}")
+                f'connection to Flickr {method} service failed! {error}')
+            self.debug(f'{error.getTraceback()}')
             return error
 
         args = {}
@@ -880,7 +880,7 @@ class FlickrStore(BackendStore):
 
     def flickr_interestingness(self, date=None, per_page=100):
         if date is None:
-            date = time.strftime("%Y-%m-%d",
+            date = time.strftime('%Y-%m-%d',
                                  time.localtime(time.time() - 86400))
         if per_page > 500:
             per_page = 500
@@ -890,7 +890,7 @@ class FlickrStore(BackendStore):
 
     def flickr_recent(self, date=None, per_page=100):
         if date is None:
-            date = time.strftime("%Y-%m-%d",
+            date = time.strftime('%Y-%m-%d',
                                  time.localtime(time.time() - 86400))
         if per_page > 500:
             per_page = 500
@@ -977,7 +977,7 @@ class FlickrStore(BackendStore):
             print(error)
 
         def got_auth_token(result):
-            print("got_auth_token", result)
+            print('got_auth_token', result)
             result = result.getroot()
             token = result.find('token').text
             print('token', token)
@@ -992,7 +992,7 @@ class FlickrStore(BackendStore):
             return d
 
         def got_frob(result):
-            print("flickr", result)
+            print('flickr', result)
             result = result.getroot()
             frob = result.text
             print(frob)
@@ -1012,16 +1012,16 @@ class FlickrStore(BackendStore):
 
     def soap_flickr_test_echo(self, value):
         client = SOAPProxy(
-            "http://api.flickr.com/services/soap/",
-            namespace=("x", "urn:flickr"),
-            envelope_attrib=[("xmlns:s",
-                             "http://www.w3.org/2003/05/soap-envelope"),
-                             ("xmlns:xsi",
-                             "http://www.w3.org/1999/XMLSchema-instance"),
-                             ("xmlns:xsd",
-                             "http://www.w3.org/1999/XMLSchema")],
-            soapaction="FlickrRequest")
-        d = client.callRemote("FlickrRequest",
+            'http://api.flickr.com/services/soap/',
+            namespace=('x', 'urn:flickr'),
+            envelope_attrib=[('xmlns:s',
+                             'http://www.w3.org/2003/05/soap-envelope'),
+                             ('xmlns:xsi',
+                             'http://www.w3.org/1999/XMLSchema-instance'),
+                             ('xmlns:xsd',
+                             'http://www.w3.org/1999/XMLSchema')],
+            soapaction='FlickrRequest')
+        d = client.callRemote('FlickrRequest',
                               {'method': 'flickr.test.echo',
                                'name': value,
                                'api_key': '837718c8a622c699edab0ea55fcec224'})
@@ -1152,7 +1152,7 @@ class FlickrStore(BackendStore):
             self.backend_import(item, io.StringIO(result[0]))
 
         def gotError(error, url):
-            self.warning(f"error requesting {url}")
+            self.warning(f'error requesting {url}')
             self.info(error)
             return failure.Failure(errorCode(718))
 
@@ -1164,7 +1164,7 @@ class FlickrStore(BackendStore):
         return {'TransferID': transfer_id}
 
     def upnp_CreateObject(self, *args, **kwargs):
-        print(f"upnp_CreateObject {args} {kwargs}")
+        print(f'upnp_CreateObject {args} {kwargs}')
         ContainerID = kwargs['ContainerID']
         Elements = kwargs['Elements']
 
@@ -1240,27 +1240,27 @@ class FlickrStore(BackendStore):
         boundary = _make_boundary()
         body = []
         for k, v in list(fields.items()):
-            body.append("--" + boundary.encode("utf-8"))
+            body.append('--' + boundary.encode('utf-8'))
             header = f'Content-Disposition: form-data; name="{k}";'
             if isinstance(v, FilePath):
                 header += f'filename="{v.basename()}";'
                 body.append(header)
-                header = "Content-Type: application/octet-stream"
+                header = 'Content-Type: application/octet-stream'
                 body.append(header)
-                body.append("")
+                body.append('')
                 body.append(v.getContent())
             elif hasattr(v, 'read'):
                 header += f'filename="{"unknown"}";'
                 body.append(header)
-                header = "Content-Type: application/octet-stream"
+                header = 'Content-Type: application/octet-stream'
                 body.append(header)
-                body.append("")
+                body.append('')
                 body.append(v.read())
             else:
                 body.append(header)
-                body.append("")
+                body.append('')
                 body.append(str(v).encode('utf-8'))
-        body.append("--" + boundary.encode("utf-8"))
+        body.append('--' + boundary.encode('utf-8'))
         content_type = f'multipart/form-data; boundary={boundary}'
         return content_type, '\r\n'.join(body)
 
@@ -1278,16 +1278,16 @@ class FlickrStore(BackendStore):
         fields['photo'] = image
 
         (content_type, formdata) = self.encode_multipart_form(fields)
-        headers = {b"Content-Type": content_type.encode('ascii'),
-                   b"Content-Length": str(len(formdata)).encode('ascii')}
+        headers = {b'Content-Type': content_type.encode('ascii'),
+                   b'Content-Length': str(len(formdata)).encode('ascii')}
 
-        d = getPage(b"http://api.flickr.com/services/upload/",
-                    method=b"POST",
+        d = getPage(b'http://api.flickr.com/services/upload/',
+                    method=b'POST',
                     headers=headers,
                     postdata=formdata)
 
         def got_something(result):
-            print(f"got_something {result}")
+            print(f'got_something {result}')
             result = parse_xml(result[0], encoding='utf-8')
             result = result.getroot()
             if (result.attrib['stat'] == 'ok' and
@@ -1302,18 +1302,18 @@ class FlickrStore(BackendStore):
         return d
 
     def backend_import(self, item, data):
-        """ we expect a FlickrItem
+        ''' we expect a FlickrItem
             and the actual image data as a FilePath
             or something with a read() method.
             like the content attribute of a Request
-        """
+        '''
         d = self.flickr_upload(data, title=item.get_name())
 
         def got_photoid(id, item):
             d = self.flickr_photos_getInfo(photo_id=id)
 
             def add_it(obj, parent):
-                print(f"add_it {obj} {obj.getroot()} {parent}")
+                print(f'add_it {obj} {obj.getroot()} {parent}')
                 root = obj.getroot()
                 self.appendPhoto(obj.getroot(), parent)
                 return 200
@@ -1338,7 +1338,7 @@ def main():
                     authtoken='xxx-x')
 
     def got_flickr_result(result):
-        print(f"flickr {result}")
+        print(f'flickr {result}')
         for photo in result.getiterator('photo'):
             title = photo.get('title').encode('utf-8')
             if len(title) == 0:
@@ -1348,19 +1348,19 @@ def main():
                 print(k, item)
 
             url = \
-                f"http://farm{photo.get('farm').encode('utf-8')}.static." \
-                f"flickr.com/{photo.get('server').encode('utf-8')}/" \
-                f"{photo.get('id').encode('utf-8')}_" \
-                f"{photo.get('secret').encode('utf-8')}.jpg"
+                f'http://farm{photo.get("farm").encode("utf-8")}.static.' \
+                f'flickr.com/{photo.get("server").encode("utf-8")}/' \
+                f'{photo.get("id").encode("utf-8")}_' \
+                f'{photo.get("secret").encode("utf-8")}.jpg'
             # orginal_url = \
-            #     f"http://farm{photo.get('farm').encode('utf-8')}.static." \
-            #     f"flickr.com/{photo.get('server').encode('utf-8')}/" \
-            #     f"{photo.get('id').encode('utf-8')}_" \
-            #     f"{photo.get('originalsecret').encode('utf-8')}_o.jpg"
+            #     f'http://farm{photo.get("farm").encode("utf-8")}.static.' \
+            #     f'flickr.com/{photo.get("server").encode("utf-8")}/' \
+            #     f'{photo.get("id").encode("utf-8")}_' \
+            #     f'{photo.get("originalsecret").encode("utf-8")}_o.jpg'
             print(photo.get('id').encode('utf-8'), title, url)
 
     def got_upnp_result(result):
-        print(f"upnp {result}")
+        print(f'upnp {result}')
 
     def got_error(error):
         print(error)

@@ -96,7 +96,7 @@ class Gallery2Item(BackendItem):
             self.update_id += 1
 
     def remove_child(self, child):
-        # self.info("remove_from %d (%s) child %d (%s)" % (
+        # self.info('remove_from %d (%s) child %d (%s)' % (
         #     self.id, self.get_name(), child.id, child.get_name()))
         if child in self.children:
             self.child_count -= 1
@@ -372,7 +372,7 @@ def main():
     f = Gallery2Store(None)
 
     def got_upnp_result(result):
-        print("upnp", result)
+        print('upnp', result)
 
     f.upnp_init()
 

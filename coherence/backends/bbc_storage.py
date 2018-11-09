@@ -102,7 +102,7 @@ class Container(BackendItem):
 
 class BBCStore(BackendStore):
     implements = ['MediaServer']
-    rss_url = "http://open.bbc.co.uk/rad/uriplay/availablecontent"
+    rss_url = 'http://open.bbc.co.uk/rad/uriplay/availablecontent'
 
     def __init__(self, server, *args, **kwargs):
         BackendStore.__init__(self, server, **kwargs)
@@ -122,7 +122,7 @@ class BBCStore(BackendStore):
         return self.next_id
 
     def get_by_id(self, id):
-        # print "looking for id %r" % id
+        # print('looking for id %r' % id)
         if isinstance(id, str):
             id = id.split('@', 1)[0]
         elif isinstance(id, bytes):
@@ -144,7 +144,7 @@ class BBCStore(BackendStore):
     def update_data(self):
 
         def fail(f):
-            print("fail", f)
+            print('fail', f)
             return f
 
         dfr = getPage(self.rss_url)
@@ -179,7 +179,7 @@ class BBCStore(BackendStore):
                     seconds = seconds - hours * 3600
                     minutes = seconds / 60
                     seconds = seconds - minutes * 60
-                    duration = f"{hours:d}:{minutes:02d}:{seconds:02d}"
+                    duration = f'{hours:d}:{minutes:02d}:{seconds:02d}'
                     for manifestation in version.findall(
                             './{http://uriplay.org/elements/}manifestedAs'):
                         encoding = manifestation.find(

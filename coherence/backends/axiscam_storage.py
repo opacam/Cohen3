@@ -56,11 +56,11 @@ class AxisCamItem(BackendItem):
             self.item.res.append(res)
 
     def __del__(self):
-        # print "AxisCamItem __del__", self.id, self.name
+        # print('AxisCamItem __del__', self.id, self.name)
         pass
 
     def remove(self):
-        # print "AxisCamItem remove", self.id, self.name, self.parent
+        # print('AxisCamItem remove', self.id, self.name, self.parent)
         if self.parent:
             self.parent.remove_child(self)
         del self.item
@@ -74,8 +74,8 @@ class AxisCamItem(BackendItem):
 
     def remove_child(self, child):
         self.info(
-            f"remove_from {self.id:d} {self.get_name():s} "
-            f"child {child.id:d} ({child.get_name():s})")
+            f'remove_from {self.id:d} {self.get_name():s} '
+            f'child {child.id:d} ({child.get_name():s})')
         if child in self.children:
             if isinstance(self.item, Container):
                 self.item.childCount -= 1
@@ -215,7 +215,7 @@ def main():
     f = AxisCamStore(None)
 
     def got_upnp_result(result):
-        print("upnp", result)
+        print('upnp', result)
 
     # f.upnp_init()
     # print f.store

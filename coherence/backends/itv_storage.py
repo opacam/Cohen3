@@ -36,8 +36,8 @@ class ProxyStream(utils.ReverseProxyUriResource, log.LogAble):
         utils.ReverseProxyUriResource.__init__(self, uri)
 
     def requestFinished(self, result):
-        """ self.connection is set in utils.ReverseProxyResource.render """
-        self.info("ProxyStream requestFinished")
+        ''' self.connection is set in utils.ReverseProxyResource.render '''
+        self.info('ProxyStream requestFinished')
         if self.connection is not None:
             self.connection.transport.loseConnection()
 
@@ -52,9 +52,9 @@ class ProxyStream(utils.ReverseProxyUriResource, log.LogAble):
                 result = result[0].split('\n')
                 for line in result:
                     if line.startswith('File1='):
-                        self.stream_url = line[6:].split(";")[0]
+                        self.stream_url = line[6:].split(';')[0]
                         break
-                # print "stream URL:", self.stream_url
+                # print('stream URL:', self.stream_url)
                 if self.stream_url is None:
                     self.warning(
                         'Error to retrieve playlist - '
@@ -69,7 +69,7 @@ class ProxyStream(utils.ReverseProxyUriResource, log.LogAble):
                 return None
 
             playlist_url = self.uri
-            # print "playlist URL:", playlist_url
+            # print('playlist URL:', playlist_url)
             d = utils.getPage(playlist_url, timeout=20)
             d.addCallbacks(got_playlist, got_error)
             return server.NOT_DONE_YET
@@ -273,16 +273,16 @@ class ITVStore(BackendStore):
         self.retrieveList(rootItem)
 
     def retrieveList(self, parent):
-        self.info("Retrieving Shoutcast TV listing...")
+        self.info('Retrieving Shoutcast TV listing...')
 
         def got_page(result):
             if self.retrieveList_attemptCount == 0:
-                self.info("Connection to ShoutCast service "
-                          "successful for TV listing")
+                self.info('Connection to ShoutCast service '
+                          'successful for TV listing')
             else:
-                self.warning(f"Connection to ShoutCast service "
-                             f"successful for TV listing after "
-                             f"{self.retrieveList_attemptCount:d} attempts.")
+                self.warning(f'Connection to ShoutCast service '
+                             f'successful for TV listing after '
+                             f'{self.retrieveList_attemptCount:d} attempts.')
             result = result[0]
             result = utils.parse_xml(result, encoding='utf-8')
 
@@ -328,8 +328,8 @@ class ITVStore(BackendStore):
 
         def got_error(error):
             self.warning(
-                "Connection to ShoutCast service failed. Will retry in 5s!")
-            self.debug(f"{error.getTraceback()!r}")
+                'Connection to ShoutCast service failed. Will retry in 5s!')
+            self.debug(f'{error.getTraceback()}')
             # will retry later
             self.retrieveList_attemptCount += 1
             reactor.callLater(5, self.retrieveList, parent=parent)

@@ -30,7 +30,7 @@ class VideoItem(BackendItem):
         self.name = name
         self.duration = None
         self.size = None
-        self.mimetype = "video"
+        self.mimetype = 'video'
         self.url = None
         self.video_url = url
         self.thumbnail_url = thumbnail_url
@@ -129,24 +129,24 @@ class MiroGuideStore(AbstractBackendStore):
         rootItem = Container(None, self.name)
         self.set_root_item(rootItem)
 
-        categoriesItem = Container(rootItem, "All by Categories")
+        categoriesItem = Container(rootItem, 'All by Categories')
         rootItem.add_child(categoriesItem)
-        languagesItem = Container(rootItem, "All by Languages")
+        languagesItem = Container(rootItem, 'All by Languages')
         rootItem.add_child(languagesItem)
 
-        self.appendLanguage("Recent Videos", self.language, rootItem,
+        self.appendLanguage('Recent Videos', self.language, rootItem,
                             sort='-age', count=15)
-        self.appendLanguage("Top Rated", self.language, rootItem,
+        self.appendLanguage('Top Rated', self.language, rootItem,
                             sort='rating', count=15)
-        self.appendLanguage("Most Popular", self.language, rootItem,
+        self.appendLanguage('Most Popular', self.language, rootItem,
                             sort='-popular', count=15)
 
         def gotError(error):
-            print("ERROR: %s" % error)
+            print(f'ERROR: {error}')
 
         def gotCategories(result):
             if result is None:
-                print("Unable to retrieve list of categories")
+                print('Unable to retrieve list of categories')
                 return
             data, header = result
             categories = eval(
@@ -156,13 +156,13 @@ class MiroGuideStore(AbstractBackendStore):
                 category_url = category['url'].encode('ascii', 'strict')
                 self.appendCategory(name, name, categoriesItem)
 
-        categories_url = "https://www.miroguide.com/api/list_categories"
+        categories_url = 'https://www.miroguide.com/api/list_categories'
         d1 = utils.getPage(categories_url)
         d1.addCallbacks(gotCategories, gotError)
 
         def gotLanguages(result):
             if result is None:
-                print("Unable to retrieve list of languages")
+                print('Unable to retrieve list of languages')
                 return
             data, header = result
             languages = eval(
@@ -172,7 +172,7 @@ class MiroGuideStore(AbstractBackendStore):
                 language_url = language['url'].encode('ascii', 'strict')
                 self.appendLanguage(name, name, languagesItem)
 
-        languages_url = "https://www.miroguide.com/api/list_languages"
+        languages_url = 'https://www.miroguide.com/api/list_languages'
         d2 = utils.getPage(languages_url)
         d2.addCallbacks(gotLanguages, gotError)
 
@@ -183,13 +183,13 @@ class MiroGuideStore(AbstractBackendStore):
 
     def appendCategory(self, name, category_id, parent):
         item = LazyContainer(parent, name, category_id, self.refresh,
-                             self.retrieveChannels, filter="category",
+                             self.retrieveChannels, filter='category',
                              filter_value=category_id, per_page=100)
         parent.add_child(item, external_id=category_id)
 
     def appendLanguage(self, name, language_id, parent, sort='name', count=0):
         item = LazyContainer(parent, name, language_id, self.refresh,
-                             self.retrieveChannels, filter="language",
+                             self.retrieveChannels, filter='language',
                              filter_value=language_id, per_page=100, sort=sort,
                              count=count)
         parent.add_child(item, external_id=language_id)
@@ -213,22 +213,22 @@ class MiroGuideStore(AbstractBackendStore):
 
     def retrieveChannels(self, parent, filter, filter_value, per_page=100,
                          page=0, offset=0, count=0, sort='name'):
-        filter_value = urllib.parse.quote(filter_value.encode("utf-8"))
+        filter_value = urllib.parse.quote(filter_value.encode('utf-8'))
 
         limit = count
         if count == 0:
             limit = per_page
         uri = \
-            f"https://www.miroguide.com/api/get_channels?" \
-            f"limit={limit:d}&offset={offset:d}&filter={filter}&" \
-            f"filter_value={filter_value}&sort={sort}"
+            f'https://www.miroguide.com/api/get_channels?' \
+            f'limit={limit:d}&offset={offset:d}&filter={filter}&' \
+            f'filter_value={filter_value}&sort={sort}'
         # print uri
         d = utils.getPage(uri)
 
         def gotChannels(result):
             if result is None:
                 print(
-                    f"Unable to retrieve channel for category {filter}")
+                    f'Unable to retrieve channel for category {filter}')
                 return
             data, header = result
             channels = eval(data)
@@ -244,22 +244,22 @@ class MiroGuideStore(AbstractBackendStore):
                 name = channel['name']
                 self.appendChannel(name, id, parent)
             if (count == 0) and (len(channels) >= per_page):
-                # print "reached page limit (%d)" % len(channels)
+                # print('reached page limit (%d)' % len(channels))
                 parent.childrenRetrievingNeeded = True
 
         def gotError(error):
-            print(f"ERROR: {error}")
+            print(f'ERROR: {error}')
 
         d.addCallbacks(gotChannels, gotError)
         return d
 
     def retrieveChannelItems(self, parent, channel_id):
-        uri = f"https://www.miroguide.com/api/get_channel?id={channel_id}"
+        uri = f'https://www.miroguide.com/api/get_channel?id={channel_id}'
         d = utils.getPage(uri)
 
         def gotItems(result):
             if result is None:
-                print(f"Unable to retrieve items for channel {channel_id}")
+                print(f'Unable to retrieve items for channel {channel_id}')
                 return
             data, header = result
             channel = eval(data)
@@ -267,14 +267,14 @@ class MiroGuideStore(AbstractBackendStore):
             if 'item' in channel:
                 items = channel['item']
             for item in items:
-                # print "item:",item
+                # print('item:',item)
                 url = item['url']
                 description = item['description']
-                # print "description:", description
+                # print('description:', description)
                 name = item['name']
                 thumbnail_url = None
                 if 'thumbnail_url' in channel:
-                    # print "Thumbnail:", channel['thumbnail_url']
+                    # print('Thumbnail:', channel['thumbnail_url'])
                     thumbnail_url = channel['thumbnail_url']
                 # size = size['size']
                 item = VideoItem(name, description, url, thumbnail_url, self)
@@ -282,7 +282,7 @@ class MiroGuideStore(AbstractBackendStore):
                 parent.add_child(item, external_id=url)
 
         def gotError(error):
-            print(f"ERROR: {error}")
+            print(f'ERROR: {error}')
 
         d.addCallbacks(gotItems, gotError)
         return d

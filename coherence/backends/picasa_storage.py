@@ -178,7 +178,7 @@ class PicasaStore(AbstractBackendStore):
 
         def gotAlbums(albums):
             if albums is None:
-                print("Unable to retrieve albums")
+                print('Unable to retrieve albums')
                 return
             for album in albums.entry:
                 title = album.title.text
@@ -189,7 +189,7 @@ class PicasaStore(AbstractBackendStore):
                 parent.add_child(item, external_id=album_id)
 
         def gotError(error):
-            print(f"ERROR: {error}")
+            print(f'ERROR: {error}')
 
         albums.addCallbacks(gotAlbums, gotError)
         return albums
@@ -200,7 +200,7 @@ class PicasaStore(AbstractBackendStore):
 
         def gotPhotos(photos):
             if photos is None:
-                print(f"Unable to retrieve photos for feed {feed_uri}")
+                print(f'Unable to retrieve photos for feed {feed_uri}')
                 return
             for photo in photos.entry:
                 photo_id = photo.gphoto_id.text
@@ -209,7 +209,7 @@ class PicasaStore(AbstractBackendStore):
                 parent.add_child(item, external_id=photo_id)
 
         def gotError(error):
-            print(f"ERROR: {error}")
+            print(f'ERROR: {error}')
 
         photos.addCallbacks(gotPhotos, gotError)
         return photos

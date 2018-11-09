@@ -41,7 +41,7 @@ class ElisaPlayer(Backend):
                 self.player = common.get_application().get_player()
                 self.init_completed = True
             except ImportError:
-                self.warning("this works only from within Elisa")
+                self.warning('this works only from within Elisa')
                 raise ImportError
         else:
             factory = pb.PBClientFactory()
@@ -57,7 +57,7 @@ class ElisaPlayer(Backend):
                 self.warning('connection to Elisa failed!')
                 self.on_init_failed(msg=error)
 
-            d.addCallback(lambda object: object.callRemote("get_player"))
+            d.addCallback(lambda object: object.callRemote('get_player'))
             d.addCallback(result)
             d.addErrback(got_error)
 
@@ -86,7 +86,7 @@ class ElisaPlayer(Backend):
     def poll_player(self):
 
         def got_result(result):
-            self.info(f"poll_player {result!r}")
+            self.info(f'poll_player {result}')
             if self.server is not None:
                 connection_id = \
                     self.server.connection_manager_server.lookup_avt_id(
@@ -107,11 +107,11 @@ class ElisaPlayer(Backend):
                     self.server.av_transport_server.set_variable(
                         connection_id, 'TransportState', transport_state)
 
-        self.call_player("get_readable_state", got_result)
+        self.call_player('get_readable_state', got_result)
 
     def query_position(self):
         def got_result(result):
-            self.info(f"query_position {result}")
+            self.info(f'query_position {result}')
             position, duration = result
             if self.server is not None:
                 connection_id = \
@@ -149,7 +149,7 @@ class ElisaPlayer(Backend):
                         for item in elt.getItems():
                             for res in item.findall('res'):
                                 res.attrib['duration'] = \
-                                    f"{h:d}:{m:02d}:{s:02d}"
+                                    f'{h:d}:{m:02d}:{s:02d}'
                         self.metadata = elt.toString()
 
                         if self.server is not None:
@@ -162,7 +162,7 @@ class ElisaPlayer(Backend):
 
                     self.duration = duration
 
-        self.call_player("get_status", got_result)
+        self.call_player('get_status', got_result)
 
     def load(self, uri, metadata):
 
@@ -188,7 +188,7 @@ class ElisaPlayer(Backend):
             self.server.av_transport_server.set_variable(
                 connection_id, 'CurrentTrackMetaData', metadata)
 
-        self.call_player("set_uri", got_result, uri)
+        self.call_player('set_uri', got_result, uri)
 
     def start(self, uri, metadata=None):
         self.load(uri, metadata)
@@ -201,7 +201,7 @@ class ElisaPlayer(Backend):
                     self.current_connection_id),
                 'TransportState', 'STOPPED')
 
-        self.call_player("stop", got_result)
+        self.call_player('stop', got_result)
 
     def play(self):
         def got_result(result):
@@ -210,7 +210,7 @@ class ElisaPlayer(Backend):
                     self.current_connection_id),
                 'TransportState', 'PLAYING')
 
-        self.call_player("play", got_result)
+        self.call_player('play', got_result)
 
     def pause(self):
         def got_result(result):
@@ -219,14 +219,14 @@ class ElisaPlayer(Backend):
                     self.current_connection_id),
                 'TransportState', 'PAUSED_PLAYBACK')
 
-        self.call_player("pause", got_result)
+        self.call_player('pause', got_result)
 
     def seek(self, location):
-        """
+        '''
         @param location:    simple number = time to seek to, in seconds
                             +nL = relative seek forward n seconds
                             -nL = relative seek backwards n seconds
-        """
+        '''
 
     def mute(self):
         def got_result(result):
@@ -236,7 +236,7 @@ class ElisaPlayer(Backend):
             self.server.rendering_control_server.set_variable(
                 rcs_id, 'Mute', 'True')
 
-        self.call_player("mute", got_result)
+        self.call_player('mute', got_result)
 
     def unmute(self):
         def got_result(result):
@@ -246,21 +246,21 @@ class ElisaPlayer(Backend):
             self.server.rendering_control_server.set_variable(
                 rcs_id, 'Mute', 'False')
 
-        self.call_player("un_mute", got_result)
+        self.call_player('un_mute', got_result)
 
     def get_mute(self):
         def got_infos(result):
-            self.info(f"got_mute: {result!r}")
+            self.info(f'got_mute: {result}')
             return result
 
-        return self.call_player("get_mute", got_infos)
+        return self.call_player('get_mute', got_infos)
 
     def get_volume(self):
-        """ playbin volume is a double from 0.0 - 10.0
-        """
+        ''' playbin volume is a double from 0.0 - 10.0
+        '''
 
         def got_infos(result):
-            self.info(f"got_volume: {result!r}")
+            self.info(f'got_volume: {result}')
             return result
 
         return self.call_player('get_volume', got_infos)
@@ -279,7 +279,7 @@ class ElisaPlayer(Backend):
             self.server.rendering_control_server.set_variable(rcs_id, 'Volume',
                                                               volume)
 
-        self.call_player("set_volume", got_result, volume)
+        self.call_player('set_volume', got_result, volume)
 
     def upnp_init(self):
         self.current_connection_id = None

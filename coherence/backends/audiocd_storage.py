@@ -38,16 +38,16 @@ from coherence.backend import AbstractBackendStore, Container, BackendItem
 from coherence.transcoder import GStreamerPipeline
 from coherence.upnp.core import DIDLLite
 
-PLAY_TRACK_GST_PIPELINE = "cdiocddasrc device=%s track=%d ! wavenc name=enc"
-TRACK_MIMETYPE = "audio/x-wav"
-TRACK_FOURTH_FIELD = "*"
+PLAY_TRACK_GST_PIPELINE = 'cdiocddasrc device=%s track=%d ! wavenc name=enc'
+TRACK_MIMETYPE = 'audio/x-wav'
+TRACK_FOURTH_FIELD = '*'
 
 
 class TrackItem(BackendItem):
-    logCategory = "audiocd"
+    logCategory = 'audiocd'
 
-    def __init__(self, device_name="/dev/cdrom", track_number=1,
-                 artist="Unknown", title="Unknown"):
+    def __init__(self, device_name='/dev/cdrom', track_number=1,
+                 artist='Unknown', title='Unknown'):
         BackendItem.__init__(self)
         self.device_name = device_name
         self.track_number = track_number
@@ -118,7 +118,7 @@ class AudioCDStore(AbstractBackendStore):
         AbstractBackendStore.__init__(self, server, **kwargs)
 
         self.name = 'audio CD'
-        self.device_name = kwargs.get('device_name', "/dev/cdom")
+        self.device_name = kwargs.get('device_name', '/dev/cdom')
 
         threads.deferToThread(self.extractAudioCdInfo)
 
@@ -138,10 +138,10 @@ class AudioCDStore(AbstractBackendStore):
             #     0, 'SortCapabilities', '*')
 
     def extractAudioCdInfo(self):
-        """
+        '''
         extract the CD info (album art + artist + tracks),
         and construct the UPnP items
-        """
+        '''
         self.cdrom = DiscID.open(self.device_name)
         disc_id = DiscID.disc_id(self.cdrom)
 
@@ -153,7 +153,7 @@ class AudioCDStore(AbstractBackendStore):
         # print(query_info['title'])
         # print(disc_id[1])
         # for i in range(disc_id[1]):
-        #    print(f"Track {i:.02d}: {read_info['TTITLE' + repr(i)]}")
+        #    print(f'Track {i:.02d}: {read_info["TTITLE" + repr(i)]}')
 
         track_count = disc_id[1]
         disc_id = query_info['disc_id']
@@ -166,12 +166,12 @@ class AudioCDStore(AbstractBackendStore):
         self.name = self.disc_title
 
         root_item = Container(None, self.disc_title)
-        root_item.sorting_method = "track_number"
+        root_item.sorting_method = 'track_number'
         self.set_root_item(root_item)
 
         for number, title in list(tracks.items()):
-            item = TrackItem(self.device_name, number, "Unknown", title)
-            external_id = f"{disc_id}_{number:d}"
+            item = TrackItem(self.device_name, number, 'Unknown', title)
+            external_id = f'{disc_id}_{number:d}'
             root_item.add_child(item, external_id=external_id)
 
         self.info('Sharing audio CD %s', self.disc_title)

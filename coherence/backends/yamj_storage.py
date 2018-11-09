@@ -63,8 +63,8 @@ class MovieItem(BackendItem):
         else:
             self.movie_url = movie.find('./files/file/fileURL').text
 
-        self.posterURL = f"{store.jukebox_url}/{self.posterFilename}"
-        self.thumbnailURL = f"{store.jukebox_url}/{self.thumbnailFilename}"
+        self.posterURL = f'{store.jukebox_url}/{self.posterFilename}'
+        self.thumbnailURL = f'{store.jukebox_url}/{self.thumbnailFilename}'
         # print self.movie_id, self.title, self.url, self.posterURL
         self.str_genres = []
         for genre in self.genres:
@@ -75,7 +75,7 @@ class MovieItem(BackendItem):
 
         url_mimetype, _ = mimetypes.guess_type(self.movie_url, strict=False)
         if url_mimetype is None:
-            url_mimetype = "video"
+            url_mimetype = 'video'
 
         self.name = self.title
         self.duration = None
@@ -101,7 +101,7 @@ class MovieItem(BackendItem):
             self.item.originalTrackNumber = None
             self.item.restricted = None
             self.item.title = self.upnp_title
-            self.item.writeStatus = "PROTECTED"
+            self.item.writeStatus = 'PROTECTED'
             self.item.icon = self.thumbnailURL
             self.item.genre = None
             self.item.genres = self.str_genres
@@ -158,8 +158,8 @@ class YamjStore(AbstractBackendStore):
         AbstractBackendStore.__init__(self, server, **kwargs)
 
         self.name = kwargs.get('name', 'YAMJ')
-        self.yamj_url = kwargs.get('yamj_url', "http://localhost/yamj")
-        self.jukebox_url = self.yamj_url + "/Jukebox/"
+        self.yamj_url = kwargs.get('yamj_url', 'http://localhost/yamj')
+        self.jukebox_url = self.yamj_url + '/Jukebox/'
         self.refresh = int(kwargs.get('refresh', 60)) * 60
 
         self.nbMoviesPerFile = None
@@ -194,7 +194,7 @@ class YamjStore(AbstractBackendStore):
             #     0, 'SortCapabilities', '*')
 
     def retrieveCategories(self, parent):
-        filepath = self.jukebox_url + "Categories.xml"
+        filepath = self.jukebox_url + 'Categories.xml'
         dfr = getPage(filepath)
 
         def read_categories(data, parent_item, jukebox_url):
@@ -202,14 +202,14 @@ class YamjStore(AbstractBackendStore):
                 type = category.get('name')
                 category_title = type
                 if type != 'Other':
-                    category_title = f"By {category_title}"
+                    category_title = f'By {category_title}'
                 categoryItem = Container(parent_item, category_title)
                 parent_item.add_child(categoryItem)
                 for index in category.findall('./index'):
                     name = index.get('name')
                     first_filename = index.text
                     root_name = first_filename[:-2]
-                    self.debug(f"adding index {type}:{name}")
+                    self.debug(f'adding index {type}:{name}')
                     parent = categoryItem
                     if type == 'Other':
                         parent = parent_item
@@ -223,8 +223,8 @@ class YamjStore(AbstractBackendStore):
 
         def fail_categories_read(f):
             self.warning(
-                f"failure reading yamj categories "
-                f"({filepath}): {f.getErrorMessage()!r}")
+                f'failure reading yamj categories '
+                f'({filepath}): {f.getErrorMessage()!r}')
             return f
 
         dfr.addCallback(etree.fromstring)
@@ -242,28 +242,28 @@ class YamjStore(AbstractBackendStore):
         else:
             counter = abs(offset / self.nbMoviesPerFile) + 1
         fileUrl = \
-            f"{self.jukebox_url}/{urllib.parse.quote(root_name)}" \
-            f"_{counter:d}.xml"
+            f'{self.jukebox_url}/{urllib.parse.quote(root_name)}' \
+            f'_{counter:d}.xml'
 
         def fail_readPage(f):
-            self.warning(f"failure reading yamj index ({fileUrl}): "
-                         f"{f.getErrorMessage()!r}")
+            self.warning(f'failure reading yamj index ({fileUrl}): '
+                         f'{f.getErrorMessage()!r}')
             return f
 
         def fail_parseIndex(f):
-            self.warning(f"failure parsing yamj index ({fileUrl}): "
-                         f"{f.getErrorMessage()!r}")
+            self.warning(f'failure parsing yamj index ({fileUrl}): '
+                         f'{f.getErrorMessage()!r}')
             return f
 
         def readIndex(data):
             for index in data.findall('category/index'):
                 current = index.get('current')
-                if current == "true":
+                if current == 'true':
                     currentIndex = index.get('currentIndex')
                     lastIndex = index.get('lastIndex')
                     if currentIndex != lastIndex:
                         parent.childrenRetrievingNeeded = True
-                    self.debug(f"{root_name}: {currentIndex}/{lastIndex}")
+                    self.debug(f'{root_name}: {currentIndex}/{lastIndex}')
                     break
             movies = data.findall('movies/movie')
             if self.nbMoviesPerFile is None:
@@ -276,7 +276,7 @@ class YamjStore(AbstractBackendStore):
                     name = movie.find('./title').text
                     index_name = movie.find('./baseFilename').text
                     set_root_name = index_name[:-2]
-                    self.debug(f"adding set {name}")
+                    self.debug(f'adding set {name}')
                     indexItem = LazyContainer(
                         parent, name, None, self.refresh,
                         self.retrieveIndexMovies,
@@ -285,7 +285,7 @@ class YamjStore(AbstractBackendStore):
 
                 else:
                     # this is a real movie
-                    movie_id = "UNK"
+                    movie_id = 'UNK'
                     movie_id_xml = movie.find('./id')
                     if movie_id_xml is not None:
                         movie_id = movie_id_xml.text
@@ -293,7 +293,7 @@ class YamjStore(AbstractBackendStore):
                     files = movie.findall('./files/file')
                     if len(files) == 1:
                         url = files[0].find('./fileURL').text
-                        external_id = f"{movie_id}/{url}"
+                        external_id = f'{movie_id}/{url}'
                         movieItem = MovieItem(movie, self)
                         parent.add_child(movieItem, external_id)
                     else:
@@ -302,7 +302,7 @@ class YamjStore(AbstractBackendStore):
                             name = movie.find('./baseFilename').text
                         season = movie.find('season').text
                         if season is not None and season != '-1':
-                            name = f"{name} - season {season}"
+                            name = f'{name} - season {season}'
                         container_item = Container(parent, name)
                         parent.add_child(container_item, name)
                         container_item.store = self
@@ -310,17 +310,17 @@ class YamjStore(AbstractBackendStore):
                             episodeIndex = file.attrib['firstPart']
                             episodeTitle = file.attrib['title']
                             if episodeTitle == 'UNKNOWN':
-                                title = f"{name} - {episodeIndex}"
+                                title = f'{name} - {episodeIndex}'
                             else:
-                                title = f"{episodeIndex} - {episodeTitle} "
+                                title = f'{episodeIndex} - {episodeTitle} '
                             episodeUrl = file.find('./fileURL').text
                             fileItem = MovieItem(
                                 movie, self, title=title, url=episodeUrl)
-                            file_external_id = f"{movie_id}/{episodeUrl}"
+                            file_external_id = f'{movie_id}/{episodeUrl}'
                             container_item.add_child(
                                 fileItem, file_external_id)
 
-        self.debug(f"Reading index file {fileUrl}")
+        self.debug(f'Reading index file {fileUrl}')
         d = getPage(fileUrl)
         d.addCallback(etree.fromstring)
         d.addErrback(fail_readPage)

@@ -67,7 +67,7 @@ class LolcatsStore(BackendImageStore):
         'DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
         'http-get:*:image/jpeg:*']
 
-    root_url = b"https://icanhas.cheezburger.com/lolcats/rss"
+    root_url = b'https://icanhas.cheezburger.com/lolcats/rss'
     root_find_items = './channel/item'
     root_id = 0
 
@@ -89,7 +89,7 @@ class LolcatsStore(BackendImageStore):
 
     def parse_item(self, item):
         title = item.find('title').text
-        title = re.sub("(\u2018|\u2019)", "'", title)
+        title = re.sub('(\u2018|\u2019)', '\'', title)
 
         try:
             img_html = item.find(

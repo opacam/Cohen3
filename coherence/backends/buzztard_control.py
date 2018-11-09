@@ -49,7 +49,7 @@ class BzClient(LineReceiver, EventDispatcher, log.LogAble):
         )
 
     def connectionMade(self):
-        self.info("connected to Buzztard")
+        self.info('connected to Buzztard')
         if self.factory is None:
             self.error('Cannot access to BzClient.factory '
                        'property...cancelled')
@@ -57,7 +57,7 @@ class BzClient(LineReceiver, EventDispatcher, log.LogAble):
         self.factory.clientReady(self)
 
     def lineReceived(self, line):
-        self.debug("received: %s", line)
+        self.debug(f'received: {line}')
 
         if line == 'flush':
             self.dispatch_event('response_flush')
@@ -96,7 +96,7 @@ class BzFactory(protocol.ClientFactory, log.LogAble):
         self.clientInstance = None
 
     def clientReady(self, instance):
-        self.info("clientReady")
+        self.info('clientReady')
         self.backend.init_completed = True
         self.clientInstance = instance
         for msg in self.messageQueue:
@@ -128,10 +128,10 @@ class BzConnection(log.LogAble):
 
     def __init__(self, backend=None, host='localhost', port=7654):
         log.LogAble.__init__(self)
-        self.debug("BzConnection __init__")
+        self.debug('BzConnection __init__')
 
     def __new__(cls, *args, **kwargs):
-        print(cls, "BzConnection __new__")
+        print(cls, 'BzConnection __new__')
         obj = getattr(cls, '_instance_', None)
         if obj is not None:
             if kwargs['backend']:
@@ -189,7 +189,7 @@ class BuzztardItem(log.LogAble):
         pass
 
     def remove(self, store):
-        self.debug(f"BuzztardItem remove {self.id} {self.name} {self.parent}")
+        self.debug(f'BuzztardItem remove {self.id} {self.name} {self.parent}')
         while len(self.children) > 0:
             child = self.children.pop()
             self.remove_child(child)
@@ -214,8 +214,8 @@ class BuzztardItem(log.LogAble):
 
     def remove_child(self, child):
         self.debug(
-            f"remove_from {self.id:d} ({self.get_name()}) "
-            f"child {child.id:d} ({child.get_name()})")
+            f'remove_from {self.id:d} ({self.get_name()}) '
+            f'child {child.id:d} ({child.get_name()})')
         if child in self.children:
             self.child_count -= 1
             if isinstance(self.item, Container):
@@ -383,7 +383,7 @@ class BuzztardStore(Backend):
         self.buzztard.connection.protocol.bind(
             response_browse=self.clear)
 
-        source_protocols = ""
+        source_protocols = ''
         if self.server:
             self.server.connection_manager_server.set_variable(
                 0, 'SourceProtocolInfo', source_protocols, default=True)
@@ -665,7 +665,7 @@ class BuzztardPlayer(log.LogAble):
 
 
 def on_init_complete(backend):
-    print("Houston, we have a touchdown!")
+    print('Houston, we have a touchdown!')
     backend.buzztard.sendMessage('browse')
 
 
@@ -689,7 +689,7 @@ def main():
     print(f.store)
 
     # def got_upnp_result(result):
-    #    print("upnp", result)
+    #    print('upnp', result)
 
     # f.upnp_init()
     # print f.store

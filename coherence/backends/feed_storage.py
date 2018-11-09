@@ -18,9 +18,9 @@ from coherence.upnp.core.utils import ReverseProxyUriResource
 try:
     import feedparser
 except ImportError:
-    raise ImportError("""
+    raise ImportError('''
         This backend depends on the feedparser module.
-        You can get it at http://www.feedparser.org/.""")
+        You can get it at http://www.feedparser.org/.''')
 
 MIME_TYPES_EXTENTION_MAPPING = {'mp3': 'audio/mpeg', }
 
@@ -64,13 +64,13 @@ class FeedContainer(BackendItem):
         self.children = []
 
     def get_children(self, start=0, end=0):
-        """returns all the chidlren of this container"""
+        '''returns all the chidlren of this container'''
         if end != 0:
             return self.children[start:end]
         return self.children[start:]
 
     def get_child_count(self):
-        """returns the number of children in this container"""
+        '''returns the number of children in this container'''
         return len(self.children)
 
 
@@ -99,14 +99,14 @@ class FeedEnclosure(BackendItem):
         elif enclosure.type.startswith('image'):
             self.item = DIDLLite.ImageItem(id, parent, self.name)
 
-        res = DIDLLite.Resource(f"{store.urlbase}{id:d}",
+        res = DIDLLite.Resource(f'{store.urlbase}{id:d}',
                                 f'http-get:*:{mime_type}:*')
 
         self.item.res.append(res)
 
 
 class FeedStore(BackendStore):
-    """a general feed store"""
+    '''a general feed store'''
 
     logCategory = 'feed_store'
     implements = ['MediaServer']
@@ -122,10 +122,10 @@ class FeedStore(BackendStore):
         self.opml_url = kwargs.get('opml_url')
         if not (self.feed_urls or self.opml_url):
             raise FeedStorageConfigurationException(
-                "either feed_urls or opml_url has to be set")
+                'either feed_urls or opml_url has to be set')
         if self.feed_urls and self.opml_url:
             raise FeedStorageConfigurationException(
-                "only feed_urls OR opml_url can be set")
+                'only feed_urls OR opml_url can be set')
 
         self.server = server
         self.refresh = \
@@ -155,7 +155,7 @@ class FeedStore(BackendStore):
         self.init_completed()
 
     def get_by_id(self, id):
-        """returns the item according to the DIDLite id"""
+        '''returns the item according to the DIDLite id'''
         if isinstance(id, str):
             id = id.split('@', 1)[0]
         elif isinstance(id, bytes):
@@ -164,11 +164,11 @@ class FeedStore(BackendStore):
             return self.store[int(id)]
         except (ValueError, KeyError):
             self.info(
-                f"can't get item {int(id):d} from {self.name} feed storage")
+                f'can\'t get item {int(id):d} from {self.name} feed storage')
         return None
 
     def _update_data(self):
-        """get the feed xml, parse it, etc."""
+        '''get the feed xml, parse it, etc.'''
         feed_urls = []
         if (self.opml_url):
             tree = ElementTree(file=urllib.request.urlopen(self.opml_url))

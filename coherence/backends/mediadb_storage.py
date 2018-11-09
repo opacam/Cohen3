@@ -5,7 +5,7 @@
 
 # Copyright 2007,2008, Frank Scholz <coherence@beebits.net>
 
-"""
+'''
 
 MediaStore
 
@@ -40,7 +40,7 @@ depends on:
 
     CoversByAmazon - https://coherence.beebits.net/browser/
                      trunk/coherence/extern/covers_by_amazon.py
-"""
+'''
 
 import os
 import shutil
@@ -116,8 +116,8 @@ except ImportError:
 
 if not get_tags:
     raise ImportError(
-        "we need some installed id3 tag library for this backend: "
-        "python-tagpy, pyid3lib or libmtag")
+        'we need some installed id3 tag library for this backend: '
+        'python-tagpy, pyid3lib or libmtag')
 
 MEDIA_DB = 'tests/media.db'
 
@@ -194,7 +194,7 @@ class Container(BackendItem):
 
 
 class Artist(item.Item, BackendItem):
-    """ definition for an artist """
+    ''' definition for an artist '''
 
     schemaVersion = 1
     typeName = 'artist'
@@ -257,7 +257,7 @@ class Artist(item.Item, BackendItem):
 
 
 class Album(item.Item, BackendItem):
-    """ definition for an album """
+    ''' definition for an album '''
 
     schemaVersion = 1
     typeName = 'album'
@@ -320,7 +320,7 @@ class Album(item.Item, BackendItem):
 
 
 class Track(item.Item, BackendItem):
-    """ definition for a track """
+    ''' definition for a track '''
 
     schemaVersion = 1
     typeName = 'track'
@@ -347,8 +347,8 @@ class Track(item.Item, BackendItem):
         item.album = self.album.title
         if self.album.cover != '':
             _, ext = os.path.splitext(self.album.cover)
-            """ add the cover image extension to help clients not reacting on
-                the mimetype """
+            ''' add the cover image extension to help clients not reacting on
+                the mimetype '''
             item.albumArtURI = ''.join(
                 (self.store.urlbase, str(self.storeID + 1000), '?cover', ext))
         item.originalTrackNumber = self.track_nr
@@ -445,14 +445,14 @@ class Track(item.Item, BackendItem):
 
 
 class Playlist(item.Item, BackendItem):
-    """ definition for a playlist
+    ''' definition for a playlist
 
         - has a name
         - and references to tracks
         - that reference list must keep its ordering
            and items can be inserted at any place,
            moved up or down or deleted
-    """
+    '''
 
     schemaVersion = 1
     typeName = ''
@@ -473,7 +473,7 @@ class MediaStore(BackendStore):
 
     def __init__(self, server, **kwargs):
         BackendStore.__init__(self, server, **kwargs)
-        self.info("MediaStore __init__")
+        self.info('MediaStore __init__')
         self.update_id = 0
 
         self.medialocation = kwargs.get('medialocation', 'tests/content/audio')
@@ -499,7 +499,7 @@ class MediaStore(BackendStore):
         self.init_completed = True
 
     def walk(self, path):
-        # print "walk", path
+        # print 'walk', path
         if os.path.exists(path):
             for filename in os.listdir(path):
                 if os.path.isdir(os.path.join(path, filename)):
@@ -517,11 +517,11 @@ class MediaStore(BackendStore):
             self.walk(path)
 
         def check_for_cover_art(path):
-            # print "check_for_cover_art", path
-            """ let's try to find in the current directory some jpg file,
+            # print 'check_for_cover_art', path
+            ''' let's try to find in the current directory some jpg file,
                 or png if the jpg search fails, and take the first one
                 that comes around
-            """
+            '''
             jpgs = [i for i in os.listdir(path) if
                     os.path.splitext(i)[1] in ('.jpg', '.JPG')]
             try:
@@ -535,7 +535,7 @@ class MediaStore(BackendStore):
                     return ''
 
         def got_tags(tags, file):
-            # print "got_tags", tags
+            # print 'got_tags', tags
 
             album = tags.get('album', '')
             artist = tags.get('artist', '')
@@ -551,7 +551,7 @@ class MediaStore(BackendStore):
             if len(title) == 0:
                 return
                 title = 'UNKNOWN_TITLE'
-            # print "Tags:", file, album, artist, title, track
+            # print 'Tags:', file, album, artist, title, track
 
             artist_ds = self.db.findOrCreate(
                 Artist, name=str(artist, 'utf8'))
@@ -563,7 +563,7 @@ class MediaStore(BackendStore):
                 dirname = str(os.path.dirname(file), 'utf-8')
                 album_ds.cover = check_for_cover_art(dirname)
                 if len(album_ds.cover) > 0:
-                    filename = f"{album_ds.artist.name} - {album_ds.title}"
+                    filename = f'{album_ds.artist.name} - {album_ds.title}'
                     filename = sanitize(
                         filename + os.path.splitext(album_ds.cover)[1])
                     filename = os.path.join(dirname, filename)
@@ -598,7 +598,7 @@ class MediaStore(BackendStore):
             print(artist)
 
     def show_tracks_by_artist(self, artist_name):
-        """
+        '''
         artist = self.db.query(Artist,Artist.name == artist_name)
         artist = list(artist)[0]
         for album in list(self.db.query(Album, Album.artist == artist)):
@@ -607,7 +607,7 @@ class MediaStore(BackendStore):
                         Track, Track.album == album,
                         sort=Track.title.ascending)):
                 print(track)
-        """
+        '''
         for track in [x[2] for x in list(
                 self.db.query(
                     (Artist, Album, Track),
@@ -632,26 +632,26 @@ class MediaStore(BackendStore):
                     sort=Track.title.ascending)):
             print(track.title, track.album.artist.name, track.track_nr)
             _, ext = os.path.splitext(track.path)
-            f = f"{track.track_nr:02d} - " \
-                f"{track.album.artist.name} - {track.title}{ext}"
+            f = f'{track.track_nr:02d} - ' \
+                f'{track.album.artist.name} - {track.title}{ext}'
             f = sanitize(f)
             print(f)
 
     def get_album_covers(self):
         for album in list(self.db.query(Album, Album.cover == '')):
-            print("missing cover for:", album.artist.name, album.title)
-            filename = f"{album.artist.name} - {album.title}"
+            print('missing cover for:', album.artist.name, album.title)
+            filename = f'{album.artist.name} - {album.title}'
             filename = sanitize(filename)
 
             if self.coverlocation is not None:
                 cover_path = os.path.join(
                     self.coverlocation, filename + '.jpg')
                 if os.path.exists(cover_path) is True:
-                    print("cover found:", cover_path)
+                    print('cover found:', cover_path)
                     album.cover = cover_path
                 else:
                     def got_it(f, a):
-                        print("cover saved:", f, a.title)
+                        print('cover saved:', f, a.title)
                         a.cover = f
 
                     aws_key = '1XHSE4FQJ0RK0X3S9WR2'
@@ -661,7 +661,7 @@ class MediaStore(BackendStore):
                                 title=album.title)
 
     def get_by_id(self, id):
-        self.info(f"get_by_id {id}")
+        self.info(f'get_by_id {id}')
         if isinstance(id, str):
             id = id.split('@', 1)[0]
         elif isinstance(id, bytes):
@@ -682,12 +682,12 @@ class MediaStore(BackendStore):
                 item = self.db.getItemByID(id - 1000)
             except Exception as e:
                 item = None
-                self.warning(f"get_by_id not found {e}")
-        self.info(f"get_by_id found {item}")
+                self.warning(f'get_by_id not found {e}')
+        self.info(f'get_by_id found {item}')
         return item
 
     def upnp_init(self):
-        # print "MediaStore upnp_init"
+        # print 'MediaStore upnp_init'
         db_is_new = False
         if os.path.exists(self.mediadb) is False:
             db_is_new = True

@@ -5,12 +5,7 @@
 
 # Copyright 2009, Philippe Normand <phil@base-art.net>
 
-"""
-TODO:
-
-- podcasts
-
-"""
+# TODO: podcasts
 
 import mimetypes
 import os
@@ -57,29 +52,29 @@ VIDEO_PLAYLIST_CONTAINER_ID = 302
 
 def get_cover_path(artist_name, album_title):
     def _escape_part(part):
-        escaped = ""
+        escaped = ''
         if part:
-            if part.find("(") > -1:
-                part = part[:part.find("(")]
-            escaped = re.sub("[^A-Za-z0-9]*", "", part).lower()
+            if part.find('(') > -1:
+                part = part[:part.find('(')]
+            escaped = re.sub('[^A-Za-z0-9]*', '', part).lower()
         return escaped
 
-    base_dir = os.path.expanduser("~/.cache/album-art")
+    base_dir = os.path.expanduser('~/.cache/album-art')
     return \
         os.path.join(
             base_dir,
-            f"{_escape_part(artist_name)}-{_escape_part(album_title)}.jpg")
+            f'{_escape_part(artist_name)}-{_escape_part(album_title)}.jpg')
 
 
 class SQLiteDB(LogAble):
-    """
+    '''
     Python DB API 2.0 backend support.
-    """
-    logCategory = "sqlite"
+    '''
+    logCategory = 'sqlite'
 
     def __init__(self, database):
-        """ Connect to a db backend hosting the given database.
-        """
+        ''' Connect to a db backend hosting the given database.
+        '''
         LogAble.__init__(self)
         self._params = {'database': database, 'check_same_thread': True}
         self.connect()
@@ -88,25 +83,25 @@ class SQLiteDB(LogAble):
         self._db.close()
 
     def connect(self):
-        """
+        '''
         Connect to the database, set L{_db} instance variable.
-        """
+        '''
         self._db = dbapi2.connect(**self._params)
 
     def reconnect(self):
-        """
+        '''
         Disconnect and reconnect to the database.
-        """
+        '''
         self.disconnect()
         self.connect()
 
     def sql_execute(self, request, *params, **kw):
-        """ Execute a SQL query in the db backend
-        """
+        ''' Execute a SQL query in the db backend
+        '''
         t0 = time.time()
         debug_msg = request
         if params:
-            debug_msg = f"{request} params={params!r}"
+            debug_msg = f'{request} params={params!r}'
         debug_msg = ''.join(debug_msg.splitlines())
         if debug_msg:
             self.debug(f'QUERY: {debug_msg}')
@@ -209,15 +204,15 @@ class Artist(BackendItem):
         self.itemID = self._row.ArtistID
         self.name = self._row.Name or ''
         if self.name:
-            self.name = self.name.encode("utf-8")
+            self.name = self.name.encode('utf-8')
 
     def get_children(self, start=0, end=0):
         albums = []
 
         def query_db():
-            q = "select * from CoreAlbums where ArtistID=? and AlbumID in " \
-                "(select distinct(AlbumID) from CoreTracks where " \
-                "PrimarySourceID=?) order by Title"
+            q = 'select * from CoreAlbums where ArtistID=? and AlbumID in ' \
+                '(select distinct(AlbumID) from CoreTracks where ' \
+                'PrimarySourceID=?) order by Title'
             rows = self._db.sql_execute(q, self.itemID,
                                         self._local_music_library_id)
             for row in rows:
@@ -230,9 +225,9 @@ class Artist(BackendItem):
         return dfr
 
     def get_child_count(self):
-        q = "select count(AlbumID) as c from CoreAlbums " \
-            "where ArtistID=? and AlbumID in (select distinct(AlbumID) " \
-            "from CoreTracks where PrimarySourceID=?) "
+        q = 'select count(AlbumID) as c from CoreAlbums ' \
+            'where ArtistID=? and AlbumID in (select distinct(AlbumID) ' \
+            'from CoreTracks where PrimarySourceID=?) '
         return self._db.sql_execute(q, self.itemID,
                                     self._local_music_library_id)[0].c
 
@@ -243,7 +238,7 @@ class Artist(BackendItem):
         return item
 
     def get_id(self):
-        return f"artist.{self.itemID:d}"
+        return f'artist.{self.itemID:d}'
 
     def __repr__(self):
         return \
@@ -252,7 +247,7 @@ class Artist(BackendItem):
 
 
 class Album(BackendItem):
-    """ definition for an album """
+    ''' definition for an album '''
     mimetype = 'directory'
     get_path = None
 
@@ -265,7 +260,7 @@ class Album(BackendItem):
         self.title = self._row.Title
         self.cover = get_cover_path(self.artist.name, self.title)
         if self.title:
-            self.title = self.title.encode("utf-8")
+            self.title = self.title.encode('utf-8')
         self.musicbrainz_id = self._row.MusicBrainzID
         self.cd_count = 1
 
@@ -273,9 +268,9 @@ class Album(BackendItem):
         tracks = []
 
         def query_db():
-            q = "select * from CoreTracks where AlbumID=? order by TrackNumber"
+            q = 'select * from CoreTracks where AlbumID=? order by TrackNumber'
             if request_count:
-                q += f" limit {request_count:d}"
+                q += f' limit {request_count:d}'
             rows = self._db.sql_execute(q, self.itemID)
             for row in rows:
                 track = Track(row, self._db, self)
@@ -287,7 +282,7 @@ class Album(BackendItem):
         return dfr
 
     def get_child_count(self):
-        q = "select count(TrackID) as c from CoreTracks where AlbumID=?"
+        q = 'select count(TrackID) as c from CoreTracks where AlbumID=?'
         count = self._db.sql_execute(q, self.itemID)[0].c
         return count
 
@@ -316,7 +311,7 @@ class Album(BackendItem):
         return dfr
 
     def get_id(self):
-        return "album.%d" % self.itemID
+        return f'album.{self.itemID:d}'
 
     def get_name(self):
         return self.title
@@ -332,8 +327,8 @@ class Album(BackendItem):
 
 
 class BasePlaylist(BackendItem):
-    """ definition for a playlist """
-    id_type = "baseplaylist"
+    ''' definition for a playlist '''
+    id_type = 'baseplaylist'
     mimetype = 'directory'
     get_path = None
 
@@ -344,11 +339,11 @@ class BasePlaylist(BackendItem):
         self._db = self._store.db
         self.title = self._row.Name
         if self.title:
-            self.title = self.title.encode("utf-8")
+            self.title = self.title.encode('utf-8')
 
     @property
     def db_id(self):
-        """Should be implemented in subclass"""
+        '''Should be implemented in subclass'''
         return ''
 
     def get_tracks(self, request_count):
@@ -360,7 +355,7 @@ class BasePlaylist(BackendItem):
         return track
 
     def get_id(self):
-        return f"{self.id_type}.{self.db_id:d}"
+        return f'{self.id_type}.{self.db_id:d}'
 
     def __repr__(self):
         return \
@@ -411,51 +406,51 @@ class BasePlaylist(BackendItem):
 
 
 class MusicPlaylist(BasePlaylist):
-    id_type = "musicplaylist"
+    id_type = 'musicplaylist'
 
     @property
     def db_id(self):
         return self._row.PlaylistID
 
     def get_tracks(self, request_count):
-        q = "select * from CoreTracks where TrackID in (select TrackID " \
-            "from CorePlaylistEntries where PlaylistID=?)"
+        q = 'select * from CoreTracks where TrackID in (select TrackID ' \
+            'from CorePlaylistEntries where PlaylistID=?)'
         if request_count:
-            q += f" limit {request_count:d}"
+            q += f' limit {request_count:d}'
         return self._db.sql_execute(q, self.db_id)
 
 
 class MusicSmartPlaylist(BasePlaylist):
-    id_type = "musicsmartplaylist"
+    id_type = 'musicsmartplaylist'
 
     @property
     def db_id(self):
         return self._row.SmartPlaylistID
 
     def get_tracks(self, request_count):
-        q = "select * from CoreTracks where TrackID in (select TrackID " \
-            "from CoreSmartPlaylistEntries where SmartPlaylistID=?)"
+        q = 'select * from CoreTracks where TrackID in (select TrackID ' \
+            'from CoreSmartPlaylistEntries where SmartPlaylistID=?)'
         if request_count:
-            q += f" limit {request_count:d}"
+            q += f' limit {request_count:d}'
         return self._db.sql_execute(q, self.db_id)
 
 
 class VideoPlaylist(MusicPlaylist):
-    id_type = "videoplaylist"
+    id_type = 'videoplaylist'
 
     def db_to_didl(self, row):
         return Video(row, self._db)
 
 
 class VideoSmartPlaylist(MusicSmartPlaylist):
-    id_type = "videosmartplaylist"
+    id_type = 'videosmartplaylist'
 
     def db_to_didl(self, row):
         return Video(row, self._db)
 
 
 class BaseTrack(BackendItem):
-    """ definition for a track """
+    ''' definition for a track '''
 
     def __init__(self, *args, **kwargs):
         BackendItem.__init__(self, *args, **kwargs)
@@ -465,7 +460,7 @@ class BaseTrack(BackendItem):
         self.title = self._row.Title
         self.track_nr = self._row.TrackNumber
         self.location = self._row.Uri
-        self.playlist = kwargs.get("playlist")
+        self.playlist = kwargs.get('playlist')
         self.album = None
 
     def get_children(self, start=0, request_count=0):
@@ -486,10 +481,10 @@ class BaseTrack(BackendItem):
         ext = ext.lower()
 
         # FIXME: drop this hack when we switch to tagbin
-        mimetype, dummy = mimetypes.guess_type(f"dummy{ext}")
+        mimetype, dummy = mimetypes.guess_type(f'dummy{ext}')
         if not mimetype:
             mimetype = 'audio/mpeg'
-            ext = "mp3"
+            ext = 'mp3'
 
         statinfo = os.stat(self.get_path())
 
@@ -502,7 +497,7 @@ class BaseTrack(BackendItem):
 
         resources.append(res)
 
-        url = f"{self._db.urlbase}{self.get_id()}{ext}"
+        url = f'{self._db.urlbase}{self.get_id()}{ext}'
 
         res = DIDLLite.Resource(url, f'http-get:*:{mimetype}:*')
         try:
@@ -516,7 +511,7 @@ class BaseTrack(BackendItem):
         return urllib.parse.unquote(self.location[7:].encode('utf-8'))
 
     def get_id(self):
-        return "track.%d" % self.itemID
+        return 'track.%d' % self.itemID
 
     def get_name(self):
         return self.title
@@ -549,8 +544,8 @@ class Track(BaseTrack):
 
         if self.album.cover != '':
             _, ext = os.path.splitext(self.album.cover)
-            """ add the cover image extension to help clients not reacting on
-                the mimetype """
+            ''' add the cover image extension to help clients not reacting on
+                the mimetype '''
             item.albumArtURI = ''.join((self._db.urlbase, self.get_id(),
                                         '?cover', ext))
         item.originalTrackNumber = self.track_nr
@@ -587,13 +582,13 @@ class Video(BaseTrack):
 
 
 class BansheeDB(LogAble):
-    logCategory = "banshee_db"
+    logCategory = 'banshee_db'
 
     def __init__(self, path=None):
         LogAble.__init__(self)
         self._local_music_library_id = None
         self._local_video_library_id = None
-        default_db_path = os.path.expanduser("~/.config/banshee-1/banshee.db")
+        default_db_path = os.path.expanduser('~/.config/banshee-1/banshee.db')
         self._db_path = path or default_db_path
 
     def open_db(self):
@@ -604,16 +599,16 @@ class BansheeDB(LogAble):
 
     def get_local_music_library_id(self):
         if self._local_music_library_id is None:
-            q = "select PrimarySourceID " \
-                "from CorePrimarySources where StringID=?"
+            q = 'select PrimarySourceID ' \
+                'from CorePrimarySources where StringID=?'
             row = self.db.sql_execute(q, 'MusicLibrarySource-Library')[0]
             self._local_music_library_id = row.PrimarySourceID
         return self._local_music_library_id
 
     def get_local_video_library_id(self):
         if self._local_video_library_id is None:
-            q = "select PrimarySourceID " \
-                "from CorePrimarySources where StringID=?"
+            q = 'select PrimarySourceID ' \
+                'from CorePrimarySources where StringID=?'
             row = self.db.sql_execute(q, 'VideoLibrarySource-VideoLibrary')[0]
             self._local_video_library_id = row.PrimarySourceID
         return self._local_video_library_id
@@ -623,9 +618,9 @@ class BansheeDB(LogAble):
 
         def query_db():
             source_id = self.get_local_music_library_id()
-            q = "select * from CoreArtists where ArtistID in " \
-                "(select distinct(ArtistID) from CoreTracks where " \
-                "PrimarySourceID=?) order by Name"
+            q = 'select * from CoreArtists where ArtistID in ' \
+                '(select distinct(ArtistID) from CoreTracks where ' \
+                'PrimarySourceID=?) order by Name'
             for row in self.db.sql_execute(q, source_id):
                 artist = Artist(row, self.db, source_id)
                 artists.append(artist)
@@ -640,9 +635,9 @@ class BansheeDB(LogAble):
         artists = {}
 
         def query_db():
-            q = "select * from CoreAlbums where AlbumID in " \
-                "(select distinct(AlbumID) from CoreTracks where " \
-                "PrimarySourceID=?) order by Title"
+            q = 'select * from CoreAlbums where AlbumID in ' \
+                '(select distinct(AlbumID) from CoreTracks where ' \
+                'PrimarySourceID=?) order by Title'
             for row in self.db.sql_execute(q,
                                            self.get_local_music_library_id()):
                 try:
@@ -666,15 +661,15 @@ class BansheeDB(LogAble):
         playlists = []
 
         def query_db():
-            q = "select * from CorePlaylists " \
-                "where PrimarySourceID=? order by Name"
+            q = 'select * from CorePlaylists ' \
+                'where PrimarySourceID=? order by Name'
             for row in self.db.sql_execute(q, source_id):
                 playlist = PlaylistClass(row, self)
                 playlists.append(playlist)
                 yield playlist
 
-            q = "select * from CoreSmartPlaylists " \
-                "where PrimarySourceID=? order by Name"
+            q = 'select * from CoreSmartPlaylists ' \
+                'where PrimarySourceID=? order by Name'
             for row in self.db.sql_execute(q, source_id):
                 playlist = SmartPlaylistClass(row, self)
                 playlists.append(playlist)
@@ -685,23 +680,23 @@ class BansheeDB(LogAble):
         return dfr
 
     def get_artist_with_id(self, artist_id):
-        q = "select * from CoreArtists where ArtistID=? limit 1"
+        q = 'select * from CoreArtists where ArtistID=? limit 1'
         row = self.db.sql_execute(q, artist_id)[0]
         return Artist(row, self.db, self.get_local_music_library_id())
 
     def get_album_with_id(self, album_id):
-        q = "select * from CoreAlbums where AlbumID=? limit 1"
+        q = 'select * from CoreAlbums where AlbumID=? limit 1'
         row = self.db.sql_execute(q, album_id)[0]
         artist = self.get_artist_with_id(row.ArtistID)
         return Album(row, self.db, artist)
 
     def get_playlist_with_id(self, playlist_id, PlaylistClass):
-        q = "select * from CorePlaylists where PlaylistID=? limit 1"
+        q = 'select * from CorePlaylists where PlaylistID=? limit 1'
         row = self.db.sql_execute(q, playlist_id)[0]
         return PlaylistClass(row, self)
 
     def get_smart_playlist_with_id(self, playlist_id, PlaylistClass):
-        q = "select * from CoreSmartPlaylists where SmartPlaylistID=? limit 1"
+        q = 'select * from CoreSmartPlaylists where SmartPlaylistID=? limit 1'
         row = self.db.sql_execute(q, playlist_id)[0]
         return PlaylistClass(row, self)
 
@@ -718,13 +713,13 @@ class BansheeDB(LogAble):
         return self.get_smart_playlist_with_id(playlist_id, VideoSmartPlaylist)
 
     def get_track_with_id(self, track_id):
-        q = "select * from CoreTracks where TrackID=? limit 1"
+        q = 'select * from CoreTracks where TrackID=? limit 1'
         row = self.db.sql_execute(q, track_id)[0]
         album = self.get_album_with_id(row.AlbumID)
         return Track(row, self.db, album)
 
     def get_track_for_uri(self, track_uri):
-        q = "select * from CoreTracks where Uri=? limit 1"
+        q = 'select * from CoreTracks where Uri=? limit 1'
         try:
             row = self.db.sql_execute(q, track_uri)[0]
         except IndexError:
@@ -740,9 +735,9 @@ class BansheeDB(LogAble):
         albums = {}
 
         def query_db():
-            q = "select * from CoreTracks where TrackID in " \
-                "(select distinct(TrackID) from CoreTracks where " \
-                "PrimarySourceID=?) order by AlbumID,TrackNumber"
+            q = 'select * from CoreTracks where TrackID in ' \
+                '(select distinct(TrackID) from CoreTracks where ' \
+                'PrimarySourceID=?) order by AlbumID,TrackNumber'
             for row in self.db.sql_execute(q,
                                            self.get_local_music_library_id()):
                 if row.AlbumID not in albums:
@@ -759,7 +754,7 @@ class BansheeDB(LogAble):
         return dfr
 
     def get_video_with_id(self, video_id):
-        q = "select * from CoreTracks where TrackID=? limit 1"
+        q = 'select * from CoreTracks where TrackID=? limit 1'
         row = self.db.sql_execute(q, video_id)[0]
         return Video(row, self.db)
 
@@ -768,9 +763,9 @@ class BansheeDB(LogAble):
 
         def query_db():
             source_id = self.get_local_video_library_id()
-            q = "select * from CoreTracks where TrackID in " \
-                "(select distinct(TrackID) from CoreTracks where " \
-                "PrimarySourceID=?)"
+            q = 'select * from CoreTracks where TrackID in ' \
+                '(select distinct(TrackID) from CoreTracks where ' \
+                'PrimarySourceID=?)'
             for row in self.db.sql_execute(q, source_id):
                 video = Video(row, self.db, source_id)
                 videos.append(video)
@@ -795,7 +790,7 @@ class BansheeStore(BackendStore, BansheeDB):
 
     def __init__(self, server, **kwargs):
         BackendStore.__init__(self, server, **kwargs)
-        BansheeDB.__init__(self, kwargs.get("db_path"))
+        BansheeDB.__init__(self, kwargs.get('db_path'))
         self.update_id = 0
         self.name = kwargs.get('name', 'Banshee')
 
@@ -872,7 +867,7 @@ class BansheeStore(BackendStore, BansheeDB):
         self.db.disconnect()
 
     def get_by_id(self, item_id):
-        self.info("get_by_id %s", item_id)
+        self.info(f'get_by_id {item_id}')
         if isinstance(item_id, bytes):
             item_id = item_id.decode('utf-8')
         if isinstance(item_id, str) and item_id.find('.') > 0:

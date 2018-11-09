@@ -44,8 +44,8 @@ class LastFMUser(log.LogAble):
 
     user = None
     passwd = None
-    host = "ws.audioscrobbler.com"
-    basepath = "/radio"
+    host = 'ws.audioscrobbler.com'
+    basepath = '/radio'
     sessionid = None
     parent = None
     getting_tracks = False
@@ -54,54 +54,54 @@ class LastFMUser(log.LogAble):
     def __init__(self, user, passwd):
         log.LogAble.__init__(self)
         if user is None:
-            self.warn("No User", )
+            self.warn('No User', )
         if passwd is None:
-            self.warn("No Passwd", )
+            self.warn('No Passwd', )
         self.user = user
         self.passwd = passwd
 
     def login(self):
 
         if self.sessionid is not None:
-            self.warning("Session seems to be valid", )
+            self.warning('Session seems to be valid', )
             return
 
         def got_page(result):
-            lines = result[0].split("\n")
+            lines = result[0].split('\n')
             for line in lines:
-                tuple = line.rstrip().split("=", 1)
+                tuple = line.rstrip().split('=', 1)
                 if len(tuple) == 2:
-                    if tuple[0] == "session":
+                    if tuple[0] == 'session':
                         self.sessionid = tuple[1]
-                        self.info(f"Got new sessionid: {self.sessionid}")
-                    if tuple[0] == "base_url":
+                        self.info(f'Got new sessionid: {self.sessionid}')
+                    if tuple[0] == 'base_url':
                         if self.host != tuple[1]:
                             self.host = tuple[1]
-                            self.info(f"Got new host: {self.host}")
-                    if tuple[0] == "base_path":
+                            self.info(f'Got new host: {self.host}')
+                    if tuple[0] == 'base_path':
                         if self.basepath != tuple[1]:
                             self.basepath = tuple[1]
-                            self.info(f"Got new path: {self.basepath}")
+                            self.info(f'Got new path: {self.basepath}')
             self.get_tracks()
 
         def got_error(error):
-            self.warning(f"Login to LastFM Failed! {error}")
-            self.debug(f"{error.getTraceback()}")
+            self.warning(f'Login to LastFM Failed! {error}')
+            self.debug(f'{error.getTraceback()}')
 
         # This function might be GPL!
         # Found this code in some other Projects, too.
         def hexify(s):
-            result = ""
+            result = ''
             for c in s:
-                result = result + ("%02x" % ord(c))
+                result = result + ('%02x' % ord(c))
             return result
 
         password = hexify(md5(self.passwd).digest())
         req = \
-            self.basepath + "/handshake.php/?version=1&platform=win&username="\
-            + self.user + "&passwordmd5=" + password\
-            + "&language=en&player=coherence"
-        utils.getPage("http://" + self.host + req).addCallbacks(
+            self.basepath + '/handshake.php/?version=1&platform=win&username='\
+            + self.user + '&passwordmd5=' + password\
+            + '&language=en&player=coherence'
+        utils.getPage('http://' + self.host + req).addCallbacks(
             got_page, got_error, None, None, None, None)
 
     def get_tracks(self):
@@ -112,7 +112,7 @@ class LastFMUser(log.LogAble):
             result = utils.parse_xml(result, encoding='utf-8')
             self.getting_tracks = False
             print(self.getting_tracks)
-            print("got Tracks")
+            print('got Tracks')
             for track in result.findall('trackList/track'):
                 data = {}
 
@@ -121,9 +121,9 @@ class LastFMUser(log.LogAble):
                     return track.find(name).text.encode('utf-8')
 
                 # Fixme: This section needs some work
-                print("adding Track")
+                print('adding Track')
                 data['mimetype'] = 'audio/mpeg'
-                data['name'] = get_data('creator') + " - " + get_data('title')
+                data['name'] = get_data('creator') + ' - ' + get_data('title')
                 data['title'] = get_data('title')
                 data['artist'] = get_data('creator')
                 data['creator'] = get_data('creator')
@@ -136,15 +136,15 @@ class LastFMUser(log.LogAble):
                 self.tracks.append(item)
 
         def got_error(error):
-            self.warning(f"Problem getting Tracks! {error}")
-            self.debug(f"{error.getTraceback()}")
+            self.warning(f'Problem getting Tracks! {error}')
+            self.debug(f'{error.getTraceback()}')
             self.getting_tracks = False
 
         self.getting_tracks = True
         req = \
-            self.basepath + "/xspf.php?sk=" + self.sessionid \
-            + "&discovery=0&desktop=1.3.1.1"
-        utils.getPage("http://" + self.host + req).addCallbacks(
+            self.basepath + '/xspf.php?sk=' + self.sessionid \
+            + '&discovery=0&desktop=1.3.1.1'
+        utils.getPage('http://' + self.host + req).addCallbacks(
             got_page, got_error, None, None, None, None)
 
     def update(self, item):
@@ -181,11 +181,11 @@ class LFMProxyStream(utils.ReverseProxyResource, log.LogAble):
         if path == '':
             path = '/'
 
-        # print(f"ProxyStream init {host} {port} {path}")
+        # print(f'ProxyStream init {host} {port} {path}')
         utils.ReverseProxyResource.__init__(self, host, port, path)
 
     def render(self, request):
-        self.debug(f"render {request}")
+        self.debug(f'render {request}')
         self.parent.store.LFM.update(self.parent)
         self.parent.played = True
         return utils.ReverseProxyResource.render(self, request)
@@ -261,8 +261,8 @@ class LastFMItem(log.LogAble):
             self.update_id += 1
 
     def remove_child(self, child):
-        self.info(f"remove_from {self.id:d} ({self.get_name()}) "
-                  f"child {child.id:d} ({child.get_name()})")
+        self.info(f'remove_from {self.id:d} ({self.get_name()}) '
+                  f'child {child.id:d} ({child.get_name()})')
         if child in self.children:
             self.child_count -= 1
             if isinstance(self.item, Container):
@@ -415,8 +415,8 @@ class LastFMStore(Backend):
 
         parent = self.append({'name': 'LastFM', 'mimetype': 'directory'}, None)
 
-        self.LFM = LastFMUser(self.config.get("login"),
-                              self.config.get("password"))
+        self.LFM = LastFMUser(self.config.get('login'),
+                              self.config.get('password'))
         self.LFM.parent = parent
         self.LFM.login()
 
@@ -430,7 +430,7 @@ def main():
     f = LastFMStore(None)
 
     def got_upnp_result(result):
-        print(f"upnp {result}")
+        print(f'upnp {result}')
 
     f.upnp_init()
 

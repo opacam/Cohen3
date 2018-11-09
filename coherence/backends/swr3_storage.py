@@ -107,7 +107,7 @@ class SWR3Store(BackendStore, BackendRssMixin):
 
         self.name = kwargs.get('name', 'SWR3')
         self.opml = kwargs.get('opml', 'http://www.swr3.de/rdf-feed/podcast/')
-        self.encoding = kwargs.get('encoding', "ISO-8859-1")
+        self.encoding = kwargs.get('encoding', 'ISO-8859-1')
         self.refresh = int(kwargs.get('refresh', 1)) * (60 * 60)
 
         self.next_id = 1000
@@ -122,7 +122,7 @@ class SWR3Store(BackendStore, BackendRssMixin):
 
     def parse_opml(self):
         def fail(f):
-            self.info(f"fail {f}")
+            self.info(f'fail {f}')
             return f
 
         def create_containers(data):
@@ -162,26 +162,26 @@ class SWR3Store(BackendStore, BackendRssMixin):
     def parse_data(self, xml_data, container):
         root = xml_data.getroot()
 
-        title = root.find("./channel/title").text
+        title = root.find('./channel/title').text
         title = title.encode(self.encoding).decode('utf-8')
         self.store[container] = Container(container, self, ROOT_CONTAINER_ID,
                                           title)
-        description = root.find("./channel/description").text
+        description = root.find('./channel/description').text
         description = description.encode(self.encoding).decode('utf-8')
         self.store[container].description = description
-        self.store[container].cover = root.find("./channel/image/url").text
+        self.store[container].cover = root.find('./channel/image/url').text
         self.store[ROOT_CONTAINER_ID].add_child(self.store[container])
 
-        for podcast in root.findall("./channel/item"):
-            enclosure = podcast.find("./enclosure")
-            title = podcast.find("./title").text
+        for podcast in root.findall('./channel/item'):
+            enclosure = podcast.find('./enclosure')
+            title = podcast.find('./title').text
             title = title.encode(self.encoding).decode('utf-8')
             item = Item(self.store[container], self.get_next_id(), title,
                         enclosure.attrib['url'])
             item.size = int(enclosure.attrib['length'])
             item.mimetype = enclosure.attrib['type']
             self.store[container].add_child(item)
-            description = podcast.find("./description")
+            description = podcast.find('./description')
             if description is not None:
                 description = description.text
                 item.description = description.encode(self.encoding).decode(

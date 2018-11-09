@@ -18,8 +18,8 @@ from coherence.upnp.core.DIDLLite import Resource
 OPML_BROWSE_URL = 'http://opml.radiotime.com/Browse.ashx'
 
 # we only handle mp3 audio streams for now
-DEFAULT_FORMAT = "mp3"
-DEFAULT_MIMETYPE = "audio/mpeg"
+DEFAULT_FORMAT = 'mp3'
+DEFAULT_MIMETYPE = 'audio/mpeg'
 
 
 # TODO : extend format handling using radiotime API
@@ -89,17 +89,17 @@ class RadiotimeStore(AbstractBackendStore):
 
         # construct URL for root menu
         if self.username is not None:
-            identification_param = f"username={self.username}"
+            identification_param = f'username={self.username}'
         else:
-            identification_param = f"serial={self.serial}"
+            identification_param = f'serial={self.serial}'
         formats_value = DEFAULT_FORMAT
         root_url = \
-            f"{self.browse_url}?partnerId={self.partner_id}&" \
-            f"{identification_param}&formats={formats_value}&" \
-            f"locale={self.locale}"
+            f'{self.browse_url}?partnerId={self.partner_id}&' \
+            f'{identification_param}&formats={formats_value}&' \
+            f'locale={self.locale}'
 
         # set root item
-        root_item = LazyContainer(None, "root", "root", self.refresh,
+        root_item = LazyContainer(None, 'root', 'root', self.refresh,
                                   self.retrieveItemsForOPML, url=root_url)
         self.set_root_item(root_item)
 
@@ -130,7 +130,7 @@ class RadiotimeStore(AbstractBackendStore):
                 key = outline.get('key')
                 external_id = None
                 if external_id is None and key is not None:
-                    external_id = f"{parent.external_id}_{key}"
+                    external_id = f'{parent.external_id}_{key}'
                 if external_id is None:
                     external_id = outline_url
                 item = Container(parent, text)
@@ -148,7 +148,7 @@ class RadiotimeStore(AbstractBackendStore):
                 guide_id = outline.get('guide_id')
                 external_id = guide_id
                 if external_id is None and key is not None:
-                    external_id = f"{parent.external_id}_{key}"
+                    external_id = f'{parent.external_id}_{key}'
                 if external_id is None:
                     external_id = outline_url
                 item = LazyContainer(
@@ -172,18 +172,18 @@ class RadiotimeStore(AbstractBackendStore):
 
         def got_error(error):
             self.warning(
-                f"connection to Radiotime service failed for url {url}")
-            self.debug("%r", error.getTraceback())
+                f'connection to Radiotime service failed for url {url}')
+            self.debug('%r', error.getTraceback())
             parent.childrenRetrievingNeeded = True  # we retry
-            return Failure(f"Unable to retrieve items for url {url}")
+            return Failure(f'Unable to retrieve items for url {url}')
 
         def got_xml_error(error):
             self.warning(
-                f"Data received from Radiotime service is invalid: {url}")
-            # self.debug("%r", error.getTraceback())
+                f'Data received from Radiotime service is invalid: {url}')
+            # self.debug('%r', error.getTraceback())
             print(error.getTraceback())
             parent.childrenRetrievingNeeded = True  # we retry
-            return Failure(f"Unable to retrieve items for url {url}")
+            return Failure(f'Unable to retrieve items for url {url}')
 
         d = utils.getPage(url, )
         d.addCallback(etree.fromstring)

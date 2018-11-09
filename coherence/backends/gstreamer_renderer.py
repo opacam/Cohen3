@@ -37,8 +37,8 @@ class Player(log.LogAble):
                  video_sink_name=None, audio_sink_options=None,
                  video_sink_options=None):
         log.LogAble.__init__(self)
-        self.audio_sink_name = audio_sink_name or "autoaudiosink"
-        self.video_sink_name = video_sink_name or "autovideosink"
+        self.audio_sink_name = audio_sink_name or 'autoaudiosink'
+        self.video_sink_name = video_sink_name or 'autovideosink'
         self.audio_sink_options = audio_sink_options or {}
         self.video_sink_options = video_sink_options or {}
 
@@ -71,14 +71,14 @@ class Player(log.LogAble):
         result = False
         if uname.startswith('Nokia'):
             try:
-                device = uname.split("-")[1]
+                device = uname.split('-')[1]
             except IndexError:
-                device = "unknown"
-            result = device != "N900"
+                device = 'unknown'
+            result = device != 'N900'
         return result
 
     def create_pipeline(self, mimetype):
-        self.debug("creating pipeline")
+        self.debug('creating pipeline')
         if self._is_not_playbin2_friendly():
             self.bus = None
             self.player = None
@@ -122,10 +122,10 @@ class Player(log.LogAble):
             self.get_mute = self.get_mute_playbin
             audio_sink = Gst.ElementFactory.make(self.audio_sink_name)
             self._set_props(audio_sink, self.audio_sink_options)
-            self.player.set_property("audio-sink", audio_sink)
+            self.player.set_property('audio-sink', audio_sink)
             video_sink = Gst.ElementFactory.make(self.video_sink_name)
             self._set_props(video_sink, self.video_sink_options)
-            self.player.set_property("video-sink", video_sink)
+            self.player.set_property('video-sink', video_sink)
 
         self.bus = self.player.get_bus()
         self.player_clean = True
@@ -155,8 +155,8 @@ class Player(log.LogAble):
         return value
 
     def get_volume_playbin(self):
-        """ playbin volume is a double from 0.0 - 10.0
-        """
+        ''' playbin volume is a double from 0.0 - 10.0
+        '''
         volume = self.sink.get_property('volume')
         return int((volume * 100) / self.max_playbin_volume)
 
@@ -170,8 +170,8 @@ class Player(log.LogAble):
         self.sink.set_property('volume', volume)
 
     def get_volume_dsp_mp3_sink(self):
-        """ dspmp3sink volume is a n in from 0 to 65535
-        """
+        ''' dspmp3sink volume is a n in from 0 to 65535
+        '''
         volume = self.sink.get_property('volume')
         return int(volume * 100 / 65535)
 
@@ -184,8 +184,8 @@ class Player(log.LogAble):
         self.sink.set_property('volume', volume * 65535 / 100)
 
     def get_volume_dsp_pcm_sink(self):
-        """ dspmp3sink volume is a n in from 0 to 65535
-        """
+        ''' dspmp3sink volume is a n in from 0 to 65535
+        '''
         volume = self.sink.get_property('volume')
         return int(volume * 100 / 65535)
 
@@ -231,17 +231,17 @@ class Player(log.LogAble):
                 muted = self.stored_volume == 0
             except Exception:
                 muted = False
-                self.warning("can't get mute state")
+                self.warning('can\'t get mute state')
         return muted
 
     def get_state(self):
         return self.player.get_state(Gst.CLOCK_TIME_NONE)
 
     def get_uri(self):
-        """ playbin2 has an empty uri property after a
+        ''' playbin2 has an empty uri property after a
             pipeline stops, as the uri is nowdays the next
             track to play, not the current one
-        """
+        '''
         if self.player.get_name() != 'player':
             return self.source.get_property(self.player_uri)
         else:
@@ -258,12 +258,12 @@ class Player(log.LogAble):
             self.current_uri = uri
 
     def on_message(self, bus, message):
-        # print("on_message", message, "from", message.src.get_name())
+        # print('on_message', message, 'from', message.src.get_name())
         t = message.type
         struct = message.get_structure()
         if t == Gst.MessageType.ERROR:
             err, debug = message.parse_error()
-            self.warning(f"Gstreamer error: {err.message},{debug!r}")
+            self.warning(f'Gstreamer error: {err.message},{debug!r}')
             if self.playing:
                 self.seek('-0')
             # self.player.set_state(Gst.State.READY)
@@ -278,8 +278,8 @@ class Player(log.LogAble):
         elif t == Gst.MessageType.STATE_CHANGED:
             if message.src == self.player:
                 old, new, pending = message.parse_state_changed()
-                print(f"player ({message.src.get_path_string()}) "
-                      f"state_change: {old} {new} {pending}")
+                print(f'player ({message.src.get_path_string()}) '
+                      f'state_change: {old} {new} {pending}')
                 if new == Gst.State.PLAYING:
                     self.playing = True
                     self.update_LC.start(1, False)
@@ -295,7 +295,7 @@ class Player(log.LogAble):
                 #    self.update()
 
         elif t == Gst.MessageType.EOS:
-            self.debug("reached file end")
+            self.debug('reached file end')
             self.seek('-0')
             self.update(message=Gst.MessageType.EOS)
 
@@ -303,7 +303,7 @@ class Player(log.LogAble):
         try:
             position, format = self.player.query_position(Gst.Format.TIME)
         except Exception:
-            # print("CLOCK_TIME_NONE", Gst.CLOCK_TIME_NONE)
+            # print('CLOCK_TIME_NONE', Gst.CLOCK_TIME_NONE)
             position = Gst.CLOCK_TIME_NONE
             position = 0
 
@@ -320,7 +320,7 @@ class Player(log.LogAble):
         r = {}
         if self.duration == 0:
             self.duration = None
-            self.debug("duration unknown")
+            self.debug('duration unknown')
             return r
         r['raw'] = {'position': str(position),
                     'remaining': str(self.duration - position),
@@ -340,7 +340,7 @@ class Player(log.LogAble):
         return r
 
     def load(self, uri, mimetype):
-        self.debug(f"load --> {uri} {mimetype}")
+        self.debug(f'load --> {uri} {mimetype}')
         _, state, _ = self.player.get_state(Gst.CLOCK_TIME_NONE)[1]
         if state == Gst.State.PLAYING or state == Gst.State.PAUSED:
             self.stop()
@@ -356,17 +356,17 @@ class Player(log.LogAble):
         self.tags = {}
         # self.player.set_state(Gst.State.PAUSED)
         # self.update()
-        self.debug("load <--")
+        self.debug('load <--')
         self.play()
 
     def play(self):
         uri = self.get_uri()
         mimetype = self.mimetype
-        self.debug(f"play --> {uri} {mimetype}")
+        self.debug(f'play --> {uri} {mimetype}')
 
         if self.player.get_name() != 'player':
             if not self.player_clean:
-                # print("rebuild pipeline")
+                # print('rebuild pipeline')
                 self.player.set_state(Gst.State.NULL)
 
                 self.create_pipeline(mimetype)
@@ -376,26 +376,26 @@ class Player(log.LogAble):
         else:
             self.player_clean = True
         self.player.set_state(Gst.State.PLAYING)
-        self.debug("play <--")
+        self.debug('play <--')
 
     def pause(self):
-        self.debug(f"pause --> {self.get_uri()}")
+        self.debug(f'pause --> {self.get_uri()}')
         self.player.set_state(Gst.State.PAUSED)
-        self.debug("pause <--")
+        self.debug('pause <--')
 
     def stop(self):
-        self.debug(f"stop --> {self.get_uri()}")
+        self.debug(f'stop --> {self.get_uri()}')
         self.seek('-0')
         self.player.set_state(Gst.State.READY)
         self.update(message=Gst.MessageType.EOS)
-        self.debug(f"stop <-- {self.get_uri()}")
+        self.debug(f'stop <-- {self.get_uri()}')
 
     def seek(self, location):
-        """
+        '''
         @param location:    simple number = time to seek to, in seconds
                             +nL = relative seek forward n seconds
                             -nL = relative seek backwards n seconds
-        """
+        '''
 
         _, state, _ = self.player.get_state(Gst.CLOCK_TIME_NONE)
         if state != Gst.State.PAUSED:
@@ -414,7 +414,7 @@ class Player(log.LogAble):
                 loc = position - (int(location[1:]) * Gst.SECOND)
                 loc = max(loc, 0)
 
-        self.debug(f"seeking to {loc}")
+        self.debug(f'seeking to {loc}')
 
         # Standard seek mode
         # self.player.seek( 1.0, Gst.Format.TIME,
@@ -438,13 +438,13 @@ class Player(log.LogAble):
         event_send = self.player.send_event(event)
 
         if event_send:
-            print(f"seek to {location} ok")
+            print(f'seek to {location} ok')
             # self.player.set_start_time(0)
         elif location != '-0':
-            print(f"seek to {location} failed")
+            print(f'seek to {location} failed')
 
         if location == '-0':
-            content_type, _ = self.mimetype.split("/")
+            content_type, _ = self.mimetype.split('/')
             try:
                 self.update_LC.stop()
             except Exception:
@@ -452,7 +452,7 @@ class Player(log.LogAble):
             if self.player.get_name() != 'player':
                 self.player.set_state(Gst.State.NULL)
                 self.player_clean = False
-            elif content_type != "image":
+            elif content_type != 'image':
                 self.player.set_state(Gst.State.READY)
             self.update()
         else:
@@ -500,10 +500,10 @@ class GStreamerPlayer(Backend):
                 'enabled in the configuration')
         self.name = kwargs.get('name', 'GStreamer Audio Player')
 
-        audio_sink_name = kwargs.get("audio_sink_name")
-        audio_sink_options = kwargs.get("audio_sink_options")
-        video_sink_name = kwargs.get("video_sink_name")
-        video_sink_options = kwargs.get("video_sink_options")
+        audio_sink_name = kwargs.get('audio_sink_name')
+        audio_sink_options = kwargs.get('audio_sink_options')
+        video_sink_name = kwargs.get('video_sink_name')
+        video_sink_options = kwargs.get('video_sink_options')
 
         self.player = Player(audio_sink_name=audio_sink_name,
                              video_sink_name=video_sink_name,
@@ -528,7 +528,7 @@ class GStreamerPlayer(Backend):
 
     def update(self, message=None):
         _, current, _ = self.player.get_state()
-        self.debug(f"update current {current}")
+        self.debug(f'update current {current}')
         connection_manager = self.server.connection_manager_server
         av_transport = self.server.av_transport_server
         conn_id = connection_manager.lookup_avt_id(self.current_connection_id)
@@ -602,7 +602,7 @@ class GStreamerPlayer(Backend):
             av_transport.set_variable(
                 conn_id, 'TransportState', 'STOPPED')
 
-        self.info("update %r", state)
+        self.info('update %r', state)
         self._update_transport_position(state)
 
     def _update_transport_position(self, state):
@@ -640,14 +640,14 @@ class GStreamerPlayer(Backend):
                                                   self.metadata)
 
             self.info(
-                f"{state} {int(position['raw']['position']) / Gst.SECOND:d}/"
-                f"{int(position['raw']['remaining']) / Gst.SECOND:d}/"
-                f"{int(position['raw']['duration']) / Gst.SECOND:d} - "
-                f"{position['percent']['position']:d}%%/"
-                f"{position['percent']['remaining']:d}%% - "
-                f"{position['human']['position']}/"
-                f"{position['human']['remaining']}/"
-                f"{position['human']['duration']}")
+                f'{state} {int(position["raw"]["position"]) / Gst.SECOND:d}/'
+                f'{int(position["raw"]["remaining"]) / Gst.SECOND:d}/'
+                f'{int(position["raw"]["duration"]) / Gst.SECOND:d} - '
+                f'{position["percent"]["position"]:d}%%/'
+                f'{position["percent"]["remaining"]:d}%% - '
+                f'{position["human"]["position"]}/'
+                f'{position["human"]["remaining"]}/'
+                f'{position["human"]["duration"]}')
 
             duration = int(position['raw']['duration'])
             formatted = self._format_time(duration)
@@ -675,7 +675,7 @@ class GStreamerPlayer(Backend):
         return formatted
 
     def load(self, uri, metadata, mimetype=None):
-        self.info(f"loading: {uri} {mimetype} ")
+        self.info(f'loading: {uri} {mimetype} ')
         _, state, _ = self.player.get_state()
         connection_id = self.server.connection_manager_server.lookup_avt_id(
             self.current_connection_id)
@@ -742,7 +742,7 @@ class GStreamerPlayer(Backend):
             connection_id, 'CurrentTransportActions', transport_actions)
 
         if state == Gst.State.PLAYING:
-            self.info("was playing...")
+            self.info('was playing...')
             self.play()
         self.update()
 
@@ -793,7 +793,7 @@ class GStreamerPlayer(Backend):
                     'STOPPED')
 
     def play(self):
-        self.info(f"Playing: {self.player.get_uri()}")
+        self.info(f'Playing: {self.player.get_uri()}')
         if self.player.get_uri() is None:
             return
         self.player.play()
@@ -843,11 +843,11 @@ class GStreamerPlayer(Backend):
             rcs_id, 'Volume', volume)
 
     def playcontainer_browse(self, uri):
-        """
+        '''
         dlna-playcontainer://uuid%3Afe814e3e-5214-4c24-847b-383fb599ff01?
         sid=urn%3Aupnp-org%3AserviceId%3AContentDirectory&
         cid=1441&fid=1444&fii=0&sc=&md=0
-        """
+        '''
         from urllib.parse import unquote
         from cgi import parse_qs
 
@@ -871,7 +871,7 @@ class GStreamerPlayer(Backend):
                     didl.addItem(item)
                     next_track = \
                         (res.data, didl.toString(), remote_content_format)
-                """ a list with these elements:
+                ''' a list with these elements:
 
                     the current track index
                      - will change during playback of the container items
@@ -881,14 +881,14 @@ class GStreamerPlayer(Backend):
                     the kwargs for the Browse call
                      - kwargs['StartingIndex'] will be modified
                         during further Browse requests
-                """
+                '''
                 self.playcontainer = [int(kw['StartingIndex']), uri,
                                       elt.getItems()[:], action, kw]
 
                 def browse_more(
                         starting_index, number_returned, total_matches):
-                    self.info(f"browse_more {starting_index} "
-                              f"{number_returned} {total_matches}")
+                    self.info(f'browse_more {starting_index} '
+                              f'{number_returned} {total_matches}')
                     try:
 
                         def handle_error(r):
@@ -907,14 +907,14 @@ class GStreamerPlayer(Backend):
                                 (total_matches - number_returned) !=
                                 starting_index):
                             self.info(
-                                "seems we have been returned only "
-                                "a part of the result")
-                            self.info(f"requested {5:d}, "
-                                      f"starting at {starting_index:d}")
-                            self.info(f"got {number_returned:d} "
-                                      f"out of {total_matches:d}")
-                            self.info(f"requesting more starting now at "
-                                      f"{starting_index + number_returned:d}")
+                                'seems we have been returned only '
+                                'a part of the result')
+                            self.info(f'requested {5:d}, '
+                                      f'starting at {starting_index:d}')
+                            self.info(f'got {number_returned:d} '
+                                      f'out of {total_matches:d}')
+                            self.info(f'requesting more starting now at '
+                                      f'{starting_index + number_returned:d}')
                             self.playcontainer[4]['StartingIndex'] = str(
                                 starting_index + number_returned)
                             d = self.playcontainer[3].call(
@@ -1164,7 +1164,7 @@ class GStreamerPlayer(Backend):
         InstanceID = int(kwargs['InstanceID'])
         CurrentURI = kwargs['CurrentURI']
         CurrentURIMetaData = kwargs['CurrentURIMetaData']
-        # print("upnp_SetAVTransportURI", InstanceID,
+        # print('upnp_SetAVTransportURI', InstanceID,
         #       CurrentURI, CurrentURIMetaData)
         if CurrentURI.startswith('dlna-playcontainer://'):
             def handle_result(r):
@@ -1241,8 +1241,8 @@ if __name__ == '__main__':
                )
 
     def check_bus_state(bus, message):
-        """Example function to check the player bus state and act accordingly
-        """
+        '''Example function to check the player bus state and act accordingly
+        '''
         t = message.type
         if t == Gst.MessageType.EOS:
             print('Reached end of file: Ending reactor/GLib.MainLoop...')

@@ -6,7 +6,7 @@
 # Copyright 2008, Benjamin Kampmann <ben.kampmann@googlemail.com>
 # Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
-"""
+'''
 TEDStore
 --------
 
@@ -34,7 +34,7 @@ Example to run from console::
           a console.
 
 .. versionchanged:: 0.8.3
-"""
+'''
 
 from coherence.backends.models.items import BackendVideoItem
 from coherence.backends.models.stores import BackendVideoStore
@@ -76,7 +76,7 @@ class TEDStore(BackendVideoStore):
         'http-get:*:video/mp4:*',
     ]
 
-    root_url = b"http://feeds.feedburner.com/tedtalks_video?format=xml"
+    root_url = b'http://feeds.feedburner.com/tedtalks_video?format=xml'
     root_find_items = './channel/item'
     root_id = 0
 

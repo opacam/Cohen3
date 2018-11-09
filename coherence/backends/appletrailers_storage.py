@@ -60,7 +60,7 @@ class AppleTrailerProxy(ReverseProxyUriResource):
 
     def render(self, request):
         request.requestHeaders.setRawHeaders(
-            b"user-agent",
+            b'user-agent',
             [b'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)'])
         return super(AppleTrailerProxy, self).render(request)
 
@@ -106,7 +106,7 @@ class AppleTrailersStore(BackendVideoStore):
         'http-get:*:video/quicktime:*',
         'http-get:*:video/mp4:*']
 
-    root_url = b"http://www.apple.com/trailers/home/xml/current.xml"
+    root_url = b'http://www.apple.com/trailers/home/xml/current.xml'
     root_find_items = './movieinfo'
     root_id = 0
 
@@ -155,7 +155,7 @@ class AppleTrailersStore(BackendVideoStore):
                     minutes, seconds = duration.split(':')
                 except ValueError:
                     seconds = duration
-            duration = f"{int(hours):d}:{int(minutes):02d}:{int(seconds):02d}"
+            duration = f'{int(hours):d}:{int(minutes):02d}:{int(seconds):02d}'
         data['duration'] = duration
         try:
             data['video_size'] = item.find(
@@ -193,7 +193,7 @@ class AppleTrailersStore(BackendVideoStore):
                 url,
                 f'http-get:*:{"image/jpeg"}:{";".join([dlna_pn] + dlna_tags)}')
             new_res.size = None
-            # new_res.resolution = "160x160"
+            # new_res.resolution = '160x160'
             trailer.item.res.append(new_res)
             if not hasattr(trailer.item, 'attachments'):
                 trailer.item.attachments = {}

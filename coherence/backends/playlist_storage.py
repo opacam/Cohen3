@@ -41,9 +41,9 @@ class PlaylistItem(BackendItem):
                 item = DIDLLite.AudioItem(upnp_id, upnp_parent_id, self.name)
 
             # what to do with MMS:// feeds?
-            protocol = "http-get"
-            if self.stream_url.startswith("rtsp://"):
-                protocol = "rtsp-rtp-udp"
+            protocol = 'http-get'
+            if self.stream_url.startswith('rtsp://'):
+                protocol = 'rtsp-rtp-udp'
 
             res = Resource(self.stream_url,
                            f'{protocol}:*:{self.mimetype}:*')
@@ -163,7 +163,7 @@ class PlaylistStore(AbstractBackendStore):
     def retrievePlaylistItems(self, url, parent_item):
 
         def gotPlaylist(playlist):
-            self.info("got playlist")
+            self.info('got playlist')
             items = []
             if playlist:
                 content, header = playlist
@@ -195,8 +195,8 @@ class PlaylistStore(AbstractBackendStore):
             return items
 
         def gotError(error):
-            self.warning(f"Unable to retrieve playlist: {url}")
-            print(f"Error: {error}")
+            self.warning(f'Unable to retrieve playlist: {url}')
+            print(f'Error: {error}')
             return None
 
         d = getPage(url)

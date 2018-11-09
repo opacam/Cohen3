@@ -519,7 +519,7 @@ class Video(BackendItem):
             seconds = seconds - hours * 3600
             minutes = seconds / 60
             seconds = seconds - minutes * 60
-            self.duration = f"{hours:d}:{minutes:02d}:{seconds:02d}"
+            self.duration = f'{hours:d}:{minutes:02d}:{seconds:02d}'
         except Exception:
             self.duration = 0
 
@@ -1026,8 +1026,8 @@ class AmpacheStore(BackendStore):
         if (kwargs.get('X_UPnPClient', '') == 'XBox' and
                 wmc_mapping is not None and
                 ObjectID in wmc_mapping):
-            """ fake a Windows Media Connect Server
-            """
+            ''' fake a Windows Media Connect Server
+            '''
             root_id = wmc_mapping[ObjectID]
             if callable(root_id):
                 item = root_id()
