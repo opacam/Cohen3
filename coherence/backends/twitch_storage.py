@@ -9,17 +9,25 @@
 A backend to access twitch.tv streams.
 
 To enable personalized features (e.g. 'Following' streams),
-add 'access_token' key into your config file.
+add 'access_token' key into your config file:
 
-1. To get access token copy and paste the following into your browser:
-  https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&
-  client_id=37684tuwyxmogmtduz6lz0jdtf0acob&
-  redirect_uri=http://localhost&scope=user_read
-2. After authorization you will be redirected to http://localhost with
-access token in fragment part, e.g.
-  http://localhost/#access_token=<YOUR_ACCESS_TOKEN_IS_HERE>&scope=user_read
-3. Copy the token and paste in TwitchStore section of your config file:
-  access_token = <YOUR_ACCESS_TOKEN (step 2)>
+  1. Click the link below to automatically request an access token for your
+     account:
+
+     `Go twitch's "get access token" page
+     <https://api.twitch.tv/kraken/oauth2/authorize\?response_type=token&
+     client_id=37684tuwyxmogmtduz6lz0jdtf0acob&redirect_uri=
+     http://localhost&scope=user_read>`_
+
+  2. After authorization you will be redirected to http://localhost with
+     access token in fragment part, e.g:
+
+        **http://localhost/#access_token=
+        <YOUR_ACCESS_TOKEN_IS_HERE> &scope=user_read**
+
+  3. Copy the token and paste in TwitchStore section of your config file:
+
+        access_token = <YOUR_ACCESS_TOKEN (step 2)>
 """
 
 import json
