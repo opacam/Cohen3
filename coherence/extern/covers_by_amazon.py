@@ -4,12 +4,13 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
-"""
-
+'''
 Covers by Amazon
+================
 
-methods to retrieve covers/album art via the
+Methods to retrieve covers/album art via the
 Amazon E-Commerce WebService v4
 http://docs.amazonwebservices.com/AWSECommerceService/2007-04-04/DG/
 
@@ -37,8 +38,7 @@ Furthermore if you save any of the cover images you
 have to take care that they are stored no longer than
 a maximum of one month and requested then from Amazon
 again.
-
-"""
+'''
 import io
 import os
 import urllib.error
@@ -96,7 +96,7 @@ class WorkQueue(object):
         if len(self.queue) == 0:
             return
         if len(self.workers) >= self.max_workers:
-            # print "WorkQueue - all workers busy"
+            # print('WorkQueue - all workers busy')
             return
         work = self.queue.pop()
         d = defer.maybeDeferred(work[0], *work[1], **work[2])
@@ -110,55 +110,60 @@ class WorkQueue(object):
 
 
 class CoverGetter(object):
-    """
-    retrieve a cover image for a given ASIN,
-                               a TITLE or
-                               an ARTIST/TITLE combo
+    '''
+    Retrieve a cover image for a given ASIN, a TITLE or an ARTIST/TITLE combo.
 
-    parameters are:
+    .. note::
+        if the filename extension and the received image extension
+        differ, the image is converted with PIL to the desired format
+        (http://www.pythonware.com/products/pil/index.htm).
 
-        filename: where to save a received image
-                  if NONE the image will be passed to the callback
-        callback: a method to call with the filename
-                  or the image as a parameter
-                  after the image request and save was successful
-                  can be:
-                  - only a callable
-                  - a tuple with a callable,
-                      - optional an argument or a tuple of arguments
-                      - optional a dict with keyword arguments
-        not_found_callback: a method to call when the search at Amazon failed
-                  can be:
-                  - only a callable
-                  - a tuple with a callable,
-                      - optional an argument or a tuple of arguments
-                      - optional a dict with keyword arguments
-        locale:   which Amazon Webservice Server to use, defaults to .com
-        image_size: request the cover as large|medium|small image
-                    resolution seems to be in pixels for
-                    large: 500x500, medium: 160x160 and small: 75x75
-        asin: the Amazon Store Identification Number
-        artist: the artists name
-        title: the album title
-
-    if the filename extension and the received image extension differ,
-    the image is converted with PIL to the desired format
-    http://www.pythonware.com/products/pil/index.htm
-
-    """
+    '''
 
     def __init__(self, filename, aws_key, callback=None,
                  not_found_callback=None,
                  locale=None,
                  image_size='large',
                  title=None, artist=None, asin=None):
-        self.aws_base_query = '/onca/xml?Service=AWSECommerceService' \
-                              '&AWSAccessKeyId=%s' % aws_key
+        '''
+        Args:
+            filename (str): where to save a received image if *None* the image
+                will be passed to the callback.
+            aws_key (str): The aws key
+            callback (object): a method to call with the filename or the image
+                as a parameter after the image request and save was successful
+                can be:
+
+                  - only a callable
+                  - a tuple with a callable:
+
+                      - optional an argument or a tuple of arguments
+                      - optional a dict with keyword arguments
+
+            not_found_callback (object): a method to call when the search at
+                Amazon failed, can be:
+
+                   - only a callable
+                   - a tuple with a callable:
+
+                      - optional an argument or a tuple of arguments
+                      - optional a dict with keyword arguments
+            locale (str): which Amazon Webservice Server to use, defaults
+                to .com.
+            image_size (str): request the cover as large|medium|small image
+                resolution seems to be in pixels for large: 500x500,
+                medium: 160x160 and small: 75x75.
+            title (str): the album title
+            artist (str): the artists name
+            asin (str): the Amazon Store Identification Number
+        '''
+        self.aws_base_query = \
+            f'/onca/xml?Service=AWSECommerceService&AWSAccessKeyId={aws_key}'
 
         self.filename = filename
         self.callback = callback
         self._errcall = not_found_callback
-        self.server = 'http://ecs.amazonaws.%s' % aws_server.get(locale, 'com')
+        self.server = f'http://ecs.amazonaws.{aws_server.get(locale, "com")}'
         self.image_size = image_size
 
         def sanitize(s):
@@ -175,35 +180,35 @@ class CoverGetter(object):
             return s
 
         if asin is not None:
-            query = aws_asin_query + '&ItemId=%s' % urllib.parse.quote(asin)
+            query = aws_asin_query + f'&ItemId={urllib.parse.quote(asin)}'
         elif artist is not None or title is not None:
             query = aws_artist_query
             if artist is not None:
                 artist = sanitize(artist)
                 query = '&'.join(
-                    (query, 'Artist=%s' % urllib.parse.quote(artist)))
+                    (query, f'Artist={urllib.parse.quote(artist)}'))
             if title is not None:
                 title = sanitize(title)
                 query = '&'.join(
-                    (query, 'Title=%s' % urllib.parse.quote(title)))
+                    (query, f'Title={urllib.parse.quote(title)}'))
         else:
             raise KeyError(
-                "Please supply either asin, title "
-                "or artist and title arguments")
+                'Please supply either asin, title '
+                'or artist and title arguments')
         url = self.server + self.aws_base_query + aws_response_group + query
         WorkQueue(self.send_request, url)
 
     def send_request(self, url, *args, **kwargs):
-        # print "send_request", url
+        # print('send_request', url)
         d = client.getPage(url)
         d.addCallback(self.got_response)
         d.addErrback(self.got_error, url)
         return d
 
     def got_image(self, result, convert_from='', convert_to=''):
-        # print "got_image"
+        # print('got_image')
         if len(convert_from) and len(convert_to):
-            # print "got_image %d, convert to %s" % (len(result), convert_to)
+            # print(f'got_image {len(result):d}, convert to {convert_to}')
             try:
                 import Image
 
@@ -213,8 +218,8 @@ class CoverGetter(object):
 
                 im.save(self.filename)
             except ImportError:
-                print("we need the Python Imaging Library "
-                      "to do image conversion")
+                print('we need the Python Imaging Library '
+                      'to do image conversion')
 
         if self.filename is None:
             data = result
@@ -222,7 +227,7 @@ class CoverGetter(object):
             data = self.filename
 
         if self.callback is not None:
-            # print "got_image", self.callback
+            # print('got_image', self.callback)
             if isinstance(self.callback, tuple):
                 if len(self.callback) == 3:
                     c, a, kw = self.callback
@@ -249,10 +254,9 @@ class CoverGetter(object):
         convert_from = convert_to = ''
         result = etree.fromstring(result)
         image_tag = result.find(
-            './/{%s}%s' % (aws_ns,
-                           aws_image_size.get(self.image_size, 'large')))
+            f'.//{{{aws_ns}}}{aws_image_size.get(self.image_size, "large")}')
         if image_tag is not None:
-            image_url = image_tag.findtext('{%s}URL' % aws_ns)
+            image_url = image_tag.findtext(f'{{{aws_ns}}}URL')
             if self.filename is None:
                 d = client.getPage(image_url)
             else:
@@ -264,7 +268,7 @@ class CoverGetter(object):
                 else:
                     _, image_ext = os.path.splitext(image_url)
                     if image_ext != '' and file_ext != image_ext:
-                        # print "hmm, we need a conversion..."
+                        # print('hmm, we need a conversion...')
                         convert_from = image_ext
                         convert_to = file_ext
                 if len(convert_to):
@@ -297,7 +301,7 @@ class CoverGetter(object):
                     self._errcall()
 
     def got_error(self, failure, url):
-        print("got_error", failure, url)
+        print('got_error', failure, url)
 
 
 if __name__ == '__main__':
@@ -316,12 +320,12 @@ if __name__ == '__main__':
     except usage.UsageError as errortext:
         import sys
 
-        print('%s: %s' % (sys.argv[0], errortext))
-        print('%s: Try --help for usage details.' % (sys.argv[0]))
+        print(f'{sys.argv[0]}: {errortext}')
+        print(f'{sys.argv[0]}: Try --help for usage details.')
         sys.exit(1)
 
     def got_it(filename, *args, **kwargs):
-        print("Mylady, it is an image and its name is", filename, args, kwargs)
+        print('Mylady, it is an image and its name is', filename, args, kwargs)
 
     aws_key = '1XHSE4FQJ0RK0X3S9WR2'
     print(options['asin'], options['artist'], options['title'])
