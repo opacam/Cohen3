@@ -190,10 +190,9 @@ class StateVariable(EventDispatcher, log.LogAble):
                                 new_value.append(v)
                             else:
                                 self.warning(
-                                    "Variable %s update, %r value %s "
-                                    "doesn't fit in %r",
-                                    self.name, self.has_vendor_values, v,
-                                    self.allowed_values)
+                                    f'Variable {self.name} update, '
+                                    f'{self.has_vendor_values} value {v} '
+                                    f'doesn\'t fit in {self.allowed_values}')
                                 new_value = 'Coherence_Value_Error'
                         else:
                             new_value.append(v)
@@ -215,9 +214,8 @@ class StateVariable(EventDispatcher, log.LogAble):
                                            self.allowed_values]:
                         new_value = value
                     else:
-                        self.warning(
-                            "Variable %s NOT updated, value %s doesn't fit",
-                            self.name, value)
+                        self.warning(f'Variable {self.name} NOT updated, '
+                                     f'value {value} doesn\'t fit')
                         new_value = 'Coherence_Value_Error'
                 else:
                     new_value = value
@@ -234,17 +232,16 @@ class StateVariable(EventDispatcher, log.LogAble):
         if new_value == 'Coherence_Value_Error':
             return
         if new_value == self.value:
-            self.info("variable NOT updated, no value change %s %s", self.name,
-                      self.value)
+            self.info(f'variable NOT updated, no value change'
+                      f' {self.name} {self.value}')
             return
         self.old_value = self.value
         self.value = new_value
         self.last_time_touched = time.time()
 
-        # print("UPDATED %s %r %r %r %r %r" % (
-        #     self.name, self.service,
-        #     isinstance(self.service, service.Service),
-        #     self.instance, self.value, self._callbacks))
+        # print(f'UPDATED {self.name} {self.service} '
+        #       f'{isinstance(self.service, service.Service)} '
+        #       f'{self.instance} {self.value} {self._callbacks}')
         self.notify()
 
         if isinstance(self.service, service.Service):
@@ -262,28 +259,23 @@ class StateVariable(EventDispatcher, log.LogAble):
     def notify(self):
         if self.name.startswith('A_ARG_TYPE_'):
             return
-        self.info("Variable %s sends notify about new value >%r<", self.name,
-                  self.value)
+        self.info(
+            f'Variable {self.name} sends notify about new value >{self.value}<'
+        )
         # if self.old_value == '':
         #    return
 
         for target in self.dispatch_targets:
             for evt in self.dispatch_events:
                 target.dispatch_event(evt, variable=self)
-        # print("CALLBACKS %s %r %r" % (
-        #     self.name, self.instance, self._callbacks))
+        # print(f'CALLBACKS {self.name} {self.instance} {self._callbacks}')
         for callback in self._callbacks:
             callback(self)
 
     def __repr__(self):
-        return "Variable: %s, %s, %d, %s, %s, %s, %s, %s, %s, %s" % \
-               (self.name,
-                str(self.service),
-                self.instance,
-                self.implementation,
-                self.data_type,
-                str(self.allowed_values),
-                str(self.default_value),
-                str(self.old_value),
-                str(self.value),
-                str(self.send_events))
+        return \
+            f'Variable: {self.name}, {str(self.service)}, {self.instance:d},' \
+            f' {self.implementation}, {self.data_type},' \
+            f' {str(self.allowed_values)}, {str(self.default_value)},' \
+            f' {str(self.old_value)}, {str(self.value)},' \
+            f' {str(self.send_events)}'
