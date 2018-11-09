@@ -109,18 +109,19 @@ class Device(EventDispatcher, log.LogAble):
         self.parent = parent
         self.udn = udn
         # self.uid = self.usn[:-len(self.st)-2]
-        self.friendly_name = ""
-        self.device_type = ""
-        self.upnp_version = "n/a"
-        self.friendly_device_type = "[unknown]"
+        self.friendly_name = ''
+        self.device_type = ''
+        self.upnp_version = 'n/a'
+        self.friendly_device_type = '[unknown]'
         self.device_type_version = 0
 
     def __repr__(self):
-        return "embedded device %r %r, parent %r" % (
-            self.friendly_name, self.device_type, self.parent)
+        return \
+            f'embedded device {self.friendly_name} ' \
+            f'{self.device_type}, parent {self.parent}'
 
     # def __del__(self):
-    #    #print "Device removal completed"
+    #    # print('Device removal completed')
     #    pass
 
     def as_dict(self):
@@ -130,22 +131,21 @@ class Device(EventDispatcher, log.LogAble):
              'services': [x.as_dict() for x in self.services]}
         icons = []
         for icon in self.icons:
-            icons.append({"mimetype": icon['mimetype'], "url": icon['url'],
-                          "height": icon['height'], "width": icon['width'],
-                          "depth": icon['depth']})
+            icons.append({'mimetype': icon['mimetype'], 'url': icon['url'],
+                          'height': icon['height'], 'width': icon['width'],
+                          'depth': icon['depth']})
         d['icons'] = icons
         return d
 
     def remove(self, *args):
-        self.info('removal of  {} {}'.format(
-            self.friendly_name, self.udn))
+        self.info(f'removal of  {self.friendly_name} {self.udn}')
         while len(self.devices) > 0:
             device = self.devices.pop()
-            self.debug('try to remove {}'.format(device))
+            self.debug(f'try to remove {device}')
             device.remove()
         while len(self.services) > 0:
             service = self.services.pop()
-            self.debug("try to remove %r", service)
+            self.debug(f'try to remove {service}')
             service.remove()
         if self.client is not None:
             self.dispatch_event(
@@ -166,9 +166,8 @@ class Device(EventDispatcher, log.LogAble):
             return
         self.detection_completed = True
         if self.parent is not None:
-            self.info(
-                'embedded device {} {} initialized, parent {}'.format(
-                    self.friendly_name, self.device_type, self.parent))
+            self.info(f'embedded device {self.friendly_name} '
+                      f'{self.device_type} initialized, parent {self.parent}')
         self.dispatch_event('device_detection_completed', None, device=self)
         if self.parent is not None:
             self.dispatch_event(
@@ -219,7 +218,7 @@ class Device(EventDispatcher, log.LogAble):
                               of :class:`~coherence.upnp.core.service.Service`
 
         '''
-        self.debug('add_service {}'.format(service))
+        self.debug(f'add_service {service}')
         if service.detection_completed:
             self.receiver(service)
         service.bind(service_detection_completed=self.receiver,
@@ -238,7 +237,7 @@ class Device(EventDispatcher, log.LogAble):
                 break
 
     def add_device(self, device):
-        self.debug("Device add_device %r", device)
+        self.debug(f'Device add_device {device}')
         self.devices.append(device)
 
     def get_friendly_name(self):
@@ -254,10 +253,9 @@ class Device(EventDispatcher, log.LogAble):
         try:
             return self._markup_name
         except AttributeError:
-            self._markup_name = "%s:%s %s" % \
-                                (self.friendly_device_type,
-                                 self.device_type_version,
-                                 self.friendly_name)
+            self._markup_name = \
+                f'{self.friendly_device_type}:{self.device_type_version} ' \
+                f'{self.friendly_name}'
             return self._markup_name
 
     def get_device_type_version(self):
@@ -280,21 +278,18 @@ class Device(EventDispatcher, log.LogAble):
             'device_got_client', self, client=self.client)
 
     def renew_service_subscriptions(self):
-        """ iterate over device's services and renew subscriptions """
-        self.info(
-            'renew service subscriptions for {}'.format(self.friendly_name))
+        ''' iterate over device's services and renew subscriptions '''
+        self.info(f'renew service subscriptions for {self.friendly_name}')
         now = time.time()
         for service in self.services:
-            self.info('check service {} {} {} {}'.format(service.id,
-                                                         service.get_sid(),
-                                                         service.get_timeout(),
-                                                         now))
+            self.info(f'check service {service.id} {service.get_sid()} '
+                      f'{service.get_timeout()} {now}')
             if service.get_sid() is not None:
                 if service.get_timeout() < now:
-                    self.debug('wow, we lost an event subscription for {} {}, '
-                               'maybe we need to rethink the loop time and '
-                               'timeout calculation?'.format(
-                                   self.friendly_name, service.get_id()))
+                    self.debug(f'wow, we lost an event subscription for '
+                               f'{self.friendly_name} {service.get_id()}, '
+                               f'maybe we need to rethink the loop time and '
+                               f'timeout calculation?')
                 if service.get_timeout() < now + 30:
                     service.renew_subscription()
 
@@ -302,7 +297,7 @@ class Device(EventDispatcher, log.LogAble):
             device.renew_service_subscriptions()
 
     def unsubscribe_service_subscriptions(self):
-        """ iterate over device's services and unsubscribe subscriptions """
+        '''Iterate over device's services and unsubscribe subscriptions '''
         sl = []
         for service in self.get_services():
             if service.get_sid() is not None:
@@ -311,48 +306,48 @@ class Device(EventDispatcher, log.LogAble):
         return dl
 
     def parse_device(self, d):
-        self.info('parse_device {}'.format(d))
-        self.device_type = d.findtext('./{%s}deviceType' % ns)
+        self.info(f'parse_device {d}')
+        self.device_type = d.findtext(f'./{{{ns}}}deviceType')
         self.friendly_device_type, self.device_type_version = \
             self.device_type.split(':')[-2:]
-        self.friendly_name = d.findtext('./{%s}friendlyName' % ns)
-        self.udn = d.findtext('./{%s}UDN' % ns)
-        self.info("found udn %r %r", self.udn, self.friendly_name)
+        self.friendly_name = d.findtext(f'./{{{ns}}}friendlyName')
+        self.udn = d.findtext(f'./{{{ns}}}UDN')
+        self.info(f'found udn {self.udn} {self.friendly_name}')
 
         try:
-            self.manufacturer = d.findtext('./{%s}manufacturer' % ns)
+            self.manufacturer = d.findtext(f'./{{{ns}}}manufacturer')
         except Exception:
             pass
         try:
-            self.manufacturer_url = d.findtext('./{%s}manufacturerURL' % ns)
+            self.manufacturer_url = d.findtext(f'./{{{ns}}}manufacturerURL')
         except Exception:
             pass
         try:
-            self.model_name = d.findtext('./{%s}modelName' % ns)
+            self.model_name = d.findtext(f'./{{{ns}}}modelName')
         except Exception:
             pass
         try:
-            self.model_description = d.findtext('./{%s}modelDescription' % ns)
+            self.model_description = d.findtext(f'./{{{ns}}}modelDescription')
         except Exception:
             pass
         try:
-            self.model_number = d.findtext('./{%s}modelNumber' % ns)
+            self.model_number = d.findtext(f'./{{{ns}}}modelNumber')
         except Exception:
             pass
         try:
-            self.model_url = d.findtext('./{%s}modelURL' % ns)
+            self.model_url = d.findtext(f'./{{{ns}}}modelURL')
         except Exception:
             pass
         try:
-            self.serial_number = d.findtext('./{%s}serialNumber' % ns)
+            self.serial_number = d.findtext(f'./{{{ns}}}serialNumber')
         except Exception:
             pass
         try:
-            self.upc = d.findtext('./{%s}UPC' % ns)
+            self.upc = d.findtext(f'./{{{ns}}}UPC')
         except Exception:
             pass
         try:
-            self.presentation_url = d.findtext('./{%s}presentationURL' % ns)
+            self.presentation_url = d.findtext(f'./{{{ns}}}presentationURL')
         except Exception:
             pass
 
@@ -379,42 +374,39 @@ class Device(EventDispatcher, log.LogAble):
         except Exception:
             pass
 
-        icon_list = d.find('./{%s}iconList' % ns)
+        icon_list = d.find(f'./{{{ns}}}iconList')
         if icon_list is not None:
             from urllib.parse import urlparse
-            url_base = "%s://%s" % urlparse(self.get_location())[:2]
-            for icon in icon_list.findall('./{%s}icon' % ns):
+            url_base = '%s://%s' % urlparse(self.get_location())[:2]
+            for icon in icon_list.findall(f'./{{{ns}}}icon'):
                 try:
                     i = {}
-                    i['mimetype'] = icon.find('./{%s}mimetype' % ns).text
-                    i['width'] = icon.find('./{%s}width' % ns).text
-                    i['height'] = icon.find('./{%s}height' % ns).text
-                    i['depth'] = icon.find('./{%s}depth' % ns).text
-                    i['realurl'] = icon.find('./{%s}url' % ns).text
+                    i['mimetype'] = icon.find(f'./{{{ns}}}mimetype').text
+                    i['width'] = icon.find(f'./{{{ns}}}width').text
+                    i['height'] = icon.find(f'./{{{ns}}}height').text
+                    i['depth'] = icon.find(f'./{{{ns}}}depth').text
+                    i['realurl'] = icon.find(f'./{{{ns}}}url').text
                     i['url'] = self.make_fullyqualified(
                         i['realurl']).decode('utf-8')
                     self.icons.append(i)
-                    self.debug('adding icon %r for %r' % (
-                        i, self.friendly_name))
+                    self.debug(f'adding icon {i} for {self.friendly_name}')
                 except Exception as e:
                     import traceback
                     self.debug(traceback.format_exc())
                     self.warning(
-                        'device %r seems to have an invalid icon description, '
-                        'ignoring that icon [error: %r]' % (
-                            self.friendly_name, e))
+                        f'device {self.friendly_name} seems to have an invalid'
+                        f' icon description, ignoring that icon [error: {e}]')
 
-        serviceList = d.find('./{%s}serviceList' % ns)
+        serviceList = d.find(f'./{{{ns}}}serviceList')
         if serviceList is not None:
-            for service in serviceList.findall('./{%s}service' % ns):
-                serviceType = service.findtext('{%s}serviceType' % ns)
-                serviceId = service.findtext('{%s}serviceId' % ns)
-                controlUrl = service.findtext('{%s}controlURL' % ns)
-                eventSubUrl = service.findtext('{%s}eventSubURL' % ns)
-                presentationUrl = service.findtext('{%s}presentationURL' % ns)
-                scpdUrl = service.findtext('{%s}SCPDURL' % ns)
-                """ check if values are somehow reasonable
-                """
+            for service in serviceList.findall(f'./{{{ns}}}service'):
+                serviceType = service.findtext(f'{{{ns}}}serviceType')
+                serviceId = service.findtext(f'{{{ns}}}serviceId')
+                controlUrl = service.findtext(f'{{{ns}}}controlURL')
+                eventSubUrl = service.findtext(f'{{{ns}}}eventSubURL')
+                presentationUrl = service.findtext(f'{{{ns}}}presentationURL')
+                scpdUrl = service.findtext(f'{{{ns}}}SCPDURL')
+                # check if values are somehow reasonable
                 if len(scpdUrl) == 0:
                     self.warning('service has no uri for its description')
                     continue
@@ -431,13 +423,12 @@ class Device(EventDispatcher, log.LogAble):
                                 eventSubUrl, presentationUrl, scpdUrl, self))
                 except Exception as e:
                     self.error(
-                        'Error on adding service: {} [ERROR: {}]'.format(
-                            service, e))
+                        f'Error on adding service: {service} [ERROR: {e}]')
 
             # now look for all sub devices
-            embedded_devices = d.find('./{%s}deviceList' % ns)
+            embedded_devices = d.find(f'./{{{ns}}}deviceList')
             if embedded_devices is not None:
-                for d in embedded_devices.findall('./{%s}device' % ns):
+                for d in embedded_devices.findall(f'./{{{ns}}}device'):
                     embedded_device = Device(self)
                     self.add_device(embedded_device)
                     embedded_device.parse_device(d)
@@ -498,7 +489,7 @@ class Device(EventDispatcher, log.LogAble):
                 if v not in [None, 'None']:
                     r.append((name, v))
             except Exception as e:
-                self.error('Device.as_tuples: %r' % e)
+                self.error(f'Device.as_tuples: {e}')
                 import traceback
                 self.debug(traceback.format_exc())
 
@@ -625,12 +616,12 @@ class RootDevice(Device):
         # we need to handle root device completion
         # these events could be our self or our children.
         self.parse_description()
-        self.debug('RootDevice initialized: %r' % self.location)
+        self.debug(f'RootDevice initialized: {self.location}')
 
     def __repr__(self):
-        return "rootdevice %r %r %r %r, manifestation %r" % \
-               (self.friendly_name, self.udn, self.st,
-                self.host, self.manifestation)
+        return \
+            f'rootdevice {self.friendly_name} {self.udn} {self.st} ' \
+            f'{self.host}, manifestation {self.manifestation}'
 
     def remove(self, *args):
         result = Device.remove(self, *args)
@@ -674,74 +665,73 @@ class RootDevice(Device):
         perform some more operations, before the :class:`RootDevice` emits
         an event notifying that the root device detection has completed.
         '''
-        self.debug("device_detect %r", kwargs)
-        self.debug("root_detection_completed %r",
-                   self.root_detection_completed)
+        self.debug(f'device_detect {kwargs}')
+        self.debug(f'root_detection_completed {self.root_detection_completed}')
         if self.root_detection_completed:
             return
         # our self is not complete yet
 
-        self.debug("detection_completed %r", self.detection_completed)
+        self.debug(f'detection_completed {self.detection_completed}')
         if not self.detection_completed:
             return
 
         # now check child devices.
-        self.debug("self.devices %r", self.devices)
+        self.debug(f'self.devices {self.devices}')
         for d in self.devices:
-            self.debug("check device %r %r", d.detection_completed, d)
+            self.debug(f'check device {d.detection_completed} {d}')
             if not d.detection_completed:
                 return
         # now must be done, so notify root done
         self.root_detection_completed = True
-        self.info("rootdevice %r %r %r initialized, manifestation %r",
-                  self.friendly_name, self.st, self.host, self.manifestation)
+        self.info(f'rootdevice {self.friendly_name} {self.st} {self.host} '
+                  f'initialized, manifestation {self.manifestation}')
         self.dispatch_event(
             'root_device_detection_completed', device=self)
 
     def add_device(self, device):
-        self.debug("RootDevice add_device %r", device)
+        self.debug(f'RootDevice add_device {device}')
         self.devices.append(device)
 
     def get_devices(self):
-        self.debug("RootDevice get_devices: %s", self.devices)
+        self.debug(f'RootDevice get_devices: {self.devices}')
         return self.devices
 
     def parse_description(self):
 
         def gotPage(x):
-            self.debug("got device description from %r", self.location)
-            self.debug("data is %r", x)
+            self.debug(f'got device description from {self.location}')
+            self.debug(f'data is {x}')
             data, headers = x
             xml_data = None
             try:
                 xml_data = etree.fromstring(data)
             except Exception:
-                self.warning("Invalid device description received from %r",
-                             self.location)
+                self.warning(f'Invalid device description received from '
+                             f'{self.location}')
                 import traceback
                 self.debug(traceback.format_exc())
 
             if xml_data is not None:
                 tree = xml_data
-                major = tree.findtext('./{%s}specVersion/{%s}major' % (ns, ns))
-                minor = tree.findtext('./{%s}specVersion/{%s}minor' % (ns, ns))
+                major = tree.findtext(f'./{{{ns}}}specVersion/{{{ns}}}major')
+                minor = tree.findtext(f'./{{{ns}}}specVersion/{{{ns}}}minor')
                 try:
                     self.upnp_version = '.'.join((major, minor))
                 except Exception:
                     self.upnp_version = 'n/a'
                 try:
-                    self.urlbase = tree.findtext('./{%s}URLBase' % ns)
+                    self.urlbase = tree.findtext(f'./{{{ns}}}URLBase')
                 except Exception:
                     import traceback
                     self.debug(traceback.format_exc())
 
-                d = tree.find('./{%s}device' % ns)
+                d = tree.find(f'./{{{ns}}}device')
                 if d is not None:
                     self.parse_device(d)  # root device
-            self.debug("device parsed successfully %r", self.location)
+            self.debug(f'device parsed successfully {self.location}')
 
         def gotError(failure, url):
-            self.warning("error getting device description from %r", url)
+            self.warning(f'error getting device description from {url}')
             self.info(failure)
 
         try:
@@ -749,11 +739,11 @@ class RootDevice(Device):
                 self.location).addCallbacks(
                 gotPage, gotError, None, None, [self.location], None)
         except Exception as e:
-            self.error('Error on parsing device description: {}'.format(e))
+            self.error(f'Error on parsing device description: {e}')
 
     def make_fullyqualified(self, url):
         '''Be aware that this function returns a byte string'''
-        self.info('make_fullyqualified: {}  [{}]'.format(url, type(url)))
+        self.info(f'make_fullyqualified: {url} [{type(url)}]')
         if isinstance(url, str):
             url = url.encode('ascii')
         if url.startswith(b'http://'):
