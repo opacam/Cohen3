@@ -5,69 +5,73 @@
 
 # Copyright 2008 Frank Scholz <coherence@beebits.net>
 
-""" A MediaServer backend to test Items
+"""
+A MediaServer backend to test Items.
 
-    Item information can be passed on the commandline
-    or in the config as an XMl fragment
+Item information can be passed on the commandline or in the config as an XML
+fragment::
 
-    coherence --plugin=backend:TestStore,name:Test,\
-       item:<item><location>audio.mp3</location>\
-            <mimetype>audio/mpeg</mimetype></item>,\
-       item:<item><location>audio.ogg</location>\
+    coherence --plugin=backend:TestStore,name:Test,\\
+       item:<item><location>audio.mp3</location>\\
+            <mimetype>audio/mpeg</mimetype></item>,\\
+       item:<item><location>audio.ogg</location>\\
             <mimetype>audio/ogg</mimetype></item>
 
-    coherence --plugin="backend:TestStore,name:Test,\
-       item:<item><type>gstreamer</type>\
-            <pipeline>v4l2src num-buffers=1 ! video/x-raw-yuv,width=640,\
-            height=480 ! ffmpegcolorspace ! jpegenc name=enc</pipeline>\
+    coherence --plugin="backend:TestStore,name:Test,\\
+       item:<item><type>gstreamer</type>\\
+            <pipeline>v4l2src num-buffers=1 ! video/x-raw-yuv,width=640,\\
+            height=480 ! ffmpegcolorspace ! jpegenc name=enc</pipeline>\\
             <mimetype>image/jpeg></mimetype></item>"
 
-    "video/x-raw-yuv,width=640,height=480" won't work here as it is a delimiter
-     for the plugin string, so if you need things like that in the pipeline,
-      you need to use a config file
+"video/x-raw-yuv,width=640,height=480" won't work here as it is a delimiter
+for the plugin string, so if you need things like that in the pipeline,
+you need to use a config file::
 
-    coherence --plugin="backend:TestStore,name:Test,\
-        item:<item><type>process</type>\
-            <command>man date</command>\
+    coherence --plugin="backend:TestStore,name:Test,\\
+        item:<item><type>process</type>\\
+            <command>man date</command>\\
             <mimetype>text/html</mimetype></item>"
 
-    The XML fragment has these elements:
+The XML fragment has these elements:
 
-    'type': file - the item is some file-system object (default)
-            url - an item pointing to an object off-site
-            gstreamer - the item is actually a GStreamer pipeline
-            process - the items content is created by an external process
+    - type:
 
-    'location': the filesystem path or an url (mandatory)
-    'mimetype': the mimetype of the item (mandatory)
-    'extension': an optional extension to append to the
-                 url created for the DIDLLite resource data
-    'title': the 'title' this item should have (optional)
-    'upnp_class': the DIDLLite class the item shall have,
-                  object.item will be taken as default
-    'fourth_field': value for the 4th field of the protocolInfo phalanx,
-                    default is '*'
-    'pipeline': a GStreamer pipeline that has to end with a bin named 'enc',
-                some pipelines do only work properly when we have a glib
-                mainloop running, so coherence needs to be started
-                with -o glib:yes
-    'command': the commandline for an external script to run, its output will
-              be returned as the items content
+      * file: the item is some file-system object (default)
+      * url: an item pointing to an object off-site
+      * gstreamer: the item is actually a GStreamer pipeline
+      * process: the items content is created by an external process
+
+    - location: the filesystem path or an url (mandatory)
+    - mimetype: the mimetype of the item (mandatory)
+    - extension: an optional extension to append to the url created for the
+      DIDLLite resource data
+    - title: the 'title' this item should have (optional)
+    - upnp_class: the DIDLLite class the item shall have, object.item will
+      be taken as default
+    - fourth_field: value for the 4th field of the protocolInfo phalanx,
+      default is *'\*'*
+    - pipeline: a GStreamer pipeline that has to end with a bin named 'enc',
+      some pipelines do only work properly when we have a glib mainloop
+      running, so coherence needs to be started with *\-o glib\:yes*
+    - command: the commandline for an external script to run, its output will
+      be returned as the items content
 
 In the config file the definition of this backend could look like this:
 
-        <plugin active="yes">
-          <backend>TestStore</backend>
-          <name>Test</name>
-          <item>
+.. code-block:: xml
+
+    <plugin active="yes">
+        <backend>TestStore</backend>
+        <name>Test</name>
+        <item>
             <location>/tmp/audio.mp3</location>
             <mimetype>audio/mpeg</mimetype>
-          </item>
-          <item>
+        </item>
+        <item>
             <location>/tmp/audio.ogg</location>
             <mimetype>audio/ogg</mimetype>
-          </item>
-        </plugin>
+         </item>
+    </plugin>
 
 """
 import os
