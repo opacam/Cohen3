@@ -105,7 +105,7 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
 
     def datagramReceived(self, data, xxx_todo_changeme):
         '''Handle a received multicast datagram.'''
-        self.debug('datagramReceived: {}'.format(data))
+        self.debug(f'datagramReceived: {data}')
         (host, port) = xxx_todo_changeme
         data = to_string(data)
         try:
@@ -126,10 +126,10 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
         # at some point of the source code. I notice that the issue appears
         # when using FSStore plugin. But where?
         def fix_string(s, to_lower=True):
-            for q in ["'", "\""]:
+            for q in ['\'', '"']:
                 while s.startswith(q):
                     s = s[1:]
-            for q in ["'", "\""]:
+            for q in ['\'', '"']:
                 while s.endswith(q):
                     s = s[:-1]
             if to_lower:
@@ -140,9 +140,8 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
             dict([(fix_string(x[0]),
                    fix_string(x[1], to_lower=False)) for x in headers])
 
-        self.msg('SSDP command {} {} - from {}:{}'.format(
-            cmd[0], cmd[1], host, port))
-        self.debug('with headers: {}'.format(headers))
+        self.msg(f'SSDP command {cmd[0]} {cmd[1]} - from {host}:{port}')
+        self.debug(f'with headers: {headers}')
         if cmd[0] == 'M-SEARCH' and cmd[1] == '*':
             # SSDP discovery
             self.discoveryRequest(headers, (host, port))
@@ -150,7 +149,7 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
             # SSDP presence
             self.notifyReceived(headers, (host, port))
         else:
-            self.warning('Unknown SSDP command {} {}'.format(cmd[0], cmd[1]))
+            self.warning(f'Unknown SSDP command {cmd[0]} {cmd[1]}')
 
         # make raw data available
         # send out the signal after we had a chance to register the device
@@ -164,9 +163,8 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
         '''Register a service or device that this SSDP server will
         respond to.'''
 
-        self.info('Registering {} ({}) -> {}'.format(
-            st, location, manifestation))
-        self.debug('\t-searching usn: {}'.format(usn))
+        self.info(f'Registering {st} ({location}) -> {manifestation}')
+        self.debug(f'\t-searching usn: {usn}')
 
         try:
             self.known[usn] = {}
@@ -183,7 +181,7 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
             self.known[usn]['last-seen'] = time.time()
 
             self.msg(self.known[usn])
-            self.debug('\t-self.known: {}'.format(self.known))
+            self.debug(f'\t-self.known: {self.known}')
 
             if manifestation == 'local':
                 self.doNotify(usn)
@@ -192,19 +190,19 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
                 self.dispatch_event(
                     'new_device', device_type=st, infos=self.known[usn])
                 self.root_devices.append(usn)
-                # self.callback("new_device", st, self.known[usn])
+                # self.callback('new_device', st, self.known[usn])
             # print('\t - ok all')
         except Exception as err:
-            self.error('\t -> Error on registering service: '
-                       '{} [error: "{}"]'.format(manifestation, err))
+            self.error(f'\t -> Error on registering service: {manifestation} '
+                       f'[error: "{err}"]')
 
     def unRegister(self, usn):
-        self.msg("Un-registering {}".format(usn))
+        self.msg(f'Un-registering {usn}')
         st = self.known[usn]['ST']
         if st == 'upnp:rootdevice':
             self.dispatch_event(
                 'removed_device', device_type=st, infos=self.known[usn])
-            # self.callback("removed_device", st, self.known[usn])
+            # self.callback('removed_device', st, self.known[usn])
             self.root_devices.remove(usn)
         del self.known[usn]
 
@@ -215,14 +213,13 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
         '''Process a presence announcement.  We just remember the
         details of the SSDP service announced.'''
         (host, port) = xxx_todo_changeme1
-        self.info('Notification from ({},{}) for {}'.format(
-            host, port, headers['nt']))
-        self.debug('Notification headers: {}'.format(headers))
+        self.info(f'Notification from ({host},{port}) for {headers["nt"]}')
+        self.debug(f'Notification headers: {headers}')
 
         if headers['nts'] == 'ssdp:alive':
             try:
                 self.known[headers['usn']]['last-seen'] = time.time()
-                self.debug('updating last-seen for {}'.format(headers['usn']))
+                self.debug(f'updating last-seen for {headers["usn"]}')
             except KeyError:
                 self.register('remote', headers['usn'], headers['nt'],
                               headers['location'],
@@ -232,28 +229,27 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
             if self.isKnown(headers['usn']):
                 self.unRegister(headers['usn'])
         else:
-            self.warning('Unknown subtype {} for notification type {}'.format(
-                headers['nts'], headers['nt']))
+            self.warning(f'Unknown subtype {headers["nts"]} '
+                         f'for notification type {headers["nt"]}')
         self.dispatch_event('log', 'SSDP', host,
                             f'Notify {headers["nts"]} for {headers["usn"]}')
 
     def send_it(self, response, destination, delay, usn):
-        self.info('send discovery response delayed by '
-                  '{} for {} to {}'.format(delay, usn, destination))
+        self.info(f'send discovery response delayed by '
+                  f'{delay} for {usn} to {destination}')
         try:
             self.transport.write(
                 to_bytes(response), to_bytes(destination))
         except (AttributeError, socket.error) as msg:
-            self.info('failure sending out byebye notification: '
-                      '{}'.format(msg))
+            self.info(f'failure sending out byebye notification: {msg}')
 
     def discoveryRequest(self, headers, xxx_todo_changeme2):
         '''Process a discovery request.  The response must be sent to
         the address specified by (host, port).'''
         (host, port) = xxx_todo_changeme2
-        self.info('Discovery request from ({},{}) for {}'.format(
-            host, port, headers['st']))
-        self.info('Discovery request for {}'.format(headers['st']))
+        self.info(
+            f'Discovery request from ({host},{port}) for {headers["st"]}')
+        self.info(f'Discovery request for {headers["st"]}')
 
         self.dispatch_event('log', 'SSDP', host,
                             f'M-Search for {headers["st"]}')
@@ -274,8 +270,8 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
                     if k == 'USN':
                         usn = v
                     if k not in ('MANIFESTATION', 'SILENT', 'HOST'):
-                        response.append(b'%r: %r' % (k, v))
-                response.append(b'DATE: %r' % datetimeToString())
+                        response.append(f'{k}: {v}'.encode('ascii'))
+                response.append(f'DATE: {datetimeToString()}'.encode('ascii'))
 
                 response.extend((b'', b''))
                 delay = random.randint(0, int(headers['mx']))
@@ -289,11 +285,11 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
 
         if self.known[usn]['SILENT'] is True:
             return
-        self.info('Sending alive notification for {}'.format(usn))
-        # self.info('\t - self.known[usn]: {}'.format(self.known[usn]))
+        self.info(f'Sending alive notification for {usn}')
+        # self.info(f'\t - self.known[usn]: {self.known[usn]}')
 
         resp = ['NOTIFY * HTTP/1.1',
-                'HOST: %s:%d' % (SSDP_ADDR, SSDP_PORT),
+                f'HOST: {SSDP_ADDR}:{SSDP_PORT}',
                 'NTS: ssdp:alive',
                 ]
         stcpy = dict(iter(self.known[usn].items()))
@@ -305,30 +301,29 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
         del stcpy['last-seen']
 
         resp.extend([
-            '%r: %r' % (k, v) for k, v in stcpy.items()])
+            f'{k}: {v}' for k, v in stcpy.items()])
         resp.extend(('', ''))
         r = '\r\n'.join(resp).encode('ascii')
-        self.debug('doNotify content {}  [transport is: {}]'.format(
-            r, self.transport))
+        self.debug(f'doNotify content {r}  [transport is: {self.transport}]')
         if not self.transport:
             try:
                 self.warning('transport not initialized...'
                              'trying to initialize a FakeDatagramTransport')
                 self.transport = proto_helpers.FakeDatagramTransport()
             except Exception as er:
-                self.error('Cannot initialize transport: {}'.format(er))
+                self.error(f'Cannot initialize transport: {er}')
         try:
             self.transport.write(r, (SSDP_ADDR, SSDP_PORT))
         except (AttributeError, socket.error) as msg:
-            self.info('failure sending out alive notification: {}'.format(msg))
+            self.info(f'failure sending out alive notification: {msg}')
 
     def doByebye(self, usn):
         '''Do byebye'''
 
-        self.info('Sending byebye notification for %s', usn)
+        self.info(f'Sending byebye notification for {usn}')
 
         resp = ['NOTIFY * HTTP/1.1',
-                'HOST: %r:%r' % (SSDP_ADDR, SSDP_PORT),
+                f'HOST: {SSDP_ADDR}:{SSDP_PORT}',
                 'NTS: ssdp:byebye',
                 ]
         try:
@@ -340,10 +335,10 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
             del stcpy['HOST']
             del stcpy['last-seen']
             resp.extend([
-                '%r: %r' % (k, v) for k, v in stcpy.items()])
+                f'{k}: {v}' for k, v in stcpy.items()])
             resp.extend(('', ''))
             r = '\r\n'.join(resp).encode('ascii')
-            self.debug('doByebye content %s', resp)
+            self.debug(f'doByebye content {resp}')
             if not self.transport:
                 self.warning('transport not initialized...'
                              'trying to initialize a FakeDatagramTransport')
@@ -353,9 +348,9 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
                 self.transport.write(r, (SSDP_ADDR, SSDP_PORT))
             except (AttributeError, socket.error) as msg:
                 self.info(
-                    "failure sending out byebye notification: %r", msg)
+                    f'failure sending out byebye notification: {msg}')
         except KeyError as msg:
-            self.debug("error building byebye notification: %r", msg)
+            self.debug(f'error building byebye notification: {msg}')
 
     def resendNotify(self):
         for usn in self.known:
@@ -367,7 +362,7 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
         Check if the discovered devices are still ok,
         or if we haven't received a new discovery response
         '''
-        self.debug("Checking devices/services are still valid")
+        self.debug('Checking devices/services are still valid')
         removable = []
         for usn in self.known:
             if self.known[usn]['MANIFESTATION'] != 'local':
@@ -375,11 +370,11 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
                 expiry = int(expiry)
                 now = time.time()
                 last_seen = self.known[usn]['last-seen']
-                self.debug('Checking if {} is still valid - last seen '
-                           '{} (+{}), now {}'.format(
-                               self.known[usn]['USN'], last_seen, expiry, now))
+                self.debug(
+                    f'Checking if {self.known[usn]["USN"]} is still valid - '
+                    f'last seen {last_seen} (+{expiry}), now {now}')
                 if last_seen + expiry + 30 < now:
-                    self.debug('Expiring: {}'.format(self.known[usn]))
+                    self.debug(f'Expiring: {self.known[usn]}')
                     if self.known[usn]['ST'] == 'upnp:rootdevice':
                         self.dispatch_event(
                             'removed_device',
