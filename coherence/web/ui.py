@@ -235,8 +235,9 @@ class DevicesWatcher(log.LogAble):
                 dirname(device.get_location().decode('utf-8')),
                 '0')  # here we force to navigate into the Content folder
         else:
-            link = f'http://{device.host}:{c.web_server_port}/' \
-                   f'{device.udn.replace("uuid:", "")}',
+            link = \
+                f'http://{device.host}:{c.web_server_port}/' \
+                f'{device.udn.replace("uuid:", "")}',
         dev = {'type': 'add-device',
                'name': device.get_markup_name(),
                'usn': device.get_usn(),

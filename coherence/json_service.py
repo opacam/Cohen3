@@ -60,12 +60,13 @@ class JsonInterface(resource.Resource, log.LogAble):
                             if action is not None:
                                 return self.call_action(action, request)
                             else:
-                                msg = f'action {path[2]} on service type ' \
-                                      f'{path[1]} for device {path[0]} ' \
-                                      f'not found'
+                                msg = \
+                                    f'action {path[2]} on service type ' \
+                                    f'{path[1]} for device {path[0]} not found'
                         else:
-                            msg = f'service type {path[1]} for device ' \
-                                  f'{path[0]} not found'
+                            msg = \
+                                f'service type {path[1]} for device ' \
+                                f'{path[0]} not found'
 
                     else:
                         msg = f'device with id {path[0]} not found'
