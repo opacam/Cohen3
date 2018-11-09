@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
@@ -18,7 +20,7 @@ class AVTransportClient(log.LogAble):
         self.service.client = self
 
     # def __del__(self):
-    #    #print "AVTransportClient deleted"
+    #    # print('AVTransportClient deleted')
     #    pass
 
     def remove(self):

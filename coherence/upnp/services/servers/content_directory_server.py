@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
@@ -5,7 +7,10 @@
 # Copyright 2006 John-Mark Gurney <gurney_j@resnet.uoregon.edu>
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
 
-# Content Directory service
+'''
+Content Directory service
+=========================
+'''
 
 from twisted.internet import defer
 from twisted.python import failure
@@ -52,11 +57,11 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         cl = ''
         for c in self.children:
             c = to_string(c)
-            cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)
+            cl += f'<li><a href={uri}/{c}>{c}</a></li>'
         return cl
 
     def render(self, request):
-        html = """\
+        html = f'''\
         <html>
         <head>
             <title>Cohen3 (ContentDirectoryServer)</title>
@@ -65,8 +70,8 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         <h5>
             <img class="logo-icon" src="/server-images/coherence-icon.svg">
             </img>Root of the ContentDirectory</h5>
-        <div class="list"><ul>%s</ul></div>
-        </html>""" % self.listchilds(request.uri)
+        <div class="list"><ul>{self.listchilds(request.uri)}</ul></div>
+        </html>'''
         return html.encode('ascii')
 
     def upnp_Search(self, *args, **kwargs):
@@ -158,12 +163,12 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         except Exception:
             pass
 
-        wmc_mapping = getattr(self.backend, "wmc_mapping", None)
+        wmc_mapping = getattr(self.backend, 'wmc_mapping', None)
         if kwargs.get('X_UPnPClient', '') == 'XBox':
             if (wmc_mapping is not None and
                     ContainerID in wmc_mapping):
-                """ fake a Windows Media Connect Server
-                """
+                ''' fake a Windows Media Connect Server
+                '''
                 root_id = wmc_mapping[ContainerID]
                 if callable(root_id):
                     item = root_id()
@@ -208,8 +213,8 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             ObjectID = kwargs['ObjectID']
         except KeyError:
             self.debug(
-                "hmm, a Browse action and no ObjectID argument? "
-                "An XBox maybe?")
+                'hmm, a Browse action and no ObjectID argument? '
+                'An XBox maybe?')
             try:
                 ObjectID = kwargs['ContainerID']
             except KeyError:
@@ -231,9 +236,9 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         else:
             requested_id = str(ObjectID)
 
-        self.info("upnp_Browse request %r %r %r %r", ObjectID, BrowseFlag,
-                  StartingIndex, RequestedCount)
-        # self.debug('\t- kwargs: {}'.format(kwargs))
+        self.info(f'upnp_Browse request {ObjectID} {BrowseFlag} '
+                  f'{StartingIndex} {RequestedCount}')
+        # self.debug(f'\t- kwargs: {kwargs}')
 
         didl = DIDLElement(upnp_client=kwargs.get('X_UPnPClient', ''),
                            requested_id=requested_id,
@@ -311,11 +316,11 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
         root_id = ObjectID
 
-        wmc_mapping = getattr(self.backend, "wmc_mapping", None)
+        wmc_mapping = getattr(self.backend, 'wmc_mapping', None)
         if kwargs.get('X_UPnPClient', '') == 'XBox' and \
                 wmc_mapping is not None and ObjectID in wmc_mapping:
-            """ fake a Windows Media Connect Server
-            """
+            ''' fake a Windows Media Connect Server
+            '''
             root_id = wmc_mapping[ObjectID]
             if callable(root_id):
                 item = root_id()

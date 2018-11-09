@@ -1,9 +1,14 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
 
-# Connection Manager service
+'''
+Connection Manager service
+==========================
+'''
 import time
 
 from twisted.internet import task
@@ -21,13 +26,13 @@ class ConnectionManagerControl(service.ServiceControl, UPnPPublisher):
 
     def __init__(self, server):
         service.ServiceControl.__init__(self)
-        # self.debug('ConnectionManagerControl.__init__: {}'.format(server))
+        # self.debug(f'ConnectionManagerControl.__init__: {server}')
         UPnPPublisher.__init__(self)
         self.service = server
         self.variables = server.get_variables()
         self.actions = server.get_actions()
-        # self.debug('\t- variables: {}'.format(self.variables))
-        # self.debug('\t- actions: {}'.format(self.actions))
+        # self.debug(f'\t- variables: {self.variables}')
+        # self.debug(f'\t- actions: {self.actions}')
 
 
 class ConnectionManagerServer(service.ServiceServer, resource.Resource):
@@ -90,10 +95,10 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
                  'Status': 'OK'}
 
         if self.device.device_type == 'MediaRenderer':
-            """
+            '''
             this is the place to instantiate AVTransport and RenderingControl
             for this connection
-            """
+            '''
             avt_id = self.next_avt_id
             self.next_avt_id += 1
             self.device.av_transport_server.create_new_instance(avt_id)
@@ -123,8 +128,7 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
                     self.lookup_rcs_id(id))
                 del self.connections[id]
             except Exception as e:
-                self.warning(
-                    'ConnectionManagerServer.remove_connection: %r' % e)
+                self.warning(f'ConnectionManagerServer.remove_connection: {e}')
             self.backend.current_connection_id = None
 
         if self.device.device_type == 'MediaServer':
@@ -134,9 +138,8 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
         self.set_variable(0, 'CurrentConnectionIDs', csv_ids)
 
     def remove_lingering_connections(self):
-        """ check if we have a connection that hasn't a StateVariable change
-            within the last 300 seconds, if so remove it
-        """
+        '''Check if we have a connection that hasn't a StateVariable change
+        within the last 300 seconds, if so remove it.'''
         if self.device.device_type != 'MediaRenderer':
             return
 
@@ -148,7 +151,7 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
             avt_active = True
             rcs_active = True
 
-            # print "remove_lingering_connections", id, avt_id, rcs_id
+            # print('remove_lingering_connections', id, avt_id, rcs_id)
             if avt_id > 0:
                 avt_variables = \
                     self.device.av_transport_server.get_variables().get(avt_id)
@@ -191,11 +194,11 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
         cl = ''
         for c in self.children:
             c = to_string(c)
-            cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)
+            cl += f'<li><a href={uri}/{c}>{c}</a></li>'
         return cl
 
     def render(self, request):
-        html = """\
+        html = f'''\
         <html>
         <head>
             <title>Cohen3 (ConnectionManagerServer)</title>
@@ -204,8 +207,8 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
         <h5>
             <img class="logo-icon" src="/server-images/coherence-icon.svg">
             </img>Root of the ConnectionManager</h5>
-        <div class="list"><ul>%s</ul></div>
-        </html>""" % self.listchilds(request.uri)
+        <div class="list"><ul>{self.listchilds(request.uri)}</ul></div>
+        </html>'''
         return html.encode('ascii')
 
     def set_variable(self, instance, variable_name, value, default=False):
@@ -256,11 +259,11 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
 
     def upnp_PrepareForConnection(self, *args, **kwargs):
         self.info('upnp_PrepareForConnection')
-        """ check if we really support that mimetype """
+        ''' check if we really support that mimetype '''
         RemoteProtocolInfo = kwargs['RemoteProtocolInfo']
-        """ if we are a MR and this in not 'Input'
+        ''' if we are a MR and this in not 'Input'
             then there is something strange going on
-        """
+        '''
         Direction = kwargs['Direction']
         if (self.device.device_type == 'MediaRenderer' and
                 Direction == 'Output'):
@@ -268,9 +271,9 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
         if (self.device.device_type == 'MediaServer' and
                 Direction != 'Input'):
             return failure.Failure(errorCode(702))
-        """ the InstanceID of the MS ? """
+        ''' the InstanceID of the MS ? '''
         PeerConnectionID = kwargs['PeerConnectionID']
-        """ ??? """
+        ''' ??? '''
         PeerConnectionManager = kwargs['PeerConnectionManager']
         local_protocol_infos = None
         if self.device.device_type == 'MediaRenderer':
@@ -278,15 +281,15 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
         if self.device.device_type == 'MediaServer':
             local_protocol_infos = \
                 self.get_variable('SourceProtocolInfo').value
-        self.debug('ProtocalInfos: %s -- %s', RemoteProtocolInfo,
-                   local_protocol_infos)
+        self.debug(
+            f'ProtocalInfos: {RemoteProtocolInfo} -- {local_protocol_infos}')
 
         try:
             remote_protocol, remote_network, remote_content_format, _ = \
                 RemoteProtocolInfo.split(':')
         except Exception as e:
-            self.warning("unable to process RemoteProtocolInfo %s [error: %r]",
-                         RemoteProtocolInfo, e)
+            self.warning(f'unable to process RemoteProtocolInfo '
+                         f'{RemoteProtocolInfo} [error: {e}]')
             return failure.Failure(errorCode(701))
 
         for protocol_info in local_protocol_infos.split(','):
@@ -318,15 +321,15 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
 
     def upnp_ConnectionComplete(self, *args, **kwargs):
         ConnectionID = int(kwargs['ConnectionID'])
-        """ remove this ConnectionID
+        ''' remove this ConnectionID
             and the associated instances @ AVTransportID and RcsID
-        """
+        '''
         self.remove_connection(ConnectionID)
         return {}
 
     def upnp_GetCurrentConnectionInfo(self, *args, **kwargs):
         ConnectionID = int(kwargs['ConnectionID'])
-        """ return for this ConnectionID
+        ''' return for this ConnectionID
             the associated InstanceIDs @ AVTransportID and RcsID
             ProtocolInfo
             PeerConnectionManager
@@ -335,7 +338,7 @@ class ConnectionManagerServer(service.ServiceServer, resource.Resource):
             Status
 
             or send a 706 if there isn't such a ConnectionID
-        """
+        '''
         connection = self.lookup_connection(ConnectionID)
         if connection is None:
             return failure.Failure(errorCode(706))

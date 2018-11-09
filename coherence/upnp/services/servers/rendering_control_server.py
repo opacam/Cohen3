@@ -1,9 +1,14 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2006, Frank Scholz <coherence@beebits.net>
 
-# RenderingControl service
+'''
+RenderingControl service
+========================
+'''
 
 from twisted.web import resource
 
@@ -41,11 +46,11 @@ class RenderingControlServer(service.ServiceServer, resource.Resource):
         cl = ''
         for c in self.children:
             c = to_string(c)
-            cl += '<li><a href=%s/%s>%s</a></li>' % (uri, c, c)
+            cl += f'<li><a href={uri}/{c}>{c}</a></li>'
         return cl
 
     def render(self, request):
-        html = """\
+        html = f'''\
         <html>
         <head>
             <title>Cohen3 (RenderingControlServer)</title>
@@ -54,6 +59,6 @@ class RenderingControlServer(service.ServiceServer, resource.Resource):
         <h5>
             <img class="logo-icon" src="/server-images/coherence-icon.svg">
             </img>Root of the RenderingControl</h5>
-        <div class="list"><ul>%s</ul></div>
-        </html>""" % self.listchilds(request.uri)
+        <div class="list"><ul>{self.listchilds(request.uri)}</ul></div>
+        </html>'''
         return html.encode('ascii')

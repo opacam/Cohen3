@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
@@ -21,10 +23,10 @@ class ContentDirectoryClient:
         self.url = service.get_control_url()
         self.service.subscribe()
         self.service.client = self
-        # print "ContentDirectoryClient __init__", self.url
+        # print('ContentDirectoryClient __init__', self.url)
 
     # def __del__(self):
-    #    print "ContentDirectoryClient deleted"
+    #    print('ContentDirectoryClient deleted')
     #    pass
 
     def remove(self):
@@ -68,7 +70,7 @@ class ContentDirectoryClient:
             return items
 
         def got_process_result(result):
-            # print result
+            # print(result)
             r = {}
             r['number_returned'] = result['NumberReturned']
             r['total_matches'] = result['TotalMatches']
@@ -76,7 +78,7 @@ class ContentDirectoryClient:
             r['items'] = {}
             elt = DIDLLite.DIDLElement.fromString(result['Result'])
             for item in elt.getItems():
-                # print "process_result", item
+                # print('process_result', item)
                 i = {}
                 i['upnp_class'] = item.upnp_class
                 i['id'] = item.id
@@ -117,7 +119,7 @@ class ContentDirectoryClient:
 
     def search(self, container_id, criteria, starting_index=0,
                requested_count=0):
-        # print "search:", criteria
+        # print('search:', criteria)
         starting_index = str(starting_index)
         requested_count = str(requested_count)
         action = self.service.get_action('Search')
@@ -125,10 +127,10 @@ class ContentDirectoryClient:
             return None
         d = action.call(ContainerID=container_id,
                         SearchCriteria=criteria,
-                        Filter="*",
+                        Filter='*',
                         StartingIndex=starting_index,
                         RequestedCount=requested_count,
-                        SortCriteria="")
+                        SortCriteria='')
         d.addErrback(self._failure)
 
         def gotResults(results):

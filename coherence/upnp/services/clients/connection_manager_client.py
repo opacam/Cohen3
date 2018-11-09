@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
@@ -14,11 +16,11 @@ class ConnectionManagerClient:
         self.service.subscribe()
 
     # def __del__(self):
-    #    #print "ConnectionManagerClient deleted"
+    #    # print('ConnectionManagerClient deleted')
     #    pass
 
     def connection_manager_id(self):
-        return "%s/%s" % (self.service.device.get_id(), self.service.get_id())
+        return f'{self.service.device.get_id()}/{self.service.get_id()}'
 
     def remove(self):
         self.service.remove()

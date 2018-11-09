@@ -1,9 +1,14 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2008, Frank Scholz <coherence@beebits.net>
 
-# Dimming service
+'''
+Dimming service
+===============
+'''
 
 from twisted.web import resource
 

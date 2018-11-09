@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
@@ -12,10 +14,10 @@ class RenderingControlClient:
         self.url = service.get_control_url()
         self.service.subscribe()
         self.service.client = self
-        # print "RenderingControlClient __init__", self.url
+        # print('RenderingControlClient __init__', self.url)
 
     # def __del__(self):
-    #    #print "RenderingControlClient deleted"
+    #    # print('RenderingControlClient deleted')
     #    pass
 
     def remove(self):
