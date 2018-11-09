@@ -63,21 +63,20 @@ class InternetGatewayDeviceClient(EventDispatcher, log.LogAble):
                 'WANDevice')[0]
             self.wan_device = WANDeviceClient(wan_device)
         except Exception as e:
-            self.warning(
-                "Embedded WANDevice device not available, "
-                "device not implemented properly according "
-                "to the UPnP specification [error: %r]" % e)
+            self.warning(f'Embedded WANDevice device not available, device not'
+                         f' implemented properly according to the UPnP'
+                         f' specification [error: {e}]')
             raise
 
-        self.info("InternetGatewayDevice %s", self.device.get_friendly_name())
+        self.info(f'InternetGatewayDevice {self.device.get_friendly_name()}')
 
     def remove(self):
-        self.info("removal of InternetGatewayDeviceClient started")
+        self.info('removal of InternetGatewayDeviceClient started')
         if self.wan_device is not None:
             self.wan_device.remove()
 
     def embedded_device_notified(self, device):
-        self.info("EmbeddedDevice %r sent notification", device)
+        self.info(f'EmbeddedDevice {device} sent notification')
         if self.detection_completed:
             return
         self.detection_completed = True
