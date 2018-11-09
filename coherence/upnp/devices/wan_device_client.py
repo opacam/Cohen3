@@ -83,28 +83,28 @@ class WANDeviceClient(EventDispatcher, log.LogAble):
                 wan_connection_device)
         except Exception as er:
             self.warning(
-                "Embedded WANConnectionDevice device not available, "
-                "device not implemented properly according to "
-                "the UPnP specification [ERROR: {}]".format(er))
+                f'Embedded WANConnectionDevice device not available, device '
+                f'not implemented properly according to the UPnP '
+                f'specification [ERROR: {er}]')
             raise
 
         for service in self.device.get_services():
             if service.get_type() in [
-                    "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1"]:
+                    'urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1']:
                 self.wan_common_interface_connection = \
                     WANCommonInterfaceConfigClient(service)
 
-        self.info("WANDevice %s", self.device.get_friendly_name())
+        self.info(f'WANDevice {self.device.get_friendly_name()}')
 
     def remove(self):
-        self.info("removal of WANDeviceClient started")
+        self.info('removal of WANDeviceClient started')
         if self.wan_common_interface_connection is not None:
             self.wan_common_interface_connection.remove()
         if self.wan_connection_device is not None:
             self.wan_connection_device.remove()
 
     def embedded_device_notified(self, device):
-        self.info("EmbeddedDevice %r sent notification", device)
+        self.info(f'EmbeddedDevice {device} sent notification')
         if self.embedded_device_detection_completed:
             return
 
@@ -115,7 +115,7 @@ class WANDeviceClient(EventDispatcher, log.LogAble):
                 'embedded_device_client_detection_completed', self)
 
     def service_notified(self, service):
-        self.info("Service %r sent notification", service)
+        self.info(f'Service {service} sent notification')
         if self.service_detection_completed:
             return
         if self.wan_common_interface_connection is not None:
