@@ -62,26 +62,26 @@ class WANConnectionDeviceClient(EventDispatcher, log.LogAble):
 
         for service in self.device.get_services():
             if service.get_type() in [
-                    "urn:schemas-upnp-org:service:WANIPConnection:1"]:
+                    'urn:schemas-upnp-org:service:WANIPConnection:1']:
                 self.wan_ip_connection = WANIPConnectionClient(service)
             if service.get_type() in [
-                    "urn:schemas-upnp-org:service:WANPPPConnection:1"]:
+                    'urn:schemas-upnp-org:service:WANPPPConnection:1']:
                 self.wan_ppp_connection = WANPPPConnectionClient(service)
-        self.info("WANConnectionDevice %s", self.device.get_friendly_name())
+        self.info(f'WANConnectionDevice {self.device.get_friendly_name()}')
         if self.wan_ip_connection:
-            self.info("WANIPConnection service available")
+            self.info('WANIPConnection service available')
         if self.wan_ppp_connection:
-            self.info("WANPPPConnection service available")
+            self.info('WANPPPConnection service available')
 
     def remove(self):
-        self.info("removal of WANConnectionDeviceClient started")
+        self.info('removal of WANConnectionDeviceClient started')
         if self.wan_ip_connection is not None:
             self.wan_ip_connection.remove()
         if self.wan_ppp_connection is not None:
             self.wan_ppp_connection.remove()
 
     def service_notified(self, service):
-        self.info("Service %r sent notification", service)
+        self.info(f'Service {service} sent notification')
         if self.detection_completed:
             return
         if self.wan_ip_connection is not None:
