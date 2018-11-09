@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
@@ -14,8 +16,8 @@ import traceback
 # set the below variable to: logging.DEBUG
 DEFAULT_COHEN_LOG_LEVEL = logging.WARN
 
-LOG_FORMAT = ("[%(levelname)-18s][$BOLD%(name)-15s$RESET]  "
-              "%(message)s    ($BOLD%(filename)s$RESET:%(lineno)d)")
+LOG_FORMAT = ('[%(levelname)-18s][$BOLD%(name)-15s$RESET]  '
+              '%(message)s    ($BOLD%(filename)s$RESET:%(lineno)d)')
 
 ENV_VAR_NAME = 'COHEN_DEBUG'
 
@@ -25,9 +27,9 @@ BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 # and the foreground with 30
 
 # These are the sequences need to get colored output
-RESET_SEQ = "\033[0m"
-COLOR_SEQ = "\033[1;%dm"
-BOLD_SEQ = "\033[1m"
+RESET_SEQ = '\033[0m'
+COLOR_SEQ = '\033[1;%dm'
+BOLD_SEQ = '\033[1m'
 
 COLORS = {
     'WARNING': YELLOW,
@@ -42,7 +44,7 @@ COLORS = {
 # caller stack frame.
 #
 if hasattr(sys, 'frozen'):  # support for py2exe
-    _srcfile = "coherence%slog%s" % (os.sep, __file__[-4:])
+    _srcfile = f'coherence{os.sep}log{__file__[-4:]}'
 elif __file__[-4:].lower() in ['.pyc', '.pyo']:
     _srcfile = __file__[:-4] + '.py'
 else:
@@ -68,12 +70,12 @@ def get_main_log_level():
 def formatter_message(message, use_color=True):
     if use_color:
         message = message.replace(
-            "$RESET", RESET_SEQ).replace(
-            "$BOLD", BOLD_SEQ)
+            '$RESET', RESET_SEQ).replace(
+            '$BOLD', BOLD_SEQ)
     else:
         message = message.replace(
-            "$RESET", "").replace(
-            "$BOLD", "")
+            '$RESET', '').replace(
+            '$BOLD', '')
     return message
 
 
@@ -110,17 +112,17 @@ class ColoredLogger(logging.Logger):
         return
 
     def findCaller(self, stack_info=False, use_color=True):
-        """
+        '''
         Find the stack frame of the caller so that we can note the source
         file name, line number and function name.
-        """
+        '''
         f = logging.currentframe()
         # On some versions of IronPython, currentframe() returns None if
         # IronPython isn't run with -X:Frames.
         if f is not None:
             f = f.f_back
-        rv = "(unknown file)", 0, "(unknown function)", None
-        while hasattr(f, "f_code"):
+        rv = '(unknown file)', 0, '(unknown function)', None
+        while hasattr(f, 'f_code'):
             co = f.f_code
             filename = os.path.normcase(co.co_filename)
             if filename in _srcfiles:
@@ -144,16 +146,15 @@ logging.setLoggerClass(ColoredLogger)
 
 
 class LogAble(object):
-    """
+    '''
     Base class for objects that want to be able to log messages with
     different level of severity.  The levels are, in order from least
     to most: log, debug, info, warning, error.
-
-    @cvar logCategory: Implementors can provide a category to log their
-       messages under.
-    """
+    '''
 
     logCategory = 'default'
+    '''Implementors can provide a category to log their messages under.'''
+
     _Loggable__logger = None
 
     FORMAT = LOG_FORMAT
@@ -168,8 +169,7 @@ class LogAble(object):
             self._logger = logging.getLogger(self.logCategory)
             self._logger.propagate = False
             loggers[self.logCategory] = self._logger
-            self.debug('Added logger with logCategory: {}'.format(
-                self.logCategory))
+            self.debug(f'Added logger with logCategory: {self.logCategory}')
         return
 
     def log(self, message, *args, **kwargs):
@@ -225,4 +225,4 @@ def init(logfilename=None, loglevel=logging.WARN):
         logger.setLevel(loglevel)
         logger.propagate = False
         loggers['coherence'] = logger
-        logger.debug('Added logger with logCategory: {}'.format('coherence'))
+        logger.debug(f'Added logger with logCategory: {"coherence"}')
