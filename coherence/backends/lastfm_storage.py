@@ -1,34 +1,34 @@
 # Licensed under the MIT license
 # http://opensource.org/licenses/mit-license.php
 
-"""
-INFO  lastFM_user                 Dez 14 17:35:27  Got new sessionid:
-    '1488f34a1cbed7c9f4232f8fd563c3bd'
-    (coherence/backends/lastfm_storage.py:60)
-DEBUG lastFM_stream               Dez 14 17:35:53  render
-    <GET /da525474-5357-4d1b-a894-76b1293224c9/1005 HTTP/1.1>
-    (coherence/backends/lastfm_storage.py:148)
-command GET
-rest /user/e0362c757ef49169e9a0f0970cc2d367.mp3
-headers {'icy-metadata': '1', 'host': 'kingpin5.last.fm',
-         'te': 'trailers', 'connection': 'TE',
-         'user-agent': 'gnome-vfs/2.12.0.19 neon/0.24.7'}
-ProxyClient handleStatus HTTP/1.1 200 OK
-ProxyClient handleHeader Content-Type audio/mpeg
-ProxyClient handleHeader Content-Length 4050441
-ProxyClient handleHeader Cache-Control no-cache, must-revalidate
-DEBUG lastFM_stream               Dez 14 17:35:53  render
-    <GET /da525474-5357-4d1b-a894-76b1293224c9/1005 HTTP/1.1>
-    (coherence/backends/lastfm_storage.py:148)
-command GET
-rest /user/e0362c757ef49169e9a0f0970cc2d367.mp3
-headers {'icy-metadata': '1', 'host': 'kingpin5.last.fm',
-         'te': 'trailers', 'connection': 'TE',
-         'user-agent': 'gnome-vfs/2.12.0.19 neon/0.24.7'}
-ProxyClient handleStatus HTTP/1.1 403 Invalid ticket
-"""
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
 # Copyright 2007, Moritz Struebe <morty@gmx.net>
+
+# TODO: remove the below "terminal output" sample when this backend get fixed
+# INFO  lastFM_user                 Dez 14 17:35:27  Got new sessionid:
+#     '1488f34a1cbed7c9f4232f8fd563c3bd'
+#     (coherence/backends/lastfm_storage.py:60)
+# DEBUG lastFM_stream               Dez 14 17:35:53  render
+#     <GET /da525474-5357-4d1b-a894-76b1293224c9/1005 HTTP/1.1>
+#     (coherence/backends/lastfm_storage.py:148)
+# command GET
+# rest /user/e0362c757ef49169e9a0f0970cc2d367.mp3
+# headers {'icy-metadata': '1', 'host': 'kingpin5.last.fm',
+#          'te': 'trailers', 'connection': 'TE',
+#          'user-agent': 'gnome-vfs/2.12.0.19 neon/0.24.7'}
+# ProxyClient handleStatus HTTP/1.1 200 OK
+# ProxyClient handleHeader Content-Type audio/mpeg
+# ProxyClient handleHeader Content-Length 4050441
+# ProxyClient handleHeader Cache-Control no-cache, must-revalidate
+# DEBUG lastFM_stream               Dez 14 17:35:53  render
+#     <GET /da525474-5357-4d1b-a894-76b1293224c9/1005 HTTP/1.1>
+#     (coherence/backends/lastfm_storage.py:148)
+# command GET
+# rest /user/e0362c757ef49169e9a0f0970cc2d367.mp3
+# headers {'icy-metadata': '1', 'host': 'kingpin5.last.fm',
+#          'te': 'trailers', 'connection': 'TE',
+#          'user-agent': 'gnome-vfs/2.12.0.19 neon/0.24.7'}
+# ProxyClient handleStatus HTTP/1.1 403 Invalid ticket
 
 from hashlib import md5
 from urllib.parse import urlsplit
