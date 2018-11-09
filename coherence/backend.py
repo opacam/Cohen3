@@ -318,7 +318,7 @@ class BackendItem(EventDispatcher, log.LogAble):
     .. code-block:: python
 
         self.item.res = []
-        res = DIDLLite.Resource(url, 'http-get:*:%s:*' % mimetype)
+        res = DIDLLite.Resource(url, f'http-get:*:{mimetype}:*')
         res.size = size
         self.item.res.append(res)
 
@@ -429,7 +429,7 @@ class BackendItem(EventDispatcher, log.LogAble):
         return self.cover
 
     def __repr__(self):
-        return "%s[%s]" % (self.__class__.__name__, self.get_name())
+        return f'{self.__class__.__name__}[{self.get_name()}]'
 
 
 class BackendRssMixin:
@@ -443,7 +443,7 @@ class BackendRssMixin:
 
         def fail(f):
             # TODO fix loggable thing
-            self.info("fail %r", f)
+            self.info(f'fail {f}')
             self.debug(f.getTraceback())
             return f
 
@@ -622,13 +622,13 @@ class LazyContainer(Container):
         # Phase 1
         # let's classify the item between items to be removed,
         # to be updated or to be added
-        self.debug("Refresh pass 1:%d %d",
-                   len(new_children), len(old_children))
+        self.debug(
+            f'Refresh pass 1:{len(new_children):d} {len(old_children):d}')
         for id, item in list(old_children.items()):
             children_to_be_removed[id] = item
         for id, item in list(new_children.items()):
             if id in old_children:
-                # print(id, "already there")
+                # print(id, 'already there')
                 children_to_be_replaced[id] = old_children[id]
                 del children_to_be_removed[id]
             else:
@@ -637,8 +637,9 @@ class LazyContainer(Container):
         # Phase 2
         # Now, we remove, update or add the relevant items
         # to the list of items
-        self.debug("Refresh pass 2: %d %d %d", len(children_to_be_removed),
-                   len(children_to_be_replaced), len(children_to_be_added))
+        self.debug(
+            f'Refresh pass 2: {len(children_to_be_removed):d} '
+            f'{len(children_to_be_replaced):d} {len(children_to_be_added):d}')
         # Remove relevant items from Container children
         for id, item in list(children_to_be_removed.items()):
             self.remove_child(item, external_id=id, update=False)
@@ -650,8 +651,8 @@ class LazyContainer(Container):
             if hasattr(old_item, 'replace_by'):
                 replaced = old_item.replace_by(new_item)
             if replaced is False:
-                # print("No replacement possible:
-                #       we remove and add the item again")
+                # print('No replacement possible:
+                #       we remove and add the item again')
                 self.remove_child(old_item, external_id=id, update=False)
                 self.add_child(new_item, external_id=id, update=False)
         # Add relevant items to COntainer children
@@ -721,7 +722,7 @@ class LazyContainer(Container):
         delay_since_last_updated = current_time - self.last_updated
         period = self.refresh
         if (period > 0) and (delay_since_last_updated > period):
-            self.info("Last update is older than %d s -> update data", period)
+            self.info(f'Last update is older than {period:d} s -> update data')
             self.childrenRetrievingNeeded = True
 
         if self.childrenRetrievingNeeded is True:
