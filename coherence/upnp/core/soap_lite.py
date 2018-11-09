@@ -2,14 +2,17 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2007 - Frank Scholz <coherence@beebits.net>
+# Copyright 2018, Pol Canelles <canellestudi@gmail.com>
 
-""" SOAP-lite
+'''
+SOAP-lite
+=========
 
-    some simple functions to implement the SOAP msgs
-    needed by UPnP with ElementTree
+Some simple functions to implement the SOAP messages needed by UPnP with
+ElementTree.
 
-    inspired by ElementSOAP.py
-"""
+.. note:: Inspired by ElementSOAP.py
+'''
 
 from lxml import etree
 from twisted.python.util import OrderedDict
@@ -17,9 +20,9 @@ from twisted.python.util import OrderedDict
 from coherence.upnp.core.xml_constants import ELEMENT_TYPE
 from coherence import log
 
-NS_SOAP_ENV = "http://schemas.xmlsoap.org/soap/envelope/"
-NS_SOAP_ENC = "http://schemas.xmlsoap.org/soap/encoding/"
-NS_XSD = "http://www.w3.org/1999/XMLSchema"
+NS_SOAP_ENV = 'http://schemas.xmlsoap.org/soap/envelope/'
+NS_SOAP_ENC = 'http://schemas.xmlsoap.org/soap/encoding/'
+NS_XSD = 'http://www.w3.org/1999/XMLSchema'
 NS_UPNP_ORG_CONTROL_1_0 = 'urn:schemas-upnp-org:control-1-0'
 
 TYPE_MAP = {
@@ -53,8 +56,8 @@ logger = log.get_logger('soap_lite')
 def build_soap_error(status,
                      description='without words',
                      pretty_print=True):
-    """ builds an UPnP SOAP error msg
-    """
+    '''Builds an UPnP SOAP error message.
+    '''
     root = etree.Element(etree.QName(NS_SOAP_ENV, 'Fault'))
     etree.SubElement(root, 'faultcode').text = 's:Client'
     etree.SubElement(root, 'faultstring').text = 'UPnPError'
@@ -71,11 +74,12 @@ def build_soap_error(status,
 def build_soap_call(method, arguments, ns=None,
                     is_response=False,
                     pretty_print=True):
-    """ create a shell for a SOAP request or response element
-        - set method to none to omitt the method element and
+    '''Create a shell for a SOAP request or response element:
+
+        - set method to none to omit the method element and
           add the arguments directly to the body (for an error msg)
         - arguments can be a dict or an etree.Element
-    """
+    '''
     envelope = etree.Element(
         etree.QName(NS_SOAP_ENV, 'Envelope'),
         attrib={etree.QName(NS_SOAP_ENV, 'encodingStyle'): NS_SOAP_ENC},
@@ -85,7 +89,7 @@ def build_soap_call(method, arguments, ns=None,
 
     if method:
         if is_response is True:
-            method += "Response"
+            method += 'Response'
 
         if ns:
             tag = etree.QName(ns, method)
@@ -118,5 +122,5 @@ def build_soap_call(method, arguments, ns=None,
 
     xml = etree.tostring(envelope, encoding='utf-8', xml_declaration=True,
                          pretty_print=pretty_print)
-    logger.debug("xml dump:\n%s", xml)
+    logger.debug(f'xml dump:\n{xml}')
     return xml
