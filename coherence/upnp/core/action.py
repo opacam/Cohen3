@@ -26,9 +26,9 @@ class Argument:
         return self.state_variable
 
     def __repr__(self):
-        return "Argument: %s, %s, %s" % (self.get_name(),
-                                         self.get_direction(),
-                                         self.get_state_variable())
+        return \
+            f'Argument: {self.get_name()}, {self.get_direction()}, ' \
+            f'{self.get_state_variable()}'
 
     def as_tuples(self):
         r = []
@@ -86,52 +86,53 @@ class Action(log.LogAble):
             return None
 
     def call(self, *args, **kwargs):
-        self.info("calling %s", self.name)
+        self.info(f'calling {self.name}')
         in_arguments = self.get_in_arguments()
-        self.info("in arguments %s", [a.get_name() for a in in_arguments])
+        self.info(f'in arguments {[a.get_name() for a in in_arguments]}')
         instance_id = 0
         for arg_name, arg in kwargs.items():
             al = [a for a in in_arguments if arg_name == a.get_name()]
             if len(al) > 0:
                 in_arguments.remove(al[0])
             else:
-                self.error("argument %s not valid for action %s", arg_name,
-                           self.name)
+                self.error(
+                    f'argument {arg_name} not valid for action {self.name}')
                 return
             if arg_name == 'InstanceID':
                 instance_id = int(arg)
         if len(in_arguments) > 0:
-            self.error("argument %s missing for action %s",
-                       [a.get_name() for a in in_arguments], self.name)
+            self.error(f'argument {[a.get_name() for a in in_arguments]} '
+                       f'missing for action {self.name}')
             return
 
         action_name = self.name
 
         if (hasattr(self.service.device.client, 'overlay_actions') and
                 self.name in self.service.device.client.overlay_actions):
-            self.info("we have an overlay method %r for action %r",
-                      self.service.device.client.overlay_actions[self.name],
-                      self.name)
+            self.info(
+                f'we have an overlay method '
+                f'{self.service.device.client.overlay_actions[self.name]} '
+                f'for action {self.name}')
             action_name, kwargs = self.service.device.client.overlay_actions[
                 self.name](**kwargs)
-            self.info("changing action to %r %r", action_name, kwargs)
+            self.info(f'changing action to {action_name} {kwargs}')
 
         def got_error(failure):
-            self.warning("error on %s request with %s %s", self.name, self.
-                         service.service_type,
-                         self.service.control_url)
+            self.warning(f'error on {self.name} request with '
+                         f'{self.service.service_type} '
+                         f'{self.service.control_url}')
             self.info(failure)
             return failure
 
         if hasattr(self.service.device.client, 'overlay_headers'):
-            self.info("action call has headers %r", 'headers' in kwargs)
+            self.info(f'action call has headers {"headers"}' in kwargs)
             if 'headers' in kwargs:
                 kwargs['headers'].update(
                     self.service.device.client.overlay_headers)
             else:
                 kwargs['headers'] = self.service.device.client.overlay_headers
-            self.info("action call with new/updated headers %r",
-                      kwargs['headers'])
+            self.info(f'action call with new/updated headers '
+                      f'{kwargs["headers"]}')
 
         client = self._get_client()
 
@@ -150,9 +151,8 @@ class Action(log.LogAble):
     def got_results(self, results, instance_id, name):
         instance_id = int(instance_id)
         out_arguments = self.get_out_arguments()
-        self.info("call %s (instance %d) returns %d arguments", name,
-                  instance_id,
-                  len(out_arguments))
+        self.info(f'call {name} (instance {instance_id:d}) '
+                  f'returns {len(out_arguments):d} arguments')
 
         # XXX A_ARG_TYPE_ arguments probably don't need a variable update
         # if len(out_arguments) == 1:
@@ -172,16 +172,14 @@ class Action(log.LogAble):
         return results
 
     def __repr__(self):
-        return "Action: %s [%s], (%s args)" % \
-               (self.get_name(), self.get_implementation(),
-                len(self.get_arguments_list()))
+        return \
+            f'Action: {self.get_name()} [{self.get_implementation()}], ' \
+            f'({len(self.get_arguments_list())} args)'
 
     def as_tuples(self):
-        r = []
-        r.append(('Name', self.get_name()))
-        r.append(("Number of 'in' arguments", len(self.get_in_arguments())))
-        r.append(("Number of 'out' arguments", len(self.get_out_arguments())))
-        return r
+        return [('Name', self.get_name()),
+                ('Number of \'in\' arguments', len(self.get_in_arguments())),
+                ('Number of \'out\' arguments', len(self.get_out_arguments()))]
 
     def as_dict(self):
         return {'name': self.get_name(),
