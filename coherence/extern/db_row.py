@@ -37,7 +37,7 @@
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/163605
 
 def get_rows(cursor, sql):
-    """Return a list of ResultRow objects from an SQL query."""
+    '''Return a list of ResultRow objects from an SQL query.'''
 
     # run the query
     cursor.execute(sql)
@@ -47,7 +47,7 @@ def get_rows(cursor, sql):
 
 
 def getdict(results, description):
-    """Return the list of DBRows in `results` with a given description."""
+    '''Return the list of DBRows in `results` with a given description.'''
 
     # get the field names
     fields = {}
@@ -64,22 +64,22 @@ def getdict(results, description):
 
 
 class DBRow(object):
-    """A single row in a result set.
+    '''A single row in a result set.
 
     Each DBRow has a dictionary-style and list-style interface.
-    """
+    '''
 
     def __init__(self, row, fields):
-        """Called by ResultSet function.  Don't call directly"""
+        '''Called by ResultSet function.  Don't call directly'''
         self.fields = fields
         self.row = row
         self._extra_fields = {}
 
     def __repr__(self):
-        return "<DBrow with %s fields>" % len(self)
+        return f'<DBrow with {len(self)} fields>'
 
     def __str__(self):
-        """Return a string representation"""
+        '''Return a string representation'''
         return str(self.row)
 
     def __getattr__(self, attr):
@@ -89,34 +89,34 @@ class DBRow(object):
         self._extra_fields[attr] = value
 
     def __getitem__(self, key):
-        """Return the value of the named column"""
+        '''Return the value of the named column'''
         if isinstance(type(key), int):  # if a number
             return self.row[key]
         else:  # a field name
             return self.row[self.fields[key]]
 
     def __setitem__(self, key, value):
-        """Not used in this implementation"""
-        raise TypeError("can't set an item of a result set")
+        '''Not used in this implementation'''
+        raise TypeError('can\'t set an item of a result set')
 
     def __getslice__(self, i, j):
-        """Return the value of the numbered column"""
+        '''Return the value of the numbered column'''
         return self.row[i: j]
 
     def __setslice__(self, i, j, list):
-        """Not used in this implementation"""
-        raise TypeError("can't set an item of a result set")
+        '''Not used in this implementation'''
+        raise TypeError('can\'t set an item of a result set')
 
     def keys(self):
-        """Return the field names"""
+        '''Return the field names'''
         return list(self.fields.keys())
 
     def keymappings(self):
-        """Return a dictionary of the keys and their indices in the row"""
+        '''Return a dictionary of the keys and their indices in the row'''
         return self.fields
 
     def has_key(self, key):
-        """Return whether the given key is valid"""
+        '''Return whether the given key is valid'''
         return key in self.fields
 
     def as_dict(self):
@@ -128,7 +128,7 @@ class DBRow(object):
         return d
 
     def __len__(self):
-        """Return how many columns are in this row"""
+        '''Return how many columns are in this row'''
         return len(self.row)
 
     def __bool__(self):
