@@ -160,7 +160,8 @@ class TubeServiceControl(UPnPPublisher):
                     f'argument {arg_name} not valid for action {action.name}')
                 return failure.Failure(errorCode(402))
         if len(in_arguments) > 0:
-            self.critical(f'argument {[a.get_name() for a in in_arguments]} '
+            args_names = [a.get_name() for a in in_arguments]
+            self.critical(f'argument {args_names} '
                           f'missing for action {action.name}')
             return failure.Failure(errorCode(402))
 
