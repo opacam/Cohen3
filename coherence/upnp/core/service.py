@@ -143,7 +143,7 @@ class Service(EventDispatcher, log.LogAble):
             presentation_url.encode('ascii') if presentation_url else None
         self.scpd_url = scpd_url if isinstance(scpd_url, bytes) else \
             scpd_url.encode('ascii') if scpd_url else None
-        self.device = device
+        self.device = device  # pylint: disable=E0203
         self._actions = {}
         self._variables = {0: {}}
         self._var_subscribers = {}
@@ -557,7 +557,7 @@ class ServiceServer(log.LogAble):
     def __init__(self, id, version, backend):
         log.LogAble.__init__(self)
         self.id = id
-        self.version = version
+        self.version = version  # pylint: disable=E0203
         self.backend = backend
         self.debug(f'ServiceServer.__init__: {id} '
                    f'[version: {version}, backend: {backend}]')

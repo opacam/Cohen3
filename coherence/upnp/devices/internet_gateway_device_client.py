@@ -47,7 +47,7 @@ class InternetGatewayDeviceClient(EventDispatcher, log.LogAble):
         self.register_event(
             'device_client_detection_completed',
         )
-        self.device = device
+        self.device = device  # pylint: disable=E0203
 
         self.device.bind(
             embedded_device_client_detection_completed=self.embedded_device_notified)  # noqa

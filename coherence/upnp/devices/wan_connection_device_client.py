@@ -50,7 +50,7 @@ class WANConnectionDeviceClient(EventDispatcher, log.LogAble):
         self.register_event(
             'embedded_device_client_detection_completed',
         )
-        self.device = device
+        self.device = device  # pylint: disable=E0203
         self.device.bind(service_notified=self.service_notified)
         self.device_type = self.device.get_friendly_device_type()
 
