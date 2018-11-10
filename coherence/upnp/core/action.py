@@ -102,7 +102,8 @@ class Action(log.LogAble):
             if arg_name == 'InstanceID':
                 instance_id = int(arg)
         if len(in_arguments) > 0:
-            self.error(f'argument {[a.get_name() for a in in_arguments]} '
+            args_names = [a.get_name() for a in in_arguments]
+            self.error(f'argument {[args_names]} '
                        f'missing for action {self.name}')
             return
 
