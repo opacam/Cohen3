@@ -1,3 +1,20 @@
+0.9.0 - Introduces new events system
+------------------------------------
+
+General:
+    - Introduce new events system (EventDispatcher) which replaces
+      louie/dispatcher
+    - Apply Python3's f-Strings
+    - Normalise simple and double quotes (defaults to single quotes)
+    - Add/enhance documentation
+    - Remove unneeded modules louie and dispatcher as well as the related tests
+
+Fixes:
+    - Fix most of the warnings when building docs
+    - Fix error on "SUBSCRIBE" for some event calls
+    - Fix wrong encoding/decoding strings introduced in the initial python 3 migration
+    - Fix extra quotes for SSDPServer's methods: doNotify and doByeBye
+
 0.8.3 - Introduces Backend's models
 -----------------------------------
 
