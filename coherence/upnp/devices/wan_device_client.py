@@ -62,7 +62,7 @@ class WANDeviceClient(EventDispatcher, log.LogAble):
             'embedded_device_client_detection_completed',
         )
 
-        self.device = device  # pylint: disable=access-member-before-definition
+        self.device = device
         self.device.bind(
             embedded_device_client_detection_completed=self.embedded_device_notified,  # noqa
             service_notified=self.service_notified
@@ -94,7 +94,7 @@ class WANDeviceClient(EventDispatcher, log.LogAble):
                 self.wan_common_interface_connection = \
                     WANCommonInterfaceConfigClient(service)
 
-        self.info(f'WANDevice {self.device.get_friendly_name()}')
+        self.info(f'WANDevice {device.get_friendly_name()}')
 
     def remove(self):
         self.info('removal of WANDeviceClient started')

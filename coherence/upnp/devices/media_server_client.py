@@ -59,7 +59,7 @@ class MediaServerClient(EventDispatcher, log.LogAble):
             'device_client_detection_completed',
         )
 
-        self.device = device  # pylint: disable=access-member-before-definition
+        self.device = device
         self.device.bind(device_service_notified=self.service_notified)
         self.device_type = self.device.get_friendly_device_type()
 
@@ -85,7 +85,7 @@ class MediaServerClient(EventDispatcher, log.LogAble):
             if service.detection_completed:
                 self.service_notified(service)
 
-        self.info(f'MediaServer {self.device.get_friendly_name()}')
+        self.info(f'MediaServer {device.get_friendly_name()}')
         if self.content_directory:
             self.info('ContentDirectory available')
         else:

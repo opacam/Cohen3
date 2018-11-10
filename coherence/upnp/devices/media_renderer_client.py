@@ -53,7 +53,7 @@ class MediaRendererClient(EventDispatcher, log.LogAble):
             'device_client_detection_completed',
         )
 
-        self.device = device  # pylint: disable=access-member-before-definition
+        self.device = device
         self.device.bind(device_service_notified=self.service_notified)
         self.device_type = self.device.get_friendly_device_type()
 
@@ -78,7 +78,7 @@ class MediaRendererClient(EventDispatcher, log.LogAble):
                 self.av_transport = AVTransportClient(service)
             if service.detection_completed:
                 self.service_notified(service)
-        self.info(f'MediaRenderer {self.device.get_friendly_name()}')
+        self.info(f'MediaRenderer {device.get_friendly_name()}')
         if self.rendering_control:
             self.info('RenderingControl available')
             '''

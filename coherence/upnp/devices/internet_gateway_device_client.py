@@ -47,8 +47,7 @@ class InternetGatewayDeviceClient(EventDispatcher, log.LogAble):
         self.register_event(
             'device_client_detection_completed',
         )
-        self.device = device  # pylint: disable=access-member-before-definition
-
+        self.device = device
         self.device.bind(
             embedded_device_client_detection_completed=self.embedded_device_notified)  # noqa
 
@@ -68,7 +67,7 @@ class InternetGatewayDeviceClient(EventDispatcher, log.LogAble):
                          f' specification [error: {e}]')
             raise
 
-        self.info(f'InternetGatewayDevice {self.device.get_friendly_name()}')
+        self.info(f'InternetGatewayDevice {device.get_friendly_name()}')
 
     def remove(self):
         self.info('removal of InternetGatewayDeviceClient started')

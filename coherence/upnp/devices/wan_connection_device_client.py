@@ -50,7 +50,7 @@ class WANConnectionDeviceClient(EventDispatcher, log.LogAble):
         self.register_event(
             'embedded_device_client_detection_completed',
         )
-        self.device = device  # pylint: disable=access-member-before-definition
+        self.device = device
         self.device.bind(service_notified=self.service_notified)
         self.device_type = self.device.get_friendly_device_type()
 
@@ -67,7 +67,7 @@ class WANConnectionDeviceClient(EventDispatcher, log.LogAble):
             if service.get_type() in [
                     'urn:schemas-upnp-org:service:WANPPPConnection:1']:
                 self.wan_ppp_connection = WANPPPConnectionClient(service)
-        self.info(f'WANConnectionDevice {self.device.get_friendly_name()}')
+        self.info(f'WANConnectionDevice {device.get_friendly_name()}')
         if self.wan_ip_connection:
             self.info('WANIPConnection service available')
         if self.wan_ppp_connection:

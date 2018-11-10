@@ -143,7 +143,7 @@ class Service(EventDispatcher, log.LogAble):
             presentation_url.encode('ascii') if presentation_url else None
         self.scpd_url = scpd_url if isinstance(scpd_url, bytes) else \
             scpd_url.encode('ascii') if scpd_url else None
-        self.device = device  # pylint: disable=access-member-before-definition
+        self.device = device
         self._actions = {}
         self._variables = {0: {}}
         self._var_subscribers = {}
@@ -161,7 +161,7 @@ class Service(EventDispatcher, log.LogAble):
         self.url_base = f'{parsed[0]}://{parsed[1]}'.encode('ascii')
 
         self.parse_actions()
-        self.info(f'{self.device.friendly_name} {self.service_type} '
+        self.info(f'{device.friendly_name} {self.service_type} '
                   f'{self.id} initialized')
 
     def as_tuples(self):
@@ -557,7 +557,7 @@ class ServiceServer(log.LogAble):
     def __init__(self, id, version, backend):
         log.LogAble.__init__(self)
         self.id = id
-        self.version = version  # pylint: disable=access-member-before-definition  # noqa
+        self.version = version
         self.backend = backend
         self.debug(f'ServiceServer.__init__: {id} '
                    f'[version: {version}, backend: {backend}]')
@@ -567,7 +567,7 @@ class ServiceServer(log.LogAble):
             self.id_namespace = 'upnp-org'
 
         self.service_type = \
-            f'urn:{self.namespace}:service:{id}:{int(self.version):d}'
+            f'urn:{self.namespace}:service:{id}:{int(version):d}'
         self.debug(f'\t-service_type: {self.service_type}')
 
         self.scpdXML = None
