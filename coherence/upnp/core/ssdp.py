@@ -238,10 +238,9 @@ class SSDPServer(EventDispatcher, DatagramProtocol, log.LogAble):
         self.info(f'send discovery response delayed by '
                   f'{delay} for {usn} to {destination}')
         try:
-            self.transport.write(
-                to_bytes(response), to_bytes(destination))
+            self.transport.write(to_bytes(response), destination)
         except (AttributeError, socket.error) as msg:
-            self.info(f'failure sending out byebye notification: {msg}')
+            self.exception(f'failure sending out datagram: {msg}')
 
     def discoveryRequest(self, headers, xxx_todo_changeme2):
         '''Process a discovery request.  The response must be sent to
