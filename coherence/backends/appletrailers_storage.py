@@ -197,6 +197,6 @@ class AppleTrailersStore(BackendVideoStore):
             trailer.item.res.append(new_res)
             if not hasattr(trailer.item, 'attachments'):
                 trailer.item.attachments = {}
-            trailer.item.attachments['poster'] = data['image']
+            trailer.item.attachments['poster'] = (data['image'])  # noqa pylint: disable=E1101
 
         return trailer
