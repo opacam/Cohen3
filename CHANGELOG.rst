@@ -1,3 +1,11 @@
+0.9.1 - Fixes SSDP datagram sending
+-----------------------------------
+
+Fixes:
+    - Fix SSDP datagram sending
+    - Fix `request.setHeader` values
+    - Fix urllib3 security vulnerability detected in version 1.23.2
+
 0.9.0 - Introduces new events system
 ------------------------------------
 
