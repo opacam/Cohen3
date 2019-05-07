@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.services.clients.rendering_control_client &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.services.clients.rendering_control_client</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.services.clients.rendering_control_client</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2006, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+
+
+<div class="viewcode-block" id="RenderingControlClient"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient">[docs]</a><span class="k">class</span> <span class="nc">RenderingControlClient</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">service</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_control_url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">subscribe</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="c1"># print(&#39;RenderingControlClient __init__&#39;, self.url)</span>
+
+    <span class="c1"># def __del__(self):</span>
+    <span class="c1">#    # print(&#39;RenderingControlClient deleted&#39;)</span>
+    <span class="c1">#    pass</span>
+
+<div class="viewcode-block" id="RenderingControlClient.remove"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">del</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.subscribe_for_variable"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.subscribe_for_variable">[docs]</a>    <span class="k">def</span> <span class="nf">subscribe_for_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">subscribe_for_variable</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                            <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">signal</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.list_presets"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.list_presets">[docs]</a>    <span class="k">def</span> <span class="nf">list_presets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;ListPresets&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.select_presets"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.select_presets">[docs]</a>    <span class="k">def</span> <span class="nf">select_presets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">preset_name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;SelectPresets&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">PresetName</span><span class="o">=</span><span class="n">preset_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.get_mute"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.get_mute">[docs]</a>    <span class="k">def</span> <span class="nf">get_mute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;Master&#39;</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetMute&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">Channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.set_mute"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.set_mute">[docs]</a>    <span class="k">def</span> <span class="nf">set_mute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;Master&#39;</span><span class="p">,</span> <span class="n">desired_mute</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;SetMute&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">Channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span>
+                           <span class="n">DesiredMute</span><span class="o">=</span><span class="n">desired_mute</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.get_volume"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.get_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;Master&#39;</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetVolume&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">Channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.set_volume"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.set_volume">[docs]</a>    <span class="k">def</span> <span class="nf">set_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;Master&#39;</span><span class="p">,</span> <span class="n">desired_volume</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;SetVolume&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">Channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span>
+                           <span class="n">DesiredVolume</span><span class="o">=</span><span class="n">desired_volume</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.get_volume_db"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.get_volume_db">[docs]</a>    <span class="k">def</span> <span class="nf">get_volume_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;Master&#39;</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetVolumeDB&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">Channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.set_volume_db"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.set_volume_db">[docs]</a>    <span class="k">def</span> <span class="nf">set_volume_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;Master&#39;</span><span class="p">,</span> <span class="n">desired_volume</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;SetVolumeDB&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">Channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span>
+                           <span class="n">DesiredVolume</span><span class="o">=</span><span class="n">desired_volume</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.get_volume_db_range"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.get_volume_db_range">[docs]</a>    <span class="k">def</span> <span class="nf">get_volume_db_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;Master&#39;</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetVolumeDBRange&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">Channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.get_loudness"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.get_loudness">[docs]</a>    <span class="k">def</span> <span class="nf">get_loudness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;Master&#39;</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetLoudness&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">Channel</span><span class="o">=</span><span class="n">channel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RenderingControlClient.set_loudness"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/rendering_control_client.html#coherence.upnp.services.clients.rendering_control_client.RenderingControlClient.set_loudness">[docs]</a>    <span class="k">def</span> <span class="nf">set_loudness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                     <span class="n">channel</span><span class="o">=</span><span class="s1">&#39;Master&#39;</span><span class="p">,</span> <span class="n">desired_loudness</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;SetLoudness&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">Channel</span><span class="o">=</span><span class="n">channel</span><span class="p">,</span>
+                           <span class="n">DesiredLoudness</span><span class="o">=</span><span class="n">desired_loudness</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

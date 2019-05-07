@@ -1,0 +1,557 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.services.servers.content_directory_server &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.services.servers.content_directory_server</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.services.servers.content_directory_server</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2005, Tim Potter &lt;tpot@samba.org&gt;</span>
+<span class="c1"># Copyright 2006 John-Mark Gurney &lt;gurney_j@resnet.uoregon.edu&gt;</span>
+<span class="c1"># Copyright 2006, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Content Directory service</span>
+<span class="sd">=========================</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">defer</span>
+<span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">failure</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">resource</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">service</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.DIDLLite</span> <span class="k">import</span> <span class="n">DIDLElement</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.soap_service</span> <span class="k">import</span> <span class="n">UPnPPublisher</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.soap_service</span> <span class="k">import</span> <span class="n">errorCode</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">to_string</span>
+
+
+<div class="viewcode-block" id="ContentDirectoryControl"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/content_directory_server.html#coherence.upnp.services.servers.content_directory_server.ContentDirectoryControl">[docs]</a><span class="k">class</span> <span class="nc">ContentDirectoryControl</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">ServiceControl</span><span class="p">,</span> <span class="n">UPnPPublisher</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">):</span>
+        <span class="n">service</span><span class="o">.</span><span class="n">ServiceControl</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">UPnPPublisher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">server</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">get_variables</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">get_actions</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ContentDirectoryServer"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/content_directory_server.html#coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer">[docs]</a><span class="k">class</span> <span class="nc">ContentDirectoryServer</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">ServiceServer</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;content_directory_server&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transcoding</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transcoding</span> <span class="o">=</span> <span class="n">transcoding</span>
+        <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">backend</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">service</span><span class="o">.</span><span class="n">ServiceServer</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;ContentDirectory&#39;</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">ContentDirectoryControl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;scpd.xml&#39;</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">scpdXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;control&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SystemUpdateID&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ContainerUpdateIDs&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ContentDirectoryServer.listchilds"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/content_directory_server.html#coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.listchilds">[docs]</a>    <span class="k">def</span> <span class="nf">listchilds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="n">cl</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">cl</span> <span class="o">+=</span> <span class="n">f</span><span class="s1">&#39;&lt;li&gt;&lt;a href=</span><span class="si">{uri}</span><span class="s1">/</span><span class="si">{c}</span><span class="s1">&gt;</span><span class="si">{c}</span><span class="s1">&lt;/a&gt;&lt;/li&gt;&#39;</span>
+        <span class="k">return</span> <span class="n">cl</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryServer.render"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/content_directory_server.html#coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">        &lt;html&gt;</span>
+<span class="s1">        &lt;head&gt;</span>
+<span class="s1">            &lt;title&gt;Cohen3 (ContentDirectoryServer)&lt;/title&gt;</span>
+<span class="s1">            &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/styles/main.css&quot; /&gt;</span>
+<span class="s1">        &lt;/head&gt;</span>
+<span class="s1">        &lt;h5&gt;</span>
+<span class="s1">            &lt;img class=&quot;logo-icon&quot; src=&quot;/server-images/coherence-icon.svg&quot;&gt;</span>
+<span class="s1">            &lt;/img&gt;Root of the ContentDirectory&lt;/h5&gt;</span>
+<span class="s1">        &lt;div class=&quot;list&quot;&gt;&lt;ul&gt;{self.listchilds(request.uri)}&lt;/ul&gt;&lt;/div&gt;</span>
+<span class="s1">        &lt;/html&gt;&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">html</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryServer.upnp_Search"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/content_directory_server.html#coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.upnp_Search">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_Search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ContainerID</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ContainerID&#39;</span><span class="p">]</span>
+        <span class="n">Filter</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;Filter&#39;</span><span class="p">]</span>
+        <span class="n">StartingIndex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;StartingIndex&#39;</span><span class="p">])</span>
+        <span class="n">RequestedCount</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;RequestedCount&#39;</span><span class="p">])</span>
+        <span class="n">SortCriteria</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;SortCriteria&#39;</span><span class="p">]</span>
+        <span class="n">SearchCriteria</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;SearchCriteria&#39;</span><span class="p">]</span>
+
+        <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">root_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">parent_container</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ContainerID</span><span class="p">)</span>
+
+        <span class="n">didl</span> <span class="o">=</span> <span class="n">DIDLElement</span><span class="p">(</span><span class="n">upnp_client</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;X_UPnPClient&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                           <span class="n">parent_container</span><span class="o">=</span><span class="n">parent_container</span><span class="p">,</span>
+                           <span class="n">transcoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transcoding</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">build_response</span><span class="p">(</span><span class="n">tm</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Result&#39;</span><span class="p">:</span> <span class="n">didl</span><span class="o">.</span><span class="n">toString</span><span class="p">(),</span> <span class="s1">&#39;TotalMatches&#39;</span><span class="p">:</span> <span class="n">tm</span><span class="p">,</span>
+                 <span class="s1">&#39;NumberReturned&#39;</span><span class="p">:</span> <span class="n">didl</span><span class="o">.</span><span class="n">numItems</span><span class="p">()}</span>
+
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+                <span class="n">r</span><span class="p">[</span><span class="s1">&#39;UpdateID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">update_id</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+                <span class="n">r</span><span class="p">[</span><span class="s1">&#39;UpdateID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">update_id</span>  <span class="c1"># FIXME</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">r</span><span class="p">[</span><span class="s1">&#39;UpdateID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">return</span> <span class="n">r</span>
+
+        <span class="k">def</span> <span class="nf">got_error</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">r</span>
+
+        <span class="k">def</span> <span class="nf">process_result</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">found_item</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">cl</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">def</span> <span class="nf">process_items</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">tm</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="n">didl</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+                <span class="k">return</span> <span class="n">build_response</span><span class="p">(</span><span class="n">tm</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">get_item</span><span class="p">)</span>
+                <span class="n">cl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">found_item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">def</span> <span class="nf">got_child_count</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+                    <span class="n">dl</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">DeferredList</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span>
+                    <span class="n">dl</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">process_items</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">dl</span>
+
+                <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">found_item</span><span class="o">.</span><span class="n">get_child_count</span><span class="p">)</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">got_child_count</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">d</span>
+            <span class="k">elif</span> <span class="n">total</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">total</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get_child_count</span><span class="p">()</span>
+
+            <span class="n">dl</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">DeferredList</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span>
+            <span class="n">dl</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">process_items</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">dl</span>
+
+        <span class="k">def</span> <span class="nf">proceed</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;X_UPnPClient&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;XBox&#39;</span> <span class="ow">and</span>
+                    <span class="nb">hasattr</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s1">&#39;get_artist_all_tracks&#39;</span><span class="p">)):</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get_artist_all_tracks</span><span class="p">,</span>
+                                        <span class="n">StartingIndex</span><span class="p">,</span>
+                                        <span class="n">StartingIndex</span> <span class="o">+</span> <span class="n">RequestedCount</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get_children</span><span class="p">,</span> <span class="n">StartingIndex</span><span class="p">,</span>
+                                        <span class="n">StartingIndex</span> <span class="o">+</span> <span class="n">RequestedCount</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">process_result</span><span class="p">,</span> <span class="n">found_item</span><span class="o">=</span><span class="n">result</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">got_error</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">d</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">root_id</span> <span class="o">=</span> <span class="n">ContainerID</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="n">wmc_mapping</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;wmc_mapping&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;X_UPnPClient&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;XBox&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">wmc_mapping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                    <span class="n">ContainerID</span> <span class="ow">in</span> <span class="n">wmc_mapping</span><span class="p">):</span>
+                <span class="sd">&#39;&#39;&#39; fake a Windows Media Connect Server</span>
+<span class="sd">                &#39;&#39;&#39;</span>
+                <span class="n">root_id</span> <span class="o">=</span> <span class="n">wmc_mapping</span><span class="p">[</span><span class="n">ContainerID</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">root_id</span><span class="p">):</span>
+                    <span class="n">item</span> <span class="o">=</span> <span class="n">root_id</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                            <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">RequestedCount</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">items</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">StartingIndex</span><span class="p">:]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">items</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">StartingIndex</span><span class="p">:</span>
+                                             <span class="n">StartingIndex</span> <span class="o">+</span> <span class="n">RequestedCount</span><span class="p">]</span>
+                            <span class="k">return</span> <span class="n">process_result</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">total</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">defer</span><span class="o">.</span><span class="n">Deferred</span><span class="p">):</span>
+                                <span class="n">item</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">proceed</span><span class="p">)</span>
+                                <span class="k">return</span> <span class="n">item</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">return</span> <span class="n">proceed</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+                <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">root_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">process_result</span><span class="p">([],</span> <span class="n">total</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">defer</span><span class="o">.</span><span class="n">Deferred</span><span class="p">):</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">proceed</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">item</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">proceed</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">root_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">701</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">defer</span><span class="o">.</span><span class="n">Deferred</span><span class="p">):</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">proceed</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">item</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">proceed</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryServer.upnp_Browse"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/content_directory_server.html#coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.upnp_Browse">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_Browse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ObjectID</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ObjectID&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s1">&#39;hmm, a Browse action and no ObjectID argument? &#39;</span>
+                <span class="s1">&#39;An XBox maybe?&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ObjectID</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ContainerID&#39;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">ObjectID</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">BrowseFlag</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;BrowseFlag&#39;</span><span class="p">]</span>
+        <span class="n">Filter</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;Filter&#39;</span><span class="p">]</span>
+        <span class="n">StartingIndex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;StartingIndex&#39;</span><span class="p">])</span>
+        <span class="n">RequestedCount</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;RequestedCount&#39;</span><span class="p">])</span>
+        <span class="n">SortCriteria</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;SortCriteria&#39;</span><span class="p">]</span>
+        <span class="n">parent_container</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">requested_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">BrowseFlag</span> <span class="o">==</span> <span class="s1">&#39;BrowseDirectChildren&#39;</span><span class="p">:</span>
+            <span class="n">parent_container</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ObjectID</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">requested_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ObjectID</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;upnp_Browse request </span><span class="si">{ObjectID}</span><span class="s1"> </span><span class="si">{BrowseFlag}</span><span class="s1"> &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;</span><span class="si">{StartingIndex}</span><span class="s1"> </span><span class="si">{RequestedCount}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># self.debug(f&#39;\t- kwargs: {kwargs}&#39;)</span>
+
+        <span class="n">didl</span> <span class="o">=</span> <span class="n">DIDLElement</span><span class="p">(</span><span class="n">upnp_client</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;X_UPnPClient&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                           <span class="n">requested_id</span><span class="o">=</span><span class="n">requested_id</span><span class="p">,</span>
+                           <span class="n">parent_container</span><span class="o">=</span><span class="n">parent_container</span><span class="p">,</span>
+                           <span class="n">transcoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transcoding</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">got_error</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">r</span>
+
+        <span class="k">def</span> <span class="nf">process_result</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">found_item</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">BrowseFlag</span> <span class="o">==</span> <span class="s1">&#39;BrowseDirectChildren&#39;</span><span class="p">:</span>
+                <span class="n">cl</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">def</span> <span class="nf">process_items</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">tm</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                            <span class="n">didl</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+                    <span class="k">return</span> <span class="n">build_response</span><span class="p">(</span><span class="n">tm</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">get_item</span><span class="p">)</span>
+                    <span class="n">cl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">found_item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">def</span> <span class="nf">got_child_count</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+                        <span class="n">dl</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">DeferredList</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span>
+                        <span class="n">dl</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">process_items</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">dl</span>
+
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">found_item</span><span class="o">.</span><span class="n">get_child_count</span><span class="p">)</span>
+                    <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">got_child_count</span><span class="p">)</span>
+
+                    <span class="k">return</span> <span class="n">d</span>
+                <span class="k">elif</span> <span class="n">total</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">total</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get_child_count</span><span class="p">()</span>
+
+                <span class="n">dl</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">DeferredList</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span>
+                <span class="n">dl</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">process_items</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">dl</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">didl</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="n">total</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="k">return</span> <span class="n">build_response</span><span class="p">(</span><span class="n">total</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">build_response</span><span class="p">(</span><span class="n">tm</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Result&#39;</span><span class="p">:</span> <span class="n">didl</span><span class="o">.</span><span class="n">toString</span><span class="p">(),</span>
+                 <span class="s1">&#39;TotalMatches&#39;</span><span class="p">:</span> <span class="n">tm</span><span class="p">,</span>
+                 <span class="s1">&#39;NumberReturned&#39;</span><span class="p">:</span> <span class="n">didl</span><span class="o">.</span><span class="n">numItems</span><span class="p">()}</span>
+
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+                <span class="n">r</span><span class="p">[</span><span class="s1">&#39;UpdateID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">update_id</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+                <span class="n">r</span><span class="p">[</span><span class="s1">&#39;UpdateID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">update_id</span>  <span class="c1"># FIXME</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">r</span><span class="p">[</span><span class="s1">&#39;UpdateID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">return</span> <span class="n">r</span>
+
+        <span class="k">def</span> <span class="nf">proceed</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">BrowseFlag</span> <span class="o">==</span> <span class="s1">&#39;BrowseDirectChildren&#39;</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get_children</span><span class="p">,</span> <span class="n">StartingIndex</span><span class="p">,</span>
+                                        <span class="n">StartingIndex</span> <span class="o">+</span> <span class="n">RequestedCount</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">get_item</span><span class="p">)</span>
+
+            <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">process_result</span><span class="p">,</span> <span class="n">found_item</span><span class="o">=</span><span class="n">result</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">got_error</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">d</span>
+
+        <span class="n">root_id</span> <span class="o">=</span> <span class="n">ObjectID</span>
+
+        <span class="n">wmc_mapping</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;wmc_mapping&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;X_UPnPClient&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;XBox&#39;</span> <span class="ow">and</span> \
+                <span class="n">wmc_mapping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ObjectID</span> <span class="ow">in</span> <span class="n">wmc_mapping</span><span class="p">:</span>
+            <span class="sd">&#39;&#39;&#39; fake a Windows Media Connect Server</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="n">root_id</span> <span class="o">=</span> <span class="n">wmc_mapping</span><span class="p">[</span><span class="n">ObjectID</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">root_id</span><span class="p">):</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">root_id</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">RequestedCount</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">items</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">StartingIndex</span><span class="p">:]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">items</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">StartingIndex</span><span class="p">:</span>
+                                         <span class="n">StartingIndex</span> <span class="o">+</span>
+                                         <span class="n">RequestedCount</span><span class="p">]</span>
+                        <span class="k">return</span> <span class="n">process_result</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">total</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">defer</span><span class="o">.</span><span class="n">Deferred</span><span class="p">):</span>
+                            <span class="n">item</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">proceed</span><span class="p">)</span>
+                            <span class="k">return</span> <span class="n">item</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">proceed</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">root_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">process_result</span><span class="p">([],</span> <span class="n">total</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">defer</span><span class="o">.</span><span class="n">Deferred</span><span class="p">):</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">proceed</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">item</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">proceed</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">root_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">701</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">defer</span><span class="o">.</span><span class="n">Deferred</span><span class="p">):</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">proceed</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">item</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">proceed</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,357 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.devices.media_renderer_client &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.devices.media_renderer_client</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.devices.media_renderer_client</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2006, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">:class:`MediaRendererClient`</span>
+<span class="sd">----------------------------</span>
+
+<span class="sd">A class representing an media renderer client device.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">eventdispatcher</span> <span class="k">import</span> <span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">Property</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.services.clients.av_transport_client</span> <span class="k">import</span> \
+    <span class="n">AVTransportClient</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.services.clients.connection_manager_client</span> <span class="k">import</span> \
+    <span class="n">ConnectionManagerClient</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.services.clients.rendering_control_client</span> <span class="k">import</span> \
+    <span class="n">RenderingControlClient</span>
+
+
+<div class="viewcode-block" id="MediaRendererClient"><a class="viewcode-back" href="../../../../source/upnp/devices/media_renderer_client.html#coherence.upnp.devices.media_renderer_client.MediaRendererClient">[docs]</a><span class="k">class</span> <span class="nc">MediaRendererClient</span><span class="p">(</span><span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">        * Introduced inheritance from EventDispatcher</span>
+<span class="sd">        * The emitted events changed:</span>
+
+<span class="sd">            - Coherence.UPnP.DeviceClient.detection_completed =&gt;</span>
+<span class="sd">              device_client_detection_completed</span>
+
+<span class="sd">        * Changed class variable :attr:`detection_completed` to benefit</span>
+<span class="sd">          from the EventDispatcher&#39;s properties</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;mr_client&#39;</span>
+
+    <span class="n">detection_completed</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    To know whenever the device detection has completed. Defaults to *False*</span>
+<span class="sd">    and it will be set automatically to `True` by the class method</span>
+<span class="sd">    :meth:`service_notified`.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">EventDispatcher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span>
+            <span class="s1">&#39;device_client_detection_completed&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">device_service_notified</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service_notified</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">get_friendly_device_type</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">get_device_type_version</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icons</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">icons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rendering_control</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">av_transport</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">get_services</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">service</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="s1">&#39;urn:schemas-upnp-org:service:RenderingControl:1&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;urn:schemas-upnp-org:service:RenderingControl:2&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rendering_control</span> <span class="o">=</span> <span class="n">RenderingControlClient</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">service</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="s1">&#39;urn:schemas-upnp-org:service:ConnectionManager:1&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;urn:schemas-upnp-org:service:ConnectionManager:2&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span> <span class="o">=</span> <span class="n">ConnectionManagerClient</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">service</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="s1">&#39;urn:schemas-upnp-org:service:AVTransport:1&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;urn:schemas-upnp-org:service:AVTransport:2&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">av_transport</span> <span class="o">=</span> <span class="n">AVTransportClient</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">service</span><span class="o">.</span><span class="n">detection_completed</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service_notified</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;MediaRenderer {device.get_friendly_name()}&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rendering_control</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;RenderingControl available&#39;</span><span class="p">)</span>
+            <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            actions =  self.rendering_control.service.get_actions()</span>
+<span class="sd">            print actions</span>
+<span class="sd">            for action in actions:</span>
+<span class="sd">                print &#39;Action:&#39;, action</span>
+<span class="sd">                for arg in actions[action].get_arguments_list():</span>
+<span class="sd">                    print &#39;       &#39;, arg</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="c1"># self.rendering_control.list_presets()</span>
+            <span class="c1"># self.rendering_control.get_mute()</span>
+            <span class="c1"># self.rendering_control.get_volume()</span>
+            <span class="c1"># self.rendering_control.set_mute(desired_mute=1)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">&#39;RenderingControl not available, device not implemented&#39;</span>
+                <span class="s1">&#39; properly according to the UPnP specification&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;ConnectionManager available&#39;</span><span class="p">)</span>
+            <span class="c1"># self.connection_manager.get_protocol_info()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">&#39;ConnectionManager not available, device not implemented&#39;</span>
+                <span class="s1">&#39; properly according to the UPnP specification&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">av_transport</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;AVTransport (optional) available&#39;</span><span class="p">)</span>
+            <span class="c1"># self.av_transport.service.subscribe_for_variable(</span>
+            <span class="c1">#     &#39;LastChange&#39;, 0, self.state_variable_change)</span>
+            <span class="c1"># self.av_transport.service.subscribe_for_variable(</span>
+            <span class="c1">#     &#39;TransportState&#39;, 0, self.state_variable_change)</span>
+            <span class="c1"># self.av_transport.service.subscribe_for_variable(</span>
+            <span class="c1">#     &#39;CurrentTransportActions&#39;, 0, self.state_variable_change)</span>
+            <span class="c1"># self.av_transport.get_transport_info()</span>
+            <span class="c1"># self.av_transport.get_current_transport_actions()</span>
+
+    <span class="c1"># def __del__(self):</span>
+    <span class="c1">#    # print(&#39;MediaRendererClient deleted&#39;)</span>
+    <span class="c1">#    pass</span>
+
+<div class="viewcode-block" id="MediaRendererClient.remove"><a class="viewcode-back" href="../../../../source/upnp/devices/media_renderer_client.html#coherence.upnp.devices.media_renderer_client.MediaRendererClient.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;removal of MediaRendererClient started&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rendering_control</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rendering_control</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">av_transport</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">av_transport</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span></div>
+        <span class="c1"># del self</span>
+
+<div class="viewcode-block" id="MediaRendererClient.service_notified"><a class="viewcode-back" href="../../../../source/upnp/devices/media_renderer_client.html#coherence.upnp.devices.media_renderer_client.MediaRendererClient.service_notified">[docs]</a>    <span class="k">def</span> <span class="nf">service_notified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Service </span><span class="si">{service}</span><span class="s1"> sent notification&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">detection_completed</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rendering_control</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rendering_control</span><span class="o">.</span><span class="n">service</span><span class="p">,</span>
+                           <span class="s1">&#39;last_time_updated&#39;</span><span class="p">):</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rendering_control</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">last_time_updated</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span><span class="o">.</span><span class="n">service</span><span class="p">,</span>
+                           <span class="s1">&#39;last_time_updated&#39;</span><span class="p">):</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">last_time_updated</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">av_transport</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">av_transport</span><span class="o">.</span><span class="n">service</span><span class="p">,</span> <span class="s1">&#39;last_time_updated&#39;</span><span class="p">):</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">av_transport</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">last_time_updated</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detection_completed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+            <span class="s1">&#39;device_client_detection_completed&#39;</span><span class="p">,</span>
+            <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">udn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">udn</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MediaRendererClient.state_variable_change"><a class="viewcode-back" href="../../../../source/upnp/devices/media_renderer_client.html#coherence.upnp.devices.media_renderer_client.MediaRendererClient.state_variable_change">[docs]</a>    <span class="k">def</span> <span class="nf">state_variable_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(name)r</span><span class="s1"> changed from </span><span class="si">%(old_value)r</span><span class="s1"> to </span><span class="si">%(value)r</span><span class="s1">&#39;</span><span class="p">,</span>
+                  <span class="nb">vars</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

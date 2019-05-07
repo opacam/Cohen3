@@ -1,0 +1,719 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.extern.galleryremote.gallery &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.extern.galleryremote.gallery</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.extern.galleryremote.gallery</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2008 Jean-Michel Sizun &lt;jm.sizun AT gmail&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (C) 2008 Brent Woodruff</span>
+<span class="c1">#   http://www.fprimex.com</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (C) 2004 John Sutherland &lt;garion@twcny.rr.com&gt;</span>
+<span class="c1">#   http://garion.tzo.com/python/</span>
+<span class="c1">#</span>
+<span class="c1"># This library is free software; you can redistribute it and/or</span>
+<span class="c1"># modify it under the terms of the GNU Lesser General Public</span>
+<span class="c1"># License as published by the Free Software Foundation; either</span>
+<span class="c1"># version 2.1 of the License, or (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This library is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># Lesser General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU Lesser General Public</span>
+<span class="c1"># License along with this library; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># Change log:</span>
+<span class="c1">#</span>
+<span class="c1"># 16-Nov-08 - Migrated from urllib to coherence infrastructure</span>
+<span class="c1">#</span>
+<span class="c1"># 04-Aug-08 - Added Gallery2 compatibility</span>
+<span class="c1">#             Changed fetch_albums and fetch_albums_prune to return dicts</span>
+<span class="c1">#             Added docstrings</span>
+<span class="c1">#             Created package and registered with Pypi</span>
+<span class="c1">#</span>
+<span class="c1"># 09-Jun-04 - Removed self.cookie=&#39;&#39; from _doRequest to allow multiple</span>
+<span class="c1">#             transactions for each login.</span>
+<span class="c1">#             Fixed cut paste error in newAlbum.</span>
+<span class="c1">#             (both patches from Yuti Takhteyev</span>
+
+<span class="kn">import</span> <span class="nn">io</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">getPage</span>
+
+
+<div class="viewcode-block" id="Gallery"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery">[docs]</a><span class="k">class</span> <span class="nc">Gallery</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The Gallery class implements the Gallery Remote protocol as documented</span>
+<span class="sd">    here:</span>
+<span class="sd">    http://codex.gallery2.org/Gallery_Remote:Protocol</span>
+
+<span class="sd">    The Gallery project is an open source web based photo album organizer</span>
+<span class="sd">    written in php. Gallery&#39;s web site is:</span>
+
+<span class="sd">     | http://gallery.menalto.com/</span>
+
+<span class="sd">    This class is a 3rd party product which is not maintained by the</span>
+<span class="sd">    creators of the Gallery project.</span>
+
+<span class="sd">    Example usage:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            from coherence.extern.galleryremote import Gallery</span>
+<span class="sd">            my_gallery = Gallery(&#39;http://www.yoursite.com/gallery2&#39;, 2)</span>
+<span class="sd">            my_gallery.login(&#39;username&#39;,&#39;password&#39;)</span>
+<span class="sd">            albums = my_gallery.fetch_albums()</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="Gallery.__init__"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Create a Gallery for remote access.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): base address of the gallery</span>
+<span class="sd">            version (int): version of the gallery being connected to</span>
+<span class="sd">                (default 2), either 1 for Gallery1 or 2 for Gallery2.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>  <span class="c1"># Gallery1 or Gallery2</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;/gallery_remote2.php&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># default to G2</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;/main.php&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth_token</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logged_in</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cookie</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span> <span class="o">=</span> <span class="s1">&#39;2.5&#39;</span></div>
+
+<div class="viewcode-block" id="Gallery._do_request"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery._do_request">[docs]</a>    <span class="k">def</span> <span class="nf">_do_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Send a request, encoded as described in the Gallery Remote protocol.</span>
+<span class="sd">        request - a dictionary of protocol parameters and values</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">request</span><span class="p">[</span><span class="s1">&#39;g2_authToken&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">auth_token</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">+=</span> <span class="s1">&#39;?&#39;</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">url</span> <span class="o">+=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{key}</span><span class="s1">=</span><span class="si">{value}</span><span class="s1">&amp;&#39;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Cookie&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie</span><span class="p">}</span>
+
+        <span class="k">def</span> <span class="nf">gotPage</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_response</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;status_text&#39;</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">auth_token</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;auth_token&#39;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+            <span class="k">if</span> <span class="s1">&#39;set-cookie&#39;</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">:</span>
+                <span class="n">cookie_info</span> <span class="o">=</span> <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;set-cookie&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cookie</span> <span class="o">=</span> <span class="n">cookie_info</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to process Gallery2 request: </span><span class="si">{url}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Error: </span><span class="si">{error}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">getPage</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">gotPage</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">gotError</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="Gallery._parse_response"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery._parse_response">[docs]</a>    <span class="k">def</span> <span class="nf">_parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Decode the response from a request.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            response (object): The response from a gallery request, encoded</span>
+<span class="sd">                according to the gallery remote protocol.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A request dict.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">my_str</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">my_str</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;#__GR2PROTO__&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="c1"># make sure the 1st line is #__GR2PROTO__</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;#__GR2PROTO__&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Bad response: </span><span class="si">{response}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">res_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">my_s</span> <span class="ow">in</span> <span class="n">my_str</span><span class="p">:</span>
+            <span class="n">my_s</span> <span class="o">=</span> <span class="n">my_s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">str_list</span> <span class="o">=</span> <span class="n">my_s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">res_dict</span><span class="p">[</span><span class="n">str_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">str_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">res_dict</span><span class="p">[</span><span class="n">str_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="n">res_dict</span></div>
+
+<div class="viewcode-block" id="Gallery._get"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery._get">[docs]</a>    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">kwd</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="n">kwd</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="n">retval</span></div>
+
+<div class="viewcode-block" id="Gallery.login"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery.login">[docs]</a>    <span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Establish an authenticated session to the remote gallery.</span>
+<span class="sd">        username - A valid gallery user&#39;s username</span>
+<span class="sd">        password - That valid user&#39;s password</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;protocol_version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;cmd&#39;</span><span class="p">:</span> <span class="s1">&#39;login&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uname&#39;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="n">password</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;g2_controller&#39;</span><span class="p">:</span> <span class="s1">&#39;remote:GalleryRemote&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[protocol_version]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[cmd]&#39;</span><span class="p">:</span> <span class="s1">&#39;login&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[uname]&#39;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[password]&#39;</span><span class="p">:</span> <span class="n">password</span>
+            <span class="p">}</span>
+
+        <span class="k">def</span> <span class="nf">gotPage</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to login as </span><span class="si">{username}</span><span class="s1"> &#39;</span>
+                      <span class="n">f</span><span class="s1">&#39;to gallery2  server (</span><span class="si">{self.url}</span><span class="s1">)&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logged_in</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">gotPage</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="Gallery.fetch_albums"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery.fetch_albums">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_albums</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Obtain a dict of albums contained in the gallery keyed by</span>
+<span class="sd">        album name. In Gallery1, the name is alphanumeric. In Gallery2,</span>
+<span class="sd">        the name is the unique identifying number for that album.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;protocol_version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;cmd&#39;</span><span class="p">:</span> <span class="s1">&#39;fetch-albums&#39;</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;g2_controller&#39;</span><span class="p">:</span> <span class="s1">&#39;remote:GalleryRemote&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[protocol_version]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[cmd]&#39;</span><span class="p">:</span> <span class="s1">&#39;fetch-albums&#39;</span>
+            <span class="p">}</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotResponse</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Unable to retrieve list of albums!&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="n">albums</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;album_count&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">album</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.name.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.title.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;summary&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.summary.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.parent.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;resize_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.resize_size.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.add&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.perms.add.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.write&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.perms.write.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.del_item&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.perms.del_item.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.del_alb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.perms.del_alb.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.create_sub&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.perms.create_sub.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.info.extrafields&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.info.extrafields&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+                <span class="n">albums</span><span class="p">[</span><span class="n">album</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">album</span>
+            <span class="k">return</span> <span class="n">albums</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">gotResponse</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="Gallery.fetch_albums_prune"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery.fetch_albums_prune">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_albums_prune</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Obtain a dict of albums contained in the gallery keyed by</span>
+<span class="sd">        album name. In Gallery1, the name is alphanumeric. In Gallery2,</span>
+<span class="sd">        the name is the unique identifying number for that album.</span>
+
+<span class="sd">        From the protocol docs:</span>
+<span class="sd">        &quot;The fetch_albums_prune command asks the server to return a list</span>
+<span class="sd">        of all albums that the user can either write to, or that are</span>
+<span class="sd">        visible to the user and contain a sub-album that is writable</span>
+<span class="sd">        (including sub-albums several times removed).&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;protocol_version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;cmd&#39;</span><span class="p">:</span> <span class="s1">&#39;fetch-albums-prune&#39;</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;g2_controller&#39;</span><span class="p">:</span> <span class="s1">&#39;remote:GalleryRemote&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[protocol_version]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[cmd]&#39;</span><span class="p">:</span> <span class="s1">&#39;fetch-albums-prune&#39;</span>
+            <span class="p">}</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotResponse</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+            <span class="c1"># as long as it comes back here without an exception, we&#39;re ok.</span>
+            <span class="n">albums</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;album_count&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">album</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.name.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.title.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;summary&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.summary.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.parent.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;resize_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.resize_size.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.add&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.perms.add.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.write&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.perms.write.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.del_item&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.perms.del_item.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.del_alb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.perms.del_alb.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.create_sub&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.perms.create_sub.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">album</span><span class="p">[</span><span class="s1">&#39;perms.info.extrafields&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;album.info.extrafields&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+                <span class="n">albums</span><span class="p">[</span><span class="n">album</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">album</span>
+
+            <span class="k">return</span> <span class="n">albums</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">gotResponse</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="Gallery.add_item"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery.add_item">[docs]</a>    <span class="k">def</span> <span class="nf">add_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">album</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">caption</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add a photo to the specified album.</span>
+<span class="sd">        album - album name / identifier</span>
+<span class="sd">        filename - image to upload</span>
+<span class="sd">        caption - string caption to add to the image</span>
+<span class="sd">        description - string description to add to the image</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;protocol_version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;cmd&#39;</span><span class="p">:</span> <span class="s1">&#39;add-item&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;set_albumName&#39;</span><span class="p">:</span> <span class="n">album</span><span class="p">,</span>
+                <span class="s1">&#39;userfile&#39;</span><span class="p">:</span> <span class="n">file</span><span class="p">,</span>
+                <span class="s1">&#39;userfile_name&#39;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span>
+                <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">caption</span><span class="p">,</span>
+                <span class="s1">&#39;extrafield.Description&#39;</span><span class="p">:</span> <span class="n">description</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;g2_form[protocol_version]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[cmd]&#39;</span><span class="p">:</span> <span class="s1">&#39;add-item&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[set_albumName]&#39;</span><span class="p">:</span> <span class="n">album</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[userfile]&#39;</span><span class="p">:</span> <span class="n">file</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[userfile_name]&#39;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[caption]&#39;</span><span class="p">:</span> <span class="n">caption</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[extrafield.Description]&#39;</span><span class="p">:</span> <span class="n">description</span>
+            <span class="p">}</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="c1"># if we get here, everything went ok.</span>
+
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="Gallery.album_properties"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery.album_properties">[docs]</a>    <span class="k">def</span> <span class="nf">album_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">album</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Obtain album property information for the specified album.</span>
+<span class="sd">        album - the album name / identifier to obtain information for</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;protocol_version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;cmd&#39;</span><span class="p">:</span> <span class="s1">&#39;album-properties&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;set_albumName&#39;</span><span class="p">:</span> <span class="n">album</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;g2_controller&#39;</span><span class="p">:</span> <span class="s1">&#39;remote:GalleryRemote&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[protocol_version]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[cmd]&#39;</span><span class="p">:</span> <span class="s1">&#39;album-properties&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[set_albumName]&#39;</span><span class="p">:</span> <span class="n">album</span>
+            <span class="p">}</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotResponse</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+            <span class="n">res_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">if</span> <span class="s1">&#39;auto_resize&#39;</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">res_dict</span><span class="p">[</span><span class="s1">&#39;auto_resize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;auto_resize&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;add_to_beginning&#39;</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">res_dict</span><span class="p">[</span><span class="s1">&#39;add_to_beginning&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;add_to_beginning&#39;</span><span class="p">]</span>
+
+            <span class="k">return</span> <span class="n">res_dict</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">gotResponse</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="Gallery.new_album"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery.new_album">[docs]</a>    <span class="k">def</span> <span class="nf">new_album</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add an album to the specified parent album.</span>
+<span class="sd">        parent - album name / identifier to contain the new album</span>
+<span class="sd">        name - unique string name of the new album</span>
+<span class="sd">        title - string title of the album</span>
+<span class="sd">        description - string description to add to the image</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;g2_controller&#39;</span><span class="p">:</span> <span class="s1">&#39;remote:GalleryRemote&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;protocol_version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;cmd&#39;</span><span class="p">:</span> <span class="s1">&#39;new-album&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;set_albumName&#39;</span><span class="p">:</span> <span class="n">parent</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">request</span><span class="p">[</span><span class="s1">&#39;newAlbumName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">request</span><span class="p">[</span><span class="s1">&#39;newAlbumTitle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
+            <span class="k">if</span> <span class="n">description</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">request</span><span class="p">[</span><span class="s1">&#39;newAlbumDesc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;g2_controller&#39;</span><span class="p">:</span> <span class="s1">&#39;remote:GalleryRemote&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[protocol_version]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[cmd]&#39;</span><span class="p">:</span> <span class="s1">&#39;new-album&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[set_albumName]&#39;</span><span class="p">:</span> <span class="n">parent</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">request</span><span class="p">[</span><span class="s1">&#39;g2_form[newAlbumName]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">request</span><span class="p">[</span><span class="s1">&#39;g2_form[newAlbumTitle]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">title</span>
+            <span class="k">if</span> <span class="n">description</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">request</span><span class="p">[</span><span class="s1">&#39;g2_form[newAlbumDesc]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">description</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotResponse</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;album_name&#39;</span><span class="p">]</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="Gallery.fetch_album_images"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery.fetch_album_images">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_album_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">album</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Get the image information for all images in the specified album.</span>
+<span class="sd">        album - specifies the album from which to obtain image information</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;protocol_version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;cmd&#39;</span><span class="p">:</span> <span class="s1">&#39;fetch-album-images&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;set_albumName&#39;</span><span class="p">:</span> <span class="n">album</span><span class="p">,</span>
+                <span class="s1">&#39;albums_too&#39;</span><span class="p">:</span> <span class="s1">&#39;no&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;extrafields&#39;</span><span class="p">:</span> <span class="s1">&#39;yes&#39;</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;g2_controller&#39;</span><span class="p">:</span> <span class="s1">&#39;remote:GalleryRemote&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[protocol_version]&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[cmd]&#39;</span><span class="p">:</span> <span class="s1">&#39;fetch-album-images&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[set_albumName]&#39;</span><span class="p">:</span> <span class="n">album</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[albums_too]&#39;</span><span class="p">:</span> <span class="s1">&#39;no&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;g2_form[extrafields]&#39;</span><span class="p">:</span> <span class="s1">&#39;yes&#39;</span>
+            <span class="p">}</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotResponse</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to retrieve list of item for album </span><span class="si">{album}</span><span class="s1">.&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;image_count&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.name.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.title.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;raw_width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.raw_width.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;raw_height&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.raw_height.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;resizedName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.resizedName.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;resized_width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.resized_width.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;resized_height&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.resized_height.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;thumbName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.thumbName.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;thumb_width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.thumb_width.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;thumb_height&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.thumb_height.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;raw_filesize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.raw_filesize.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.caption.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;clicks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.clicks.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;capturedate.year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.capturedate.year&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;capturedate.mon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.capturedate.mon&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;capturedate.mday&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.capturedate.mday&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;capturedate.hours&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.capturedate.hours&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;capturedate.minutes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.capturedate.minutes&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;capturedate.seconds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.capturedate.seconds&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                <span class="n">image</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="s1">&#39;image.extrafield.Description.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+                <span class="n">images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">images</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">gotResponse</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="Gallery.get_URL_for_image"><a class="viewcode-back" href="../../../../source/extern/galleryremote/gallery.html#coherence.extern.galleryremote.gallery.Gallery.get_URL_for_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_URL_for_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gallery2_id</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.url}</span><span class="s1">/main.php?g2_view=&#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;core.DownloadItem&amp;g2_itemId=</span><span class="si">{gallery2_id}</span><span class="s1">&#39;</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,632 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.fs_storage (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="coherence.backends.gallery2_storage (module)" href="gallery2.html" />
+    <link rel="prev" title="coherence.backends.flickr_storage (module)" href="flickr.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../coherence.backends.html">coherence.backends (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ampache.html">coherence.backends.ampache_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appletrailers.html">coherence.backends.appletrailers_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="audiocd.html">coherence.backends.audiocd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="axiscam.html">coherence.backends.axiscam_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="banshee.html">coherence.backends.banshee_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bbc.html">coherence.backends.bbc_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="buzztard.html">coherence.backends.buzztard_control (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dvbd.html">coherence.backends.dvbd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elisarenderer.html">coherence.backends.elisa_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elisastorage.html">coherence.backends.elisa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="feed.html">coherence.backends.feed_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="flickr.html">coherence.backends.flickr_storage (module)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">coherence.backends.fs_storage (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#fsstore-filesystem-media-server">FSStore - filesystem media server</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gallery2.html">coherence.backends.gallery2_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gstreamer_renderer.html">coherence.backends.gstreamer_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iradio.html">coherence.backends.iradio_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="itv.html">coherence.backends.itv_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lastfm.html">coherence.backends.lastfm_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lolcats.html">coherence.backends.lolcats_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mediadb.html">coherence.backends.mediadb_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="miroguide.html">coherence.backends.miroguide_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="picasa.html">coherence.backends.picasa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="playlist.html">coherence.backends.playlist_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="radiotime.html">coherence.backends.radiotime_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="swr3.html">coherence.backends.swr3_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ted.html">coherence.backends.ted_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="test.html">coherence.backends.test_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracker.html">coherence.backends.tracker_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="twitch.html">coherence.backends.twitch_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="yamj.html">coherence.backends.yamj_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="youtube.html">coherence.backends.youtube_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coherence.backends.html#coherence-backends-models-package">coherence.backends.models (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../coherence.backends.html">coherence.backends (package)</a> &raquo;</li>
+        
+      <li>coherence.backends.fs_storage (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/source/backends/fs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.backends.fs_storage">
+<span id="coherence-backends-fs-storage-module"></span><span id="coherence-backends-fs"></span><h1>coherence.backends.fs_storage (module)<a class="headerlink" href="#module-coherence.backends.fs_storage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="fsstore-filesystem-media-server">
+<h2>FSStore - filesystem media server<a class="headerlink" href="#fsstore-filesystem-media-server" title="Permalink to this headline">¶</a></h2>
+<p>FSStore exposes media files found in the directory trees defined by
+the ‘content’ configuration entry.</p>
+<p>The first “.jpg” or “.png” file found inside a media directory is
+served as a cover image.</p>
+<p>The plugin is configured with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;plugin active=&quot;yes&quot;&gt;
+  &lt;!-- The plugin identifier, mandatory --&gt;
+  &lt;backend&gt;FSStore&lt;/backend&gt;
+  &lt;!-- A comma-separated list of path containing the medias to serve --&gt;
+  &lt;content&gt;/media/path1,/media/path2&lt;/content&gt;
+  &lt;!-- The avertized media server name, default: &quot;my media&quot; --&gt;
+  &lt;name&gt;my media&lt;/name&gt;
+  &lt;!-- The highest UPnP version this
+  media server should support, default: 2 --&gt;
+  &lt;version&gt;2&lt;/version&gt;
+  &lt;!-- A unique identifier used to reference the media server,
+  autogenerated if not set explicitly. In this case, some control points
+  might memorize it between runs and display the same media server more
+  than once. --&gt;
+  &lt;uuid&gt;2f7f4096-cba3-4390-be7d-d1d07106a6f4&lt;/uuid&gt;
+&lt;/plugin&gt;
+</pre></div>
+</div>
+<dl class="function">
+<dt id="coherence.backends.fs_storage._natural_key">
+<code class="descname">_natural_key</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#_natural_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage._natural_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="exception">
+<dt id="coherence.backends.fs_storage.NoThumbnailFound">
+<em class="property">exception </em><code class="descname">NoThumbnailFound</code><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#NoThumbnailFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.NoThumbnailFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>no thumbnail found</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.backends.fs_storage._find_thumbnail">
+<code class="descname">_find_thumbnail</code><span class="sig-paren">(</span><em>filename</em>, <em>thumbnail_folder='.thumbs'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#_find_thumbnail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage._find_thumbnail" title="Permalink to this definition">¶</a></dt>
+<dd><p>looks for a thumbnail file of the same basename
+in a folder named ‘.thumbs’ relative to the file</p>
+<p>returns the filename of the thumb, its mimetype and
+the correspondig DLNA PN string or throws an Exception otherwise</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.fs_storage.FSItem">
+<em class="property">class </em><code class="descname">FSItem</code><span class="sig-paren">(</span><em>object_id</em>, <em>parent</em>, <em>path</em>, <em>mimetype</em>, <em>urlbase</em>, <em>UPnPClass</em>, <em>update=False</em>, <em>store=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.backend.BackendItem" title="coherence.backend.BackendItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.BackendItem</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.backends.fs_storage.FSItem.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'fs_item'</em><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.rebuild">
+<code class="descname">rebuild</code><span class="sig-paren">(</span><em>urlbase</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.rebuild"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.rebuild" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.check_for_cover_art">
+<code class="descname">check_for_cover_art</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.check_for_cover_art"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.check_for_cover_art" title="Permalink to this definition">¶</a></dt>
+<dd><p>let’s try to find in the current directory some jpg file,
+or png if the jpg search fails, and take the first one
+that comes around</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.add_child">
+<code class="descname">add_child</code><span class="sig-paren">(</span><em>child</em>, <em>update=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.add_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.add_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.remove_child">
+<code class="descname">remove_child</code><span class="sig-paren">(</span><em>child</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.remove_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.remove_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.get_children">
+<code class="descname">get_children</code><span class="sig-paren">(</span><em>start=0</em>, <em>request_count=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.get_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS and the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the start.</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the end.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>a list of its childs, from start to end.</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.get_child_count">
+<code class="descname">get_child_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.get_child_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.get_child_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>the number of its childs - len(childs)</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.get_id">
+<code class="descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.get_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.get_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.get_update_id">
+<code class="descname">get_update_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.get_update_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.get_update_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.get_path">
+<code class="descname">get_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.get_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the filepath where to find the media file that this item does
+refer to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.get_realpath">
+<code class="descname">get_realpath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.get_realpath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.get_realpath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.set_path">
+<code class="descname">set_path</code><span class="sig-paren">(</span><em>path=None</em>, <em>extension=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.set_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.set_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the name of the item, it is always expected to be in unicode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.get_cover">
+<code class="descname">get_cover</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.get_cover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.get_cover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the filepath where to find the album art file</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>only needed when we have created for that item an
+albumArtURI property that does point back to us.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.get_parent">
+<code class="descname">get_parent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.get_parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.get_parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.get_item">
+<code class="descname">get_item</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.get_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.get_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS and the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>an UPnP ContentDirectoryServer DIDLLite object</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSItem.get_xml">
+<code class="descname">get_xml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSItem.get_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSItem.get_xml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.fs_storage.FSStore">
+<em class="property">class </em><code class="descname">FSStore</code><span class="sig-paren">(</span><em>server</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.backend.BackendStore" title="coherence.backend.BackendStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.BackendStore</span></code></a></p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span>Migrated from louie/dispatcher to EventDispatcher</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.fs_storage.FSStore.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'fs_store'</em><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.fs_storage.FSStore.implements">
+<code class="descname">implements</code><em class="property"> = ['MediaServer']</em><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.implements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.fs_storage.FSStore.description">
+<code class="descname">description</code><em class="property"> = 'MediaServer exporting files from the file-system'</em><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.fs_storage.FSStore.options">
+<code class="descname">options</code><em class="property"> = [{'option': 'name', 'type': 'string', 'default': 'my media', 'help': 'the name under this MediaServer shall show up with on other UPnP clients'}, {'option': 'version', 'type': 'int', 'default': 2, 'enum': (2, 1), 'help': 'the highest UPnP version this MediaServer shall support', 'level': 'advance'}, {'option': 'uuid', 'type': 'string', 'help': 'the unique (UPnP) identifier for this MediaServer, usually automatically set', 'level': 'advance'}, {'option': 'content', 'type': 'string', 'default': None, 'help': 'the path(s) this MediaServer shall export'}, {'option': 'ignore_patterns', 'type': 'string', 'help': 'list of regex patterns, matching filenames will be ignored'}, {'option': 'enable_inotify', 'type': 'string', 'default': 'yes', 'help': 'enable real-time monitoring of the content folders'}, {'option': 'enable_destroy', 'type': 'string', 'default': 'no', 'help': 'enable deleting a file via an UPnP method'}, {'option': 'import_folder', 'type': 'string', 'help': 'The path to store files imported via an UPnP method, if empty the Import method is disabled'}]</em><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.options" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.release">
+<code class="descname">release</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.release" title="Permalink to this definition">¶</a></dt>
+<dd><p>If anything needs to be cleaned up upon shutdown of this backend,
+this is the place for it. Should be overwritten in subclass.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.len">
+<code class="descname">len</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.len"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.len" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.get_by_id">
+<code class="descname">get_by_id</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.get_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.get_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – is the id property of our DIDLLite item</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>None when no matching item for that id is found,</p></li>
+<li><p>a BackendItem,</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p>Called by the CDS or the MediaServer web.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>if this MediaServer implements containers that can share their
+content, like ‘all tracks’, ‘album’ and ‘album_of_artist’ (they all
+have the same track item as content), then the id may be passed by
+the CDS like this:</p>
+<blockquote>
+<div><p><a class="reference external" href="mailto:'id&#37;&#52;&#48;container">‘id<span>&#64;</span>container</a>’ or ‘id&#64;container&#64;container&#64;container…’</p>
+</div></blockquote>
+<p>therefore a</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>may be appropriate as the first thing to do when entering this
+method.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.get_id_by_name">
+<code class="descname">get_id_by_name</code><span class="sig-paren">(</span><em>parent='0'</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.get_id_by_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.get_id_by_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.get_url_by_name">
+<code class="descname">get_url_by_name</code><span class="sig-paren">(</span><em>parent='0'</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.get_url_by_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.get_url_by_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.update_config">
+<code class="descname">update_config</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.update_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.update_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.add_content_folder">
+<code class="descname">add_content_folder</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.add_content_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.add_content_folder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.remove_content_folder">
+<code class="descname">remove_content_folder</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.remove_content_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.remove_content_folder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.walk">
+<code class="descname">walk</code><span class="sig-paren">(</span><em>path</em>, <em>parent=None</em>, <em>ignore_file_pattern=''</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.walk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.walk" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.create">
+<code class="descname">create</code><span class="sig-paren">(</span><em>mimetype</em>, <em>path</em>, <em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>bytes_path</em>, <em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.notify">
+<code class="descname">notify</code><span class="sig-paren">(</span><em>ignore</em>, <em>path</em>, <em>mask</em>, <em>parameter=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.notify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.notify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.getnextID">
+<code class="descname">getnextID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.getnextID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.getnextID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.backend_import">
+<code class="descname">backend_import</code><span class="sig-paren">(</span><em>item</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.backend_import"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.backend_import" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.upnp_init">
+<code class="descname">upnp_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.upnp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.upnp_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method gets called after the device is fired, here all
+initializations of service related state variables should happen, as
+the services aren’t available before that point.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.upnp_ImportResource">
+<code class="descname">upnp_ImportResource</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.upnp_ImportResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.upnp_ImportResource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.upnp_CreateObject">
+<code class="descname">upnp_CreateObject</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.upnp_CreateObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.upnp_CreateObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.fs_storage.FSStore.hidden_upnp_DestroyObject">
+<code class="descname">hidden_upnp_DestroyObject</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/fs_storage.html#FSStore.hidden_upnp_DestroyObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.fs_storage.FSStore.hidden_upnp_DestroyObject" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gallery2.html" class="btn btn-neutral float-right" title="coherence.backends.gallery2_storage (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="flickr.html" class="btn btn-neutral float-left" title="coherence.backends.flickr_storage (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

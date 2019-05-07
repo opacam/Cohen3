@@ -1,0 +1,593 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.ssdp &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.ssdp</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.core.ssdp</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2005, Tim Potter &lt;tpot@samba.org&gt;</span>
+<span class="c1"># Copyright 2006 John-Mark Gurney &lt;gurney_j@resnet.uroegon.edu&gt;</span>
+<span class="c1"># Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).</span>
+<span class="c1"># Copyright 2006,2007,2008,2009 Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">:class:`SSDPServer`</span>
+<span class="sd">-------------------</span>
+
+<span class="sd">Implementation of a SSDP server under Twisted and EventDispatcher.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">task</span>
+<span class="kn">from</span> <span class="nn">twisted.internet.protocol</span> <span class="k">import</span> <span class="n">DatagramProtocol</span>
+<span class="kn">from</span> <span class="nn">twisted.web.http</span> <span class="k">import</span> <span class="n">datetimeToString</span>
+<span class="kn">from</span> <span class="nn">twisted.test</span> <span class="k">import</span> <span class="n">proto_helpers</span>
+
+<span class="kn">from</span> <span class="nn">eventdispatcher</span> <span class="k">import</span> <span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">ListProperty</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">to_bytes</span><span class="p">,</span> <span class="n">to_string</span>
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">SERVER_ID</span>
+
+<span class="n">SSDP_PORT</span> <span class="o">=</span> <span class="mi">1900</span>
+<span class="n">SSDP_ADDR</span> <span class="o">=</span> <span class="s1">&#39;239.255.255.250&#39;</span>
+
+
+<div class="viewcode-block" id="SSDPServer"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer">[docs]</a><span class="k">class</span> <span class="nc">SSDPServer</span><span class="p">(</span><span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">DatagramProtocol</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A class implementing a SSDP server.</span>
+
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">        * Migrated from louie/dispatcher to EventDispatcher</span>
+<span class="sd">        * The emitted events changed:</span>
+
+<span class="sd">            - datagram_received =&gt; datagram_received</span>
+<span class="sd">            - Coherence.UPnP.SSDP.new_device =&gt; new_device</span>
+<span class="sd">            - Coherence.UPnP.SSDP.removed_device =&gt; removed_device</span>
+<span class="sd">            - Coherence.UPnP.Log =&gt; log</span>
+
+<span class="sd">        * Added new class variable `root_devices` which uses EventDispatcher&#39;s</span>
+<span class="sd">          properties</span>
+
+<span class="sd">    .. note:: The methods :meth:`notifyReceived` and :meth:`searchReceived`</span>
+<span class="sd">              are called when the appropriate type of datagram is received by</span>
+<span class="sd">              the server.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;ssdp&#39;</span>
+
+    <span class="n">root_devices</span> <span class="o">=</span> <span class="n">ListProperty</span><span class="p">([])</span>
+    <span class="sd">&#39;&#39;&#39;A list of the detected root devices&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="c1"># Create SSDP server</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">EventDispatcher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span>
+            <span class="s1">&#39;datagram_received&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;new_device&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;removed_device&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;log&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">known</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="n">test</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">listenMulticast</span><span class="p">(</span>
+                <span class="n">SSDP_PORT</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span>
+                <span class="n">listenMultiple</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">interface</span><span class="o">=</span><span class="n">interface</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">joinGroup</span><span class="p">(</span><span class="n">SSDP_ADDR</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="n">interface</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">resend_notify_loop</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">LoopingCall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resendNotify</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resend_notify_loop</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mf">777.0</span><span class="p">,</span> <span class="n">now</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_valid_loop</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">LoopingCall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_valid</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_valid_loop</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mf">333.0</span><span class="p">,</span> <span class="n">now</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_calls</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="SSDPServer.shutdown"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.shutdown">[docs]</a>    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Shutdowns the server :class:`SSDPServer` and sends out</span>
+<span class="sd">        the bye bye notifications via method :meth:`doByebye`.&#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">call</span> <span class="ow">in</span> <span class="n">reactor</span><span class="o">.</span><span class="n">getDelayedCalls</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">call</span><span class="o">.</span><span class="n">func</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_it</span><span class="p">:</span>
+                <span class="n">call</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">test</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resend_notify_loop</span><span class="o">.</span><span class="n">running</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resend_notify_loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_valid_loop</span><span class="o">.</span><span class="n">running</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check_valid_loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">st</span><span class="p">][</span><span class="s1">&#39;MANIFESTATION&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">doByebye</span><span class="p">(</span><span class="n">st</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SSDPServer.datagramReceived"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.datagramReceived">[docs]</a>    <span class="k">def</span> <span class="nf">datagramReceived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">xxx_todo_changeme</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Handle a received multicast datagram.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;datagramReceived: </span><span class="si">{data}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span> <span class="o">=</span> <span class="n">xxx_todo_changeme</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">header</span><span class="p">,</span> <span class="n">payload</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n\r\n</span><span class="s1">&#39;</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Arggg,&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="kn">import</span> <span class="nn">pdb</span>
+            <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># TODO: Find  and fix where some of the header&#39;s keys are quoted.</span>
+        <span class="c1"># This hack, allows to fix the quoted keys for the headers, introduced</span>
+        <span class="c1"># at some point of the source code. I notice that the issue appears</span>
+        <span class="c1"># when using FSStore plugin. But where?</span>
+        <span class="k">def</span> <span class="nf">fix_string</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">to_lower</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">]:</span>
+                <span class="k">while</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">]:</span>
+                <span class="k">while</span> <span class="n">s</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">to_lower</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">s</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+        <span class="n">headers</span> <span class="o">=</span> \
+            <span class="nb">dict</span><span class="p">([(</span><span class="n">fix_string</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                   <span class="n">fix_string</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">to_lower</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;SSDP command </span><span class="si">{cmd[0]}</span><span class="s1"> </span><span class="si">{cmd[1]}</span><span class="s1"> - from </span><span class="si">{host}</span><span class="s1">:</span><span class="si">{port}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;with headers: </span><span class="si">{headers}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;M-SEARCH&#39;</span> <span class="ow">and</span> <span class="n">cmd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+            <span class="c1"># SSDP discovery</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">discoveryRequest</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NOTIFY&#39;</span> <span class="ow">and</span> <span class="n">cmd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+            <span class="c1"># SSDP presence</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notifyReceived</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unknown SSDP command </span><span class="si">{cmd[0]}</span><span class="s1"> </span><span class="si">{cmd[1]}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># make raw data available</span>
+        <span class="c1"># send out the signal after we had a chance to register the device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span><span class="s1">&#39;datagram_received&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SSDPServer.register"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">manifestation</span><span class="p">,</span> <span class="n">usn</span><span class="p">,</span> <span class="n">st</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
+                 <span class="n">server</span><span class="o">=</span><span class="n">SERVER_ID</span><span class="p">,</span>
+                 <span class="n">cache_control</span><span class="o">=</span><span class="s1">&#39;max-age=1800&#39;</span><span class="p">,</span>
+                 <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Register a service or device that this SSDP server will</span>
+<span class="sd">        respond to.&#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Registering </span><span class="si">{st}</span><span class="s1"> (</span><span class="si">{location}</span><span class="s1">) -&gt; </span><span class="si">{manifestation}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-searching usn: </span><span class="si">{usn}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;USN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">usn</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;LOCATION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">location</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">st</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;EXT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;SERVER&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">server</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;CACHE-CONTROL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cache_control</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;MANIFESTATION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">manifestation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;SILENT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">silent</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;HOST&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">host</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;last-seen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-self.known: </span><span class="si">{self.known}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">manifestation</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">doNotify</span><span class="p">(</span><span class="n">usn</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">st</span> <span class="o">==</span> <span class="s1">&#39;upnp:rootdevice&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+                    <span class="s1">&#39;new_device&#39;</span><span class="p">,</span> <span class="n">device_type</span><span class="o">=</span><span class="n">st</span><span class="p">,</span> <span class="n">infos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root_devices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">usn</span><span class="p">)</span>
+                <span class="c1"># self.callback(&#39;new_device&#39;, st, self.known[usn])</span>
+            <span class="c1"># print(&#39;\t - ok all&#39;)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> -&gt; Error on registering service: </span><span class="si">{manifestation}</span><span class="s1"> &#39;</span>
+                       <span class="n">f</span><span class="s1">&#39;[error: &quot;</span><span class="si">{err}</span><span class="s1">&quot;]&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SSDPServer.unRegister"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.unRegister">[docs]</a>    <span class="k">def</span> <span class="nf">unRegister</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usn</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Un-registering </span><span class="si">{usn}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">st</span> <span class="o">==</span> <span class="s1">&#39;upnp:rootdevice&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+                <span class="s1">&#39;removed_device&#39;</span><span class="p">,</span> <span class="n">device_type</span><span class="o">=</span><span class="n">st</span><span class="p">,</span> <span class="n">infos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">])</span>
+            <span class="c1"># self.callback(&#39;removed_device&#39;, st, self.known[usn])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root_devices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">usn</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SSDPServer.isKnown"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.isKnown">[docs]</a>    <span class="k">def</span> <span class="nf">isKnown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usn</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">usn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span></div>
+
+<div class="viewcode-block" id="SSDPServer.notifyReceived"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.notifyReceived">[docs]</a>    <span class="k">def</span> <span class="nf">notifyReceived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">xxx_todo_changeme1</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Process a presence announcement.  We just remember the</span>
+<span class="sd">        details of the SSDP service announced.&#39;&#39;&#39;</span>
+        <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span> <span class="o">=</span> <span class="n">xxx_todo_changeme1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Notification from (</span><span class="si">{host}</span><span class="s1">,</span><span class="si">{port}</span><span class="s1">) for </span><span class="si">{headers[&quot;nt&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Notification headers: </span><span class="si">{headers}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;nts&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ssdp:alive&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;usn&#39;</span><span class="p">]][</span><span class="s1">&#39;last-seen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;updating last-seen for </span><span class="si">{headers[&quot;usn&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;remote&#39;</span><span class="p">,</span> <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;usn&#39;</span><span class="p">],</span> <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;nt&#39;</span><span class="p">],</span>
+                              <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">],</span>
+                              <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;server&#39;</span><span class="p">],</span> <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;cache-control&#39;</span><span class="p">],</span>
+                              <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;nts&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ssdp:byebye&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isKnown</span><span class="p">(</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;usn&#39;</span><span class="p">]):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">unRegister</span><span class="p">(</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;usn&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unknown subtype </span><span class="si">{headers[&quot;nts&quot;]}</span><span class="s1"> &#39;</span>
+                         <span class="n">f</span><span class="s1">&#39;for notification type </span><span class="si">{headers[&quot;nt&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="s1">&#39;SSDP&#39;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span>
+                            <span class="n">f</span><span class="s1">&#39;Notify </span><span class="si">{headers[&quot;nts&quot;]}</span><span class="s1"> for </span><span class="si">{headers[&quot;usn&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SSDPServer.send_it"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.send_it">[docs]</a>    <span class="k">def</span> <span class="nf">send_it</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">usn</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;send discovery response delayed by &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;</span><span class="si">{delay}</span><span class="s1"> for </span><span class="si">{usn}</span><span class="s1"> to </span><span class="si">{destination}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">response</span><span class="p">),</span> <span class="n">destination</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">)</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;failure sending out datagram: </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SSDPServer.discoveryRequest"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.discoveryRequest">[docs]</a>    <span class="k">def</span> <span class="nf">discoveryRequest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">xxx_todo_changeme2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Process a discovery request.  The response must be sent to</span>
+<span class="sd">        the address specified by (host, port).&#39;&#39;&#39;</span>
+        <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span> <span class="o">=</span> <span class="n">xxx_todo_changeme2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;Discovery request from (</span><span class="si">{host}</span><span class="s1">,</span><span class="si">{port}</span><span class="s1">) for </span><span class="si">{headers[&quot;st&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Discovery request for </span><span class="si">{headers[&quot;st&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="s1">&#39;SSDP&#39;</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span>
+                            <span class="n">f</span><span class="s1">&#39;M-Search for </span><span class="si">{headers[&quot;st&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Do we know about this service?</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;MANIFESTATION&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;remote&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ssdp:all&#39;</span> <span class="ow">and</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;SILENT&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="ow">or</span>
+                    <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;st&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;ssdp:all&#39;</span><span class="p">):</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;HTTP/1.1 200 OK&#39;</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;USN&#39;</span><span class="p">:</span>
+                        <span class="n">usn</span> <span class="o">=</span> <span class="n">v</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;MANIFESTATION&#39;</span><span class="p">,</span> <span class="s1">&#39;SILENT&#39;</span><span class="p">,</span> <span class="s1">&#39;HOST&#39;</span><span class="p">):</span>
+                        <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{k}</span><span class="s1">: </span><span class="si">{v}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;DATE: {datetimeToString()}&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+
+                <span class="n">response</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+                <span class="n">delay</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;mx&#39;</span><span class="p">]))</span>
+
+                <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span>
+                    <span class="n">delay</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_it</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">response</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">),</span> <span class="n">delay</span><span class="p">,</span> <span class="n">usn</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SSDPServer.doNotify"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.doNotify">[docs]</a>    <span class="k">def</span> <span class="nf">doNotify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usn</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Do notification&#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;SILENT&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Sending alive notification for </span><span class="si">{usn}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># self.info(f&#39;\t - self.known[usn]: {self.known[usn]}&#39;)</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NOTIFY * HTTP/1.1&#39;</span><span class="p">,</span>
+                <span class="n">f</span><span class="s1">&#39;HOST: </span><span class="si">{SSDP_ADDR}</span><span class="s1">:</span><span class="si">{SSDP_PORT}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;NTS: ssdp:alive&#39;</span><span class="p">,</span>
+                <span class="p">]</span>
+        <span class="n">stcpy</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;NT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;MANIFESTATION&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;SILENT&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;HOST&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;last-seen&#39;</span><span class="p">]</span>
+
+        <span class="n">resp</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{k}</span><span class="s1">: </span><span class="si">{v}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stcpy</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="n">resp</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;doNotify content </span><span class="si">{r}</span><span class="s1">  [transport is: </span><span class="si">{self.transport}</span><span class="s1">]&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;transport not initialized...&#39;</span>
+                             <span class="s1">&#39;trying to initialize a FakeDatagramTransport&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="n">proto_helpers</span><span class="o">.</span><span class="n">FakeDatagramTransport</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">er</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Cannot initialize transport: </span><span class="si">{er}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="p">(</span><span class="n">SSDP_ADDR</span><span class="p">,</span> <span class="n">SSDP_PORT</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">)</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;failure sending out alive notification: </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SSDPServer.doByebye"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.doByebye">[docs]</a>    <span class="k">def</span> <span class="nf">doByebye</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usn</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Do byebye&#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Sending byebye notification for </span><span class="si">{usn}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;NOTIFY * HTTP/1.1&#39;</span><span class="p">,</span>
+                <span class="n">f</span><span class="s1">&#39;HOST: </span><span class="si">{SSDP_ADDR}</span><span class="s1">:</span><span class="si">{SSDP_PORT}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;NTS: ssdp:byebye&#39;</span><span class="p">,</span>
+                <span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">stcpy</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+            <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;NT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;MANIFESTATION&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;SILENT&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;HOST&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">stcpy</span><span class="p">[</span><span class="s1">&#39;last-seen&#39;</span><span class="p">]</span>
+            <span class="n">resp</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                <span class="n">f</span><span class="s1">&#39;</span><span class="si">{k}</span><span class="s1">: </span><span class="si">{v}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stcpy</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+            <span class="n">resp</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;doByebye content </span><span class="si">{resp}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;transport not initialized...&#39;</span>
+                             <span class="s1">&#39;trying to initialize a FakeDatagramTransport&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="n">proto_helpers</span><span class="o">.</span><span class="n">FakeDatagramTransport</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">makeConnection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="p">(</span><span class="n">SSDP_ADDR</span><span class="p">,</span> <span class="n">SSDP_PORT</span><span class="p">))</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">)</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;failure sending out byebye notification: </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;error building byebye notification: </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SSDPServer.resendNotify"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.resendNotify">[docs]</a>    <span class="k">def</span> <span class="nf">resendNotify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">usn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;MANIFESTATION&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">doNotify</span><span class="p">(</span><span class="n">usn</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SSDPServer.check_valid"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.check_valid">[docs]</a>    <span class="k">def</span> <span class="nf">check_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Check if the discovered devices are still ok,</span>
+<span class="sd">        or if we haven&#39;t received a new discovery response</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Checking devices/services are still valid&#39;</span><span class="p">)</span>
+        <span class="n">removable</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">usn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;MANIFESTATION&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">expiry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;CACHE-CONTROL&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+                <span class="n">expiry</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">expiry</span><span class="p">)</span>
+                <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="n">last_seen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;last-seen&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;Checking if </span><span class="si">{self.known[usn][&quot;USN&quot;]}</span><span class="s1"> is still valid - &#39;</span>
+                    <span class="n">f</span><span class="s1">&#39;last seen </span><span class="si">{last_seen}</span><span class="s1"> (+</span><span class="si">{expiry}</span><span class="s1">), now </span><span class="si">{now}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">last_seen</span> <span class="o">+</span> <span class="n">expiry</span> <span class="o">+</span> <span class="mi">30</span> <span class="o">&lt;</span> <span class="n">now</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Expiring: </span><span class="si">{self.known[usn]}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;upnp:rootdevice&#39;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+                            <span class="s1">&#39;removed_device&#39;</span><span class="p">,</span>
+                            <span class="n">device_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">][</span><span class="s1">&#39;ST&#39;</span><span class="p">],</span>
+                            <span class="n">infos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">])</span>
+                    <span class="n">removable</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">usn</span><span class="p">)</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">removable</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">usn</span> <span class="o">=</span> <span class="n">removable</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">known</span><span class="p">[</span><span class="n">usn</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SSDPServer.subscribe"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.subscribe">[docs]</a>    <span class="k">def</span> <span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SSDPServer.unsubscribe"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.unsubscribe">[docs]</a>    <span class="k">def</span> <span class="nf">unsubscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="n">callbacks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">:</span>
+            <span class="n">callbacks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">callbacks</span></div>
+
+<div class="viewcode-block" id="SSDPServer.callback"><a class="viewcode-back" href="../../../../source/upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer.callback">[docs]</a>    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">callback</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

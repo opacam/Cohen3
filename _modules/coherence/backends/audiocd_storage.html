@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.audiocd_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.audiocd_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.audiocd_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># &lt;EXPERIMENTAL&gt;</span>
+
+<span class="c1"># a backend to expose to the local network the content of an audio CD</span>
+<span class="c1"># inserted in a local drive</span>
+<span class="c1"># the CD data is extracted from the CDDB/FreeDB database</span>
+
+<span class="c1"># Warning: this backend does not detect insertion and ejection of CD drive</span>
+<span class="c1"># the CD must be inserted before activating the backing.</span>
+<span class="c1"># The backend must be disabled before ejecting the audio CD.</span>
+
+<span class="c1"># Dependencies</span>
+<span class="c1"># CDDB.py and DiscID.py (ex: debian package python-cddb)</span>
+<span class="c1"># python-gst (with base and ugly plugins)</span>
+
+<span class="c1"># TODO: switch from CDDB/FreeDB to musicBrainz</span>
+<span class="c1"># TODO: find source for AlbumArt UI</span>
+<span class="c1"># TODO: support other character encoding environment than ISO-8856-1</span>
+
+<span class="c1"># Copyright 2010, Jean-Michel Sizun</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">CDDB</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">CDDB</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">DiscID</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">DiscID</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">cmp_to_key</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span><span class="p">,</span> <span class="n">threads</span>
+
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">AbstractBackendStore</span><span class="p">,</span> <span class="n">Container</span><span class="p">,</span> <span class="n">BackendItem</span>
+<span class="kn">from</span> <span class="nn">coherence.transcoder</span> <span class="k">import</span> <span class="n">GStreamerPipeline</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+
+<span class="n">PLAY_TRACK_GST_PIPELINE</span> <span class="o">=</span> <span class="s1">&#39;cdiocddasrc device=</span><span class="si">%s</span><span class="s1"> track=</span><span class="si">%d</span><span class="s1"> ! wavenc name=enc&#39;</span>
+<span class="n">TRACK_MIMETYPE</span> <span class="o">=</span> <span class="s1">&#39;audio/x-wav&#39;</span>
+<span class="n">TRACK_FOURTH_FIELD</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+
+
+<div class="viewcode-block" id="TrackItem"><a class="viewcode-back" href="../../../source/backends/audiocd.html#coherence.backends.audiocd_storage.TrackItem">[docs]</a><span class="k">class</span> <span class="nc">TrackItem</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;audiocd&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_name</span><span class="o">=</span><span class="s1">&#39;/dev/cdrom&#39;</span><span class="p">,</span> <span class="n">track_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">artist</span><span class="o">=</span><span class="s1">&#39;Unknown&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Unknown&#39;</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device_name</span> <span class="o">=</span> <span class="n">device_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">track_number</span> <span class="o">=</span> <span class="n">track_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist</span> <span class="o">=</span> <span class="n">artist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">TRACK_MIMETYPE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fourth_field</span> <span class="o">=</span> <span class="n">TRACK_FOURTH_FIELD</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">PLAY_TRACK_GST_PIPELINE</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">track_number</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">GStreamerPipeline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TrackItem.get_item"><a class="viewcode-back" href="../../../source/backends/audiocd.html#coherence.backends.audiocd_storage.TrackItem.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upnp_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span>
+            <span class="n">upnp_parent_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">MusicTrack</span><span class="p">(</span>
+                <span class="n">upnp_id</span><span class="p">,</span> <span class="n">upnp_parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+
+            <span class="n">res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{self.mimetype}</span><span class="s1">:</span><span class="si">{self.fourth_field}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="c1"># res.duration = self.duration</span>
+            <span class="c1"># res.size = self.get_size()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="TrackItem.get_name"><a class="viewcode-back" href="../../../source/backends/audiocd.html#coherence.backends.audiocd_storage.TrackItem.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span></div>
+
+<div class="viewcode-block" id="TrackItem.get_path"><a class="viewcode-back" href="../../../source/backends/audiocd.html#coherence.backends.audiocd_storage.TrackItem.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span></div>
+
+<div class="viewcode-block" id="TrackItem.get_size"><a class="viewcode-back" href="../../../source/backends/audiocd.html#coherence.backends.audiocd_storage.TrackItem.get_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span></div>
+
+<div class="viewcode-block" id="TrackItem.get_id"><a class="viewcode-back" href="../../../source/backends/audiocd.html#coherence.backends.audiocd_storage.TrackItem.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span></div></div>
+
+
+<div class="viewcode-block" id="AudioCDStore"><a class="viewcode-back" href="../../../source/backends/audiocd.html#coherence.backends.audiocd_storage.AudioCDStore">[docs]</a><span class="k">class</span> <span class="nc">AudioCDStore</span><span class="p">(</span><span class="n">AbstractBackendStore</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;audiocd&#39;</span>
+
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;audioCD&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UPnP Version:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the highest UPnP version this MediaServer shall support&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;uuid&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UUID Identifier:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the unique (UPnP) identifier for this MediaServer, &#39;</span>
+                 <span class="s1">&#39;usually automatically set&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;device_name&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;device name for audio CD:&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;device name containing the audio cd.&#39;</span><span class="p">}</span>
+    <span class="p">]</span>
+
+    <span class="n">disc_title</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">cdrom</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">AbstractBackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;audio CD&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;device_name&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/cdom&#39;</span><span class="p">)</span>
+
+        <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extractAudioCdInfo</span><span class="p">)</span>
+
+        <span class="c1"># will be fired when the audio CD info is extracted</span>
+        <span class="c1"># self.init_completed()</span>
+
+<div class="viewcode-block" id="AudioCDStore.upnp_init"><a class="viewcode-back" href="../../../source/backends/audiocd.html#coherence.backends.audiocd_storage.AudioCDStore.upnp_init">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{TRACK_MIMETYPE}</span><span class="s1">:</span><span class="si">{TRACK_FOURTH_FIELD}</span><span class="s1">&#39;</span><span class="p">],</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SystemUpdateID&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span><span class="p">)</span></div>
+            <span class="c1"># self.server.content_directory_server.set_variable(</span>
+            <span class="c1">#     0, &#39;SortCapabilities&#39;, &#39;*&#39;)</span>
+
+<div class="viewcode-block" id="AudioCDStore.extractAudioCdInfo"><a class="viewcode-back" href="../../../source/backends/audiocd.html#coherence.backends.audiocd_storage.AudioCDStore.extractAudioCdInfo">[docs]</a>    <span class="k">def</span> <span class="nf">extractAudioCdInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        extract the CD info (album art + artist + tracks),</span>
+<span class="sd">        and construct the UPnP items</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cdrom</span> <span class="o">=</span> <span class="n">DiscID</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">)</span>
+        <span class="n">disc_id</span> <span class="o">=</span> <span class="n">DiscID</span><span class="o">.</span><span class="n">disc_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdrom</span><span class="p">)</span>
+
+        <span class="p">(</span><span class="n">query_status</span><span class="p">,</span> <span class="n">query_info</span><span class="p">)</span> <span class="o">=</span> <span class="n">CDDB</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">disc_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">query_status</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">210</span><span class="p">,</span> <span class="mi">211</span><span class="p">):</span>
+            <span class="n">query_info</span> <span class="o">=</span> <span class="n">query_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">(</span><span class="n">read_status</span><span class="p">,</span> <span class="n">read_info</span><span class="p">)</span> <span class="o">=</span> <span class="n">CDDB</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">query_info</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">],</span>
+                                             <span class="n">query_info</span><span class="p">[</span><span class="s1">&#39;disc_id&#39;</span><span class="p">])</span>
+        <span class="c1"># print(query_info[&#39;title&#39;])</span>
+        <span class="c1"># print(disc_id[1])</span>
+        <span class="c1"># for i in range(disc_id[1]):</span>
+        <span class="c1">#    print(f&#39;Track {i:.02d}: {read_info[&quot;TTITLE&quot; + repr(i)]}&#39;)</span>
+
+        <span class="n">track_count</span> <span class="o">=</span> <span class="n">disc_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">disc_id</span> <span class="o">=</span> <span class="n">query_info</span><span class="p">[</span><span class="s1">&#39;disc_id&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disc_title</span> <span class="o">=</span> <span class="n">query_info</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">tracks</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">track_count</span><span class="p">):</span>
+            <span class="n">tracks</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_info</span><span class="p">[</span><span class="n">f</span><span class="s1">&#39;TTITLE{repr(i)}&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="s1">&#39;ISO-8859-1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">disc_title</span>
+
+        <span class="n">root_item</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disc_title</span><span class="p">)</span>
+        <span class="n">root_item</span><span class="o">.</span><span class="n">sorting_method</span> <span class="o">=</span> <span class="s1">&#39;track_number&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_root_item</span><span class="p">(</span><span class="n">root_item</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">number</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">tracks</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">TrackItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device_name</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="s1">&#39;Unknown&#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+            <span class="n">external_id</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{disc_id}</span><span class="s1">_</span><span class="si">{number:d}</span><span class="s1">&#39;</span>
+            <span class="n">root_item</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">external_id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Sharing audio CD </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disc_title</span><span class="p">)</span>
+
+        <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkIfAudioCdStillPresent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AudioCDStore.checkIfAudioCdStillPresent"><a class="viewcode-back" href="../../../source/backends/audiocd.html#coherence.backends.audiocd_storage.AudioCDStore.checkIfAudioCdStillPresent">[docs]</a>    <span class="k">def</span> <span class="nf">checkIfAudioCdStillPresent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">disc_id</span> <span class="o">=</span> <span class="n">DiscID</span><span class="o">.</span><span class="n">disc_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cdrom</span><span class="p">)</span>
+            <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkIfAudioCdStillPresent</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;audio CD </span><span class="si">{self.disc_title}</span><span class="s1"> ejected:&#39;</span>
+                         <span class="n">f</span><span class="s1">&#39; closing UPnP server!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">remove_plugin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

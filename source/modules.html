@@ -1,0 +1,2442 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backend (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="coherence.backends (package)" href="coherence.backends.html" />
+    <link rel="prev" title="Cohen3 source tree" href="coherence.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">coherence.backend (module)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#backend">Backend</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#backendstore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendStore</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#abstractbackendstore"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractBackendStore</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#backenditem"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendItem</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#container"><code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#lazycontainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LazyContainer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#backendrssmixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendRssMixin</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-coherence.base">coherence.base (module)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#base">Base</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#simpleroot"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleRoot</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#webserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#webserverui"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServerUi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#plugins"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plugins</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+      <li>coherence.backend (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/modules.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="coherence-backend-module">
+<span id="modules"></span><h1>coherence.backend (module)<a class="headerlink" href="#coherence-backend-module" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div></div></blockquote>
+<span class="target" id="module-coherence.backend"><span id="coherence-backend"></span></span><div class="section" id="backend">
+<h2>Backend<a class="headerlink" href="#backend" title="Permalink to this headline">¶</a></h2>
+<p>A set of base classes related with backends.</p>
+<div class="section" id="id1">
+<h3><a class="reference internal" href="#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a><a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The base class for all backends.</p>
+</div>
+<div class="section" id="backendstore">
+<h3><a class="reference internal" href="#coherence.backend.BackendStore" title="coherence.backend.BackendStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendStore</span></code></a><a class="headerlink" href="#backendstore" title="Permalink to this headline">¶</a></h3>
+<p>The base class for all MediaServer backend stores.</p>
+</div>
+<div class="section" id="abstractbackendstore">
+<h3><a class="reference internal" href="#coherence.backend.AbstractBackendStore" title="coherence.backend.AbstractBackendStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractBackendStore</span></code></a><a class="headerlink" href="#abstractbackendstore" title="Permalink to this headline">¶</a></h3>
+<p>Inherits from <a class="reference internal" href="#coherence.backend.BackendStore" title="coherence.backend.BackendStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendStore</span></code></a> and extends his capabilities.</p>
+</div>
+<div class="section" id="backenditem">
+<h3><a class="reference internal" href="#coherence.backend.BackendItem" title="coherence.backend.BackendItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendItem</span></code></a><a class="headerlink" href="#backenditem" title="Permalink to this headline">¶</a></h3>
+<p>The base class for all MediaServer backend items.</p>
+</div>
+<div class="section" id="container">
+<h3><a class="reference internal" href="#coherence.backend.Container" title="coherence.backend.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code></a><a class="headerlink" href="#container" title="Permalink to this headline">¶</a></h3>
+<p>The base class for all containers. Actually his base class is the <cite>BackendItem</cite>
+with a few modifications which extends his capabilities to store backend items.</p>
+</div>
+<div class="section" id="lazycontainer">
+<h3><a class="reference internal" href="#coherence.backend.LazyContainer" title="coherence.backend.LazyContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LazyContainer</span></code></a><a class="headerlink" href="#lazycontainer" title="Permalink to this headline">¶</a></h3>
+<p>Inherits from <a class="reference internal" href="#coherence.backend.Container" title="coherence.backend.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code></a> and extends his capabilities.</p>
+</div>
+<div class="section" id="backendrssmixin">
+<h3><a class="reference internal" href="#coherence.backend.BackendRssMixin" title="coherence.backend.BackendRssMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendRssMixin</span></code></a><a class="headerlink" href="#backendrssmixin" title="Permalink to this headline">¶</a></h3>
+<p>A base class intended to be implemented into a subclass which creates a
+deferred chain to retrieve a RDF file, parse it, extract the metadata and
+reschedule itself.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>RDF (Resource Description Framework) is a family of World Wide Web
+Consortium specifications originally designed as a metadata data model.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>RDF extended information at wikipedia:
+<a class="reference external" href="https://en.wikipedia.org/wiki/Resource_Description_Framework">https://en.wikipedia.org/wiki/Resource_Description_Framework</a></p>
+</div>
+<dl class="class">
+<dt id="coherence.backend.Backend">
+<em class="property">class </em><code class="descname">Backend</code><span class="sig-paren">(</span><em>server</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code>, <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a>, <a class="reference internal" href="extern/simple_plugin.html#coherence.extern.simple_plugin.Plugin" title="coherence.extern.simple_plugin.Plugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.extern.simple_plugin.Plugin</span></code></a></p>
+<p>In the <a class="reference internal" href="#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a> class we initialize the very basic stuff
+needed to create a Backend and registers some basic events needed to
+be successfully detected by our server.</p>
+<p>The init method for a backend, should probably most of the time be
+overwritten when the init is done and send a signal to its device. We
+can send this signal via two methods, depending on the nature of our
+backend. For instance, if we want that the backend to be notified
+without fetching any data we could simply set the attribute
+<a class="reference internal" href="#coherence.backend.Backend.init_completed" title="coherence.backend.Backend.init_completed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">init_completed</span></code></a> equal to True at the end of our init method of
+the backend, but in some cases, we will want to send this signal after
+some deferred call returns a result…in that case we should process
+slightly differently, you can see how to do that at the end of the
+init method of the class
+<a class="reference internal" href="backends/models/stores.html#coherence.backends.models.stores.BackendBaseStore" title="coherence.backends.models.stores.BackendBaseStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendBaseStore</span></code></a>.</p>
+<p>After that, the device will then setup, announce itself and should
+call to the backend’s method <a class="reference internal" href="#coherence.backend.Backend.upnp_init" title="coherence.backend.Backend.upnp_init"><code class="xref py py-meth docutils literal notranslate"><span class="pre">upnp_init()</span></code></a>.</p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Introduced inheritance from EventDispatcher</p></li>
+<li><p>The emitted events changed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.Backend.init_completed =&gt; backend_init_completed</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Added new event: backend_init_failed</p></li>
+<li><p>Added new method <a class="reference internal" href="#coherence.backend.Backend.on_init_failed" title="coherence.backend.Backend.on_init_failed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">on_init_failed()</span></code></a></p></li>
+<li><p>Moved class method <cite>init_completed</cite> to <cite>on_init_completed</cite> and added
+class variable <a class="reference internal" href="#coherence.backend.Backend.init_completed" title="coherence.backend.Backend.init_completed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">init_completed</span></code></a></p></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We can also use this init class to do whatever is necessary with
+the stuff we can extract from the config dict, connect maybe to an
+external data-source and start up the backend or if there are any UPnP
+service actions (Like maybe upnp_Browse for the CDS Browse action),
+that can’t be handled by the service classes itself, or need some
+special adjustments for the backend, they probably will need to be
+defined into the method <a class="reference internal" href="#coherence.backend.Backend.__init__" title="coherence.backend.Backend.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>server</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – This usually should be an instance of our main
+class <a class="reference internal" href="#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a> (the UPnP device
+that’s hosting our backend).</p></li>
+<li><p><strong>*args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list with extra arguments for the backend. This,
+must be implemented into the subclass (if needed).</p></li>
+<li><p><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – An unpacked dictionary with the backend’s
+configuration.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="coherence.backend.Backend.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'backend'</em><a class="headerlink" href="#coherence.backend.Backend.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.Backend.implements">
+<code class="descname">implements</code><em class="property"> = []</em><a class="headerlink" href="#coherence.backend.Backend.implements" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of the device classe like:</p>
+<p>[‘MediaServer’,’MediaRenderer’]</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.Backend.init_completed">
+<code class="descname">init_completed</code><a class="headerlink" href="#coherence.backend.Backend.init_completed" title="Permalink to this definition">¶</a></dt>
+<dd><p>To know whenever the backend init has completed. This has to be done in
+the actual backend, maybe it has to wait for an answer from an external
+data-source first…so…the backend should set this variable to <cite>True</cite>,
+then the method <a class="reference internal" href="#coherence.backend.Backend.on_init_completed" title="coherence.backend.Backend.on_init_completed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">on_init_completed()</span></code></a> will be automatically
+triggered dispatching an event announcing that the backend has been
+initialized.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Backend.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>server</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Backend.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Backend.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>server</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – This usually should be an instance of our main
+class <a class="reference internal" href="#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a> (the UPnP device
+that’s hosting our backend).</p></li>
+<li><p><strong>*args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list with extra arguments for the backend. This,
+must be implemented into the subclass (if needed).</p></li>
+<li><p><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – An unpacked dictionary with the backend’s
+configuration.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Backend.on_init_completed">
+<code class="descname">on_init_completed</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Backend.on_init_completed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Backend.on_init_completed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inform Coherence that this backend is ready for announcement. This
+method just accepts any form of arguments as we don’t under which
+circumstances it is called.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Backend.on_init_failed">
+<code class="descname">on_init_failed</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Backend.on_init_failed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Backend.on_init_failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inform Coherence that this backend has failed.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Backend.upnp_init">
+<code class="descname">upnp_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Backend.upnp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Backend.upnp_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method gets called after the device is fired, here all
+initializations of service related state variables should happen, as
+the services aren’t available before that point.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backend.BackendStore">
+<em class="property">class </em><code class="descname">BackendStore</code><span class="sig-paren">(</span><em>server</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.Backend</span></code></a></p>
+<p>The base class for all MediaServer backend stores. Inherits from class
+<a class="reference internal" href="#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a> and extends his capabilities to make easy to create
+a Backend Store by setting an initial wmc mapping, and defining some
+attributes and methods needed by a Backend Store.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>server</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – This usually should be an instance of our main
+class <a class="reference internal" href="#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a> (the UPnP device
+that’s hosting our backend).</p></li>
+<li><p><strong>*args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list with extra arguments for the backend. This,
+must be implemented into the subclass (if needed).</p></li>
+<li><p><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – An unpacked dictionary with the backend’s
+configuration.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In case we want so serve something via the MediaServer web backend,
+the class <a class="reference internal" href="#coherence.backend.BackendItem" title="coherence.backend.BackendItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendItem</span></code></a> should pass an URI assembled of
+urlbase + ‘/’ + id to the
+<a class="reference internal" href="upnp/core/didllite.html#coherence.upnp.core.DIDLLite.Resource" title="coherence.upnp.core.DIDLLite.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Remember to sent the event init_completed via setting to <cite>True</cite>
+the attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">init_completed</span></code>. Check the base class
+<a class="reference internal" href="#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a> for instructions about how to do it.</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.backend.BackendStore.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'backend_store'</em><a class="headerlink" href="#coherence.backend.BackendStore.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendStore.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>server</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendStore.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendStore.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>server</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – This usually should be an instance of our main
+class <a class="reference internal" href="#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a> (the UPnP device
+that’s hosting our backend).</p></li>
+<li><p><strong>*args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list with extra arguments for the backend. This,
+must be implemented into the subclass (if needed).</p></li>
+<li><p><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – An unpacked dictionary with the backend’s
+configuration.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In case we want so serve something via the MediaServer web backend,
+the class <a class="reference internal" href="#coherence.backend.BackendItem" title="coherence.backend.BackendItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendItem</span></code></a> should pass an URI assembled of
+urlbase + ‘/’ + id to the
+<a class="reference internal" href="upnp/core/didllite.html#coherence.upnp.core.DIDLLite.Resource" title="coherence.upnp.core.DIDLLite.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Remember to sent the event init_completed via setting to <cite>True</cite>
+the attribute <code class="xref py py-attr docutils literal notranslate"><span class="pre">init_completed</span></code>. Check the base class
+<a class="reference internal" href="#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a> for instructions about how to do it.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendStore.release">
+<code class="descname">release</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendStore.release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendStore.release" title="Permalink to this definition">¶</a></dt>
+<dd><p>If anything needs to be cleaned up upon shutdown of this backend,
+this is the place for it. Should be overwritten in subclass.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendStore._get_all_items">
+<code class="descname">_get_all_items</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendStore._get_all_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendStore._get_all_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>A helper method to get all items as a response to some XBox 360
+UPnP Search action probably never be used as the backend will overwrite
+the wmc_mapping with more appropriate methods.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendStore.get_by_id">
+<code class="descname">get_by_id</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendStore.get_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendStore.get_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – is the id property of our DIDLLite item</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>None when no matching item for that id is found,</p></li>
+<li><p>a BackendItem,</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p>Called by the CDS or the MediaServer web.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>if this MediaServer implements containers that can share their
+content, like ‘all tracks’, ‘album’ and ‘album_of_artist’ (they all
+have the same track item as content), then the id may be passed by
+the CDS like this:</p>
+<blockquote>
+<div><p><a class="reference external" href="mailto:'id&#37;&#52;&#48;container">‘id<span>&#64;</span>container</a>’ or ‘id&#64;container&#64;container&#64;container…’</p>
+</div></blockquote>
+<p>therefore a</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>may be appropriate as the first thing to do when entering this
+method.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backend.BackendItem">
+<em class="property">class </em><code class="descname">BackendItem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code>, <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>This is the base class for all MediaServer backend items.</p>
+<p>Most of the time we collect the necessary data for an UPnP
+ContentDirectoryService Container or Object and instantiate it into the
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span><span class="n">parent_id</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">MusicTrack</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span><span class="n">parent_id</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To make that a valid UPnP CDS Object it needs one or more
+DIDLLite. <a class="reference internal" href="upnp/core/didllite.html#coherence.upnp.core.DIDLLite.Resource" title="coherence.upnp.core.DIDLLite.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;http-get:*:{mimetype}:*&#39;</span><span class="p">)</span>
+<span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>url should be the urlbase of our backend + ‘/’ + our id.</p>
+</div>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Introduced inheritance from EventDispatcher</p></li>
+<li><p>Moved class variable <code class="xref py py-attr docutils literal notranslate"><span class="pre">update_id</span></code> to class
+<a class="reference internal" href="#coherence.backend.Container.update_id" title="coherence.backend.Container.update_id"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Container.update_id</span></code></a></p></li>
+<li><p>Added class variable <a class="reference internal" href="#coherence.backend.BackendItem.mimetype" title="coherence.backend.BackendItem.mimetype"><code class="xref py py-attr docutils literal notranslate"><span class="pre">mimetype</span></code></a> to benefit from the
+EventDispatcher’s properties</p></li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.backend.BackendItem.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'backend_item'</em><a class="headerlink" href="#coherence.backend.BackendItem.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.BackendItem.name">
+<code class="descname">name</code><em class="property"> = 'backend_item_name'</em><a class="headerlink" href="#coherence.backend.BackendItem.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>the basename of a file, the album title, the artists name…is expected
+to be unicode</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.BackendItem.location">
+<code class="descname">location</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backend.BackendItem.location" title="Permalink to this definition">¶</a></dt>
+<dd><p>the filepath of our media file, or alternatively a FilePath or
+a ReverseProxyResource object</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.BackendItem.cover">
+<code class="descname">cover</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backend.BackendItem.cover" title="Permalink to this definition">¶</a></dt>
+<dd><p>if we have some album art image, let’s put the filepath or
+link into here</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.BackendItem.store">
+<code class="descname">store</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backend.BackendItem.store" title="Permalink to this definition">¶</a></dt>
+<dd><p>The backend store.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.BackendItem.storage_id">
+<code class="descname">storage_id</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backend.BackendItem.storage_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The id of the backend store.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.BackendItem.item">
+<code class="descname">item</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backend.BackendItem.item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Usually an atomic object from
+<a class="reference internal" href="upnp/core/didllite.html#coherence.upnp.core.DIDLLite.Item" title="coherence.upnp.core.DIDLLite.Item"><code class="xref py py-class docutils literal notranslate"><span class="pre">Item</span></code></a> or derived.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.BackendItem.mimetype">
+<code class="descname">mimetype</code><a class="headerlink" href="#coherence.backend.BackendItem.mimetype" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mimetype variable describes the protocol info for the object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendItem.get_children">
+<code class="descname">get_children</code><span class="sig-paren">(</span><em>start=0</em>, <em>end=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendItem.get_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendItem.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS and the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the start.</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the end.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>a list of its childs, from start to end.</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendItem.get_child_count">
+<code class="descname">get_child_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendItem.get_child_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendItem.get_child_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>the number of its childs - len(childs)</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendItem.get_item">
+<code class="descname">get_item</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendItem.get_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendItem.get_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS and the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>an UPnP ContentDirectoryServer DIDLLite object</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendItem.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendItem.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendItem.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the name of the item, it is always expected to be in unicode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendItem.get_path">
+<code class="descname">get_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendItem.get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendItem.get_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the filepath where to find the media file that this item does
+refer to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendItem.get_cover">
+<code class="descname">get_cover</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendItem.get_cover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendItem.get_cover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the filepath where to find the album art file</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>only needed when we have created for that item an
+albumArtURI property that does point back to us.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backend.BackendRssMixin">
+<em class="property">class </em><code class="descname">BackendRssMixin</code><a class="reference internal" href="../_modules/coherence/backend.html#BackendRssMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendRssMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="coherence.backend.BackendRssMixin.update_data">
+<code class="descname">update_data</code><span class="sig-paren">(</span><em>rss_url</em>, <em>container=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendRssMixin.update_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendRssMixin.update_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a deferred chain to retrieve the rdf file, parse and extract
+the metadata and reschedule itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendRssMixin.parse_data">
+<code class="descname">parse_data</code><span class="sig-paren">(</span><em>xml_data</em>, <em>container</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendRssMixin.parse_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendRssMixin.parse_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract media info and create BackendItems</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.BackendRssMixin.queue_update">
+<code class="descname">queue_update</code><span class="sig-paren">(</span><em>error_or_failure</em>, <em>rss_url</em>, <em>container</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#BackendRssMixin.queue_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.BackendRssMixin.queue_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backend.Container">
+<em class="property">class </em><code class="descname">Container</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.backend.BackendItem" title="coherence.backend.BackendItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.BackendItem</span></code></a></p>
+<p>Represents a backend item which will contains backend items inside.</p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Added static class variable <a class="reference internal" href="#coherence.backend.Container.update_id" title="coherence.backend.Container.update_id"><code class="xref py py-attr docutils literal notranslate"><span class="pre">update_id</span></code></a></p></li>
+<li><p>Changed some variables to benefit from the EventDispatcher’s
+properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="#coherence.backend.Container.children" title="coherence.backend.Container.children"><code class="xref py py-attr docutils literal notranslate"><span class="pre">children</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.backend.Container.children_ids" title="coherence.backend.Container.children_ids"><code class="xref py py-attr docutils literal notranslate"><span class="pre">children_ids</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.backend.Container.children_by_external_id" title="coherence.backend.Container.children_by_external_id"><code class="xref py py-attr docutils literal notranslate"><span class="pre">children_by_external_id</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.backend.Container.parent" title="coherence.backend.Container.parent"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parent</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.backend.Container.update_id">
+<code class="descname">update_id</code><a class="headerlink" href="#coherence.backend.Container.update_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>It represents the update id of thhe container. This should be
+incremented on every modification of the UPnP ContentDirectoryService
+Container, as we do in methods <a class="reference internal" href="#coherence.backend.Container.add_child" title="coherence.backend.Container.add_child"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_child()</span></code></a> and <a class="reference internal" href="#coherence.backend.Container.remove_child" title="coherence.backend.Container.remove_child"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove_child()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.Container.children">
+<code class="descname">children</code><a class="headerlink" href="#coherence.backend.Container.children" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of the backend items.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.Container.children_ids">
+<code class="descname">children_ids</code><a class="headerlink" href="#coherence.backend.Container.children_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary of the backend items by his id.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.Container.children_by_external_id">
+<code class="descname">children_by_external_id</code><a class="headerlink" href="#coherence.backend.Container.children_by_external_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary of the backend items by his external id.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.Container.parent_id">
+<code class="descname">parent_id</code><em class="property"> = -1</em><a class="headerlink" href="#coherence.backend.Container.parent_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The id of the parent object. This will be automatically set whenever
+we set the attribute <a class="reference internal" href="#coherence.backend.Container.parent" title="coherence.backend.Container.parent"><code class="xref py py-attr docutils literal notranslate"><span class="pre">parent</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.Container.mimetype">
+<code class="descname">mimetype</code><em class="property"> = 'directory'</em><a class="headerlink" href="#coherence.backend.Container.mimetype" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mimetype variable describes the protocol info for the object. In a
+<a class="reference internal" href="#coherence.backend.Container" title="coherence.backend.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code></a> this should be set to value <cite>directory</cite> or <cite>root</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backend.Container.parent">
+<code class="descname">parent</code><a class="headerlink" href="#coherence.backend.Container.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>The parent object for this class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Container.on_parent">
+<code class="descname">on_parent</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container.on_parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container.on_parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Container.register_child">
+<code class="descname">register_child</code><span class="sig-paren">(</span><em>child</em>, <em>external_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container.register_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container.register_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Container.add_child">
+<code class="descname">add_child</code><span class="sig-paren">(</span><em>child</em>, <em>external_id=None</em>, <em>update=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container.add_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container.add_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Container.remove_child">
+<code class="descname">remove_child</code><span class="sig-paren">(</span><em>child</em>, <em>external_id=None</em>, <em>update=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container.remove_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container.remove_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Container.get_children">
+<code class="descname">get_children</code><span class="sig-paren">(</span><em>start=0</em>, <em>end=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container.get_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS and the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the start.</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the end.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>a list of its childs, from start to end.</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Container.get_child_count">
+<code class="descname">get_child_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container.get_child_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container.get_child_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>the number of its childs - len(childs)</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Container.get_path">
+<code class="descname">get_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container.get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container.get_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the filepath where to find the media file that this item does
+refer to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Container.get_item">
+<code class="descname">get_item</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container.get_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container.get_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS and the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>an UPnP ContentDirectoryServer DIDLLite object</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Container.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the name of the item, it is always expected to be in unicode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Container.get_id">
+<code class="descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container.get_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container.get_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.Container.get_update_id">
+<code class="descname">get_update_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#Container.get_update_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.Container.get_update_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backend.LazyContainer">
+<em class="property">class </em><code class="descname">LazyContainer</code><span class="sig-paren">(</span><em>parent</em>, <em>title</em>, <em>external_id=None</em>, <em>refresh=0</em>, <em>childrenRetriever=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#LazyContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.LazyContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.backend.Container" title="coherence.backend.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.Container</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.backend.LazyContainer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'lazyContainer'</em><a class="headerlink" href="#coherence.backend.LazyContainer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.LazyContainer.replace_by">
+<code class="descname">replace_by</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#LazyContainer.replace_by"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.LazyContainer.replace_by" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.LazyContainer.add_child">
+<code class="descname">add_child</code><span class="sig-paren">(</span><em>child</em>, <em>external_id=None</em>, <em>update=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#LazyContainer.add_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.LazyContainer.add_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.LazyContainer.update_children">
+<code class="descname">update_children</code><span class="sig-paren">(</span><em>new_children</em>, <em>old_children</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#LazyContainer.update_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.LazyContainer.update_children" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.LazyContainer.start_children_retrieval_campaign">
+<code class="descname">start_children_retrieval_campaign</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#LazyContainer.start_children_retrieval_campaign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.LazyContainer.start_children_retrieval_campaign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.LazyContainer.end_children_retrieval_campaign">
+<code class="descname">end_children_retrieval_campaign</code><span class="sig-paren">(</span><em>success=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#LazyContainer.end_children_retrieval_campaign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.LazyContainer.end_children_retrieval_campaign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.LazyContainer.retrieve_children">
+<code class="descname">retrieve_children</code><span class="sig-paren">(</span><em>start=0</em>, <em>page=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#LazyContainer.retrieve_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.LazyContainer.retrieve_children" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.LazyContainer.retrieve_all_children">
+<code class="descname">retrieve_all_children</code><span class="sig-paren">(</span><em>start=0</em>, <em>request_count=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#LazyContainer.retrieve_all_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.LazyContainer.retrieve_all_children" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.LazyContainer.get_children">
+<code class="descname">get_children</code><span class="sig-paren">(</span><em>start=0</em>, <em>request_count=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#LazyContainer.get_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.LazyContainer.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS and the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the start.</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the end.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>a list of its childs, from start to end.</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backend.AbstractBackendStore">
+<em class="property">class </em><code class="descname">AbstractBackendStore</code><span class="sig-paren">(</span><em>server</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#AbstractBackendStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.AbstractBackendStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.backend.BackendStore" title="coherence.backend.BackendStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.BackendStore</span></code></a></p>
+<dl class="method">
+<dt id="coherence.backend.AbstractBackendStore.len">
+<code class="descname">len</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#AbstractBackendStore.len"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.AbstractBackendStore.len" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.AbstractBackendStore.set_root_item">
+<code class="descname">set_root_item</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#AbstractBackendStore.set_root_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.AbstractBackendStore.set_root_item" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.AbstractBackendStore.get_root_id">
+<code class="descname">get_root_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#AbstractBackendStore.get_root_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.AbstractBackendStore.get_root_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.AbstractBackendStore.get_root_item">
+<code class="descname">get_root_item</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#AbstractBackendStore.get_root_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.AbstractBackendStore.get_root_item" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.AbstractBackendStore.append_item">
+<code class="descname">append_item</code><span class="sig-paren">(</span><em>item</em>, <em>storage_id=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#AbstractBackendStore.append_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.AbstractBackendStore.append_item" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.AbstractBackendStore.remove_item">
+<code class="descname">remove_item</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#AbstractBackendStore.remove_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.AbstractBackendStore.remove_item" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.AbstractBackendStore.get_by_id">
+<code class="descname">get_by_id</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#AbstractBackendStore.get_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.AbstractBackendStore.get_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – is the id property of our DIDLLite item</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>None when no matching item for that id is found,</p></li>
+<li><p>a BackendItem,</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p>Called by the CDS or the MediaServer web.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>if this MediaServer implements containers that can share their
+content, like ‘all tracks’, ‘album’ and ‘album_of_artist’ (they all
+have the same track item as content), then the id may be passed by
+the CDS like this:</p>
+<blockquote>
+<div><p><a class="reference external" href="mailto:'id&#37;&#52;&#48;container">‘id<span>&#64;</span>container</a>’ or ‘id&#64;container&#64;container&#64;container…’</p>
+</div></blockquote>
+<p>therefore a</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>may be appropriate as the first thing to do when entering this
+method.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backend.AbstractBackendStore.getnextID">
+<code class="descname">getnextID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/backend.html#AbstractBackendStore.getnextID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backend.AbstractBackendStore.getnextID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+<div class="section" id="module-coherence.base">
+<span id="coherence-base-module"></span><h1>coherence.base (module)<a class="headerlink" href="#module-coherence.base" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="base">
+<h2>Base<a class="headerlink" href="#base" title="Permalink to this headline">¶</a></h2>
+<p>The core of the project. Holds the class <a class="reference internal" href="#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a> intended to be used
+to manage all the resources of the project. Also contains some other classes
+which are vital to the project.</p>
+<div class="section" id="simpleroot">
+<h3><a class="reference internal" href="#coherence.base.SimpleRoot" title="coherence.base.SimpleRoot"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleRoot</span></code></a><a class="headerlink" href="#simpleroot" title="Permalink to this headline">¶</a></h3>
+<p>A web resource representing a web site. Used to build the contents browser for
+our instance of a <a class="reference internal" href="#coherence.base.WebServer" title="coherence.base.WebServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServer</span></code></a> or <a class="reference internal" href="#coherence.base.WebServerUi" title="coherence.base.WebServerUi"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServerUi</span></code></a>.</p>
+</div>
+<div class="section" id="webserver">
+<h3><a class="reference internal" href="#coherence.base.WebServer" title="coherence.base.WebServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServer</span></code></a><a class="headerlink" href="#webserver" title="Permalink to this headline">¶</a></h3>
+<p>A class which takes care of dealing with the web representation of the running
+<a class="reference internal" href="#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a>’s instance. This is the default webserver used.</p>
+</div>
+<div class="section" id="webserverui">
+<h3><a class="reference internal" href="#coherence.base.WebServerUi" title="coherence.base.WebServerUi"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServerUi</span></code></a><a class="headerlink" href="#webserverui" title="Permalink to this headline">¶</a></h3>
+<p>The default web server, <a class="reference internal" href="#coherence.base.WebServer" title="coherence.base.WebServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServer</span></code></a>, can be replaced by this class which
+will do the same thing as the default web server, but with a more polished
+interface.</p>
+</div>
+<div class="section" id="plugins">
+<h3><a class="reference internal" href="#coherence.base.Plugins" title="coherence.base.Plugins"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plugins</span></code></a><a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h3>
+<p>Manage all the available plugins for the Cohen3 project.</p>
+</div>
+<div class="section" id="coherence">
+<h3><a class="reference internal" href="#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a><a class="headerlink" href="#coherence" title="Permalink to this headline">¶</a></h3>
+<p>The Main class of the Cohen3 project. The Coherence class controls all the
+servers initialization depending on the configuration passed.</p>
+<dl class="class">
+<dt id="coherence.base.SimpleRoot">
+<em class="property">class </em><code class="descname">SimpleRoot</code><span class="sig-paren">(</span><em>coherence</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#SimpleRoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.SimpleRoot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code>, <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.base.SimpleRoot.addSlash">
+<code class="descname">addSlash</code><em class="property"> = True</em><a class="headerlink" href="#coherence.base.SimpleRoot.addSlash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.SimpleRoot.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'coherence'</em><a class="headerlink" href="#coherence.base.SimpleRoot.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.SimpleRoot.getChild">
+<code class="descname">getChild</code><span class="sig-paren">(</span><em>name</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#SimpleRoot.getChild"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.SimpleRoot.getChild" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a ‘child’ resource from me.</p>
+<p>Implement this to create dynamic resource generation – resources which
+are always available may be registered with self.putChild().</p>
+<p>This will not be called if the class-level variable ‘isLeaf’ is set in
+your subclass; instead, the ‘postpath’ attribute of the request will be
+left as a list of the remaining path elements.</p>
+<p>For example, the URL /foo/bar/baz will normally be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">site</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>However, if the resource returned by ‘bar’ has isLeaf set to true, then
+the getChild call will never be made on it.</p>
+<p>Parameters and return value have the same meaning and requirements as
+those defined by L{IResource.getChildWithDefault}.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.SimpleRoot.listchilds">
+<code class="descname">listchilds</code><span class="sig-paren">(</span><em>uri</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#SimpleRoot.listchilds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.SimpleRoot.listchilds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.SimpleRoot.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#SimpleRoot.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.SimpleRoot.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a given resource. See L{IResource}’s render method.</p>
+<p>I delegate to methods of self with the form ‘render_METHOD’
+where METHOD is the HTTP that was used to make the
+request. Examples: render_GET, render_HEAD, render_POST, and
+so on. Generally you should implement those methods instead of
+overriding this one.</p>
+<p>render_METHOD methods are expected to return a byte string which will be
+the rendered page, unless the return value is C{server.NOT_DONE_YET}, in
+which case it is this class’s responsibility to write the results using
+C{request.write(data)} and then call C{request.finish()}.</p>
+<p>Old code that overrides render() directly is likewise expected
+to return a byte string or NOT_DONE_YET.</p>
+<p>&#64;see: L{IResource.render}</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.base.WebServer">
+<em class="property">class </em><code class="descname">WebServer</code><span class="sig-paren">(</span><em>ui</em>, <em>port</em>, <em>coherence</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#WebServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.WebServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.base.WebServer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'webserver'</em><a class="headerlink" href="#coherence.base.WebServer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.WebServer._endpoint_listen">
+<code class="descname">_endpoint_listen</code><span class="sig-paren">(</span><em>coherence</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#WebServer._endpoint_listen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.WebServer._endpoint_listen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.base.WebServerUi">
+<em class="property">class </em><code class="descname">WebServerUi</code><span class="sig-paren">(</span><em>port</em>, <em>coherence</em>, <em>unittests=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#WebServerUi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.WebServerUi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.base.WebServer" title="coherence.base.WebServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.base.WebServer</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.base.WebServerUi.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'webserverui'</em><a class="headerlink" href="#coherence.base.WebServerUi.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.WebServerUi._endpoint_listen">
+<code class="descname">_endpoint_listen</code><span class="sig-paren">(</span><em>coherence</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#WebServerUi._endpoint_listen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.WebServerUi._endpoint_listen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.WebServerUi._ws_endpoint_listen">
+<code class="descname">_ws_endpoint_listen</code><span class="sig-paren">(</span><em>coherence</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#WebServerUi._ws_endpoint_listen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.WebServerUi._ws_endpoint_listen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.base.Plugins">
+<em class="property">class </em><code class="descname">Plugins</code><span class="sig-paren">(</span><em>ids=('coherence.plugins.backend.media_server'</em>, <em>'coherence.plugins.backend.media_renderer'</em>, <em>'coherence.plugins.backend.binary_light'</em>, <em>'coherence.plugins.backend.dimmable_light')</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Plugins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Plugins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.base.Plugins.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'plugins'</em><a class="headerlink" href="#coherence.base.Plugins.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Plugins._valids">
+<code class="descname">_valids</code><em class="property"> = ('coherence.plugins.backend.media_server', 'coherence.plugins.backend.media_renderer', 'coherence.plugins.backend.binary_light', 'coherence.plugins.backend.dimmable_light')</em><a class="headerlink" href="#coherence.base.Plugins._valids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Plugins._plugins">
+<code class="descname">_plugins</code><em class="property"> = {}</em><a class="headerlink" href="#coherence.base.Plugins._plugins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Plugins.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>key</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Plugins.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Plugins.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Plugins.set">
+<code class="descname">set</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Plugins.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Plugins.set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Plugins.keys">
+<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Plugins.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Plugins.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Plugins._collect_from_module">
+<code class="descname">_collect_from_module</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Plugins._collect_from_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Plugins._collect_from_module" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Plugins._Plugins__initialized">
+<code class="descname">_Plugins__initialized</code><em class="property"> = False</em><a class="headerlink" href="#coherence.base.Plugins._Plugins__initialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Plugins._Plugins__instance">
+<code class="descname">_Plugins__instance</code><em class="property"> = None</em><a class="headerlink" href="#coherence.base.Plugins._Plugins__instance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.base.Coherence">
+<em class="property">class </em><code class="descname">Coherence</code><span class="sig-paren">(</span><em>config=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code>, <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>The Main class of the Cohen3 project. The Coherence class controls all the
+servers initialization depending on the configuration passed.
+It is also capable of initialize the plugins defined in config variable or
+by configuration file.
+It supports the creation of multiple servers at once.</p>
+<p><strong>Example of a simple server via plugin AppleTrailersStore</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">coherence.base</span> <span class="k">import</span> <span class="n">Coherence</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.uuid</span> <span class="k">import</span> <span class="n">UUID</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+<span class="n">new_uuid</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">()</span>
+
+<span class="n">coherence</span> <span class="o">=</span> <span class="n">Coherence</span><span class="p">(</span>
+    <span class="p">{</span><span class="s1">&#39;logmode&#39;</span><span class="p">:</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;controlpoint&#39;</span><span class="p">:</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;plugin&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;backend&#39;</span><span class="p">:</span> <span class="s1">&#39;AppleTrailersStore&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Cohen3 Example FSStore&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uuid&#39;</span><span class="p">:</span> <span class="n">new_uuid</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="p">]</span>
+     <span class="p">}</span>
+<span class="p">)</span>
+<span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Introduced inheritance from EventDispatcher</p></li>
+<li><p>The emitted events changed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.Device.detection_completed =&gt;
+coherence_device_detection_completed</p></li>
+<li><p>Coherence.UPnP.Device.removed =&gt; coherence_device_removed</p></li>
+<li><p>Coherence.UPnP.RootDevice.removed =&gt;
+coherence_root_device_removed</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Changed some variables to benefit from the EventDispatcher’s
+properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="#coherence.base.Coherence.devices" title="coherence.base.Coherence.devices"><code class="xref py py-attr docutils literal notranslate"><span class="pre">devices</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.base.Coherence.children" title="coherence.base.Coherence.children"><code class="xref py py-attr docutils literal notranslate"><span class="pre">children</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.base.Coherence._callbacks" title="coherence.base.Coherence._callbacks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_callbacks</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.base.Coherence.active_backends" title="coherence.base.Coherence.active_backends"><code class="xref py py-attr docutils literal notranslate"><span class="pre">active_backends</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.base.Coherence.ctrl" title="coherence.base.Coherence.ctrl"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ctrl</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.base.Coherence.dbus" title="coherence.base.Coherence.dbus"><code class="xref py py-attr docutils literal notranslate"><span class="pre">dbus</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.base.Coherence.json" title="coherence.base.Coherence.json"><code class="xref py py-attr docutils literal notranslate"><span class="pre">json</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.base.Coherence.msearch" title="coherence.base.Coherence.msearch"><code class="xref py py-attr docutils literal notranslate"><span class="pre">msearch</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.base.Coherence.ssdp_server" title="coherence.base.Coherence.ssdp_server"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ssdp_server</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.base.Coherence.transcoder_manager" title="coherence.base.Coherence.transcoder_manager"><code class="xref py py-attr docutils literal notranslate"><span class="pre">transcoder_manager</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.base.Coherence.web_server" title="coherence.base.Coherence.web_server"><code class="xref py py-attr docutils literal notranslate"><span class="pre">web_server</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.base.Coherence.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'coherence'</em><a class="headerlink" href="#coherence.base.Coherence.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence.devices">
+<code class="descname">devices</code><a class="headerlink" href="#coherence.base.Coherence.devices" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of the added devices.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence.children">
+<code class="descname">children</code><a class="headerlink" href="#coherence.base.Coherence.children" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dict containing the web resources.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence._callbacks">
+<code class="descname">_callbacks</code><a class="headerlink" href="#coherence.base.Coherence._callbacks" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dict containing the callbacks, used by the methods <a class="reference internal" href="#coherence.base.Coherence.subscribe" title="coherence.base.Coherence.subscribe"><code class="xref py py-meth docutils literal notranslate"><span class="pre">subscribe()</span></code></a>
+and <a class="reference internal" href="#coherence.base.Coherence.unsubscribe" title="coherence.base.Coherence.unsubscribe"><code class="xref py py-meth docutils literal notranslate"><span class="pre">unsubscribe()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence.active_backends">
+<code class="descname">active_backends</code><a class="headerlink" href="#coherence.base.Coherence.active_backends" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dict containing the active backends.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence.ctrl">
+<code class="descname">ctrl</code><a class="headerlink" href="#coherence.base.Coherence.ctrl" title="Permalink to this definition">¶</a></dt>
+<dd><p>A coherence’s instance of class
+<a class="reference internal" href="upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint" title="coherence.upnp.devices.control_point.ControlPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ControlPoint</span></code></a>. This will be
+enabled if we request it by config dict or configuration file via
+keyword <em>controlpoint = yes</em>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence.dbus">
+<code class="descname">dbus</code><a class="headerlink" href="#coherence.base.Coherence.dbus" title="Permalink to this definition">¶</a></dt>
+<dd><p>A coherence’s instance of class
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DBusPontoon</span></code>. This will be
+enabled if we request it by config dict or configuration file via
+keyword <em>use_dbus = yes</em>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence.json">
+<code class="descname">json</code><a class="headerlink" href="#coherence.base.Coherence.json" title="Permalink to this definition">¶</a></dt>
+<dd><p>A coherence’s instance of class
+<a class="reference internal" href="#coherence.json_service.JsonInterface" title="coherence.json_service.JsonInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">JsonInterface</span></code></a>. This will be
+enabled if we request it by config dict or configuration file via
+keyword <em>json = yes</em>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence.msearch">
+<code class="descname">msearch</code><a class="headerlink" href="#coherence.base.Coherence.msearch" title="Permalink to this definition">¶</a></dt>
+<dd><p>A coherence’s instance of class
+<a class="reference internal" href="upnp/core/msearch.html#coherence.upnp.core.msearch.MSearch" title="coherence.upnp.core.msearch.MSearch"><code class="xref py py-class docutils literal notranslate"><span class="pre">MSearch</span></code></a>. This is automatically
+enabled when <a class="reference internal" href="#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a> is initialized</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence.ssdp_server">
+<code class="descname">ssdp_server</code><a class="headerlink" href="#coherence.base.Coherence.ssdp_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>A coherence’s instance of class
+<a class="reference internal" href="upnp/core/ssdp.html#coherence.upnp.core.ssdp.SSDPServer" title="coherence.upnp.core.ssdp.SSDPServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SSDPServer</span></code></a>. This is automatically
+enabled when <a class="reference internal" href="#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a> is initialized</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence.transcoder_manager">
+<code class="descname">transcoder_manager</code><a class="headerlink" href="#coherence.base.Coherence.transcoder_manager" title="Permalink to this definition">¶</a></dt>
+<dd><p>A coherence’s instance of class
+<a class="reference internal" href="#coherence.transcoder.TranscoderManager" title="coherence.transcoder.TranscoderManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">TranscoderManager</span></code></a>. This will be
+enabled if we request itby config dict or configuration file via
+keyword <em>transcoding = yes</em>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence.web_server">
+<code class="descname">web_server</code><a class="headerlink" href="#coherence.base.Coherence.web_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>A coherence’s instance of class
+<a class="reference internal" href="#coherence.base.WebServer" title="coherence.base.WebServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServer</span></code></a> or <a class="reference internal" href="#coherence.base.WebServerUi" title="coherence.base.WebServerUi"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServerUi</span></code></a>. We can request our preference
+by config dict or configuration file. If we use the keyword <em>web-ui = yes</em>,
+then the class <a class="reference internal" href="#coherence.base.WebServerUi" title="coherence.base.WebServerUi"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServerUi</span></code></a> will be used, otherwise, the enabled
+web server will be of class <a class="reference internal" href="#coherence.base.WebServer" title="coherence.base.WebServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServer</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>We do need this to survive multiple calls to Coherence
+during trial tests</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.setup_part2">
+<code class="descname">setup_part2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.setup_part2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.setup_part2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the basic and optional services/devices and the enabled
+plugins (backends).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.add_plugin">
+<code class="descname">add_plugin</code><span class="sig-paren">(</span><em>plugin</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.add_plugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.add_plugin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.remove_plugin">
+<code class="descname">remove_plugin</code><span class="sig-paren">(</span><em>plugin</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.remove_plugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.remove_plugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a backend from Coherence</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>plugin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – is the object return by add_plugin or
+an UUID string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.base.Coherence.writeable_config">
+<em class="property">static </em><code class="descname">writeable_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.writeable_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.writeable_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do we have a new-style config file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.store_plugin_config">
+<code class="descname">store_plugin_config</code><span class="sig-paren">(</span><em>uuid</em>, <em>items</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.store_plugin_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.store_plugin_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the backend with uuid and store in its the config the key
+and value pair(s).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.receiver">
+<code class="descname">receiver</code><span class="sig-paren">(</span><em>signal</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.receiver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.receiver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.shutdown">
+<code class="descname">shutdown</code><span class="sig-paren">(</span><em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.shutdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.check_devices">
+<code class="descname">check_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.check_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.check_devices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over devices and their embedded ones and renew
+subscriptions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.subscribe">
+<code class="descname">subscribe</code><span class="sig-paren">(</span><em>name</em>, <em>callback</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.subscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.subscribe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.unsubscribe">
+<code class="descname">unsubscribe</code><span class="sig-paren">(</span><em>name</em>, <em>callback</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.unsubscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.unsubscribe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.callback">
+<code class="descname">callback</code><span class="sig-paren">(</span><em>name</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence._Coherence__cls">
+<code class="descname">_Coherence__cls</code><em class="property"> = None</em><a class="headerlink" href="#coherence.base.Coherence._Coherence__cls" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence._Coherence__incarnations">
+<code class="descname">_Coherence__incarnations</code><em class="property"> = 0</em><a class="headerlink" href="#coherence.base.Coherence._Coherence__incarnations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence._Coherence__initialized">
+<code class="descname">_Coherence__initialized</code><em class="property"> = False</em><a class="headerlink" href="#coherence.base.Coherence._Coherence__initialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.base.Coherence._Coherence__instance">
+<code class="descname">_Coherence__instance</code><em class="property"> = None</em><a class="headerlink" href="#coherence.base.Coherence._Coherence__instance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.get_device_by_host">
+<code class="descname">get_device_by_host</code><span class="sig-paren">(</span><em>host</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.get_device_by_host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.get_device_by_host" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.get_device_with_usn">
+<code class="descname">get_device_with_usn</code><span class="sig-paren">(</span><em>usn</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.get_device_with_usn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.get_device_with_usn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.get_device_with_id">
+<code class="descname">get_device_with_id</code><span class="sig-paren">(</span><em>device_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.get_device_with_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.get_device_with_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.get_devices">
+<code class="descname">get_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.get_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.get_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.get_local_devices">
+<code class="descname">get_local_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.get_local_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.get_local_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.get_nonlocal_devices">
+<code class="descname">get_nonlocal_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.get_nonlocal_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.get_nonlocal_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.is_device_added">
+<code class="descname">is_device_added</code><span class="sig-paren">(</span><em>infos</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.is_device_added"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.is_device_added" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the device exists in our list of created <a class="reference internal" href="#coherence.base.Coherence.devices" title="coherence.base.Coherence.devices"><code class="xref py py-attr docutils literal notranslate"><span class="pre">devices</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>infos</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Information about the device</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if the device exists in our list of <a class="reference internal" href="#coherence.base.Coherence.devices" title="coherence.base.Coherence.devices"><code class="xref py py-attr docutils literal notranslate"><span class="pre">devices</span></code></a>,
+otherwise, returns False.</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.create_device">
+<code class="descname">create_device</code><span class="sig-paren">(</span><em>device_type</em>, <em>infos</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.create_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.create_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.add_device">
+<code class="descname">add_device</code><span class="sig-paren">(</span><em>device</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.add_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.add_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.remove_device">
+<code class="descname">remove_device</code><span class="sig-paren">(</span><em>device_type</em>, <em>infos</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.remove_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.remove_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.add_web_resource">
+<code class="descname">add_web_resource</code><span class="sig-paren">(</span><em>name</em>, <em>sub</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.add_web_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.add_web_resource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.remove_web_resource">
+<code class="descname">remove_web_resource</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.remove_web_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.remove_web_resource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.base.Coherence.check_louie">
+<em class="property">static </em><code class="descname">check_louie</code><span class="sig-paren">(</span><em>receiver</em>, <em>signal</em>, <em>method='connect'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.check_louie"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.check_louie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the connect or disconnect method’s arguments are valid in
+order to automatically convert to EventDispatcher’s bind
+The old valid signals are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.Device.detection_completed</p></li>
+<li><p>Coherence.UPnP.RootDevice.detection_completed</p></li>
+<li><p>Coherence.UPnP.Device.removed</p></li>
+<li><p>Coherence.UPnP.RootDevice.removed</p></li>
+</ul>
+</div></blockquote>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>receiver</em>, <em>signal=None</em>, <em>sender=None</em>, <em>weak=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper method around the deprecated method louie.connect. It will
+check if the passed signal is supported by executing the method
+<a class="reference internal" href="#coherence.base.Coherence.check_louie" title="coherence.base.Coherence.check_louie"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_louie()</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This will probably be removed at some point, if you use
+the connect method you should migrate to the new event
+system EventDispatcher.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span>Added EventDispatcher’s compatibility for some basic signals</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.base.Coherence.disconnect">
+<code class="descname">disconnect</code><span class="sig-paren">(</span><em>receiver</em>, <em>signal=None</em>, <em>sender=None</em>, <em>weak=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/base.html#Coherence.disconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.base.Coherence.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper method around the deprecated method louie.disconnect. It will
+check if the passed signal is supported by executing the method
+<a class="reference internal" href="#coherence.base.Coherence.check_louie" title="coherence.base.Coherence.check_louie"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_louie()</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This will probably be removed at some point, if you use
+the disconnect method you should migrate to the new event
+system EventDispatcher.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span>Added EventDispatcher’s compatibility for some basic signals</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+<div class="section" id="module-coherence.dbus_constants">
+<span id="coherence-dbus-constants-module"></span><h1>coherence.dbus_constants (module)<a class="headerlink" href="#module-coherence.dbus_constants" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="coherence-dbus-service-module">
+<h1>coherence.dbus_service (module)<a class="headerlink" href="#coherence-dbus-service-module" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="module-coherence.json_service">
+<span id="coherence-json-service-module"></span><h1>coherence.json_service (module)<a class="headerlink" href="#module-coherence.json_service" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="coherence.json_service.JsonInterface">
+<em class="property">class </em><code class="descname">JsonInterface</code><span class="sig-paren">(</span><em>controlpoint</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/json_service.html#JsonInterface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.json_service.JsonInterface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code>, <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.json_service.JsonInterface.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'json'</em><a class="headerlink" href="#coherence.json_service.JsonInterface.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.json_service.JsonInterface.render_GET">
+<code class="descname">render_GET</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/json_service.html#JsonInterface.render_GET"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.json_service.JsonInterface.render_GET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.json_service.JsonInterface.render_POST">
+<code class="descname">render_POST</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/json_service.html#JsonInterface.render_POST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.json_service.JsonInterface.render_POST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.json_service.JsonInterface.getChildWithDefault">
+<code class="descname">getChildWithDefault</code><span class="sig-paren">(</span><em>path</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/json_service.html#JsonInterface.getChildWithDefault"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.json_service.JsonInterface.getChildWithDefault" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a static or dynamically generated child resource from me.</p>
+<p>First checks if a resource was added manually by putChild, and then
+call getChild to check for dynamic resources. Only override if you want
+to affect behaviour of all child lookups, rather than just dynamic
+ones.</p>
+<p>This will check to see if I have a pre-registered child resource of the
+given name, and call getChild if I do not.</p>
+<p>&#64;see: L{IResource.getChildWithDefault}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.json_service.JsonInterface.do_the_render">
+<code class="descname">do_the_render</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/json_service.html#JsonInterface.do_the_render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.json_service.JsonInterface.do_the_render" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.json_service.JsonInterface.list_devices">
+<code class="descname">list_devices</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/json_service.html#JsonInterface.list_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.json_service.JsonInterface.list_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.json_service.JsonInterface.call_action">
+<code class="descname">call_action</code><span class="sig-paren">(</span><em>action</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/json_service.html#JsonInterface.call_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.json_service.JsonInterface.call_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-coherence.log">
+<span id="coherence-log-module"></span><h1>coherence.log (module)<a class="headerlink" href="#module-coherence.log" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="coherence.log.get_main_log_level">
+<code class="descname">get_main_log_level</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#get_main_log_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.get_main_log_level" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="coherence.log.formatter_message">
+<code class="descname">formatter_message</code><span class="sig-paren">(</span><em>message</em>, <em>use_color=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#formatter_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.formatter_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="coherence.log.ColoredFormatter">
+<em class="property">class </em><code class="descname">ColoredFormatter</code><span class="sig-paren">(</span><em>msg</em>, <em>use_color=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#ColoredFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.ColoredFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Formatter" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">logging.Formatter</span></code></a></p>
+<dl class="method">
+<dt id="coherence.log.ColoredFormatter.format">
+<code class="descname">format</code><span class="sig-paren">(</span><em>record</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#ColoredFormatter.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.ColoredFormatter.format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format the specified record as text.</p>
+<p>The record’s attribute dictionary is used as the operand to a
+string formatting operation which yields the returned string.
+Before formatting the dictionary, a couple of preparatory steps
+are carried out. The message attribute of the record is computed
+using LogRecord.getMessage(). If the formatting string uses the
+time (as determined by a call to usesTime(), formatTime() is
+called to format the event time. If there is exception information,
+it is formatted using formatException() and appended to the message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.log.ColoredLogger">
+<em class="property">class </em><code class="descname">ColoredLogger</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#ColoredLogger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.ColoredLogger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">logging.Logger</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.log.ColoredLogger.FORMAT">
+<code class="descname">FORMAT</code><em class="property"> = '[%(levelname)-18s][$BOLD%(name)-15s$RESET]  %(message)s    ($BOLD%(filename)s$RESET:%(lineno)d)'</em><a class="headerlink" href="#coherence.log.ColoredLogger.FORMAT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.log.ColoredLogger.COLOR_FORMAT">
+<code class="descname">COLOR_FORMAT</code><em class="property"> = '[%(levelname)-18s][\x1b[1m%(name)-15s\x1b[0m]  %(message)s    (\x1b[1m%(filename)s\x1b[0m:%(lineno)d)'</em><a class="headerlink" href="#coherence.log.ColoredLogger.COLOR_FORMAT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.log.ColoredLogger.findCaller">
+<code class="descname">findCaller</code><span class="sig-paren">(</span><em>stack_info=False</em>, <em>use_color=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#ColoredLogger.findCaller"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.ColoredLogger.findCaller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the stack frame of the caller so that we can note the source
+file name, line number and function name.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.log.LogAble">
+<em class="property">class </em><code class="descname">LogAble</code><a class="reference internal" href="../_modules/coherence/log.html#LogAble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.LogAble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for objects that want to be able to log messages with
+different level of severity.  The levels are, in order from least
+to most: log, debug, info, warning, error.</p>
+<dl class="attribute">
+<dt id="coherence.log.LogAble.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'default'</em><a class="headerlink" href="#coherence.log.LogAble.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementors can provide a category to log their messages under.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.log.LogAble._Loggable__logger">
+<code class="descname">_Loggable__logger</code><em class="property"> = None</em><a class="headerlink" href="#coherence.log.LogAble._Loggable__logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.log.LogAble.FORMAT">
+<code class="descname">FORMAT</code><em class="property"> = '[%(levelname)-18s][$BOLD%(name)-15s$RESET]  %(message)s    ($BOLD%(filename)s$RESET:%(lineno)d)'</em><a class="headerlink" href="#coherence.log.LogAble.FORMAT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.log.LogAble.COLOR_FORMAT">
+<code class="descname">COLOR_FORMAT</code><em class="property"> = '[%(levelname)-18s][\x1b[1m%(name)-15s\x1b[0m]  %(message)s    (\x1b[1m%(filename)s\x1b[0m:%(lineno)d)'</em><a class="headerlink" href="#coherence.log.LogAble.COLOR_FORMAT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.log.LogAble.log">
+<code class="descname">log</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#LogAble.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.LogAble.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.log.LogAble.warning">
+<code class="descname">warning</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#LogAble.warning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.LogAble.warning" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.log.LogAble.info">
+<code class="descname">info</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#LogAble.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.LogAble.info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.log.LogAble.critical">
+<code class="descname">critical</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#LogAble.critical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.LogAble.critical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.log.LogAble.debug">
+<code class="descname">debug</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#LogAble.debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.LogAble.debug" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.log.LogAble.error">
+<code class="descname">error</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#LogAble.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.LogAble.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.log.LogAble.exception">
+<code class="descname">exception</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#LogAble.exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.LogAble.exception" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.log.LogAble.fatal">
+<code class="descname">fatal</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#coherence.log.LogAble.fatal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.log.LogAble.warn">
+<code class="descname">warn</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#coherence.log.LogAble.warn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.log.LogAble.msg">
+<code class="descname">msg</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#coherence.log.LogAble.msg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.log.get_logger">
+<code class="descname">get_logger</code><span class="sig-paren">(</span><em>log_category</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#get_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.get_logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="coherence.log.init">
+<code class="descname">init</code><span class="sig-paren">(</span><em>logfilename=None</em>, <em>loglevel=30</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/log.html#init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.log.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-coherence.transcoder">
+<span id="coherence-transcoder-module"></span><h1>coherence.transcoder (module)<a class="headerlink" href="#module-coherence.transcoder" title="Permalink to this headline">¶</a></h1>
+<p>Transcoder classes to be used in combination with a Coherence MediaServer,
+using GStreamer pipelines for the actually work and feeding the output into
+a http response.</p>
+<dl class="function">
+<dt id="coherence.transcoder.get_transcoder_name">
+<code class="descname">get_transcoder_name</code><span class="sig-paren">(</span><em>transcoder</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#get_transcoder_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.get_transcoder_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.InternalTranscoder">
+<em class="property">class </em><code class="descname">InternalTranscoder</code><a class="reference internal" href="../_modules/coherence/transcoder.html#InternalTranscoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.InternalTranscoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Just a class to inherit from and which we can look
+for upon creating our list of available transcoders.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.FakeTransformer">
+<em class="property">class </em><code class="descname">FakeTransformer</code><span class="sig-paren">(</span><em>destination=None</em>, <em>request=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#FakeTransformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.FakeTransformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gi.repository.Gst.Element</span></code>, <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.transcoder.FakeTransformer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'faker_datasink'</em><a class="headerlink" href="#coherence.transcoder.FakeTransformer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.FakeTransformer._sinkpadtemplate">
+<code class="descname">_sinkpadtemplate</code><em class="property"> = &lt;Gst.PadTemplate object at 0x7f2a9b219948 (GstPadTemplate at 0x38159f0)&gt;</em><a class="headerlink" href="#coherence.transcoder.FakeTransformer._sinkpadtemplate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.FakeTransformer._srcpadtemplate">
+<code class="descname">_srcpadtemplate</code><em class="property"> = &lt;Gst.PadTemplate object at 0x7f2a9b219510 (GstPadTemplate at 0x3815a80)&gt;</em><a class="headerlink" href="#coherence.transcoder.FakeTransformer._srcpadtemplate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.FakeTransformer.get_fake_header">
+<code class="descname">get_fake_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#FakeTransformer.get_fake_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.FakeTransformer.get_fake_header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.FakeTransformer.chainfunc">
+<code class="descname">chainfunc</code><span class="sig-paren">(</span><em>pad</em>, <em>buffer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#FakeTransformer.chainfunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.FakeTransformer.chainfunc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.DataSink">
+<em class="property">class </em><code class="descname">DataSink</code><span class="sig-paren">(</span><em>destination=None</em>, <em>request=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#DataSink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.DataSink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gi.repository.Gst.Element</span></code>, <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.transcoder.DataSink.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'transcoder_datasink'</em><a class="headerlink" href="#coherence.transcoder.DataSink.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.DataSink._sinkpadtemplate">
+<code class="descname">_sinkpadtemplate</code><em class="property"> = &lt;Gst.PadTemplate object at 0x7f2a9b219a68 (GstPadTemplate at 0x3815b10)&gt;</em><a class="headerlink" href="#coherence.transcoder.DataSink._sinkpadtemplate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.DataSink.chainfunc">
+<code class="descname">chainfunc</code><span class="sig-paren">(</span><em>pad</em>, <em>inst</em>, <em>buffer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#DataSink.chainfunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.DataSink.chainfunc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.DataSink.eventfunc">
+<code class="descname">eventfunc</code><span class="sig-paren">(</span><em>pad</em>, <em>inst</em>, <em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#DataSink.eventfunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.DataSink.eventfunc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.GStreamerPipeline">
+<em class="property">class </em><code class="descname">GStreamerPipeline</code><span class="sig-paren">(</span><em>pipeline</em>, <em>content_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code>, <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.transcoder.GStreamerPipeline.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'gstreamer'</em><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.GStreamerPipeline.addSlash">
+<code class="descname">addSlash</code><em class="property"> = True</em><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.addSlash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerPipeline.parse_pipeline">
+<code class="descname">parse_pipeline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline.parse_pipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.parse_pipeline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerPipeline.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>request=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerPipeline.new_preroll">
+<code class="descname">new_preroll</code><span class="sig-paren">(</span><em>appsink</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline.new_preroll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.new_preroll" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerPipeline.new_buffer">
+<code class="descname">new_buffer</code><span class="sig-paren">(</span><em>appsink</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline.new_buffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.new_buffer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerPipeline.eos">
+<code class="descname">eos</code><span class="sig-paren">(</span><em>appsink</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline.eos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.eos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerPipeline.getChild">
+<code class="descname">getChild</code><span class="sig-paren">(</span><em>name</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline.getChild"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.getChild" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a ‘child’ resource from me.</p>
+<p>Implement this to create dynamic resource generation – resources which
+are always available may be registered with self.putChild().</p>
+<p>This will not be called if the class-level variable ‘isLeaf’ is set in
+your subclass; instead, the ‘postpath’ attribute of the request will be
+left as a list of the remaining path elements.</p>
+<p>For example, the URL /foo/bar/baz will normally be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">site</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>However, if the resource returned by ‘bar’ has isLeaf set to true, then
+the getChild call will never be made on it.</p>
+<p>Parameters and return value have the same meaning and requirements as
+those defined by L{IResource.getChildWithDefault}.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerPipeline.render_GET">
+<code class="descname">render_GET</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline.render_GET"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.render_GET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerPipeline.render_HEAD">
+<code class="descname">render_HEAD</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline.render_HEAD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.render_HEAD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default handling of HEAD method.</p>
+<p>I just return self.render_GET(request). When method is HEAD,
+the framework will handle this correctly.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerPipeline.requestFinished">
+<code class="descname">requestFinished</code><span class="sig-paren">(</span><em>result</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline.requestFinished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.requestFinished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerPipeline.on_message">
+<code class="descname">on_message</code><span class="sig-paren">(</span><em>bus</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline.on_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.on_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerPipeline.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerPipeline.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerPipeline.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.BaseTranscoder">
+<em class="property">class </em><code class="descname">BaseTranscoder</code><span class="sig-paren">(</span><em>uri</em>, <em>destination=None</em>, <em>content_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#BaseTranscoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.BaseTranscoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code>, <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.transcoder.BaseTranscoder.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'transcoder'</em><a class="headerlink" href="#coherence.transcoder.BaseTranscoder.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.BaseTranscoder.addSlash">
+<code class="descname">addSlash</code><em class="property"> = True</em><a class="headerlink" href="#coherence.transcoder.BaseTranscoder.addSlash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.BaseTranscoder.getChild">
+<code class="descname">getChild</code><span class="sig-paren">(</span><em>name</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#BaseTranscoder.getChild"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.BaseTranscoder.getChild" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a ‘child’ resource from me.</p>
+<p>Implement this to create dynamic resource generation – resources which
+are always available may be registered with self.putChild().</p>
+<p>This will not be called if the class-level variable ‘isLeaf’ is set in
+your subclass; instead, the ‘postpath’ attribute of the request will be
+left as a list of the remaining path elements.</p>
+<p>For example, the URL /foo/bar/baz will normally be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">site</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>However, if the resource returned by ‘bar’ has isLeaf set to true, then
+the getChild call will never be made on it.</p>
+<p>Parameters and return value have the same meaning and requirements as
+those defined by L{IResource.getChildWithDefault}.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.BaseTranscoder.render_GET">
+<code class="descname">render_GET</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#BaseTranscoder.render_GET"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.BaseTranscoder.render_GET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.BaseTranscoder.render_HEAD">
+<code class="descname">render_HEAD</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#BaseTranscoder.render_HEAD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.BaseTranscoder.render_HEAD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default handling of HEAD method.</p>
+<p>I just return self.render_GET(request). When method is HEAD,
+the framework will handle this correctly.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.BaseTranscoder.requestFinished">
+<code class="descname">requestFinished</code><span class="sig-paren">(</span><em>result</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#BaseTranscoder.requestFinished"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.BaseTranscoder.requestFinished" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.BaseTranscoder.on_message">
+<code class="descname">on_message</code><span class="sig-paren">(</span><em>bus</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#BaseTranscoder.on_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.BaseTranscoder.on_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.BaseTranscoder.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#BaseTranscoder.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.BaseTranscoder.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.BaseTranscoder.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>request=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#BaseTranscoder.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.BaseTranscoder.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method should be sub classed for each
+class which inherits from BaseTranscoder</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.PCMTranscoder">
+<em class="property">class </em><code class="descname">PCMTranscoder</code><span class="sig-paren">(</span><em>uri</em>, <em>destination=None</em>, <em>content_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#PCMTranscoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.PCMTranscoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.transcoder.BaseTranscoder" title="coherence.transcoder.BaseTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.BaseTranscoder</span></code></a>, <a class="reference internal" href="#coherence.transcoder.InternalTranscoder" title="coherence.transcoder.InternalTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.InternalTranscoder</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.transcoder.PCMTranscoder.contentType">
+<code class="descname">contentType</code><em class="property"> = 'audio/L16;rate=44100;channels=2'</em><a class="headerlink" href="#coherence.transcoder.PCMTranscoder.contentType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.PCMTranscoder.name">
+<code class="descname">name</code><em class="property"> = 'lpcm'</em><a class="headerlink" href="#coherence.transcoder.PCMTranscoder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.PCMTranscoder.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>request=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#PCMTranscoder.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.PCMTranscoder.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method should be sub classed for each
+class which inherits from BaseTranscoder</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.WAVTranscoder">
+<em class="property">class </em><code class="descname">WAVTranscoder</code><span class="sig-paren">(</span><em>uri</em>, <em>destination=None</em>, <em>content_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#WAVTranscoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.WAVTranscoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.transcoder.BaseTranscoder" title="coherence.transcoder.BaseTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.BaseTranscoder</span></code></a>, <a class="reference internal" href="#coherence.transcoder.InternalTranscoder" title="coherence.transcoder.InternalTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.InternalTranscoder</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.transcoder.WAVTranscoder.contentType">
+<code class="descname">contentType</code><em class="property"> = 'audio/x-wav'</em><a class="headerlink" href="#coherence.transcoder.WAVTranscoder.contentType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.WAVTranscoder.name">
+<code class="descname">name</code><em class="property"> = 'wav'</em><a class="headerlink" href="#coherence.transcoder.WAVTranscoder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.WAVTranscoder.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>request=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#WAVTranscoder.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.WAVTranscoder.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method should be sub classed for each
+class which inherits from BaseTranscoder</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.MP3Transcoder">
+<em class="property">class </em><code class="descname">MP3Transcoder</code><span class="sig-paren">(</span><em>uri</em>, <em>destination=None</em>, <em>content_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#MP3Transcoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.MP3Transcoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.transcoder.BaseTranscoder" title="coherence.transcoder.BaseTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.BaseTranscoder</span></code></a>, <a class="reference internal" href="#coherence.transcoder.InternalTranscoder" title="coherence.transcoder.InternalTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.InternalTranscoder</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.transcoder.MP3Transcoder.contentType">
+<code class="descname">contentType</code><em class="property"> = 'audio/mpeg'</em><a class="headerlink" href="#coherence.transcoder.MP3Transcoder.contentType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.MP3Transcoder.name">
+<code class="descname">name</code><em class="property"> = 'mp3'</em><a class="headerlink" href="#coherence.transcoder.MP3Transcoder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.MP3Transcoder.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>request=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#MP3Transcoder.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.MP3Transcoder.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method should be sub classed for each
+class which inherits from BaseTranscoder</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.MP4Transcoder">
+<em class="property">class </em><code class="descname">MP4Transcoder</code><span class="sig-paren">(</span><em>uri</em>, <em>destination=None</em>, <em>content_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#MP4Transcoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.MP4Transcoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.transcoder.BaseTranscoder" title="coherence.transcoder.BaseTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.BaseTranscoder</span></code></a>, <a class="reference internal" href="#coherence.transcoder.InternalTranscoder" title="coherence.transcoder.InternalTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.InternalTranscoder</span></code></a></p>
+<p>Only works if H264 inside Quicktime/MP4 container is input
+Source has to be a valid uri</p>
+<dl class="attribute">
+<dt id="coherence.transcoder.MP4Transcoder.contentType">
+<code class="descname">contentType</code><em class="property"> = 'video/mp4'</em><a class="headerlink" href="#coherence.transcoder.MP4Transcoder.contentType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.MP4Transcoder.name">
+<code class="descname">name</code><em class="property"> = 'mp4'</em><a class="headerlink" href="#coherence.transcoder.MP4Transcoder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.MP4Transcoder.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>request=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#MP4Transcoder.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.MP4Transcoder.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method should be sub classed for each
+class which inherits from BaseTranscoder</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.MP2TSTranscoder">
+<em class="property">class </em><code class="descname">MP2TSTranscoder</code><span class="sig-paren">(</span><em>uri</em>, <em>destination=None</em>, <em>content_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#MP2TSTranscoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.MP2TSTranscoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.transcoder.BaseTranscoder" title="coherence.transcoder.BaseTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.BaseTranscoder</span></code></a>, <a class="reference internal" href="#coherence.transcoder.InternalTranscoder" title="coherence.transcoder.InternalTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.InternalTranscoder</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.transcoder.MP2TSTranscoder.contentType">
+<code class="descname">contentType</code><em class="property"> = 'video/mpeg'</em><a class="headerlink" href="#coherence.transcoder.MP2TSTranscoder.contentType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.MP2TSTranscoder.name">
+<code class="descname">name</code><em class="property"> = 'mpegts'</em><a class="headerlink" href="#coherence.transcoder.MP2TSTranscoder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.MP2TSTranscoder.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>request=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#MP2TSTranscoder.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.MP2TSTranscoder.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method should be sub classed for each
+class which inherits from BaseTranscoder</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.ThumbTranscoder">
+<em class="property">class </em><code class="descname">ThumbTranscoder</code><span class="sig-paren">(</span><em>uri</em>, <em>destination=None</em>, <em>content_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ThumbTranscoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ThumbTranscoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.transcoder.BaseTranscoder" title="coherence.transcoder.BaseTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.BaseTranscoder</span></code></a>, <a class="reference internal" href="#coherence.transcoder.InternalTranscoder" title="coherence.transcoder.InternalTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.InternalTranscoder</span></code></a></p>
+<p>Should create a valid thumbnail according to the DLNA spec</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Neither width nor height must exceed 160px</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.transcoder.ThumbTranscoder.contentType">
+<code class="descname">contentType</code><em class="property"> = 'image/jpeg'</em><a class="headerlink" href="#coherence.transcoder.ThumbTranscoder.contentType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.ThumbTranscoder.name">
+<code class="descname">name</code><em class="property"> = 'thumb'</em><a class="headerlink" href="#coherence.transcoder.ThumbTranscoder.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ThumbTranscoder.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>request=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ThumbTranscoder.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ThumbTranscoder.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method should be sub classed for each
+class which inherits from BaseTranscoder</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.GStreamerTranscoder">
+<em class="property">class </em><code class="descname">GStreamerTranscoder</code><span class="sig-paren">(</span><em>uri</em>, <em>destination=None</em>, <em>content_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerTranscoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerTranscoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.transcoder.BaseTranscoder" title="coherence.transcoder.BaseTranscoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.transcoder.BaseTranscoder</span></code></a></p>
+<p>A generic Transcoder based on GStreamer.</p>
+<dl class="attribute">
+<dt id="coherence.transcoder.GStreamerTranscoder.pipeline_description">
+<code class="descname">pipeline_description</code><em class="property"> = None</em><a class="headerlink" href="#coherence.transcoder.GStreamerTranscoder.pipeline_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>The pipeline which will be parsed upon calling the start method,
+has to be set as the attribute <a class="reference internal" href="#coherence.transcoder.GStreamerTranscoder.pipeline_description" title="coherence.transcoder.GStreamerTranscoder.pipeline_description"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pipeline_description</span></code></a> to
+the instantiated class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.GStreamerTranscoder.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>request=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#GStreamerTranscoder.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.GStreamerTranscoder.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method should be sub classed for each
+class which inherits from BaseTranscoder</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.ExternalProcessProtocol">
+<em class="property">class </em><code class="descname">ExternalProcessProtocol</code><span class="sig-paren">(</span><em>caller</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.internet.protocol.ProcessProtocol</span></code></p>
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessProtocol.connectionMade">
+<code class="descname">connectionMade</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProtocol.connectionMade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProtocol.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a connection is made.</p>
+<p>This may be considered the initializer of the protocol, because
+it is called when the connection is completed.  For clients,
+this is called once the connection to the server has been
+established; for servers, this is called after an accept() call
+stops blocking and a socket has been received.  If you need to
+send any greeting or initial message, do it here.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessProtocol.outReceived">
+<code class="descname">outReceived</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProtocol.outReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProtocol.outReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Some data was received from stdout.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessProtocol.errReceived">
+<code class="descname">errReceived</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProtocol.errReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProtocol.errReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Some data was received from stderr.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessProtocol.inConnectionLost">
+<code class="descname">inConnectionLost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProtocol.inConnectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProtocol.inConnectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will be called when stdin is closed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessProtocol.outConnectionLost">
+<code class="descname">outConnectionLost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProtocol.outConnectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProtocol.outConnectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will be called when stdout is closed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessProtocol.errConnectionLost">
+<code class="descname">errConnectionLost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProtocol.errConnectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProtocol.errConnectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will be called when stderr is closed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessProtocol.processEnded">
+<code class="descname">processEnded</code><span class="sig-paren">(</span><em>status_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProtocol.processEnded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProtocol.processEnded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the child process exits and all file descriptors
+associated with it have been closed.</p>
+<p>&#64;type reason: L{twisted.python.failure.Failure}</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.ExternalProcessProducer">
+<em class="property">class </em><code class="descname">ExternalProcessProducer</code><span class="sig-paren">(</span><em>pipeline</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProducer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProducer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.transcoder.ExternalProcessProducer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'externalprocess'</em><a class="headerlink" href="#coherence.transcoder.ExternalProcessProducer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessProducer.write_data">
+<code class="descname">write_data</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProducer.write_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProducer.write_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessProducer.resumeProducing">
+<code class="descname">resumeProducing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProducer.resumeProducing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProducer.resumeProducing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessProducer.pauseProducing">
+<code class="descname">pauseProducing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProducer.pauseProducing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProducer.pauseProducing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessProducer.stopProducing">
+<code class="descname">stopProducing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessProducer.stopProducing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessProducer.stopProducing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.ExternalProcessPipeline">
+<em class="property">class </em><code class="descname">ExternalProcessPipeline</code><span class="sig-paren">(</span><em>uri</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessPipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessPipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code>, <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.transcoder.ExternalProcessPipeline.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'externalprocess'</em><a class="headerlink" href="#coherence.transcoder.ExternalProcessPipeline.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.ExternalProcessPipeline.addSlash">
+<code class="descname">addSlash</code><em class="property"> = False</em><a class="headerlink" href="#coherence.transcoder.ExternalProcessPipeline.addSlash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.ExternalProcessPipeline.pipeline_description">
+<code class="descname">pipeline_description</code><em class="property"> = None</em><a class="headerlink" href="#coherence.transcoder.ExternalProcessPipeline.pipeline_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.ExternalProcessPipeline.contentType">
+<code class="descname">contentType</code><em class="property"> = None</em><a class="headerlink" href="#coherence.transcoder.ExternalProcessPipeline.contentType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessPipeline.getChildWithDefault">
+<code class="descname">getChildWithDefault</code><span class="sig-paren">(</span><em>path</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessPipeline.getChildWithDefault"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessPipeline.getChildWithDefault" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a static or dynamically generated child resource from me.</p>
+<p>First checks if a resource was added manually by putChild, and then
+call getChild to check for dynamic resources. Only override if you want
+to affect behaviour of all child lookups, rather than just dynamic
+ones.</p>
+<p>This will check to see if I have a pre-registered child resource of the
+given name, and call getChild if I do not.</p>
+<p>&#64;see: L{IResource.getChildWithDefault}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.ExternalProcessPipeline.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#ExternalProcessPipeline.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.ExternalProcessPipeline.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a given resource. See L{IResource}’s render method.</p>
+<p>I delegate to methods of self with the form ‘render_METHOD’
+where METHOD is the HTTP that was used to make the
+request. Examples: render_GET, render_HEAD, render_POST, and
+so on. Generally you should implement those methods instead of
+overriding this one.</p>
+<p>render_METHOD methods are expected to return a byte string which will be
+the rendered page, unless the return value is C{server.NOT_DONE_YET}, in
+which case it is this class’s responsibility to write the results using
+C{request.write(data)} and then call C{request.finish()}.</p>
+<p>Old code that overrides render() directly is likewise expected
+to return a byte string or NOT_DONE_YET.</p>
+<p>&#64;see: L{IResource.render}</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.transcoder.transcoder_class_wrapper">
+<code class="descname">transcoder_class_wrapper</code><span class="sig-paren">(</span><em>klass</em>, <em>content_type</em>, <em>pipeline</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#transcoder_class_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.transcoder_class_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="coherence.transcoder.TranscoderManager">
+<em class="property">class </em><code class="descname">TranscoderManager</code><span class="sig-paren">(</span><em>coherence=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#TranscoderManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.TranscoderManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>Singleton class which holds information about all available transcoders.
+They are put into a transcoders dict with their id as the key.</p>
+<p>We collect all internal transcoders by searching for all subclasses of
+InternalTranscoder, the class will be the value.</p>
+<p>Transcoders defined in the config are parsed and stored as a dict in the
+transcoders dict.</p>
+<p>In the config, a transcoder description has to look like this:</p>
+<p><strong>* preliminary, will be extended and
+might even change without further notice *</strong></p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;transcoder&gt;</span>
+    <span class="nt">&lt;pipeline&gt;</span>%s ...<span class="nt">&lt;/pipeline&gt;</span> <span class="c">&lt;!-- we need a %s here to insert the</span>
+<span class="c">                                    source uri (or can we have all the</span>
+<span class="c">                                    times pipelines we can prepend with</span>
+<span class="c">                                    a &#39;%s !&#39;) and an element named mux</span>
+<span class="c">                                    where we can attach our sink --&gt;</span>
+    <span class="nt">&lt;type&gt;</span>gstreamer<span class="nt">&lt;/type&gt;</span>      <span class="c">&lt;!-- could be gstreamer or process --&gt;</span>
+    <span class="nt">&lt;name&gt;</span>mpegts<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;target&gt;</span>video/mpeg<span class="nt">&lt;/target&gt;</span>
+    <span class="nt">&lt;fourth_field&gt;</span>              <span class="c">&lt;!-- value for the 4th field of the</span>
+<span class="c">                                    protocolInfo phalanx, default is</span>
+<span class="c">                                    &#39;*&#39; --&gt;</span>
+<span class="nt">&lt;/transcoder&gt;</span>
+</pre></div>
+</div>
+<p>Initializes the class <a class="reference internal" href="#coherence.transcoder.TranscoderManager" title="coherence.transcoder.TranscoderManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">TranscoderManager</span></code></a>.</p>
+<p>It should be called at least once with the main
+<a class="reference internal" href="#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a> class passed as an argument,
+so we have access to the config.</p>
+<dl class="attribute">
+<dt id="coherence.transcoder.TranscoderManager.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'transcoder_manager'</em><a class="headerlink" href="#coherence.transcoder.TranscoderManager.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.transcoder.TranscoderManager._instance_">
+<code class="descname">_instance_</code><em class="property"> = None</em><a class="headerlink" href="#coherence.transcoder.TranscoderManager._instance_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.TranscoderManager.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>coherence=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#TranscoderManager.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.TranscoderManager.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the class <a class="reference internal" href="#coherence.transcoder.TranscoderManager" title="coherence.transcoder.TranscoderManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">TranscoderManager</span></code></a>.</p>
+<p>It should be called at least once with the main
+<a class="reference internal" href="#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a> class passed as an argument,
+so we have access to the config.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.transcoder.TranscoderManager.select">
+<code class="descname">select</code><span class="sig-paren">(</span><em>name</em>, <em>uri</em>, <em>backend=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/transcoder.html#TranscoderManager.select"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.transcoder.TranscoderManager.select" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="coherence-tube-service-module">
+<h1>coherence.tube_service (module)<a class="headerlink" href="#coherence-tube-service-module" title="Permalink to this headline">¶</a></h1>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="coherence.backends.html" class="btn btn-neutral float-right" title="coherence.backends (package)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="coherence.html" class="btn btn-neutral float-left" title="Cohen3 source tree" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

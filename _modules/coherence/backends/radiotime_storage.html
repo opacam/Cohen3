@@ -1,0 +1,388 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.radiotime_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.radiotime_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.radiotime_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># an internet radio media server for the Coherence UPnP Framework</span>
+<span class="c1"># based on the radiotime (http://radiotime.com) catalog service</span>
+
+<span class="c1"># Copyright 2007, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2009-2010, Jean-Michel Sizun &lt;jmDOTsizunATfreeDOTfr&gt;</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">twisted.python.failure</span> <span class="k">import</span> <span class="n">Failure</span>
+
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendItem</span><span class="p">,</span> <span class="n">Container</span><span class="p">,</span> <span class="n">LazyContainer</span><span class="p">,</span> \
+    <span class="n">AbstractBackendStore</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.DIDLLite</span> <span class="k">import</span> <span class="n">Resource</span>
+
+<span class="n">OPML_BROWSE_URL</span> <span class="o">=</span> <span class="s1">&#39;http://opml.radiotime.com/Browse.ashx&#39;</span>
+
+<span class="c1"># we only handle mp3 audio streams for now</span>
+<span class="n">DEFAULT_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;mp3&#39;</span>
+<span class="n">DEFAULT_MIMETYPE</span> <span class="o">=</span> <span class="s1">&#39;audio/mpeg&#39;</span>
+
+
+<span class="c1"># TODO : extend format handling using radiotime API</span>
+
+<div class="viewcode-block" id="RadiotimeAudioItem"><a class="viewcode-back" href="../../../source/backends/radiotime.html#coherence.backends.radiotime_storage.RadiotimeAudioItem">[docs]</a><span class="k">class</span> <span class="nc">RadiotimeAudioItem</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;radiotime&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outline</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preset_id</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;preset_id&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">DEFAULT_MIMETYPE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;URL&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">)</span>
+        <span class="c1"># self.location = PlaylistStreamProxy(self.stream_url)</span>
+        <span class="c1"># self.url = self.stream_url</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="RadiotimeAudioItem.replace_by"><a class="viewcode-back" href="../../../source/backends/radiotime.html#coherence.backends.radiotime_storage.RadiotimeAudioItem.replace_by">[docs]</a>    <span class="k">def</span> <span class="nf">replace_by</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c1"># do nothing: we suppose the replacement item is the same</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="RadiotimeAudioItem.get_item"><a class="viewcode-back" href="../../../source/backends/radiotime.html#coherence.backends.radiotime_storage.RadiotimeAudioItem.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upnp_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="n">upnp_parent_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">AudioBroadcast</span><span class="p">(</span><span class="n">upnp_id</span><span class="p">,</span> <span class="n">upnp_parent_id</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span>
+            <span class="n">protocols</span> <span class="o">=</span> <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">(</span><span class="s1">&#39;DLNA.ORG_PN=MP3&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;DLNA.ORG_CI=0&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;DLNA.ORG_OP=01&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;DLNA.ORG_FLAGS=01700000000000000000000000000000&#39;</span><span class="p">))</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="p">,</span>
+                <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{self.mimetype}</span><span class="s1">:</span><span class="si">{protocols}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="RadiotimeAudioItem.get_path"><a class="viewcode-back" href="../../../source/backends/radiotime.html#coherence.backends.radiotime_storage.RadiotimeAudioItem.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span></div>
+
+<div class="viewcode-block" id="RadiotimeAudioItem.get_id"><a class="viewcode-back" href="../../../source/backends/radiotime.html#coherence.backends.radiotime_storage.RadiotimeAudioItem.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span></div></div>
+
+
+<div class="viewcode-block" id="RadiotimeStore"><a class="viewcode-back" href="../../../source/backends/radiotime.html#coherence.backends.radiotime_storage.RadiotimeStore">[docs]</a><span class="k">class</span> <span class="nc">RadiotimeStore</span><span class="p">(</span><span class="n">AbstractBackendStore</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;radiotime&#39;</span>
+
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">AbstractBackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;radiotimeStore&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;refresh&#39;</span><span class="p">,</span> <span class="mi">60</span><span class="p">))</span> <span class="o">*</span> <span class="mi">60</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">browse_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;browse_url&#39;</span><span class="p">,</span> <span class="n">OPML_BROWSE_URL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partner_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;partner_id&#39;</span><span class="p">,</span> <span class="s1">&#39;TMe3Cn6v&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;locale&#39;</span><span class="p">,</span> <span class="s1">&#39;en&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">uuid</span> <span class="k">if</span> <span class="n">server</span> <span class="k">else</span> <span class="s1">&#39;n/a&#39;</span>
+
+        <span class="c1"># construct URL for root menu</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">identification_param</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;username=</span><span class="si">{self.username}</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">identification_param</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;serial=</span><span class="si">{self.serial}</span><span class="s1">&#39;</span>
+        <span class="n">formats_value</span> <span class="o">=</span> <span class="n">DEFAULT_FORMAT</span>
+        <span class="n">root_url</span> <span class="o">=</span> \
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.browse_url}</span><span class="s1">?partnerId=</span><span class="si">{self.partner_id}</span><span class="s1">&amp;&#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{identification_param}</span><span class="s1">&amp;formats=</span><span class="si">{formats_value}</span><span class="s1">&amp;&#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;locale=</span><span class="si">{self.locale}</span><span class="s1">&#39;</span>
+
+        <span class="c1"># set root item</span>
+        <span class="n">root_item</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">retrieveItemsForOPML</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">root_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_root_item</span><span class="p">(</span><span class="n">root_item</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RadiotimeStore.upnp_init"><a class="viewcode-back" href="../../../source/backends/radiotime.html#coherence.backends.radiotime_storage.RadiotimeStore.upnp_init">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmc_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;4&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_root_id</span><span class="p">()}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span>
+                <span class="p">[</span><span class="s1">&#39;http-get:*:audio/mpeg:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:audio/x-scpls:*&#39;</span><span class="p">],</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RadiotimeStore.retrieveItemsForOPML"><a class="viewcode-back" href="../../../source/backends/radiotime.html#coherence.backends.radiotime_storage.RadiotimeStore.retrieveItemsForOPML">[docs]</a>    <span class="k">def</span> <span class="nf">retrieveItemsForOPML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">append_outline</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">outline</span><span class="p">):</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span>
+            <span class="n">outline_url</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;URL&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># This outline is just a classification item containing</span>
+                <span class="c1"># other outline elements the corresponding item</span>
+                <span class="c1"># will a static Container</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">)</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">)</span>
+                <span class="n">external_id</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">external_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">external_id</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{parent.external_id}</span><span class="s1">_</span><span class="si">{key}</span><span class="s1">&#39;</span>
+                <span class="k">if</span> <span class="n">external_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">external_id</span> <span class="o">=</span> <span class="n">outline_url</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">external_id</span> <span class="o">=</span> <span class="n">external_id</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">store</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">external_id</span><span class="p">)</span>
+                <span class="n">sub_outlines</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;outline&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">sub_outline</span> <span class="ow">in</span> <span class="n">sub_outlines</span><span class="p">:</span>
+                    <span class="n">append_outline</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">sub_outline</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;link&#39;</span><span class="p">:</span>
+                <span class="c1"># the corresponding item will a self-populating Container</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">)</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">)</span>
+                <span class="n">guide_id</span> <span class="o">=</span> <span class="n">outline</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;guide_id&#39;</span><span class="p">)</span>
+                <span class="n">external_id</span> <span class="o">=</span> <span class="n">guide_id</span>
+                <span class="k">if</span> <span class="n">external_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">external_id</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{parent.external_id}</span><span class="s1">_</span><span class="si">{key}</span><span class="s1">&#39;</span>
+                <span class="k">if</span> <span class="n">external_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">external_id</span> <span class="o">=</span> <span class="n">outline_url</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span>
+                    <span class="n">parent</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">external_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">retrieveItemsForOPML</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">outline_url</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">external_id</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;audio&#39;</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">RadiotimeAudioItem</span><span class="p">(</span><span class="n">outline</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">preset_id</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">got_page</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;connection to Radiotime service successful for url </span><span class="si">{url}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="n">outlines</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;body/outline&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">outline</span> <span class="ow">in</span> <span class="n">outlines</span><span class="p">:</span>
+                <span class="n">append_outline</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">outline</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">def</span> <span class="nf">got_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;connection to Radiotime service failed for url </span><span class="si">{url}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">getTraceback</span><span class="p">())</span>
+            <span class="n">parent</span><span class="o">.</span><span class="n">childrenRetrievingNeeded</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># we retry</span>
+            <span class="k">return</span> <span class="n">Failure</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to retrieve items for url </span><span class="si">{url}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">got_xml_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;Data received from Radiotime service is invalid: </span><span class="si">{url}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="c1"># self.debug(&#39;%r&#39;, error.getTraceback())</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">getTraceback</span><span class="p">())</span>
+            <span class="n">parent</span><span class="o">.</span><span class="n">childrenRetrievingNeeded</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># we retry</span>
+            <span class="k">return</span> <span class="n">Failure</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to retrieve items for url </span><span class="si">{url}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">got_error</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">got_page</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">got_xml_error</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

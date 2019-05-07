@@ -1,0 +1,440 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.extern.covers_by_amazon (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="coherence.extern.db_row (module)" href="db_row.html" />
+    <link rel="prev" title="coherence.extern (package)" href="../coherence.extern.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../coherence.extern.html">coherence.extern (package)</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">coherence.extern.covers_by_amazon (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#covers-by-amazon">Covers by Amazon</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="db_row.html">coherence.extern.db_row (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple_plugin.html">coherence.extern.simple_plugin (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="xdg.html">coherence.extern.xdg (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coherence.extern.html#coherence-extern-galleryremote-package">coherence.extern.galleryremote (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coherence.extern.html#coherence-extern-youtubedl-package">coherence.extern.youtubedl (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../coherence.extern.html">coherence.extern (package)</a> &raquo;</li>
+        
+      <li>coherence.extern.covers_by_amazon (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/source/extern/covers_by_amazon.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.extern.covers_by_amazon">
+<span id="coherence-extern-covers-by-amazon-module"></span><span id="extern-covers-by-amazon"></span><h1>coherence.extern.covers_by_amazon (module)<a class="headerlink" href="#module-coherence.extern.covers_by_amazon" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="covers-by-amazon">
+<h2>Covers by Amazon<a class="headerlink" href="#covers-by-amazon" title="Permalink to this headline">¶</a></h2>
+<p>Methods to retrieve covers/album art via the
+Amazon E-Commerce WebService v4
+<a class="reference external" href="http://docs.amazonwebservices.com/AWSECommerceService/2007-04-04/DG/">http://docs.amazonwebservices.com/AWSECommerceService/2007-04-04/DG/</a></p>
+<p>The licence agreement says something about only
+one request per second, so we need to serialize
+and delay the calls a bit.</p>
+<p>The AWSAccessKeyId supplied is _ONLY_ for the use
+in conjunction with Coherence, <a class="reference external" href="http://coherence.beebits.net">http://coherence.beebits.net</a></p>
+<p>If you use this library in your own software please
+apply for your own key &#64; <a class="reference external" href="http://www.amazon.com/webservices">http://www.amazon.com/webservices</a>
+and follow the rules of their license.</p>
+<p>Especially you must add the following disclaimer in a place
+that is reasonably viewable by the user of your application:</p>
+<blockquote>
+<div><p>PLEASE KEEP IN MIND THAT SOME OF THE CONTENT THAT WE
+MAKE AVAILABLE TO YOU THROUGH THIS APPLICATION COMES
+FROM AMAZON WEB SERVICES. ALL SUCH CONTENT IS PROVIDED
+TO YOU “AS IS.” THIS CONTENT AND YOUR USE OF IT
+ARE SUBJECT TO CHANGE AND/OR REMOVAL AT ANY TIME.</p>
+</div></blockquote>
+<p>Furthermore if you save any of the cover images you
+have to take care that they are stored no longer than
+a maximum of one month and requested then from Amazon
+again.</p>
+<dl class="class">
+<dt id="coherence.extern.covers_by_amazon.WorkQueue">
+<em class="property">class </em><code class="descname">WorkQueue</code><span class="sig-paren">(</span><em>method</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/covers_by_amazon.html#WorkQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.covers_by_amazon.WorkQueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.extern.covers_by_amazon.WorkQueue._instance_">
+<code class="descname">_instance_</code><em class="property"> = None</em><a class="headerlink" href="#coherence.extern.covers_by_amazon.WorkQueue._instance_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.covers_by_amazon.WorkQueue.queue">
+<code class="descname">queue</code><em class="property"> = []</em><a class="headerlink" href="#coherence.extern.covers_by_amazon.WorkQueue.queue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.covers_by_amazon.WorkQueue.workers">
+<code class="descname">workers</code><em class="property"> = []</em><a class="headerlink" href="#coherence.extern.covers_by_amazon.WorkQueue.workers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.covers_by_amazon.WorkQueue.max_workers">
+<code class="descname">max_workers</code><em class="property"> = 1</em><a class="headerlink" href="#coherence.extern.covers_by_amazon.WorkQueue.max_workers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.covers_by_amazon.WorkQueue.queue_run">
+<code class="descname">queue_run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/covers_by_amazon.html#WorkQueue.queue_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.covers_by_amazon.WorkQueue.queue_run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.covers_by_amazon.WorkQueue.remove_from_workers">
+<code class="descname">remove_from_workers</code><span class="sig-paren">(</span><em>result</em>, <em>d</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/covers_by_amazon.html#WorkQueue.remove_from_workers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.covers_by_amazon.WorkQueue.remove_from_workers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.extern.covers_by_amazon.CoverGetter">
+<em class="property">class </em><code class="descname">CoverGetter</code><span class="sig-paren">(</span><em>filename</em>, <em>aws_key</em>, <em>callback=None</em>, <em>not_found_callback=None</em>, <em>locale=None</em>, <em>image_size='large'</em>, <em>title=None</em>, <em>artist=None</em>, <em>asin=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/covers_by_amazon.html#CoverGetter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.covers_by_amazon.CoverGetter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Retrieve a cover image for a given ASIN, a TITLE or an ARTIST/TITLE combo.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>if the filename extension and the received image extension
+differ, the image is converted with PIL to the desired format
+(<a class="reference external" href="http://www.pythonware.com/products/pil/index.htm">http://www.pythonware.com/products/pil/index.htm</a>).</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – where to save a received image if <em>None</em> the image
+will be passed to the callback.</p></li>
+<li><p><strong>aws_key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The aws key</p></li>
+<li><p><strong>callback</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – <p>a method to call with the filename or the image
+as a parameter after the image request and save was successful
+can be:</p>
+<blockquote>
+<div><ul>
+<li><p>only a callable</p></li>
+<li><p>a tuple with a callable:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>optional an argument or a tuple of arguments</p></li>
+<li><p>optional a dict with keyword arguments</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>not_found_callback</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – <p>a method to call when the search at
+Amazon failed, can be:</p>
+<blockquote>
+<div><ul>
+<li><p>only a callable</p></li>
+<li><p>a tuple with a callable:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>optional an argument or a tuple of arguments</p></li>
+<li><p>optional a dict with keyword arguments</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>locale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – which Amazon Webservice Server to use, defaults
+to .com.</p></li>
+<li><p><strong>image_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – request the cover as large|medium|small image
+resolution seems to be in pixels for large: 500x500,
+medium: 160x160 and small: 75x75.</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the album title</p></li>
+<li><p><strong>artist</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the artists name</p></li>
+<li><p><strong>asin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the Amazon Store Identification Number</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="coherence.extern.covers_by_amazon.CoverGetter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>filename</em>, <em>aws_key</em>, <em>callback=None</em>, <em>not_found_callback=None</em>, <em>locale=None</em>, <em>image_size='large'</em>, <em>title=None</em>, <em>artist=None</em>, <em>asin=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/covers_by_amazon.html#CoverGetter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.covers_by_amazon.CoverGetter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – where to save a received image if <em>None</em> the image
+will be passed to the callback.</p></li>
+<li><p><strong>aws_key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The aws key</p></li>
+<li><p><strong>callback</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – <p>a method to call with the filename or the image
+as a parameter after the image request and save was successful
+can be:</p>
+<blockquote>
+<div><ul>
+<li><p>only a callable</p></li>
+<li><p>a tuple with a callable:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>optional an argument or a tuple of arguments</p></li>
+<li><p>optional a dict with keyword arguments</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>not_found_callback</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – <p>a method to call when the search at
+Amazon failed, can be:</p>
+<blockquote>
+<div><ul>
+<li><p>only a callable</p></li>
+<li><p>a tuple with a callable:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>optional an argument or a tuple of arguments</p></li>
+<li><p>optional a dict with keyword arguments</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>locale</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – which Amazon Webservice Server to use, defaults
+to .com.</p></li>
+<li><p><strong>image_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – request the cover as large|medium|small image
+resolution seems to be in pixels for large: 500x500,
+medium: 160x160 and small: 75x75.</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the album title</p></li>
+<li><p><strong>artist</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the artists name</p></li>
+<li><p><strong>asin</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the Amazon Store Identification Number</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.covers_by_amazon.CoverGetter.send_request">
+<code class="descname">send_request</code><span class="sig-paren">(</span><em>url</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/covers_by_amazon.html#CoverGetter.send_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.covers_by_amazon.CoverGetter.send_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.covers_by_amazon.CoverGetter.got_image">
+<code class="descname">got_image</code><span class="sig-paren">(</span><em>result</em>, <em>convert_from=''</em>, <em>convert_to=''</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/covers_by_amazon.html#CoverGetter.got_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.covers_by_amazon.CoverGetter.got_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.covers_by_amazon.CoverGetter.got_response">
+<code class="descname">got_response</code><span class="sig-paren">(</span><em>result</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/covers_by_amazon.html#CoverGetter.got_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.covers_by_amazon.CoverGetter.got_response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.covers_by_amazon.CoverGetter.got_error">
+<code class="descname">got_error</code><span class="sig-paren">(</span><em>failure</em>, <em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/covers_by_amazon.html#CoverGetter.got_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.covers_by_amazon.CoverGetter.got_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="db_row.html" class="btn btn-neutral float-right" title="coherence.extern.db_row (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../coherence.extern.html" class="btn btn-neutral float-left" title="coherence.extern (package)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.services.clients.content_directory_client &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.services.clients.content_directory_client</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.services.clients.content_directory_client</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).</span>
+<span class="c1"># Copyright 2006, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+
+<span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">log</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+
+<span class="k">global</span> <span class="n">work</span><span class="p">,</span> <span class="n">pending</span>
+<span class="n">work</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">pending</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="ContentDirectoryClient"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient">[docs]</a><span class="k">class</span> <span class="nc">ContentDirectoryClient</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">service</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_control_url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">subscribe</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="c1"># print(&#39;ContentDirectoryClient __init__&#39;, self.url)</span>
+
+    <span class="c1"># def __del__(self):</span>
+    <span class="c1">#    print(&#39;ContentDirectoryClient deleted&#39;)</span>
+    <span class="c1">#    pass</span>
+
+<div class="viewcode-block" id="ContentDirectoryClient.remove"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">del</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.subscribe_for_variable"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.subscribe_for_variable">[docs]</a>    <span class="k">def</span> <span class="nf">subscribe_for_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">subscribe_for_variable</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                            <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">signal</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.get_search_capabilities"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.get_search_capabilities">[docs]</a>    <span class="k">def</span> <span class="nf">get_search_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetSearchCapabilities&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.get_sort_extension_capabilities"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.get_sort_extension_capabilities">[docs]</a>    <span class="k">def</span> <span class="nf">get_sort_extension_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetSortExtensionCapabilities&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.get_feature_list"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.get_feature_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetFeatureList&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.get_system_update_id"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.get_system_update_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_system_update_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetSystemUpdateID&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.browse"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.browse">[docs]</a>    <span class="k">def</span> <span class="nf">browse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">browse_flag</span><span class="o">=</span><span class="s1">&#39;BrowseDirectChildren&#39;</span><span class="p">,</span>
+               <span class="nb">filter</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">sort_criteria</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+               <span class="n">starting_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">requested_count</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+               <span class="n">process_result</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+               <span class="n">backward_compatibility</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">got_result</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">elt</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">DIDLElement</span><span class="o">.</span><span class="n">fromString</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;Result&#39;</span><span class="p">])</span>
+                <span class="n">items</span> <span class="o">=</span> <span class="n">elt</span><span class="o">.</span><span class="n">getItems</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">items</span>
+
+        <span class="k">def</span> <span class="nf">got_process_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="c1"># print(result)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;number_returned&#39;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;NumberReturned&#39;</span><span class="p">],</span>
+                 <span class="s1">&#39;total_matches&#39;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;TotalMatches&#39;</span><span class="p">],</span>
+                 <span class="s1">&#39;update_id&#39;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;UpdateID&#39;</span><span class="p">],</span>
+                 <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+            <span class="n">elt</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">DIDLElement</span><span class="o">.</span><span class="n">fromString</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;Result&#39;</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">elt</span><span class="o">.</span><span class="n">getItems</span><span class="p">():</span>
+                <span class="c1"># print(&#39;process_result&#39;, item)</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;upnp_class&#39;</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">upnp_class</span><span class="p">,</span>
+                     <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                     <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                     <span class="s1">&#39;parent_id&#39;</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">parentID</span><span class="p">}</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;childCount&#39;</span><span class="p">):</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;child_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">item</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">date</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;album&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">item</span><span class="o">.</span><span class="n">album</span><span class="p">:</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;album&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">album</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;artist&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">item</span><span class="o">.</span><span class="n">artist</span><span class="p">:</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">artist</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;albumArtURI&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span><span class="p">:</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;album_art_uri&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;res&#39;</span><span class="p">):</span>
+                    <span class="n">resources</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="p">:</span>
+                        <span class="n">url</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">data</span>
+                        <span class="n">resources</span><span class="p">[</span><span class="n">url</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">protocolInfo</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">):</span>
+                        <span class="n">i</span><span class="p">[</span><span class="s1">&#39;resources&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">resources</span>
+                <span class="n">r</span><span class="p">[</span><span class="s1">&#39;items&#39;</span><span class="p">][</span><span class="n">item</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">return</span> <span class="n">r</span>
+
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;Browse&#39;</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">ObjectID</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span>
+                        <span class="n">BrowseFlag</span><span class="o">=</span><span class="n">browse_flag</span><span class="p">,</span>
+                        <span class="n">Filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">,</span> <span class="n">SortCriteria</span><span class="o">=</span><span class="n">sort_criteria</span><span class="p">,</span>
+                        <span class="n">StartingIndex</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">starting_index</span><span class="p">),</span>
+                        <span class="n">RequestedCount</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">requested_count</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">process_result</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span> <span class="s1">&#39;Yes&#39;</span><span class="p">]:</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">got_process_result</span><span class="p">)</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#    d.addCallback(got_result)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_failure</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.search"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.search">[docs]</a>    <span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">criteria</span><span class="p">,</span> <span class="n">starting_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+               <span class="n">requested_count</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># print(&#39;search:&#39;, criteria)</span>
+        <span class="n">starting_index</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">starting_index</span><span class="p">)</span>
+        <span class="n">requested_count</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">requested_count</span><span class="p">)</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;Search&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">ContainerID</span><span class="o">=</span><span class="n">container_id</span><span class="p">,</span>
+                        <span class="n">SearchCriteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
+                        <span class="n">Filter</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+                        <span class="n">StartingIndex</span><span class="o">=</span><span class="n">starting_index</span><span class="p">,</span>
+                        <span class="n">RequestedCount</span><span class="o">=</span><span class="n">requested_count</span><span class="p">,</span>
+                        <span class="n">SortCriteria</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_failure</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotResults</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">elt</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">DIDLElement</span><span class="o">.</span><span class="n">fromString</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s1">&#39;Result&#39;</span><span class="p">])</span>
+                <span class="n">items</span> <span class="o">=</span> <span class="n">elt</span><span class="o">.</span><span class="n">getItems</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">items</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">gotResults</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.dict2item"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.dict2item">[docs]</a>    <span class="k">def</span> <span class="nf">dict2item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elements</span><span class="p">):</span>
+        <span class="n">upnp_class</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">upnp_classes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">elements</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;upnp_class&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">upnp_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">del</span> <span class="n">elements</span><span class="p">[</span><span class="s1">&#39;upnp_class&#39;</span><span class="p">]</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">upnp_class</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                          <span class="n">parentID</span><span class="o">=</span><span class="n">elements</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;parentID&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                          <span class="n">title</span><span class="o">=</span><span class="n">elements</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                          <span class="n">restricted</span><span class="o">=</span><span class="n">elements</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;restricted&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">elements</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">attribute</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">attribute</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">attribute</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.create_object"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.create_object">[docs]</a>    <span class="k">def</span> <span class="nf">create_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">elements</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict2item</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Object</span><span class="p">):</span>
+            <span class="n">didl</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">DIDLElement</span><span class="p">()</span>
+            <span class="n">didl</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">elements</span><span class="p">)</span>
+            <span class="n">elements</span> <span class="o">=</span> <span class="n">didl</span><span class="o">.</span><span class="n">toString</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">elements</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">elements</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;CreateObject&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">ContainerID</span><span class="o">=</span><span class="n">container_id</span><span class="p">,</span>
+                               <span class="n">Elements</span><span class="o">=</span><span class="n">elements</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.destroy_object"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.destroy_object">[docs]</a>    <span class="k">def</span> <span class="nf">destroy_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;DestroyObject&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">ObjectID</span><span class="o">=</span><span class="n">object_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.update_object"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.update_object">[docs]</a>    <span class="k">def</span> <span class="nf">update_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_id</span><span class="p">,</span> <span class="n">current_tag_value</span><span class="p">,</span> <span class="n">new_tag_value</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;UpdateObject&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">ObjectID</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span>
+                               <span class="n">CurrentTagValue</span><span class="o">=</span><span class="n">current_tag_value</span><span class="p">,</span>
+                               <span class="n">NewTagValue</span><span class="o">=</span><span class="n">new_tag_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.move_object"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.move_object">[docs]</a>    <span class="k">def</span> <span class="nf">move_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_id</span><span class="p">,</span> <span class="n">new_parent_id</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;MoveObject&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">ObjectID</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span>
+                               <span class="n">NewParentID</span><span class="o">=</span><span class="n">new_parent_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.import_resource"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.import_resource">[docs]</a>    <span class="k">def</span> <span class="nf">import_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_uri</span><span class="p">,</span> <span class="n">destination_uri</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;ImportResource&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">SourceURI</span><span class="o">=</span><span class="n">source_uri</span><span class="p">,</span>
+                               <span class="n">DestinationURI</span><span class="o">=</span><span class="n">destination_uri</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.export_resource"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.export_resource">[docs]</a>    <span class="k">def</span> <span class="nf">export_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_uri</span><span class="p">,</span> <span class="n">destination_uri</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;ExportResource&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">SourceURI</span><span class="o">=</span><span class="n">source_uri</span><span class="p">,</span>
+                               <span class="n">DestinationURI</span><span class="o">=</span><span class="n">destination_uri</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.delete_resource"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.delete_resource">[docs]</a>    <span class="k">def</span> <span class="nf">delete_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_uri</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;DeleteResource&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">ResourceURI</span><span class="o">=</span><span class="n">resource_uri</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.stop_transfer_resource"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.stop_transfer_resource">[docs]</a>    <span class="k">def</span> <span class="nf">stop_transfer_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transfer_id</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;StopTransferResource&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">TransferID</span><span class="o">=</span><span class="n">transfer_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.get_transfer_progress"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.get_transfer_progress">[docs]</a>    <span class="k">def</span> <span class="nf">get_transfer_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transfer_id</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetTransferProgress&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">TransferID</span><span class="o">=</span><span class="n">transfer_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient.create_reference"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient.create_reference">[docs]</a>    <span class="k">def</span> <span class="nf">create_reference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;CreateReference&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">ContainerID</span><span class="o">=</span><span class="n">container_id</span><span class="p">,</span>
+                               <span class="n">ObjectID</span><span class="o">=</span><span class="n">object_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ContentDirectoryClient._failure"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/content_directory_client.html#coherence.upnp.services.clients.content_directory_client.ContentDirectoryClient._failure">[docs]</a>    <span class="k">def</span> <span class="nf">_failure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">getTraceback</span><span class="p">(),</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">error</span><span class="o">.</span><span class="n">trap</span><span class="p">(</span><span class="ne">Exception</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

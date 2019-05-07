@@ -1,0 +1,1000 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.transcoder &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.transcoder</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.transcoder</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2008, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Transcoder classes to be used in combination with a Coherence MediaServer,</span>
+<span class="sd">using GStreamer pipelines for the actually work and feeding the output into</span>
+<span class="sd">a http response.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">gi</span>
+<span class="n">gi</span><span class="o">.</span><span class="n">require_version</span><span class="p">(</span><span class="s1">&#39;Gst&#39;</span><span class="p">,</span> <span class="s1">&#39;1.0&#39;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">Gst</span>
+<span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">GObject</span>
+<span class="n">Gst</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">import</span> <span class="nn">urllib.error</span>
+
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">resource</span><span class="p">,</span> <span class="n">server</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">protocol</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+
+<span class="kn">import</span> <span class="nn">struct</span>
+
+
+<div class="viewcode-block" id="get_transcoder_name"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.get_transcoder_name">[docs]</a><span class="k">def</span> <span class="nf">get_transcoder_name</span><span class="p">(</span><span class="n">transcoder</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">transcoder</span><span class="o">.</span><span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="InternalTranscoder"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.InternalTranscoder">[docs]</a><span class="k">class</span> <span class="nc">InternalTranscoder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Just a class to inherit from and which we can look</span>
+<span class="sd">    for upon creating our list of available transcoders.&#39;&#39;&#39;</span></div>
+
+
+<div class="viewcode-block" id="FakeTransformer"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.FakeTransformer">[docs]</a><span class="k">class</span> <span class="nc">FakeTransformer</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">Element</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;faker_datasink&#39;</span>
+
+    <span class="n">_sinkpadtemplate</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">PadTemplate</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+        <span class="s1">&#39;sinkpadtemplate&#39;</span><span class="p">,</span>
+        <span class="n">Gst</span><span class="o">.</span><span class="n">PadDirection</span><span class="o">.</span><span class="n">SINK</span><span class="p">,</span>
+        <span class="n">Gst</span><span class="o">.</span><span class="n">PadPresence</span><span class="o">.</span><span class="n">ALWAYS</span><span class="p">,</span>
+        <span class="n">Gst</span><span class="o">.</span><span class="n">Caps</span><span class="o">.</span><span class="n">new_any</span><span class="p">())</span>
+
+    <span class="n">_srcpadtemplate</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">PadTemplate</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+        <span class="s1">&#39;srcpadtemplate&#39;</span><span class="p">,</span>
+        <span class="n">Gst</span><span class="o">.</span><span class="n">PadDirection</span><span class="o">.</span><span class="n">SRC</span><span class="p">,</span>
+        <span class="n">Gst</span><span class="o">.</span><span class="n">PadPresence</span><span class="o">.</span><span class="n">ALWAYS</span><span class="p">,</span>
+        <span class="n">Gst</span><span class="o">.</span><span class="n">Caps</span><span class="o">.</span><span class="n">new_any</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">Gst</span><span class="o">.</span><span class="n">Element</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sinkpad</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">Pad</span><span class="o">.</span><span class="n">new_from_template</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sinkpadtemplate</span><span class="p">,</span> <span class="s1">&#39;sink&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srcpad</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">Pad</span><span class="o">.</span><span class="n">new_from_template</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_srcpadtemplate</span><span class="p">,</span> <span class="s1">&#39;src&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_pad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sinkpad</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_pad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srcpad</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sinkpad</span><span class="o">.</span><span class="n">set_chain_function_full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chainfunc</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">got_new_segment</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="FakeTransformer.get_fake_header"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.FakeTransformer.get_fake_header">[docs]</a>    <span class="k">def</span> <span class="nf">get_fake_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span>
+                <span class="s1">&#39;&gt;L4s&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="s1">&#39;ftyp&#39;</span><span class="p">)</span> <span class="o">+</span> \
+            <span class="sa">b</span><span class="s1">&#39;mp42</span><span class="se">\x00\x00\x00\x00</span><span class="s1">mp42mp41isomiso2&#39;</span></div>
+
+<div class="viewcode-block" id="FakeTransformer.chainfunc"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.FakeTransformer.chainfunc">[docs]</a>    <span class="k">def</span> <span class="nf">chainfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">buffer</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="p">:</span>
+            <span class="c1"># we are in proxy mode already</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">srcpad</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Gst</span><span class="o">.</span><span class="n">FlowReturn</span><span class="o">.</span><span class="n">OK</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">+</span> <span class="n">buffer</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer_size</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">buffer_size</span><span class="p">,</span> <span class="n">a_type</span> <span class="o">=</span> \
+                    <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&gt;L4s&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">[:</span><span class="mi">8</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Gst</span><span class="o">.</span><span class="n">FlowReturn</span><span class="o">.</span><span class="n">OK</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer_size</span><span class="p">:</span>
+            <span class="c1"># we need to buffer more</span>
+            <span class="k">return</span> <span class="n">Gst</span><span class="o">.</span><span class="n">FlowReturn</span><span class="o">.</span><span class="n">OK</span>
+
+        <span class="n">buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_size</span><span class="p">:]</span>
+        <span class="n">fake_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fake_header</span><span class="p">()</span>
+        <span class="n">n_buf</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">Buffer</span><span class="p">(</span><span class="n">fake_header</span> <span class="o">+</span> <span class="n">buffer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srcpad</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="n">n_buf</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Gst</span><span class="o">.</span><span class="n">FlowReturn</span><span class="o">.</span><span class="n">OK</span></div></div>
+
+
+<span class="n">GObject</span><span class="o">.</span><span class="n">type_register</span><span class="p">(</span><span class="n">FakeTransformer</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DataSink"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.DataSink">[docs]</a><span class="k">class</span> <span class="nc">DataSink</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">Element</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;transcoder_datasink&#39;</span>
+
+    <span class="n">_sinkpadtemplate</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">PadTemplate</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+        <span class="s1">&#39;sinkpadtemplate&#39;</span><span class="p">,</span>
+        <span class="n">Gst</span><span class="o">.</span><span class="n">PadDirection</span><span class="o">.</span><span class="n">SINK</span><span class="p">,</span>
+        <span class="n">Gst</span><span class="o">.</span><span class="n">PadPresence</span><span class="o">.</span><span class="n">ALWAYS</span><span class="p">,</span>
+        <span class="n">Gst</span><span class="o">.</span><span class="n">Caps</span><span class="o">.</span><span class="n">new_any</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">Gst</span><span class="o">.</span><span class="n">Element</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sinkpad</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">Pad</span><span class="o">.</span><span class="n">new_from_template</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sinkpadtemplate</span><span class="p">,</span> <span class="s1">&#39;sink&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_pad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sinkpad</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sinkpad</span><span class="o">.</span><span class="n">set_chain_function_full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chainfunc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sinkpad</span><span class="o">.</span><span class="n">set_event_function_full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eventfunc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destination</span> <span class="o">=</span> <span class="n">destination</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">request</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">destination</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">got_new_segment</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="DataSink.chainfunc"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.DataSink.chainfunc">[docs]</a>    <span class="k">def</span> <span class="nf">chainfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">buffer</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">get_size</span><span class="p">()</span>
+        <span class="n">buf_data</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">extract_dup</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">buf_data</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Gst</span><span class="o">.</span><span class="n">FlowReturn</span><span class="o">.</span><span class="n">OK</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf_data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">+=</span> <span class="n">buf_data</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">200000</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">+=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_size</span> <span class="o">+=</span> <span class="n">size</span>
+        <span class="k">return</span> <span class="n">Gst</span><span class="o">.</span><span class="n">FlowReturn</span><span class="o">.</span><span class="n">OK</span></div>
+
+<div class="viewcode-block" id="DataSink.eventfunc"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.DataSink.eventfunc">[docs]</a>    <span class="k">def</span> <span class="nf">eventfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Gst</span><span class="o">.</span><span class="n">Event</span><span class="o">.</span><span class="n">new_stream_start</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">got_new_segment</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">got_new_segment</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Gst</span><span class="o">.</span><span class="n">Event</span><span class="o">.</span><span class="n">new_eos</span><span class="p">()</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+<span class="n">GObject</span><span class="o">.</span><span class="n">type_register</span><span class="p">(</span><span class="n">DataSink</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="GStreamerPipeline"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline">[docs]</a><span class="k">class</span> <span class="nc">GStreamerPipeline</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;gstreamer&#39;</span>
+    <span class="n">addSlash</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">content_type</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_description</span> <span class="o">=</span> <span class="n">pipeline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contentType</span> <span class="o">=</span> <span class="n">content_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requests</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># if stream has a streamheader (something that has to be prepended</span>
+        <span class="c1"># before any data), then it will be a tuple of GstBuffers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streamheader</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_pipeline</span><span class="p">()</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GStreamerPipeline.parse_pipeline"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline.parse_pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">parse_pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">parse_launch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_description</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">appsink</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">ElementFactory</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;appsink&#39;</span><span class="p">,</span> <span class="s1">&#39;sink&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">appsink</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s1">&#39;emit-signals&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">appsink</span><span class="p">)</span>
+        <span class="n">enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_by_name</span><span class="p">(</span><span class="s1">&#39;enc&#39;</span><span class="p">)</span>
+        <span class="n">enc</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">appsink</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">appsink</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;new-preroll&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_preroll</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">appsink</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;new-buffer&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_buffer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">appsink</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;eos&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eos</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GStreamerPipeline.start"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;GStreamerPipeline start </span><span class="si">{request}</span><span class="s1"> </span><span class="si">{self.pipeline_description}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">PLAYING</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GStreamerPipeline.new_preroll"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline.new_preroll">[docs]</a>    <span class="k">def</span> <span class="nf">new_preroll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appsink</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;new preroll&#39;</span><span class="p">)</span>
+        <span class="n">buffer</span> <span class="o">=</span> <span class="n">appsink</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;pull-preroll&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">streamheader</span><span class="p">:</span>
+            <span class="c1"># check caps for streamheader buffer</span>
+            <span class="n">caps</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">get_caps</span><span class="p">()</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">caps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;streamheader&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">streamheader</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;streamheader&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;setting streamheader&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;writing streamheader&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">streamheader</span><span class="p">:</span>
+                        <span class="n">r</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;writing preroll&#39;</span><span class="p">)</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GStreamerPipeline.new_buffer"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline.new_buffer">[docs]</a>    <span class="k">def</span> <span class="nf">new_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appsink</span><span class="p">):</span>
+        <span class="n">buffer</span> <span class="o">=</span> <span class="n">appsink</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">&#39;pull-buffer&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">streamheader</span><span class="p">:</span>
+            <span class="c1"># check caps for streamheader buffers</span>
+            <span class="n">caps</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">get_caps</span><span class="p">()</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">caps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;streamheader&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">streamheader</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;streamheader&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;setting streamheader&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;writing streamheader&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">streamheader</span><span class="p">:</span>
+                        <span class="n">r</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GStreamerPipeline.eos"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline.eos">[docs]</a>    <span class="k">def</span> <span class="nf">eos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">appsink</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;eos&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GStreamerPipeline.getChild"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline.getChild">[docs]</a>    <span class="k">def</span> <span class="nf">getChild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;getChild </span><span class="si">{name}</span><span class="s1">, </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="GStreamerPipeline.render_GET"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline.render_GET">[docs]</a>    <span class="k">def</span> <span class="nf">render_GET</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;render GET </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;contentType&#39;</span><span class="p">):</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contentType</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">getAllHeaders</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;connection&#39;</span> <span class="ow">in</span> <span class="n">headers</span> <span class="ow">and</span>
+                <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;connection&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;close&#39;</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">streamheader</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;writing streamheader&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">streamheader</span><span class="p">:</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parse_pipeline</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span></div>
+
+<div class="viewcode-block" id="GStreamerPipeline.render_HEAD"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline.render_HEAD">[docs]</a>    <span class="k">def</span> <span class="nf">render_HEAD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;render HEAD </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contentType</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GStreamerPipeline.requestFinished"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline.requestFinished">[docs]</a>    <span class="k">def</span> <span class="nf">requestFinished</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;requestFinished </span><span class="si">{result}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># TODO: we need to find a way to destroy the pipeline here</span>
+        <span class="c1"># from twisted.internet import reactor</span>
+        <span class="c1"># reactor.callLater(0, self.pipeline.set_state, Gst.State.NULL)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GStreamerPipeline.on_message"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline.on_message">[docs]</a>    <span class="k">def</span> <span class="nf">on_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;on_message&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="n">Gst</span><span class="o">.</span><span class="n">Message</span><span class="o">.</span><span class="n">ERROR</span><span class="p">:</span>
+            <span class="c1"># err, debug = message.parse_error()</span>
+            <span class="c1"># print(f&#39;Error: {err}&#39;, debug)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">Gst</span><span class="o">.</span><span class="n">Message</span><span class="o">.</span><span class="n">EOS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GStreamerPipeline.cleanup"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerPipeline.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;pipeline cleanup&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">NULL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requests</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streamheader</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="BaseTranscoder"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.BaseTranscoder">[docs]</a><span class="k">class</span> <span class="nc">BaseTranscoder</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;transcoder&#39;</span>
+    <span class="n">addSlash</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">uri</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;file://&#39;</span><span class="p">,</span> <span class="s1">&#39;http://&#39;</span><span class="p">]:</span>
+            <span class="n">uri</span> <span class="o">=</span> <span class="s1">&#39;file://&#39;</span> <span class="o">+</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>  <span class="c1"># FIXME</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destination</span> <span class="o">=</span> <span class="n">destination</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contentType</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;uri </span><span class="si">{uri}</span><span class="s1"> {type(uri)}&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BaseTranscoder.getChild"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.BaseTranscoder.getChild">[docs]</a>    <span class="k">def</span> <span class="nf">getChild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;getChild </span><span class="si">{name}</span><span class="s1">, </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="BaseTranscoder.render_GET"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.BaseTranscoder.render_GET">[docs]</a>    <span class="k">def</span> <span class="nf">render_GET</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;render GET </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">contentType</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contentType</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">getAllHeaders</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;connection&#39;</span> <span class="ow">in</span> <span class="n">headers</span> <span class="ow">and</span>
+                <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;connection&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;close&#39;</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span></div>
+
+<div class="viewcode-block" id="BaseTranscoder.render_HEAD"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.BaseTranscoder.render_HEAD">[docs]</a>    <span class="k">def</span> <span class="nf">render_HEAD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;render HEAD </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contentType</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BaseTranscoder.requestFinished"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.BaseTranscoder.requestFinished">[docs]</a>    <span class="k">def</span> <span class="nf">requestFinished</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;requestFinished </span><span class="si">{result}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="sd">&#39;&#39;&#39; we need to find a way to destroy the pipeline here</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># from twisted.internet import reactor</span>
+        <span class="c1"># reactor.callLater(0, self.pipeline.set_state, Gst.State.NULL)</span>
+        <span class="n">GObject</span><span class="o">.</span><span class="n">idle_add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BaseTranscoder.on_message"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.BaseTranscoder.on_message">[docs]</a>    <span class="k">def</span> <span class="nf">on_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;on_message&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="n">Gst</span><span class="o">.</span><span class="n">Message</span><span class="o">.</span><span class="n">ERROR</span><span class="p">:</span>
+            <span class="c1"># err, debug = message.parse_error()</span>
+            <span class="c1"># print(f&#39;Error: {err}&#39;, debug)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">Gst</span><span class="o">.</span><span class="n">Message</span><span class="o">.</span><span class="n">EOS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BaseTranscoder.cleanup"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.BaseTranscoder.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">NULL</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BaseTranscoder.start"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.BaseTranscoder.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;This method should be sub classed for each</span>
+<span class="sd">        class which inherits from BaseTranscoder&#39;&#39;&#39;</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="PCMTranscoder"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.PCMTranscoder">[docs]</a><span class="k">class</span> <span class="nc">PCMTranscoder</span><span class="p">(</span><span class="n">BaseTranscoder</span><span class="p">,</span> <span class="n">InternalTranscoder</span><span class="p">):</span>
+    <span class="n">contentType</span> <span class="o">=</span> <span class="s1">&#39;audio/L16;rate=44100;channels=2&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;lpcm&#39;</span>
+
+<div class="viewcode-block" id="PCMTranscoder.start"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.PCMTranscoder.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;PCMTranscoder start </span><span class="si">{request}</span><span class="s1"> </span><span class="si">{self.uri}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">parse_launch</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.uri}</span><span class="s1"> ! decodebin ! audioconvert name=conv&#39;</span><span class="p">)</span>
+
+        <span class="n">conv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_by_name</span><span class="p">(</span><span class="s1">&#39;conv&#39;</span><span class="p">)</span>
+        <span class="n">caps</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">Caps</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span>
+            <span class="s1">&#39;audio/x-raw-int,rate=44100,endianness=4321,&#39;</span>
+            <span class="s1">&#39;channels=2,width=16,depth=16,signed=true&#39;</span><span class="p">)</span>
+        <span class="c1"># FIXME: UGLY. &#39;filter&#39; is a python builtin!</span>
+        <span class="nb">filter</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">ElementFactory</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s1">&#39;capsfilter&#39;</span><span class="p">,</span> <span class="s1">&#39;filter&#39;</span><span class="p">)</span>
+        <span class="nb">filter</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s1">&#39;caps&#39;</span><span class="p">,</span> <span class="n">caps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span>
+        <span class="n">conv</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span>
+
+        <span class="n">sink</span> <span class="o">=</span> <span class="n">DataSink</span><span class="p">(</span><span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="nb">filter</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">PLAYING</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WAVTranscoder"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.WAVTranscoder">[docs]</a><span class="k">class</span> <span class="nc">WAVTranscoder</span><span class="p">(</span><span class="n">BaseTranscoder</span><span class="p">,</span> <span class="n">InternalTranscoder</span><span class="p">):</span>
+    <span class="n">contentType</span> <span class="o">=</span> <span class="s1">&#39;audio/x-wav&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;wav&#39;</span>
+
+<div class="viewcode-block" id="WAVTranscoder.start"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.WAVTranscoder.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;start </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">parse_launch</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.uri}</span><span class="s1"> ! decodebin ! audioconvert ! wavenc name=enc&#39;</span><span class="p">)</span>
+        <span class="n">enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_by_name</span><span class="p">(</span><span class="s1">&#39;enc&#39;</span><span class="p">)</span>
+        <span class="n">sink</span> <span class="o">=</span> <span class="n">DataSink</span><span class="p">(</span><span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="n">enc</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="c1"># bus = self.pipeline.get_bus()</span>
+        <span class="c1"># bus.connect(&#39;message&#39;, self.on_message)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">PLAYING</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MP3Transcoder"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.MP3Transcoder">[docs]</a><span class="k">class</span> <span class="nc">MP3Transcoder</span><span class="p">(</span><span class="n">BaseTranscoder</span><span class="p">,</span> <span class="n">InternalTranscoder</span><span class="p">):</span>
+    <span class="n">contentType</span> <span class="o">=</span> <span class="s1">&#39;audio/mpeg&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;mp3&#39;</span>
+
+<div class="viewcode-block" id="MP3Transcoder.start"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.MP3Transcoder.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;start </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">parse_launch</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.uri}</span><span class="s1"> ! decodebin ! audioconvert ! lame name=enc&#39;</span><span class="p">)</span>
+        <span class="n">enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_by_name</span><span class="p">(</span><span class="s1">&#39;enc&#39;</span><span class="p">)</span>
+        <span class="n">sink</span> <span class="o">=</span> <span class="n">DataSink</span><span class="p">(</span><span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="n">enc</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">PLAYING</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MP4Transcoder"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.MP4Transcoder">[docs]</a><span class="k">class</span> <span class="nc">MP4Transcoder</span><span class="p">(</span><span class="n">BaseTranscoder</span><span class="p">,</span> <span class="n">InternalTranscoder</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Only works if H264 inside Quicktime/MP4 container is input</span>
+<span class="sd">        Source has to be a valid uri</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">contentType</span> <span class="o">=</span> <span class="s1">&#39;video/mp4&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;mp4&#39;</span>
+
+<div class="viewcode-block" id="MP4Transcoder.start"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.MP4Transcoder.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;start </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">parse_launch</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.uri}</span><span class="s1"> ! qtdemux name=d ! queue ! h264parse &#39;</span>
+            <span class="n">f</span><span class="s1">&#39;! mp4mux name=mux d. ! queue ! mux.&#39;</span><span class="p">)</span>
+        <span class="n">mux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_by_name</span><span class="p">(</span><span class="s1">&#39;mux&#39;</span><span class="p">)</span>
+        <span class="n">sink</span> <span class="o">=</span> <span class="n">DataSink</span><span class="p">(</span><span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="n">mux</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">PLAYING</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MP2TSTranscoder"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.MP2TSTranscoder">[docs]</a><span class="k">class</span> <span class="nc">MP2TSTranscoder</span><span class="p">(</span><span class="n">BaseTranscoder</span><span class="p">,</span> <span class="n">InternalTranscoder</span><span class="p">):</span>
+    <span class="n">contentType</span> <span class="o">=</span> <span class="s1">&#39;video/mpeg&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;mpegts&#39;</span>
+
+<div class="viewcode-block" id="MP2TSTranscoder.start"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.MP2TSTranscoder.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;start </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># FIXME - mpeg2enc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">parse_launch</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;mpegtsmux name=mux </span><span class="si">{self.uri}</span><span class="s1"> ! decodebin2 name=d ! queue &#39;</span>
+            <span class="n">f</span><span class="s1">&#39;! ffmpegcolorspace ! mpeg2enc ! queue ! mux. d. &#39;</span>
+            <span class="n">f</span><span class="s1">&#39;! queue ! audioconvert ! twolame ! queue ! mux.&#39;</span><span class="p">)</span>
+        <span class="n">enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_by_name</span><span class="p">(</span><span class="s1">&#39;mux&#39;</span><span class="p">)</span>
+        <span class="n">sink</span> <span class="o">=</span> <span class="n">DataSink</span><span class="p">(</span><span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="n">enc</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">PLAYING</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ThumbTranscoder"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ThumbTranscoder">[docs]</a><span class="k">class</span> <span class="nc">ThumbTranscoder</span><span class="p">(</span><span class="n">BaseTranscoder</span><span class="p">,</span> <span class="n">InternalTranscoder</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Should create a valid thumbnail according to the DLNA spec</span>
+
+<span class="sd">    .. warning:: Neither width nor height must exceed 160px</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">contentType</span> <span class="o">=</span> <span class="s1">&#39;image/jpeg&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;thumb&#39;</span>
+
+<div class="viewcode-block" id="ThumbTranscoder.start"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ThumbTranscoder.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;start </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        # what we actually want here is a pipeline that calls</span>
+<span class="sd">        # us when it knows about the size of the original image,</span>
+<span class="sd">        # and allows us now to adjust the caps-filter with the</span>
+<span class="sd">        # calculated values for width and height</span>
+<span class="sd">        new_width = 160</span>
+<span class="sd">        new_height = 160</span>
+<span class="sd">        if original_width &gt; 160:</span>
+<span class="sd">            new_heigth = \</span>
+<span class="sd">                int(float(original_height) * (160.0/float(original_width)))</span>
+<span class="sd">            if new_height &gt; 160:</span>
+<span class="sd">                new_width = \</span>
+<span class="sd">                    int(float(new_width) * (160.0/float(new_height)))</span>
+<span class="sd">        elif original_height &gt; 160:</span>
+<span class="sd">            new_width = \</span>
+<span class="sd">                int(float(original_width) * (160.0/float(original_height)))</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="s1">&#39;jpeg&#39;</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;png&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">parse_launch</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.uri}</span><span class="s1"> ! decodebin2 ! videoscale &#39;</span>
+                <span class="n">f</span><span class="s1">&#39;! video/x-raw-yuv,width=160,height=160 ! pngenc name=enc&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contentType</span> <span class="o">=</span> <span class="s1">&#39;image/png&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">parse_launch</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.uri}</span><span class="s1"> ! decodebin2 ! videoscale &#39;</span>
+                <span class="n">f</span><span class="s1">&#39;! video/x-raw-yuv,width=160,height=160 ! jpegenc name=enc&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contentType</span> <span class="o">=</span> <span class="s1">&#39;image/jpeg&#39;</span>
+        <span class="n">enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_by_name</span><span class="p">(</span><span class="s1">&#39;enc&#39;</span><span class="p">)</span>
+        <span class="n">sink</span> <span class="o">=</span> <span class="n">DataSink</span><span class="p">(</span><span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="n">enc</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">PLAYING</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GStreamerTranscoder"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerTranscoder">[docs]</a><span class="k">class</span> <span class="nc">GStreamerTranscoder</span><span class="p">(</span><span class="n">BaseTranscoder</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A generic Transcoder based on GStreamer.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">pipeline_description</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The pipeline which will be parsed upon calling the start method,</span>
+<span class="sd">    has to be set as the attribute :attr:`pipeline_description` to</span>
+<span class="sd">    the instantiated class.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="GStreamerTranscoder.start"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.GStreamerTranscoder.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_description</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s1">&#39;Warning: operation cancelled. You must set a value for &#39;</span>
+                <span class="s1">&#39;GStreamerTranscoder.pipeline_description&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;start </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Gst</span><span class="o">.</span><span class="n">parse_launch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_description</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+        <span class="n">enc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">get_by_name</span><span class="p">(</span><span class="s1">&#39;mux&#39;</span><span class="p">)</span>
+        <span class="n">sink</span> <span class="o">=</span> <span class="n">DataSink</span><span class="p">(</span><span class="n">destination</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="n">enc</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">Gst</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">PLAYING</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ExternalProcessProtocol"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProtocol">[docs]</a><span class="k">class</span> <span class="nc">ExternalProcessProtocol</span><span class="p">(</span><span class="n">protocol</span><span class="o">.</span><span class="n">ProcessProtocol</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caller</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caller</span> <span class="o">=</span> <span class="n">caller</span>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.connectionMade"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProtocol.connectionMade">[docs]</a>    <span class="k">def</span> <span class="nf">connectionMade</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;pp connection made&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.outReceived"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProtocol.outReceived">[docs]</a>    <span class="k">def</span> <span class="nf">outReceived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="c1"># print(f&#39;outReceived with {len(data):d} bytes!&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caller</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.errReceived"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProtocol.errReceived">[docs]</a>    <span class="k">def</span> <span class="nf">errReceived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="c1"># print(f&#39;errReceived! with {len(data):d} bytes!&#39;)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;pp (err):&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.inConnectionLost"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProtocol.inConnectionLost">[docs]</a>    <span class="k">def</span> <span class="nf">inConnectionLost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(&#39;inConnectionLost! stdin is closed! (we probably did it)&#39;)</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.outConnectionLost"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProtocol.outConnectionLost">[docs]</a>    <span class="k">def</span> <span class="nf">outConnectionLost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(&#39;outConnectionLost! The child closed their stdout!&#39;)</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.errConnectionLost"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProtocol.errConnectionLost">[docs]</a>    <span class="k">def</span> <span class="nf">errConnectionLost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(&#39;errConnectionLost! The child closed their stderr.&#39;)</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.processEnded"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProtocol.processEnded">[docs]</a>    <span class="k">def</span> <span class="nf">processEnded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_object</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;processEnded, status </span><span class="si">{status_object.value.exitCode:d}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;processEnded quitting&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caller</span><span class="o">.</span><span class="n">ended</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caller</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ExternalProcessProducer"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProducer">[docs]</a><span class="k">class</span> <span class="nc">ExternalProcessProducer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;externalprocess&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">request</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">written</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ended</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">registerProducer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExternalProcessProducer.write_data"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProducer.write_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+            <span class="c1"># print(f&#39;write {len(data):d} bytes of data&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">written</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="c1"># this .write will spin the reactor, calling .doWrite and then</span>
+            <span class="c1"># .resumeProducing again, so be prepared for a re-entrant call</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ended</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;closing&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">unregisterProducer</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProducer.resumeProducing"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProducer.resumeProducing">[docs]</a>    <span class="k">def</span> <span class="nf">resumeProducing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(&#39;resumeProducing&#39;, self.request)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">argv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">executable</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">spawnProcess</span><span class="p">(</span><span class="n">ExternalProcessProtocol</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+                                                <span class="n">executable</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="p">{})</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProducer.pauseProducing"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProducer.pauseProducing">[docs]</a>    <span class="k">def</span> <span class="nf">pauseProducing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProducer.stopProducing"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessProducer.stopProducing">[docs]</a>    <span class="k">def</span> <span class="nf">stopProducing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stopProducing&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">unregisterProducer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">loseConnection</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="ExternalProcessPipeline"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessPipeline">[docs]</a><span class="k">class</span> <span class="nc">ExternalProcessPipeline</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;externalprocess&#39;</span>
+    <span class="n">addSlash</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">pipeline_description</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">contentType</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExternalProcessPipeline.getChildWithDefault"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessPipeline.getChildWithDefault">[docs]</a>    <span class="k">def</span> <span class="nf">getChildWithDefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ExternalProcessPipeline.render"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.ExternalProcessPipeline.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ExternalProcessPipeline render&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_description</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s1">&#39;Warning: operation cancelled. You must set a value for &#39;</span>
+                <span class="s1">&#39;ExternalProcessPipeline.pipeline_description&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">contentType</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contentType</span><span class="p">)</span>
+
+        <span class="n">ExternalProcessProducer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_description</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span></div></div>
+
+
+<div class="viewcode-block" id="transcoder_class_wrapper"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.transcoder_class_wrapper">[docs]</a><span class="k">def</span> <span class="nf">transcoder_class_wrapper</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="n">content_type</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_object</span><span class="p">(</span><span class="n">uri</span><span class="p">):</span>
+        <span class="n">transcoder</span> <span class="o">=</span> <span class="n">klass</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="n">transcoder</span><span class="o">.</span><span class="n">contentType</span> <span class="o">=</span> <span class="n">content_type</span>
+        <span class="n">transcoder</span><span class="o">.</span><span class="n">pipeline_description</span> <span class="o">=</span> <span class="n">pipeline</span>
+        <span class="k">return</span> <span class="n">transcoder</span>
+
+    <span class="k">return</span> <span class="n">create_object</span></div>
+
+
+<div class="viewcode-block" id="TranscoderManager"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.TranscoderManager">[docs]</a><span class="k">class</span> <span class="nc">TranscoderManager</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Singleton class which holds information about all available transcoders.</span>
+<span class="sd">    They are put into a transcoders dict with their id as the key.</span>
+
+<span class="sd">    We collect all internal transcoders by searching for all subclasses of</span>
+<span class="sd">    InternalTranscoder, the class will be the value.</span>
+
+<span class="sd">    Transcoders defined in the config are parsed and stored as a dict in the</span>
+<span class="sd">    transcoders dict.</span>
+
+<span class="sd">    In the config, a transcoder description has to look like this:</span>
+
+<span class="sd">    *** preliminary, will be extended and</span>
+<span class="sd">    might even change without further notice ***</span>
+
+<span class="sd">    .. code-block:: xml</span>
+
+<span class="sd">        &lt;transcoder&gt;</span>
+<span class="sd">            &lt;pipeline&gt;%s ...&lt;/pipeline&gt; &lt;!-- we need a %s here to insert the</span>
+<span class="sd">                                            source uri (or can we have all the</span>
+<span class="sd">                                            times pipelines we can prepend with</span>
+<span class="sd">                                            a &#39;%s !&#39;) and an element named mux</span>
+<span class="sd">                                            where we can attach our sink --&gt;</span>
+<span class="sd">            &lt;type&gt;gstreamer&lt;/type&gt;      &lt;!-- could be gstreamer or process --&gt;</span>
+<span class="sd">            &lt;name&gt;mpegts&lt;/name&gt;</span>
+<span class="sd">            &lt;target&gt;video/mpeg&lt;/target&gt;</span>
+<span class="sd">            &lt;fourth_field&gt;              &lt;!-- value for the 4th field of the</span>
+<span class="sd">                                            protocolInfo phalanx, default is</span>
+<span class="sd">                                            &#39;*&#39; --&gt;</span>
+<span class="sd">        &lt;/transcoder&gt;</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;transcoder_manager&#39;</span>
+    <span class="n">_instance_</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Singleton</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Creates the singleton.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TranscoderManager</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;coherence&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;coherence&#39;</span><span class="p">]</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance_</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_instance_</span>
+
+<div class="viewcode-block" id="TranscoderManager.__init__"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.TranscoderManager.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initializes the class :class:`TranscoderManager`.</span>
+
+<span class="sd">        It should be called at least once with the main</span>
+<span class="sd">        :class:`~coherence.base.Coherence` class passed as an argument,</span>
+<span class="sd">        so we have access to the config.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transcoders</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">transcoder</span> <span class="ow">in</span> <span class="n">InternalTranscoder</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transcoders</span><span class="p">[</span><span class="n">get_transcoder_name</span><span class="p">(</span><span class="n">transcoder</span><span class="p">)]</span> <span class="o">=</span> <span class="n">transcoder</span>
+
+        <span class="k">if</span> <span class="n">coherence</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">coherence</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">transcoders_from_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;transcoder&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transcoders_from_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">transcoders_from_config</span> <span class="o">=</span> <span class="p">[</span><span class="n">transcoders_from_config</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">transcoders_from_config</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">transcoder</span> <span class="ow">in</span> <span class="n">transcoders_from_config</span><span class="p">:</span>
+                <span class="c1"># FIXME: is anyone checking if all keys are given ?</span>
+                <span class="n">pipeline</span> <span class="o">=</span> <span class="n">transcoder</span><span class="p">[</span><span class="s1">&#39;pipeline&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pipeline</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t create transcoder </span><span class="si">%r</span><span class="s1">:&#39;</span>
+                                 <span class="s1">&#39; missing placehoder </span><span class="se">\&#39;</span><span class="si">%%</span><span class="s1">s</span><span class="se">\&#39;</span><span class="s1"> in </span><span class="se">\&#39;</span><span class="s1">pipeline</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">,</span>
+                                 <span class="n">transcoder</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">transcoder_name</span> <span class="o">=</span> <span class="n">transcoder</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>  <span class="c1"># .decode(&#39;ascii&#39;)</span>
+                <span class="k">except</span> <span class="ne">UnicodeEncodeError</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t create transcoder </span><span class="si">%r</span><span class="s1">:&#39;</span>
+                                 <span class="s1">&#39; the </span><span class="se">\&#39;</span><span class="s1">name</span><span class="se">\&#39;</span><span class="s1"> contains non-ascii letters&#39;</span><span class="p">,</span>
+                                 <span class="n">transcoder</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="n">transcoder_type</span> <span class="o">=</span> <span class="n">transcoder</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">transcoder_type</span> <span class="o">==</span> <span class="s1">&#39;gstreamer&#39;</span><span class="p">:</span>
+                    <span class="n">wrapped</span> <span class="o">=</span> <span class="n">transcoder_class_wrapper</span><span class="p">(</span><span class="n">GStreamerTranscoder</span><span class="p">,</span>
+                                                       <span class="n">transcoder</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">],</span>
+                                                       <span class="n">transcoder</span><span class="p">[</span><span class="s1">&#39;pipeline&#39;</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">transcoder_type</span> <span class="o">==</span> <span class="s1">&#39;process&#39;</span><span class="p">:</span>
+                    <span class="n">wrapped</span> <span class="o">=</span> <span class="n">transcoder_class_wrapper</span><span class="p">(</span><span class="n">ExternalProcessPipeline</span><span class="p">,</span>
+                                                       <span class="n">transcoder</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">],</span>
+                                                       <span class="n">transcoder</span><span class="p">[</span><span class="s1">&#39;pipeline&#39;</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="n">f</span><span class="s1">&#39;unknown transcoder type </span><span class="si">{transcoder_type}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">transcoders</span><span class="p">[</span><span class="n">transcoder_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrapped</span>
+
+        <span class="c1"># FIXME reduce that to info later</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;available transcoders </span><span class="si">{self.transcoders}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TranscoderManager.select"><a class="viewcode-back" href="../../source/modules.html#coherence.transcoder.TranscoderManager.select">[docs]</a>    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># FIXME:why do we specify the name when trying to get it?</span>
+
+        <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="sd">&#39;&#39;&#39; try to find a transcoder provided by the backend</span>
+<span class="sd">                and return that here,</span>
+<span class="sd">                if there isn&#39;t one continue with the ones</span>
+<span class="sd">                provided by the config or the internal ones</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="k">pass</span>
+
+        <span class="n">transcoder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transcoders</span><span class="p">[</span><span class="n">name</span><span class="p">](</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">transcoder</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

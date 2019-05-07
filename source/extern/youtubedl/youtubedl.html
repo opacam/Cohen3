@@ -1,0 +1,974 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.extern.youtubedl.youtubedl (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.upnp (package)" href="../../coherence.upnp.html" />
+    <link rel="prev" title="coherence.extern.galleryremote.gallery (module)" href="../galleryremote/gallery.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../covers_by_amazon.html">coherence.extern.covers_by_amazon (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../db_row.html">coherence.extern.db_row (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simple_plugin.html">coherence.extern.simple_plugin (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xdg.html">coherence.extern.xdg (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.extern.html#coherence-extern-galleryremote-package">coherence.extern.galleryremote (package)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.extern.html#coherence-extern-youtubedl-package">coherence.extern.youtubedl (package)</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.extern.youtubedl.youtubedl (module)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.extern.html">coherence.extern (package)</a> &raquo;</li>
+        
+      <li>coherence.extern.youtubedl.youtubedl (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/extern/youtubedl/youtubedl.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.extern.youtubedl.youtubedl">
+<span id="coherence-extern-youtubedl-youtubedl-module"></span><span id="extern-youtubedl"></span><h1>coherence.extern.youtubedl.youtubedl (module)<a class="headerlink" href="#module-coherence.extern.youtubedl.youtubedl" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="coherence.extern.youtubedl.youtubedl.preferredencoding">
+<code class="descname">preferredencoding</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#preferredencoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.preferredencoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get preferred encoding.</p>
+<p>Returns the best encoding scheme for the system, based on
+locale.getpreferredencoding() and some further tweaks.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="coherence.extern.youtubedl.youtubedl.DownloadError">
+<em class="property">exception </em><code class="descname">DownloadError</code><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#DownloadError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.DownloadError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Download Error exception.</p>
+<p>This exception may be thrown by FileDownloader objects if they are not
+configured to continue on errors. They will contain the appropriate
+error message.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="coherence.extern.youtubedl.youtubedl.SameFileError">
+<em class="property">exception </em><code class="descname">SameFileError</code><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#SameFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.SameFileError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Same File exception.</p>
+<p>This exception will be thrown by FileDownloader objects if they detect
+multiple files would have to be downloaded to the same file on disk.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="coherence.extern.youtubedl.youtubedl.PostProcessingError">
+<em class="property">exception </em><code class="descname">PostProcessingError</code><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#PostProcessingError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.PostProcessingError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Post Processing exception.</p>
+<p>This exception may be raised by PostProcessor’s .run() method to
+indicate an error in the postprocessing task.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="coherence.extern.youtubedl.youtubedl.UnavailableFormatError">
+<em class="property">exception </em><code class="descname">UnavailableFormatError</code><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#UnavailableFormatError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.UnavailableFormatError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Unavailable Format exception.</p>
+<p>This exception will be thrown when a video is requested
+in a format that is not available for that video.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="coherence.extern.youtubedl.youtubedl.ContentTooShortError">
+<em class="property">exception </em><code class="descname">ContentTooShortError</code><span class="sig-paren">(</span><em>downloaded</em>, <em>expected</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#ContentTooShortError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.ContentTooShortError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Content Too Short exception.</p>
+<p>This exception may be raised by FileDownloader objects when a file they
+download is too small for what the server announced first, indicating
+the connection was probably interrupted.</p>
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.ContentTooShortError.downloaded">
+<code class="descname">downloaded</code><em class="property"> = None</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.ContentTooShortError.downloaded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.ContentTooShortError.expected">
+<code class="descname">expected</code><em class="property"> = None</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.ContentTooShortError.expected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader">
+<em class="property">class </em><code class="descname">FileDownloader</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>File Downloader class.</p>
+<p>File downloader objects are the ones responsible of downloading the
+actual video file and writing it to disk if the user has requested
+it, among some other tasks. In most cases there should be one per
+program. As, given a video URL, the downloader doesn’t know how to
+extract all the needed information, task that InfoExtractors do, it
+has to pass the URL to one of them.</p>
+<p>For this, file downloader objects have a method that allows
+InfoExtractors to be registered in a given order. When it is passed
+a URL, the file downloader handles it to the first InfoExtractor it
+finds that reports being able to handle it. The InfoExtractor extracts
+all the information about the video or videos the URL refers to, and
+asks the FileDownloader to process the video information, possibly
+downloading the video.</p>
+<p>File downloaders accept a lot of parameters. In order not to saturate
+the object constructor with arguments, it receives a dictionary of
+options instead. These options are available through the params
+attribute for the InfoExtractors to use. The FileDownloader also
+registers itself as the downloader in charge for the InfoExtractors
+that are added to it, so this is a “mutual registration”.</p>
+<p>Available options:</p>
+<p>username:   Username for authentication purposes.
+password:   Password for authentication purposes.
+usenetrc:   Use netrc for authentication instead.
+quiet:              Do not print messages to stdout.
+forceurl:   Force printing final URL.
+forcetitle: Force printing title.
+simulate:   Do not download the video files.
+format:             Video format code.
+outtmpl:    Template for output names.
+ignoreerrors:       Do not stop on download errors.
+ratelimit:  Download speed limit, in bytes/sec.
+nooverwrites:    Prevent overwriting files.
+continuedl:    Try to continue downloads if possible.</p>
+<p>Create a FileDownloader object with the given options.</p>
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a FileDownloader object with the given options.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader._ies">
+<code class="descname">_ies</code><em class="property"> = []</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader._ies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader._pps">
+<code class="descname">_pps</code><em class="property"> = []</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader._pps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader._download_retcode">
+<code class="descname">_download_retcode</code><em class="property"> = None</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader._download_retcode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.params">
+<code class="descname">params</code><em class="property"> = None</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.pmkdir">
+<em class="property">static </em><code class="descname">pmkdir</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.pmkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.pmkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create directory components in filename. Similar to Unix “mkdir -p”.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.format_bytes">
+<em class="property">static </em><code class="descname">format_bytes</code><span class="sig-paren">(</span><em>bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.format_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.format_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.calc_percent">
+<em class="property">static </em><code class="descname">calc_percent</code><span class="sig-paren">(</span><em>byte_counter</em>, <em>data_len</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.calc_percent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.calc_percent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.calc_eta">
+<em class="property">static </em><code class="descname">calc_eta</code><span class="sig-paren">(</span><em>start</em>, <em>now</em>, <em>total</em>, <em>current</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.calc_eta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.calc_eta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.calc_speed">
+<em class="property">static </em><code class="descname">calc_speed</code><span class="sig-paren">(</span><em>start</em>, <em>now</em>, <em>bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.calc_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.calc_speed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.best_block_size">
+<em class="property">static </em><code class="descname">best_block_size</code><span class="sig-paren">(</span><em>elapsed_time</em>, <em>bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.best_block_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.best_block_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.parse_bytes">
+<em class="property">static </em><code class="descname">parse_bytes</code><span class="sig-paren">(</span><em>bytestr</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.parse_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.parse_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a string indicating a byte quantity into a long integer.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.verify_url">
+<em class="property">static </em><code class="descname">verify_url</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.verify_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.verify_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verify a URL is valid and data could be downloaded.
+Return real data URL.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.add_info_extractor">
+<code class="descname">add_info_extractor</code><span class="sig-paren">(</span><em>ie</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.add_info_extractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.add_info_extractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an InfoExtractor object to the end of the list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.add_post_processor">
+<code class="descname">add_post_processor</code><span class="sig-paren">(</span><em>pp</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.add_post_processor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.add_post_processor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a PostProcessor object to the end of the chain.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.to_stdout">
+<code class="descname">to_stdout</code><span class="sig-paren">(</span><em>message</em>, <em>skip_eol=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.to_stdout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.to_stdout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print message to stdout if not in quiet mode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.to_stderr">
+<code class="descname">to_stderr</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.to_stderr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.to_stderr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print message to stderr.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.fixed_template">
+<code class="descname">fixed_template</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.fixed_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.fixed_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the output template is fixed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.trouble">
+<code class="descname">trouble</code><span class="sig-paren">(</span><em>message=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.trouble"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.trouble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine action to take when a download problem appears.</p>
+<p>Depending on if the downloader has been configured to ignore
+download errors or not, this method may throw an exception or
+not when errors are found, after printing the message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.slow_down">
+<code class="descname">slow_down</code><span class="sig-paren">(</span><em>start_time</em>, <em>byte_counter</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.slow_down"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.slow_down" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sleep if the download speed is over the rate limit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.report_destination">
+<code class="descname">report_destination</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.report_destination"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.report_destination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report destination filename.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.report_progress">
+<code class="descname">report_progress</code><span class="sig-paren">(</span><em>percent_str</em>, <em>data_len_str</em>, <em>speed_str</em>, <em>eta_str</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.report_progress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.report_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report download progress.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.report_resuming_byte">
+<code class="descname">report_resuming_byte</code><span class="sig-paren">(</span><em>resume_len</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.report_resuming_byte"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.report_resuming_byte" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report attemtp to resume at given byte.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.report_file_already_downloaded">
+<code class="descname">report_file_already_downloaded</code><span class="sig-paren">(</span><em>file_name</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.report_file_already_downloaded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.report_file_already_downloaded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report file has already been fully downloaded.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.report_unable_to_resume">
+<code class="descname">report_unable_to_resume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.report_unable_to_resume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.report_unable_to_resume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report it was impossible to resume download.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.report_finish">
+<code class="descname">report_finish</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.report_finish"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.report_finish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report download finished.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader._do_download">
+<code class="descname">_do_download</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader._do_download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader._do_download" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.process_info">
+<code class="descname">process_info</code><span class="sig-paren">(</span><em>info_dict</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.process_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.process_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a single dictionary returned by an InfoExtractor.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.download">
+<code class="descname">download</code><span class="sig-paren">(</span><em>url_list</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a given list of URLs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.get_real_urls">
+<code class="descname">get_real_urls</code><span class="sig-paren">(</span><em>url_list</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.get_real_urls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.get_real_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a given list of URLs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.FileDownloader.post_process">
+<code class="descname">post_process</code><span class="sig-paren">(</span><em>filename</em>, <em>ie_info</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#FileDownloader.post_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.FileDownloader.post_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the postprocessing chain on the given file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor">
+<em class="property">class </em><code class="descname">InfoExtractor</code><span class="sig-paren">(</span><em>downloader=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#InfoExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Information Extractor class.</p>
+<p>Information extractors are the classes that, given a URL, extract
+information from the video (or videos) the URL refers to. This
+information includes the real video URL, the video title and simplified
+title, author and others. The information is stored in a dictionary
+which is then passed to the FileDownloader. The FileDownloader
+processes this information possibly downloading the video to the file
+system, among other possible outcomes. The dictionaries must include
+the following fields:</p>
+<p>id:         Video identifier.
+url:                Final video URL.
+uploader:   Nickname of the video uploader.
+title:              Literal title.
+stitle:             Simplified title.
+ext:                Video filename extension.</p>
+<p>Subclasses of this one should re-define the _real_initialize() and
+_real_extract() methods, as well as the suitable() static method.
+Probably, they should also be instantiated and added to the main
+downloader.</p>
+<p>Constructor. Receives an optional downloader.</p>
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor._downloader">
+<code class="descname">_downloader</code><em class="property"> = None</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor._downloader" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>downloader=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#InfoExtractor.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor. Receives an optional downloader.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor._ready">
+<code class="descname">_ready</code><em class="property"> = False</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor._ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor.suitable">
+<em class="property">static </em><code class="descname">suitable</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#InfoExtractor.suitable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor.suitable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receives a URL and returns True if suitable for this IE.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor.initialize">
+<code class="descname">initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#InfoExtractor.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes an instance (authentication, etc).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor.extract">
+<code class="descname">extract</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#InfoExtractor.extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor.extract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts URL information and returns it in list of dicts.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor.set_downloader">
+<code class="descname">set_downloader</code><span class="sig-paren">(</span><em>downloader</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#InfoExtractor.set_downloader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor.set_downloader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the downloader for this IE.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor.to_stdout">
+<code class="descname">to_stdout</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#InfoExtractor.to_stdout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor.to_stdout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print message to stdout if downloader is not in quiet mode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor.to_stderr">
+<code class="descname">to_stderr</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#InfoExtractor.to_stderr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor.to_stderr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print message to stderr.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor._real_initialize">
+<code class="descname">_real_initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#InfoExtractor._real_initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor._real_initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real initialization process. Redefine in subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.InfoExtractor._real_extract">
+<code class="descname">_real_extract</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#InfoExtractor._real_extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor._real_extract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real extraction process. Redefine in subclasses.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE">
+<em class="property">class </em><code class="descname">YoutubeIE</code><span class="sig-paren">(</span><em>downloader=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor" title="coherence.extern.youtubedl.youtubedl.InfoExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.extern.youtubedl.youtubedl.InfoExtractor</span></code></a></p>
+<p>Information extractor for youtube.com.</p>
+<p>Constructor. Receives an optional downloader.</p>
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE._VALID_URL">
+<code class="descname">_VALID_URL</code><em class="property"> = '^((?:https://)?(?:\\w+\\.)?youtube\\.com/(?:(?:v/)|(?:(?:watch(?:\\.php)?)?\\?(?:.+&amp;)?v=)))?([0-9A-Za-z_-]+)(?(1).+)?$'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE._VALID_URL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE._LANG_URL">
+<code class="descname">_LANG_URL</code><em class="property"> = 'https://uk.youtube.com/?hl=en&amp;persist_hl=1&amp;gl=US&amp;persist_gl=1&amp;opt_out_ackd=1'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE._LANG_URL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE._LOGIN_URL">
+<code class="descname">_LOGIN_URL</code><em class="property"> = 'https://www.youtube.com/signup?next=/&amp;gl=US&amp;hl=en'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE._LOGIN_URL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE._AGE_URL">
+<code class="descname">_AGE_URL</code><em class="property"> = 'https://www.youtube.com/verify_age?next_url=/&amp;gl=US&amp;hl=en'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE._AGE_URL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE._NETRC_MACHINE">
+<code class="descname">_NETRC_MACHINE</code><em class="property"> = 'youtube'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE._NETRC_MACHINE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE._available_formats">
+<code class="descname">_available_formats</code><em class="property"> = ['22', '35', '18', '5', '17', '13', None]</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE._available_formats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE._video_extensions">
+<code class="descname">_video_extensions</code><em class="property"> = {'13': '3gp', '17': 'mp4', '18': 'mp4', '22': 'mp4'}</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE._video_extensions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE.suitable">
+<em class="property">static </em><code class="descname">suitable</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE.suitable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE.suitable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receives a URL and returns True if suitable for this IE.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE.htmlentity_transform">
+<em class="property">static </em><code class="descname">htmlentity_transform</code><span class="sig-paren">(</span><em>matchobj</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE.htmlentity_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE.htmlentity_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms an HTML entity to a Unicode character.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE.report_lang">
+<code class="descname">report_lang</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE.report_lang"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE.report_lang" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report attempt to set language.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE.report_login">
+<code class="descname">report_login</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE.report_login"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE.report_login" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report attempt to log in.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE.report_age_confirmation">
+<code class="descname">report_age_confirmation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE.report_age_confirmation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE.report_age_confirmation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report attempt to confirm age.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE.report_video_info_webpage_download">
+<code class="descname">report_video_info_webpage_download</code><span class="sig-paren">(</span><em>video_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE.report_video_info_webpage_download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE.report_video_info_webpage_download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report attempt to download video info webpage.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE.report_information_extraction">
+<code class="descname">report_information_extraction</code><span class="sig-paren">(</span><em>video_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE.report_information_extraction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE.report_information_extraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report attempt to extract video information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE.report_unavailable_format">
+<code class="descname">report_unavailable_format</code><span class="sig-paren">(</span><em>video_id</em>, <em>format</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE.report_unavailable_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE.report_unavailable_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report extracted video URL.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE.report_video_url">
+<code class="descname">report_video_url</code><span class="sig-paren">(</span><em>video_id</em>, <em>video_real_url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE.report_video_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE.report_video_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report extracted video URL.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE._real_initialize">
+<code class="descname">_real_initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE._real_initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE._real_initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real initialization process. Redefine in subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeIE._real_extract">
+<code class="descname">_real_extract</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeIE._real_extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeIE._real_extract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real extraction process. Redefine in subclasses.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE">
+<em class="property">class </em><code class="descname">MetacafeIE</code><span class="sig-paren">(</span><em>youtube_ie</em>, <em>downloader=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#MetacafeIE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor" title="coherence.extern.youtubedl.youtubedl.InfoExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.extern.youtubedl.youtubedl.InfoExtractor</span></code></a></p>
+<p>Information Extractor for metacafe.com.</p>
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE._VALID_URL">
+<code class="descname">_VALID_URL</code><em class="property"> = '(?:https://)?(?:www\\.)?metacafe\\.com/watch/([^/]+)/([^/]+)/.*'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE._VALID_URL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE._DISCLAIMER">
+<code class="descname">_DISCLAIMER</code><em class="property"> = 'https://www.metacafe.com/family_filter/'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE._DISCLAIMER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE._FILTER_POST">
+<code class="descname">_FILTER_POST</code><em class="property"> = 'https://www.metacafe.com/f/index.php?inputType=filter&amp;controllerGroup=user'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE._FILTER_POST" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE._youtube_ie">
+<code class="descname">_youtube_ie</code><em class="property"> = None</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE._youtube_ie" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE.suitable">
+<em class="property">static </em><code class="descname">suitable</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#MetacafeIE.suitable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE.suitable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receives a URL and returns True if suitable for this IE.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE.report_disclaimer">
+<code class="descname">report_disclaimer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#MetacafeIE.report_disclaimer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE.report_disclaimer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report disclaimer retrieval.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE.report_age_confirmation">
+<code class="descname">report_age_confirmation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#MetacafeIE.report_age_confirmation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE.report_age_confirmation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report attempt to confirm age.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE.report_download_webpage">
+<code class="descname">report_download_webpage</code><span class="sig-paren">(</span><em>video_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#MetacafeIE.report_download_webpage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE.report_download_webpage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report webpage download.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE.report_extraction">
+<code class="descname">report_extraction</code><span class="sig-paren">(</span><em>video_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#MetacafeIE.report_extraction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE.report_extraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report information extraction.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE._real_initialize">
+<code class="descname">_real_initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#MetacafeIE._real_initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE._real_initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real initialization process. Redefine in subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.MetacafeIE._real_extract">
+<code class="descname">_real_extract</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#MetacafeIE._real_extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.MetacafeIE._real_extract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real extraction process. Redefine in subclasses.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE">
+<em class="property">class </em><code class="descname">YoutubeSearchIE</code><span class="sig-paren">(</span><em>youtube_ie</em>, <em>downloader=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeSearchIE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor" title="coherence.extern.youtubedl.youtubedl.InfoExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.extern.youtubedl.youtubedl.InfoExtractor</span></code></a></p>
+<p>Information Extractor for YouTube search queries.</p>
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._VALID_QUERY">
+<code class="descname">_VALID_QUERY</code><em class="property"> = 'ytsearch(\\d+|all)?:[\\s\\S]+'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._VALID_QUERY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._TEMPLATE_URL">
+<code class="descname">_TEMPLATE_URL</code><em class="property"> = 'https://www.youtube.com/results?search_query=%s&amp;page=%s&amp;gl=US&amp;hl=en'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._TEMPLATE_URL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._VIDEO_INDICATOR">
+<code class="descname">_VIDEO_INDICATOR</code><em class="property"> = 'href=&quot;/watch\\?v=.+?&quot;'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._VIDEO_INDICATOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._MORE_PAGES_INDICATOR">
+<code class="descname">_MORE_PAGES_INDICATOR</code><em class="property"> = '(?m)&gt;\\s*Next\\s*&lt;/a&gt;'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._MORE_PAGES_INDICATOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._max_youtube_results">
+<code class="descname">_max_youtube_results</code><em class="property"> = 1000</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._max_youtube_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._youtube_ie">
+<code class="descname">_youtube_ie</code><em class="property"> = None</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._youtube_ie" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE.suitable">
+<em class="property">static </em><code class="descname">suitable</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeSearchIE.suitable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE.suitable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receives a URL and returns True if suitable for this IE.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE.report_download_page">
+<code class="descname">report_download_page</code><span class="sig-paren">(</span><em>query</em>, <em>pagenum</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeSearchIE.report_download_page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE.report_download_page" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report attempt to download playlist page with given number.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._real_initialize">
+<code class="descname">_real_initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeSearchIE._real_initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._real_initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real initialization process. Redefine in subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._real_extract">
+<code class="descname">_real_extract</code><span class="sig-paren">(</span><em>query</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeSearchIE._real_extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._real_extract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real extraction process. Redefine in subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._download_n_results">
+<code class="descname">_download_n_results</code><span class="sig-paren">(</span><em>query</em>, <em>n</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubeSearchIE._download_n_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubeSearchIE._download_n_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads a specified number of results for a query</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE">
+<em class="property">class </em><code class="descname">YoutubePlaylistIE</code><span class="sig-paren">(</span><em>youtube_ie</em>, <em>downloader=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubePlaylistIE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.extern.youtubedl.youtubedl.InfoExtractor" title="coherence.extern.youtubedl.youtubedl.InfoExtractor"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.extern.youtubedl.youtubedl.InfoExtractor</span></code></a></p>
+<p>Information Extractor for YouTube playlists.</p>
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._VALID_URL">
+<code class="descname">_VALID_URL</code><em class="property"> = '(?:https://)?(?:\\w+\\.)?youtube.com/(?:view_play_list|my_playlists)\\?.*?p=([^&amp;]+).*'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._VALID_URL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._TEMPLATE_URL">
+<code class="descname">_TEMPLATE_URL</code><em class="property"> = 'https://www.youtube.com/view_play_list?p=%s&amp;page=%s&amp;gl=US&amp;hl=en'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._TEMPLATE_URL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._VIDEO_INDICATOR">
+<code class="descname">_VIDEO_INDICATOR</code><em class="property"> = '/watch\\?v=(.+?)&amp;'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._VIDEO_INDICATOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._MORE_PAGES_INDICATOR">
+<code class="descname">_MORE_PAGES_INDICATOR</code><em class="property"> = '/view_play_list?p=%s&amp;page=%s'</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._MORE_PAGES_INDICATOR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._youtube_ie">
+<code class="descname">_youtube_ie</code><em class="property"> = None</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._youtube_ie" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE.suitable">
+<em class="property">static </em><code class="descname">suitable</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubePlaylistIE.suitable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE.suitable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receives a URL and returns True if suitable for this IE.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE.report_download_page">
+<code class="descname">report_download_page</code><span class="sig-paren">(</span><em>playlist_id</em>, <em>pagenum</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubePlaylistIE.report_download_page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE.report_download_page" title="Permalink to this definition">¶</a></dt>
+<dd><p>Report attempt to download playlist page with given number.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._real_initialize">
+<code class="descname">_real_initialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubePlaylistIE._real_initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._real_initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real initialization process. Redefine in subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._real_extract">
+<code class="descname">_real_extract</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#YoutubePlaylistIE._real_extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.YoutubePlaylistIE._real_extract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real extraction process. Redefine in subclasses.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.extern.youtubedl.youtubedl.PostProcessor">
+<em class="property">class </em><code class="descname">PostProcessor</code><span class="sig-paren">(</span><em>downloader=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#PostProcessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.PostProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Post Processor class.</p>
+<p>PostProcessor objects can be added to downloaders with their
+add_post_processor() method. When the downloader has finished a
+successful download, it will take its internal chain of PostProcessors
+and start calling the run() method on each one of them, first with
+an initial argument and then with the returned value of the previous
+PostProcessor.</p>
+<p>The chain will be stopped if one of them ever returns None or the end
+of the chain is reached.</p>
+<p>PostProcessor objects follow a “mutual registration” process similar
+to InfoExtractor objects.</p>
+<dl class="attribute">
+<dt id="coherence.extern.youtubedl.youtubedl.PostProcessor._downloader">
+<code class="descname">_downloader</code><em class="property"> = None</em><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.PostProcessor._downloader" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.PostProcessor.to_stdout">
+<code class="descname">to_stdout</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#PostProcessor.to_stdout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.PostProcessor.to_stdout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print message to stdout if downloader is not in quiet mode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.PostProcessor.to_stderr">
+<code class="descname">to_stderr</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#PostProcessor.to_stderr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.PostProcessor.to_stderr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print message to stderr.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.PostProcessor.set_downloader">
+<code class="descname">set_downloader</code><span class="sig-paren">(</span><em>downloader</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#PostProcessor.set_downloader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.PostProcessor.set_downloader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the downloader for this PP.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.youtubedl.youtubedl.PostProcessor.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>information</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/youtubedl/youtubedl.html#PostProcessor.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.youtubedl.youtubedl.PostProcessor.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the PostProcessor.</p>
+<p>The “information” argument is a dictionary like the ones
+composed by InfoExtractors. The only difference is that this
+one has an extra field called “filepath” that points to the
+downloaded file.</p>
+<p>When this method returns None, the postprocessing chain is
+stopped. However, this method may return an information
+dictionary that will be passed to the next postprocessing
+object in the chain. It can be the one it received after
+changing some fields.</p>
+<p>In addition, this method may raise a PostProcessingError
+exception that will be taken into account by the downloader
+it was called from.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../coherence.upnp.html" class="btn btn-neutral float-right" title="coherence.upnp (package)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../galleryremote/gallery.html" class="btn btn-neutral float-left" title="coherence.extern.galleryremote.gallery (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

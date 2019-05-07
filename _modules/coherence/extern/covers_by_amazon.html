@@ -1,0 +1,535 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.extern.covers_by_amazon &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.extern.covers_by_amazon</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.extern.covers_by_amazon</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2007, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Covers by Amazon</span>
+<span class="sd">================</span>
+
+<span class="sd">Methods to retrieve covers/album art via the</span>
+<span class="sd">Amazon E-Commerce WebService v4</span>
+<span class="sd">http://docs.amazonwebservices.com/AWSECommerceService/2007-04-04/DG/</span>
+
+<span class="sd">The licence agreement says something about only</span>
+<span class="sd">one request per second, so we need to serialize</span>
+<span class="sd">and delay the calls a bit.</span>
+
+<span class="sd">The AWSAccessKeyId supplied is _ONLY_ for the use</span>
+<span class="sd">in conjunction with Coherence, http://coherence.beebits.net</span>
+
+<span class="sd">If you use this library in your own software please</span>
+<span class="sd">apply for your own key @ http://www.amazon.com/webservices</span>
+<span class="sd">and follow the rules of their license.</span>
+
+<span class="sd">Especially you must add the following disclaimer in a place</span>
+<span class="sd">that is reasonably viewable by the user of your application:</span>
+
+<span class="sd"> PLEASE KEEP IN MIND THAT SOME OF THE CONTENT THAT WE</span>
+<span class="sd"> MAKE AVAILABLE TO YOU THROUGH THIS APPLICATION COMES</span>
+<span class="sd"> FROM AMAZON WEB SERVICES. ALL SUCH CONTENT IS PROVIDED</span>
+<span class="sd"> TO YOU &quot;AS IS.&quot; THIS CONTENT AND YOUR USE OF IT</span>
+<span class="sd"> ARE SUBJECT TO CHANGE AND/OR REMOVAL AT ANY TIME.</span>
+
+<span class="sd">Furthermore if you save any of the cover images you</span>
+<span class="sd">have to take care that they are stored no longer than</span>
+<span class="sd">a maximum of one month and requested then from Amazon</span>
+<span class="sd">again.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">urllib.error</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">defer</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">client</span>
+
+<span class="n">aws_server</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;de&#39;</span><span class="p">:</span> <span class="s1">&#39;de&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;jp&#39;</span><span class="p">:</span> <span class="s1">&#39;jp&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;ca&#39;</span><span class="p">:</span> <span class="s1">&#39;ca&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;uk&#39;</span><span class="p">:</span> <span class="s1">&#39;co.uk&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;fr&#39;</span><span class="p">:</span> <span class="s1">&#39;fr&#39;</span><span class="p">}</span>
+
+<span class="n">aws_artist_query</span> <span class="o">=</span> <span class="s1">&#39;&amp;Operation=ItemSearch&#39;</span> \
+                   <span class="s1">&#39;&amp;SearchIndex=Music&#39;</span>
+
+<span class="n">aws_asin_query</span> <span class="o">=</span> <span class="s1">&#39;&amp;Operation=ItemLookup&#39;</span>
+
+<span class="n">aws_response_group</span> <span class="o">=</span> <span class="s1">&#39;&amp;ResponseGroup=Images&#39;</span>
+
+<span class="n">aws_ns</span> <span class="o">=</span> <span class="s1">&#39;http://webservices.amazon.com/AWSECommerceService/2005-10-05&#39;</span>
+
+<span class="n">aws_image_size</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;large&#39;</span><span class="p">:</span> <span class="s1">&#39;LargeImage&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;medium&#39;</span><span class="p">:</span> <span class="s1">&#39;MediumImage&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;small&#39;</span><span class="p">:</span> <span class="s1">&#39;SmallImage&#39;</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="WorkQueue"><a class="viewcode-back" href="../../../source/extern/covers_by_amazon.html#coherence.extern.covers_by_amazon.WorkQueue">[docs]</a><span class="k">class</span> <span class="nc">WorkQueue</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">_instance_</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Singleton</span>
+    <span class="n">queue</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">workers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">max_workers</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;_instance_&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">obj</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">WorkQueue</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_instance_</span> <span class="o">=</span> <span class="n">obj</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">max_workers</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;max_workers&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">workers</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">method</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue_run</span><span class="p">()</span>
+
+<div class="viewcode-block" id="WorkQueue.queue_run"><a class="viewcode-back" href="../../../source/extern/covers_by_amazon.html#coherence.extern.covers_by_amazon.WorkQueue.queue_run">[docs]</a>    <span class="k">def</span> <span class="nf">queue_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workers</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_workers</span><span class="p">:</span>
+            <span class="c1"># print(&#39;WorkQueue - all workers busy&#39;)</span>
+            <span class="k">return</span>
+        <span class="n">work</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">work</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">work</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">work</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_from_workers</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_from_workers</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WorkQueue.remove_from_workers"><a class="viewcode-back" href="../../../source/extern/covers_by_amazon.html#coherence.extern.covers_by_amazon.WorkQueue.remove_from_workers">[docs]</a>    <span class="k">def</span> <span class="nf">remove_from_workers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_run</span><span class="p">)</span>  <span class="c1"># a very,very weak attempt</span></div></div>
+
+
+<div class="viewcode-block" id="CoverGetter"><a class="viewcode-back" href="../../../source/extern/covers_by_amazon.html#coherence.extern.covers_by_amazon.CoverGetter">[docs]</a><span class="k">class</span> <span class="nc">CoverGetter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Retrieve a cover image for a given ASIN, a TITLE or an ARTIST/TITLE combo.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        if the filename extension and the received image extension</span>
+<span class="sd">        differ, the image is converted with PIL to the desired format</span>
+<span class="sd">        (http://www.pythonware.com/products/pil/index.htm).</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="CoverGetter.__init__"><a class="viewcode-back" href="../../../source/extern/covers_by_amazon.html#coherence.extern.covers_by_amazon.CoverGetter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">aws_key</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">not_found_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">locale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">image_size</span><span class="o">=</span><span class="s1">&#39;large&#39;</span><span class="p">,</span>
+                 <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asin</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): where to save a received image if *None* the image</span>
+<span class="sd">                will be passed to the callback.</span>
+<span class="sd">            aws_key (str): The aws key</span>
+<span class="sd">            callback (object): a method to call with the filename or the image</span>
+<span class="sd">                as a parameter after the image request and save was successful</span>
+<span class="sd">                can be:</span>
+
+<span class="sd">                  - only a callable</span>
+<span class="sd">                  - a tuple with a callable:</span>
+
+<span class="sd">                      - optional an argument or a tuple of arguments</span>
+<span class="sd">                      - optional a dict with keyword arguments</span>
+
+<span class="sd">            not_found_callback (object): a method to call when the search at</span>
+<span class="sd">                Amazon failed, can be:</span>
+
+<span class="sd">                   - only a callable</span>
+<span class="sd">                   - a tuple with a callable:</span>
+
+<span class="sd">                      - optional an argument or a tuple of arguments</span>
+<span class="sd">                      - optional a dict with keyword arguments</span>
+<span class="sd">            locale (str): which Amazon Webservice Server to use, defaults</span>
+<span class="sd">                to .com.</span>
+<span class="sd">            image_size (str): request the cover as large|medium|small image</span>
+<span class="sd">                resolution seems to be in pixels for large: 500x500,</span>
+<span class="sd">                medium: 160x160 and small: 75x75.</span>
+<span class="sd">            title (str): the album title</span>
+<span class="sd">            artist (str): the artists name</span>
+<span class="sd">            asin (str): the Amazon Store Identification Number</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aws_base_query</span> <span class="o">=</span> \
+            <span class="n">f</span><span class="s1">&#39;/onca/xml?Service=AWSECommerceService&amp;AWSAccessKeyId=</span><span class="si">{aws_key}</span><span class="s1">&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_errcall</span> <span class="o">=</span> <span class="n">not_found_callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;http://ecs.amazonaws.{aws_server.get(locale, &quot;com&quot;)}&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_size</span> <span class="o">=</span> <span class="n">image_size</span>
+
+        <span class="k">def</span> <span class="nf">sanitize</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;ä&#39;</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;ae&#39;</span><span class="p">))</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;ö&#39;</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;oe&#39;</span><span class="p">))</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;ü&#39;</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;ue&#39;</span><span class="p">))</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;ß&#39;</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="s1">&#39;ss&#39;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">s</span>
+
+        <span class="k">if</span> <span class="n">asin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">aws_asin_query</span> <span class="o">+</span> <span class="n">f</span><span class="s1">&#39;&amp;ItemId={urllib.parse.quote(asin)}&#39;</span>
+        <span class="k">elif</span> <span class="n">artist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">aws_artist_query</span>
+            <span class="k">if</span> <span class="n">artist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">artist</span> <span class="o">=</span> <span class="n">sanitize</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;Artist={urllib.parse.quote(artist)}&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">sanitize</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;Title={urllib.parse.quote(title)}&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                <span class="s1">&#39;Please supply either asin, title &#39;</span>
+                <span class="s1">&#39;or artist and title arguments&#39;</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">aws_base_query</span> <span class="o">+</span> <span class="n">aws_response_group</span> <span class="o">+</span> <span class="n">query</span>
+        <span class="n">WorkQueue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_request</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CoverGetter.send_request"><a class="viewcode-back" href="../../../source/extern/covers_by_amazon.html#coherence.extern.covers_by_amazon.CoverGetter.send_request">[docs]</a>    <span class="k">def</span> <span class="nf">send_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># print(&#39;send_request&#39;, url)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">got_response</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">got_error</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="CoverGetter.got_image"><a class="viewcode-back" href="../../../source/extern/covers_by_amazon.html#coherence.extern.covers_by_amazon.CoverGetter.got_image">[docs]</a>    <span class="k">def</span> <span class="nf">got_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">convert_from</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">convert_to</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="c1"># print(&#39;got_image&#39;)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">convert_from</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">convert_to</span><span class="p">):</span>
+            <span class="c1"># print(f&#39;got_image {len(result):d}, convert to {convert_to}&#39;)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">Image</span>
+
+                <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+                <span class="n">name</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="n">convert_to</span>
+
+                <span class="n">im</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;we need the Python Imaging Library &#39;</span>
+                      <span class="s1">&#39;to do image conversion&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># print(&#39;got_image&#39;, self.callback)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">c</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">kw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                        <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">,)</span>
+                    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="p">,)</span> <span class="o">+</span> <span class="n">a</span>
+                    <span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">c</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="n">c</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">a</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                            <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">,)</span>
+                        <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="p">,)</span> <span class="o">+</span> <span class="n">a</span>
+                        <span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span>
+                    <span class="n">c</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CoverGetter.got_response"><a class="viewcode-back" href="../../../source/extern/covers_by_amazon.html#coherence.extern.covers_by_amazon.CoverGetter.got_response">[docs]</a>    <span class="k">def</span> <span class="nf">got_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="n">convert_from</span> <span class="o">=</span> <span class="n">convert_to</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">image_tag</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;.//{{</span><span class="si">{aws_ns}</span><span class="s1">}}{aws_image_size.get(self.image_size, &quot;large&quot;)}&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">image_tag</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">image_url</span> <span class="o">=</span> <span class="n">image_tag</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{{</span><span class="si">{aws_ns}</span><span class="s1">}}URL&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">file_ext</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="n">_</span><span class="p">,</span> <span class="n">image_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">image_ext</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">image_ext</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_</span><span class="p">,</span> <span class="n">image_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">image_ext</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">file_ext</span> <span class="o">!=</span> <span class="n">image_ext</span><span class="p">:</span>
+                        <span class="c1"># print(&#39;hmm, we need a conversion...&#39;)</span>
+                        <span class="n">convert_from</span> <span class="o">=</span> <span class="n">image_ext</span>
+                        <span class="n">convert_to</span> <span class="o">=</span> <span class="n">file_ext</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">convert_to</span><span class="p">):</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">downloadPage</span><span class="p">(</span><span class="n">image_url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">got_image</span><span class="p">,</span> <span class="n">convert_from</span><span class="o">=</span><span class="n">convert_from</span><span class="p">,</span>
+                          <span class="n">convert_to</span><span class="o">=</span><span class="n">convert_to</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">got_error</span><span class="p">,</span> <span class="n">image_url</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcall</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_errcall</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_errcall</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="n">c</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">kw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcall</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                            <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">,)</span>
+                        <span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_errcall</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">c</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcall</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                            <span class="n">c</span><span class="p">(</span><span class="o">**</span><span class="n">a</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                                <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">,)</span>
+                            <span class="n">c</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_errcall</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcall</span>
+                        <span class="n">c</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_errcall</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CoverGetter.got_error"><a class="viewcode-back" href="../../../source/extern/covers_by_amazon.html#coherence.extern.covers_by_amazon.CoverGetter.got_error">[docs]</a>    <span class="k">def</span> <span class="nf">got_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">failure</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;got_error&#39;</span><span class="p">,</span> <span class="n">failure</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">usage</span>
+
+    <span class="k">class</span> <span class="nc">Options</span><span class="p">(</span><span class="n">usage</span><span class="o">.</span><span class="n">Options</span><span class="p">):</span>
+        <span class="n">optParameters</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;artist&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;artist name&#39;</span><span class="p">],</span>
+                         <span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">],</span>
+                         <span class="p">[</span><span class="s1">&#39;asin&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;ASIN&#39;</span><span class="p">],</span>
+                         <span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;cover.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">],</span>
+                         <span class="p">]</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="n">Options</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">parseOptions</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">usage</span><span class="o">.</span><span class="n">UsageError</span> <span class="k">as</span> <span class="n">errortext</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">sys</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{sys.argv[0]}</span><span class="s1">: </span><span class="si">{errortext}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{sys.argv[0]}</span><span class="s1">: Try --help for usage details.&#39;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">got_it</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Mylady, it is an image and its name is&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">aws_key</span> <span class="o">=</span> <span class="s1">&#39;1XHSE4FQJ0RK0X3S9WR2&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;asin&#39;</span><span class="p">],</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">],</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;asin&#39;</span><span class="p">]):</span>
+        <span class="n">reactor</span><span class="o">.</span><span class="n">callWhenRunning</span><span class="p">(</span><span class="n">CoverGetter</span><span class="p">,</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">],</span> <span class="n">aws_key</span><span class="p">,</span>
+                                <span class="n">callback</span><span class="o">=</span><span class="n">got_it</span><span class="p">,</span> <span class="n">asin</span><span class="o">=</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;asin&#39;</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]):</span>
+        <span class="n">reactor</span><span class="o">.</span><span class="n">callWhenRunning</span><span class="p">(</span><span class="n">CoverGetter</span><span class="p">,</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">],</span> <span class="n">aws_key</span><span class="p">,</span>
+                                <span class="n">callback</span><span class="o">=</span><span class="n">got_it</span><span class="p">,</span> <span class="n">artist</span><span class="o">=</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">],</span>
+                                <span class="n">title</span><span class="o">=</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">])</span>
+
+    <span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

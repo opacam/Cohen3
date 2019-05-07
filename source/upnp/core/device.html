@@ -1,0 +1,634 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.device (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.upnp.core.DIDLLite (module)" href="didllite.html" />
+    <link rel="prev" title="coherence.upnp.core.action (module)" href="action.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-core-package">coherence.upnp.core (package)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="action.html">coherence.upnp.core.action (module)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.upnp.core.device (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="didllite.html">coherence.upnp.core.DIDLLite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dlna.html">coherence.upnp.core.dlna (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="event.html">coherence.upnp.core.event (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="msearch.html">coherence.upnp.core.msearch (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="service.html">coherence.upnp.core.service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_lite.html">coherence.upnp.core.soap_lite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_proxy.html">coherence.upnp.core.soap_proxy (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_service.html">coherence.upnp.core.soap_service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ssdp.html">coherence.upnp.core.ssdp (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html">coherence.upnp.core.utils (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="uuid.html">coherence.upnp.core.uuid (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="variable.html">coherence.upnp.core.variable (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xml_constants.html">coherence.upnp.core.xml_constants (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-devices-package">coherence.upnp.devices (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-package">coherence.upnp.services (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-clients-subpackage">coherence.upnp.services.clients (subpackage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-servers-subpackage">coherence.upnp.services.servers (subpackage)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.upnp.html">coherence.upnp (package)</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.device (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/upnp/core/device.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="module-coherence.upnp.core.device">
+<span id="coherence-upnp-core-device-module"></span><span id="upnp-core-device"></span><h1>coherence.upnp.core.device (module)<a class="headerlink" href="#module-coherence.upnp.core.device" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="devices">
+<h2>Devices<a class="headerlink" href="#devices" title="Permalink to this headline">¶</a></h2>
+<p>This module contains two classes describing UPnP devices.</p>
+<div class="section" id="device">
+<h3><a class="reference internal" href="#coherence.upnp.core.device.Device" title="coherence.upnp.core.device.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code></a><a class="headerlink" href="#device" title="Permalink to this headline">¶</a></h3>
+<p>The base class for all devices.</p>
+</div>
+<div class="section" id="rootdevice">
+<h3><a class="reference internal" href="#coherence.upnp.core.device.RootDevice" title="coherence.upnp.core.device.RootDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">RootDevice</span></code></a><a class="headerlink" href="#rootdevice" title="Permalink to this headline">¶</a></h3>
+<p>A device representing a root device.</p>
+<dl class="class">
+<dt id="coherence.upnp.core.device.Device">
+<em class="property">class </em><code class="descname">Device</code><span class="sig-paren">(</span><em>parent=None</em>, <em>udn=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>Represents a UPnP’s device, but this is not a root device, it’s the base
+class used for any device. See <a class="reference internal" href="#coherence.upnp.core.device.RootDevice" title="coherence.upnp.core.device.RootDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">RootDevice</span></code></a> if you want a root
+device.</p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Migrated from louie/dispatcher to EventDispatcher</p></li>
+<li><p>The emitted events changed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.Device.detection_completed =&gt;
+device_detection_completed</p></li>
+<li><p>Coherence.UPnP.Device.remove_client =&gt;
+device_remove_client</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>New events: device_service_notified, device_got_client</p></li>
+<li><p>Changes some class variables to benefit from the EventDispatcher’s
+properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="#coherence.upnp.core.device.Device.client" title="coherence.upnp.core.device.Device.client"><code class="xref py py-attr docutils literal notranslate"><span class="pre">client</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.device.Device.devices" title="coherence.upnp.core.device.Device.devices"><code class="xref py py-attr docutils literal notranslate"><span class="pre">devices</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.device.Device.services" title="coherence.upnp.core.device.Device.services"><code class="xref py py-attr docutils literal notranslate"><span class="pre">services</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.device.Device.client" title="coherence.upnp.core.device.Device.client"><code class="xref py py-attr docutils literal notranslate"><span class="pre">client</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.device.Device.detection_completed" title="coherence.upnp.core.device.Device.detection_completed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detection_completed</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.upnp.core.device.Device.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'device'</em><a class="headerlink" href="#coherence.upnp.core.device.Device.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.device.Device.client">
+<code class="descname">client</code><a class="headerlink" href="#coherence.upnp.core.device.Device.client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defined by <code class="xref py py-class docutils literal notranslate"><span class="pre">ControlPoint</span></code>.
+It should be one of:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Initialized instance of a class
+<a class="reference internal" href="../devices/media_server_client.html#coherence.upnp.devices.media_server_client.MediaServerClient" title="coherence.upnp.devices.media_server_client.MediaServerClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">MediaServerClient</span></code></a></p></li>
+<li><p>Initialized instance of a class
+<a class="reference internal" href="../devices/media_renderer_client.html#coherence.upnp.devices.media_renderer_client.MediaRendererClient" title="coherence.upnp.devices.media_renderer_client.MediaRendererClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">MediaRendererClient</span></code></a></p></li>
+<li><p>Initialized instance of a class
+<a class="reference internal" href="../devices/internet_gateway_device_client.html#coherence.upnp.devices.internet_gateway_device_client.InternetGatewayDeviceClient" title="coherence.upnp.devices.internet_gateway_device_client.InternetGatewayDeviceClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternetGatewayDeviceClient</span></code></a></p></li>
+</ul>
+</div></blockquote>
+<p>Whenever a client is set an event will be sent notifying it by
+<a class="reference internal" href="#coherence.upnp.core.device.Device.on_client" title="coherence.upnp.core.device.Device.on_client"><code class="xref py py-meth docutils literal notranslate"><span class="pre">on_client()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.device.Device.icons">
+<code class="descname">icons</code><a class="headerlink" href="#coherence.upnp.core.device.Device.icons" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of the device icons.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.device.Device.devices">
+<code class="descname">devices</code><a class="headerlink" href="#coherence.upnp.core.device.Device.devices" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of the device devices.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.device.Device.services">
+<code class="descname">services</code><a class="headerlink" href="#coherence.upnp.core.device.Device.services" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of the device services.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.device.Device.detection_completed">
+<code class="descname">detection_completed</code><a class="headerlink" href="#coherence.upnp.core.device.Device.detection_completed" title="Permalink to this definition">¶</a></dt>
+<dd><p>To know whenever the device detection has completed. Defaults to <cite>False</cite>
+and it will be set automatically to <cite>True</cite> by the class method
+<a class="reference internal" href="#coherence.upnp.core.device.Device.receiver" title="coherence.upnp.core.device.Device.receiver"><code class="xref py py-meth docutils literal notranslate"><span class="pre">receiver()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.as_dict">
+<code class="descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.receiver">
+<code class="descname">receiver</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.receiver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.receiver" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.service_detection_failed">
+<code class="descname">service_detection_failed</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.service_detection_failed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.service_detection_failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_id">
+<code class="descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_uuid">
+<code class="descname">get_uuid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_uuid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_uuid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_embedded_devices">
+<code class="descname">get_embedded_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_embedded_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_embedded_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_embedded_device_by_type">
+<code class="descname">get_embedded_device_by_type</code><span class="sig-paren">(</span><em>type</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_embedded_device_by_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_embedded_device_by_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_services">
+<code class="descname">get_services</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_services"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_services" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_service_by_type">
+<code class="descname">get_service_by_type</code><span class="sig-paren">(</span><em>type</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_service_by_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_service_by_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.add_service">
+<code class="descname">add_service</code><span class="sig-paren">(</span><em>service</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.add_service"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.add_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a service to the device. Also we check if service already notified,
+and trigger the callback if needed. We also connect the device to
+service in case the service still not completed his detection in order
+that the device knows when the service has completed his detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>service</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – A service which should be an initialized instance
+of <a class="reference internal" href="service.html#coherence.upnp.core.service.Service" title="coherence.upnp.core.service.Service"><code class="xref py py-class docutils literal notranslate"><span class="pre">Service</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.remove_service_with_usn">
+<code class="descname">remove_service_with_usn</code><span class="sig-paren">(</span><em>service_usn</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.remove_service_with_usn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.remove_service_with_usn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.add_device">
+<code class="descname">add_device</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.add_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.add_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_friendly_name">
+<code class="descname">get_friendly_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_friendly_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_friendly_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_device_type">
+<code class="descname">get_device_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_device_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_device_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_friendly_device_type">
+<code class="descname">get_friendly_device_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_friendly_device_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_friendly_device_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_markup_name">
+<code class="descname">get_markup_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_markup_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_markup_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_device_type_version">
+<code class="descname">get_device_type_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_device_type_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_device_type_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.set_client">
+<code class="descname">set_client</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.set_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.set_client" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_client">
+<code class="descname">get_client</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_client" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.on_client">
+<code class="descname">on_client</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.on_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.on_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically triggered whenever a client is set or changed. Emmit
+an event notifying that the client has changed.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.renew_service_subscriptions">
+<code class="descname">renew_service_subscriptions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.renew_service_subscriptions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.renew_service_subscriptions" title="Permalink to this definition">¶</a></dt>
+<dd><p>iterate over device’s services and renew subscriptions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.unsubscribe_service_subscriptions">
+<code class="descname">unsubscribe_service_subscriptions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.unsubscribe_service_subscriptions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.unsubscribe_service_subscriptions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over device’s services and unsubscribe subscriptions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.parse_device">
+<code class="descname">parse_device</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.parse_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.parse_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_location">
+<code class="descname">get_location</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_location" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_usn">
+<code class="descname">get_usn</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_usn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_usn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_upnp_version">
+<code class="descname">get_upnp_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_upnp_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_upnp_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_urlbase">
+<code class="descname">get_urlbase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_urlbase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_urlbase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_presentation_url">
+<code class="descname">get_presentation_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_presentation_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_presentation_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.get_parent_id">
+<code class="descname">get_parent_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.get_parent_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.get_parent_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.make_fullyqualified">
+<code class="descname">make_fullyqualified</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.make_fullyqualified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.make_fullyqualified" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.Device.as_tuples">
+<code class="descname">as_tuples</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#Device.as_tuples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.Device.as_tuples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.device.RootDevice">
+<em class="property">class </em><code class="descname">RootDevice</code><span class="sig-paren">(</span><em>infos</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.device.Device" title="coherence.upnp.core.device.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.device.Device</span></code></a></p>
+<p>Description for a root device.</p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Migrated from louie/dispatcher to EventDispatcher</p></li>
+<li><p>The emitted events changed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.RootDevice.detection_completed =&gt;
+root_device_detection_completed</p></li>
+<li><p>Coherence.UPnP.RootDevice.removed =&gt; root_device_removed</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.upnp.core.device.RootDevice.root_detection_completed">
+<code class="descname">root_detection_completed</code><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.root_detection_completed" title="Permalink to this definition">¶</a></dt>
+<dd><p>To know whenever the root device detection has completed. Defaults to
+<cite>False</cite> and it will be set automatically to <cite>True</cite> by the class method
+<a class="reference internal" href="#coherence.upnp.core.device.RootDevice.device_detect" title="coherence.upnp.core.device.RootDevice.device_detect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">device_detect()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.get_usn">
+<code class="descname">get_usn</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.get_usn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.get_usn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.get_st">
+<code class="descname">get_st</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.get_st"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.get_st" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.get_location">
+<code class="descname">get_location</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.get_location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.get_location" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.get_upnp_version">
+<code class="descname">get_upnp_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.get_upnp_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.get_upnp_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.get_urlbase">
+<code class="descname">get_urlbase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.get_urlbase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.get_urlbase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.get_host">
+<code class="descname">get_host</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.get_host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.get_host" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.is_local">
+<code class="descname">is_local</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.is_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.is_local" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.is_remote">
+<code class="descname">is_remote</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.is_remote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.is_remote" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.device_detect">
+<code class="descname">device_detect</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.device_detect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.device_detect" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is automatically triggered whenever the property of the
+base class <a class="reference internal" href="#coherence.upnp.core.device.Device.detection_completed" title="coherence.upnp.core.device.Device.detection_completed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Device.detection_completed</span></code></a> is set to <cite>True</cite>. Here we
+perform some more operations, before the <a class="reference internal" href="#coherence.upnp.core.device.RootDevice" title="coherence.upnp.core.device.RootDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">RootDevice</span></code></a> emits
+an event notifying that the root device detection has completed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.add_device">
+<code class="descname">add_device</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.add_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.add_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.get_devices">
+<code class="descname">get_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.get_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.get_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.parse_description">
+<code class="descname">parse_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.parse_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.parse_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.device.RootDevice.make_fullyqualified">
+<code class="descname">make_fullyqualified</code><span class="sig-paren">(</span><em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/device.html#RootDevice.make_fullyqualified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.device.RootDevice.make_fullyqualified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Be aware that this function returns a byte string</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="didllite.html" class="btn btn-neutral float-right" title="coherence.upnp.core.DIDLLite (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="action.html" class="btn btn-neutral float-left" title="coherence.upnp.core.action (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

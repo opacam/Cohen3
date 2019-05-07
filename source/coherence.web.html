@@ -1,0 +1,716 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.web (package) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing" href="../contributing.html" />
+    <link rel="prev" title="coherence.upnp.services.servers.switch_power_server (module)" href="upnp/services/servers/switch_power_server.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">coherence.web (package)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-coherence.web.ui">coherence.web.ui (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#webui">WebUI</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+      <li>coherence.web (package)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/coherence.web.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="coherence-web-package">
+<span id="web"></span><h1>coherence.web (package)<a class="headerlink" href="#coherence-web-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-coherence.web.ui">
+<span id="coherence-web-ui-module"></span><h2>coherence.web.ui (module)<a class="headerlink" href="#module-coherence.web.ui" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="webui">
+<h3>WebUI<a class="headerlink" href="#webui" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="#coherence.web.ui.WebUI" title="coherence.web.ui.WebUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebUI</span></code></a> is used to enable an html interface where the user can
+browse the devices content via web browser. By default, the WebUI interface
+is disabled and could be enabled from config file or by config dictionary when
+initializing <a class="reference internal" href="modules.html#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a></p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.8.2.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Be aware that the browser should support Web Sockets and js enabled.
+All modern browsers should have this features integrated (tested with
+firefox and google chrome).</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Don’t create your web server into port 9000. This is reserved for
+the js WebSocket.</p>
+</div>
+<div class="section" id="webui-example">
+<h4>WebUi Example<a class="headerlink" href="#webui-example" title="Permalink to this headline">¶</a></h4>
+<p>A simple server with <em>web-ui</em> enabled:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">coherence.base</span> <span class="k">import</span> <span class="n">Coherence</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.uuid</span> <span class="k">import</span> <span class="n">UUID</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+<span class="n">new_uuid</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">()</span>
+<span class="n">coherence</span> <span class="o">=</span> <span class="n">Coherence</span><span class="p">(</span>
+        <span class="p">{</span><span class="s1">&#39;web-ui&#39;</span><span class="p">:</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;serverport&#39;</span><span class="p">:</span> <span class="s1">&#39;9001&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;logmode&#39;</span><span class="p">:</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;controlpoint&#39;</span><span class="p">:</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;plugin&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;backend&#39;</span><span class="p">:</span> <span class="s1">&#39;FSStore&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;WEB UI FSStore&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="s1">&#39;path-to-a-directory-with-media-content&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;uuid&#39;</span><span class="p">:</span> <span class="n">new_uuid</span>
+                    <span class="p">}</span>
+         <span class="p">}</span>
+<span class="p">)</span>
+<span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="coherence.web.ui.WSBroadcastServerProtocol">
+<em class="property">class </em><code class="descname">WSBroadcastServerProtocol</code><a class="reference internal" href="../_modules/coherence/web/ui.html#WSBroadcastServerProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WSBroadcastServerProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">autobahn.twisted.websocket.WebSocketServerProtocol</span></code></p>
+<p>WSBroadcastServerProtocol deals with the async WebSocket client connection.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.2.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span>Migrated from louie/dispatcher to EventDispatcher</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We can attach a callback into the variable message_callback, this
+callback will be triggered whenever onMessage is called.</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.web.ui.WSBroadcastServerProtocol.factory">
+<code class="descname">factory</code><em class="property"> = None</em><a class="headerlink" href="#coherence.web.ui.WSBroadcastServerProtocol.factory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.web.ui.WSBroadcastServerProtocol.message_callback">
+<code class="descname">message_callback</code><em class="property"> = None</em><a class="headerlink" href="#coherence.web.ui.WSBroadcastServerProtocol.message_callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.WSBroadcastServerProtocol.onMessage">
+<code class="descname">onMessage</code><span class="sig-paren">(</span><em>payload</em>, <em>isBinary</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WSBroadcastServerProtocol.onMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WSBroadcastServerProtocol.onMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements <code class="xref py py-func docutils literal notranslate"><span class="pre">autobahn.websocket.interfaces.IWebSocketChannel.onMessage()</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.WSBroadcastServerProtocol.onOpen">
+<code class="descname">onOpen</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WSBroadcastServerProtocol.onOpen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WSBroadcastServerProtocol.onOpen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements <code class="xref py py-func docutils literal notranslate"><span class="pre">autobahn.websocket.interfaces.IWebSocketChannel.onOpen()</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.WSBroadcastServerProtocol.connectionLost">
+<code class="descname">connectionLost</code><span class="sig-paren">(</span><em>reason</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WSBroadcastServerProtocol.connectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WSBroadcastServerProtocol.connectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the connection is shut down.</p>
+<p>Clear any circular references here, and any external references
+to this Protocol.  The connection has been closed.</p>
+<p>&#64;type reason: L{twisted.python.failure.Failure}</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.web.ui.WSBroadcastServerFactory">
+<em class="property">class </em><code class="descname">WSBroadcastServerFactory</code><span class="sig-paren">(</span><em>client_tracker</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WSBroadcastServerFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WSBroadcastServerFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">autobahn.twisted.websocket.WebSocketServerFactory</span></code></p>
+<p>WSBroadcastServerFactory is the central WebSocket server side component
+shared between connections.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.2.</span></p>
+</div>
+<dl class="method">
+<dt id="coherence.web.ui.WSBroadcastServerFactory.register">
+<code class="descname">register</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WSBroadcastServerFactory.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WSBroadcastServerFactory.register" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.WSBroadcastServerFactory.unregister">
+<code class="descname">unregister</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WSBroadcastServerFactory.unregister"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WSBroadcastServerFactory.unregister" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.WSBroadcastServerFactory.broadcast">
+<code class="descname">broadcast</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WSBroadcastServerFactory.broadcast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WSBroadcastServerFactory.broadcast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.web.ui.WSClientTracker">
+<em class="property">class </em><code class="descname">WSClientTracker</code><a class="reference internal" href="../_modules/coherence/web/ui.html#WSClientTracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WSClientTracker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Helper to keep track of connections,
+accessed by the sync and async methods.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.2.</span></p>
+</div>
+<dl class="method">
+<dt id="coherence.web.ui.WSClientTracker.register">
+<code class="descname">register</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WSClientTracker.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WSClientTracker.register" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.WSClientTracker.unregister">
+<code class="descname">unregister</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WSClientTracker.unregister"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WSClientTracker.unregister" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.web.ui.MenuItemElement">
+<em class="property">class </em><code class="descname">MenuItemElement</code><span class="sig-paren">(</span><em>loader</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#MenuItemElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.MenuItemElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web._element.Element</span></code></p>
+<p>Helper class to render a menu entry for the main navigation bar, created
+with <code class="xref py py-class docutils literal notranslate"><span class="pre">MenuNavigationBar</span></code>.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.2.</span></p>
+</div>
+<dl class="method">
+<dt id="coherence.web.ui.MenuItemElement.name">
+<code class="descname">name</code><span class="sig-paren">(</span><em>request</em>, <em>tag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#MenuItemElement.name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.MenuItemElement.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.web.ui.MenuNavigationBar">
+<em class="property">class </em><code class="descname">MenuNavigationBar</code><span class="sig-paren">(</span><em>page</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#MenuNavigationBar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.MenuNavigationBar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web._element.Element</span></code></p>
+<p>Convenient class to create a dynamic navigation bar</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.2.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is strongly related with the file:
+templates/template_index.html. The content of the each element
+should be implemented dynamically (here or in any subclass) or
+statically (into the mentioned file).</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.web.ui.MenuNavigationBar.loader">
+<code class="descname">loader</code><em class="property"> = &lt;twisted.web.template.XMLString object&gt;</em><a class="headerlink" href="#coherence.web.ui.MenuNavigationBar.loader" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.web.ui.MenuNavigationBar.menuData">
+<code class="descname">menuData</code><em class="property"> = ['cohen3', 'devices', 'logging', 'about']</em><a class="headerlink" href="#coherence.web.ui.MenuNavigationBar.menuData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.MenuNavigationBar.menu_elements">
+<code class="descname">menu_elements</code><span class="sig-paren">(</span><em>request</em>, <em>tag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#MenuNavigationBar.menu_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.MenuNavigationBar.menu_elements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.web.ui.DevicesWatcher">
+<em class="property">class </em><code class="descname">DevicesWatcher</code><span class="sig-paren">(</span><em>page</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#DevicesWatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.DevicesWatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>To manage the connected devices. Broadcast messages informing about the
+connected/disconnected devices via the web socket interface. This messages
+can be received by the html/js side, which will be responsible to add or
+to remove the devices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>page</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – An instance of <a class="reference internal" href="#coherence.web.ui.WebUI" title="coherence.web.ui.WebUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebUI</span></code></a>.</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.2.</span></p>
+</div>
+<dl class="attribute">
+<dt id="coherence.web.ui.DevicesWatcher.addSlash">
+<code class="descname">addSlash</code><em class="property"> = False</em><a class="headerlink" href="#coherence.web.ui.DevicesWatcher.addSlash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.web.ui.DevicesWatcher.isLeaf">
+<code class="descname">isLeaf</code><em class="property"> = True</em><a class="headerlink" href="#coherence.web.ui.DevicesWatcher.isLeaf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.web.ui.DevicesWatcher.detected">
+<code class="descname">detected</code><em class="property"> = []</em><a class="headerlink" href="#coherence.web.ui.DevicesWatcher.detected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.DevicesWatcher.add_device">
+<code class="descname">add_device</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#DevicesWatcher.add_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.DevicesWatcher.add_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.DevicesWatcher.remove_device">
+<code class="descname">remove_device</code><span class="sig-paren">(</span><em>usn</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#DevicesWatcher.remove_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.DevicesWatcher.remove_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.DevicesWatcher.going_live">
+<code class="descname">going_live</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#DevicesWatcher.going_live"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.DevicesWatcher.going_live" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.web.ui.format_log">
+<code class="descname">format_log</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#format_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.format_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple method to format the captured logs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Message from the captured log.</p></li>
+<li><p><strong>*args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – The args from the captured log.</p></li>
+<li><p><strong>**kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – The kwargs from the captured log.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A formatted string including the args and the kwargs.</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.2.</span></p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.web.ui.LogsWatcher">
+<em class="property">class </em><code class="descname">LogsWatcher</code><span class="sig-paren">(</span><em>page</em>, <em>active</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#LogsWatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.LogsWatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>Object that takes control of all known loggers (at init time) and redirects
+them into the web-ui interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>page</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – An instance of <a class="reference internal" href="#coherence.web.ui.WebUI" title="coherence.web.ui.WebUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebUI</span></code></a>.</p></li>
+<li><p><strong>active</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Choice to enable disable the web-ui logging system</p></li>
+</ul>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.2.</span></p>
+</div>
+<dl class="attribute">
+<dt id="coherence.web.ui.LogsWatcher.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'webui-logger'</em><a class="headerlink" href="#coherence.web.ui.LogsWatcher.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.web.ui.LogsWatcher.addSlash">
+<code class="descname">addSlash</code><em class="property"> = False</em><a class="headerlink" href="#coherence.web.ui.LogsWatcher.addSlash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.web.ui.LogsWatcher.isLeaf">
+<code class="descname">isLeaf</code><em class="property"> = True</em><a class="headerlink" href="#coherence.web.ui.LogsWatcher.isLeaf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.web.ui.LogsWatcher._messages">
+<code class="descname">_messages</code><em class="property"> = []</em><a class="headerlink" href="#coherence.web.ui.LogsWatcher._messages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.web.ui.LogsWatcher._ws_ready">
+<code class="descname">_ws_ready</code><em class="property"> = False</em><a class="headerlink" href="#coherence.web.ui.LogsWatcher._ws_ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.LogsWatcher.going_live">
+<code class="descname">going_live</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#LogsWatcher.going_live"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.LogsWatcher.going_live" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.LogsWatcher.send_log">
+<code class="descname">send_log</code><span class="sig-paren">(</span><em>type</em>, <em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#LogsWatcher.send_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.LogsWatcher.send_log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.LogsWatcher.log">
+<code class="descname">log</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#LogsWatcher.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.LogsWatcher.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.LogsWatcher.warning">
+<code class="descname">warning</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#LogsWatcher.warning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.LogsWatcher.warning" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.LogsWatcher.info">
+<code class="descname">info</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#LogsWatcher.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.LogsWatcher.info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.LogsWatcher.critical">
+<code class="descname">critical</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#LogsWatcher.critical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.LogsWatcher.critical" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.LogsWatcher.debug">
+<code class="descname">debug</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#LogsWatcher.debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.LogsWatcher.debug" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.LogsWatcher.error">
+<code class="descname">error</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#LogsWatcher.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.LogsWatcher.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.LogsWatcher.exception">
+<code class="descname">exception</code><span class="sig-paren">(</span><em>message</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#LogsWatcher.exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.LogsWatcher.exception" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.web.ui.IndexResource">
+<em class="property">class </em><code class="descname">IndexResource</code><span class="sig-paren">(</span><em>web_resource</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#IndexResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.IndexResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web._element.Element</span></code>, <a class="reference internal" href="modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>A sub class of <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.template.Element</span></code> which represents the
+main page for the web-ui interface. This takes care of rendering the main
+page as an element template, so we could add some dynamic elements when
+initializing it, like the navigation bar or the current version of the
+program.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.2.</span></p>
+</div>
+<dl class="attribute">
+<dt id="coherence.web.ui.IndexResource.loader">
+<code class="descname">loader</code><em class="property"> = &lt;XMLFile of FilePath('/home/travis/build/opacam/Cohen3/coherence/web/templates/template_index.xml')&gt;</em><a class="headerlink" href="#coherence.web.ui.IndexResource.loader" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.IndexResource.version">
+<code class="descname">version</code><span class="sig-paren">(</span><em>request</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#IndexResource.version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.IndexResource.version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.IndexResource.menu">
+<code class="descname">menu</code><span class="sig-paren">(</span><em>request</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#IndexResource.menu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.IndexResource.menu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.web.ui.Web">
+<em class="property">class </em><code class="descname">Web</code><span class="sig-paren">(</span><em>coherence</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#Web"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.Web" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Convenient class describing an adapterFactory that allow us to register
+<code class="xref py py-class docutils literal notranslate"><span class="pre">registerAdapter</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>coherence</strong> – An instance of <cite>~coherence.base.Coherence</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.web.ui.WebUI">
+<em class="property">class </em><code class="descname">WebUI</code><span class="sig-paren">(</span><em>coherence</em>, <em>*a</em>, <em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WebUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WebUI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code>, <a class="reference internal" href="modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>A convenient html interface to browse the connected devices via preferred
+web browser. This interface could be enabled when initializing
+<a class="reference internal" href="modules.html#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a> by setting “‘web-ui’: ‘yes’” into your
+config command or via config file using the same key and value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>coherence</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – An instance of <cite>~coherence.base.Coherence</cite></p>
+</dd>
+</dl>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.8.2.</span></p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Be aware that the browser should support Web Sockets and to
+have js enabled. All modern browsers should have this features
+integrated (tested with firefox and google chrome).</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.web.ui.WebUI.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'webui'</em><a class="headerlink" href="#coherence.web.ui.WebUI.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.web.ui.WebUI.addSlash">
+<code class="descname">addSlash</code><em class="property"> = True</em><a class="headerlink" href="#coherence.web.ui.WebUI.addSlash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.web.ui.WebUI.isLeaf">
+<code class="descname">isLeaf</code><em class="property"> = False</em><a class="headerlink" href="#coherence.web.ui.WebUI.isLeaf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.web.ui.WebUI.ws_recived">
+<code class="descname">ws_recived</code><em class="property"> = []</em><a class="headerlink" href="#coherence.web.ui.WebUI.ws_recived" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.WebUI.on_ws_message">
+<code class="descname">on_ws_message</code><span class="sig-paren">(</span><em>payload</em>, <em>isBinary</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WebUI.on_ws_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WebUI.on_ws_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.WebUI.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WebUI.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WebUI.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a given resource. See L{IResource}’s render method.</p>
+<p>I delegate to methods of self with the form ‘render_METHOD’
+where METHOD is the HTTP that was used to make the
+request. Examples: render_GET, render_HEAD, render_POST, and
+so on. Generally you should implement those methods instead of
+overriding this one.</p>
+<p>render_METHOD methods are expected to return a byte string which will be
+the rendered page, unless the return value is C{server.NOT_DONE_YET}, in
+which case it is this class’s responsibility to write the results using
+C{request.write(data)} and then call C{request.finish()}.</p>
+<p>Old code that overrides render() directly is likewise expected
+to return a byte string or NOT_DONE_YET.</p>
+<p>&#64;see: L{IResource.render}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.WebUI.render_GET">
+<code class="descname">render_GET</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WebUI.render_GET"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WebUI.render_GET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.web.ui.WebUI.getChild">
+<code class="descname">getChild</code><span class="sig-paren">(</span><em>name</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/coherence/web/ui.html#WebUI.getChild"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.web.ui.WebUI.getChild" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a ‘child’ resource from me.</p>
+<p>Implement this to create dynamic resource generation – resources which
+are always available may be registered with self.putChild().</p>
+<p>This will not be called if the class-level variable ‘isLeaf’ is set in
+your subclass; instead, the ‘postpath’ attribute of the request will be
+left as a list of the remaining path elements.</p>
+<p>For example, the URL /foo/bar/baz will normally be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">site</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>However, if the resource returned by ‘bar’ has isLeaf set to true, then
+the getChild call will never be made on it.</p>
+<p>Parameters and return value have the same meaning and requirements as
+those defined by L{IResource.getChildWithDefault}.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="upnp/services/servers/switch_power_server.html" class="btn btn-neutral float-left" title="coherence.upnp.services.servers.switch_power_server (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

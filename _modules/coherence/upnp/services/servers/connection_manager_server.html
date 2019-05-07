@@ -1,0 +1,549 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.services.servers.connection_manager_server &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.services.servers.connection_manager_server</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.services.servers.connection_manager_server</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2006, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Connection Manager service</span>
+<span class="sd">==========================</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">task</span>
+<span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">failure</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">resource</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">service</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.DIDLLite</span> <span class="k">import</span> <span class="n">build_dlna_additional_info</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.soap_service</span> <span class="k">import</span> <span class="n">UPnPPublisher</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.soap_service</span> <span class="k">import</span> <span class="n">errorCode</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">to_string</span>
+
+
+<div class="viewcode-block" id="ConnectionManagerControl"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerControl">[docs]</a><span class="k">class</span> <span class="nc">ConnectionManagerControl</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">ServiceControl</span><span class="p">,</span> <span class="n">UPnPPublisher</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">):</span>
+        <span class="n">service</span><span class="o">.</span><span class="n">ServiceControl</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># self.debug(f&#39;ConnectionManagerControl.__init__: {server}&#39;)</span>
+        <span class="n">UPnPPublisher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">server</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">get_variables</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">get_actions</span><span class="p">()</span></div>
+        <span class="c1"># self.debug(f&#39;\t- variables: {self.variables}&#39;)</span>
+        <span class="c1"># self.debug(f&#39;\t- actions: {self.actions}&#39;)</span>
+
+
+<div class="viewcode-block" id="ConnectionManagerServer"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer">[docs]</a><span class="k">class</span> <span class="nc">ConnectionManagerServer</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">ServiceServer</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;connection_manager_server&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">backend</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">service</span><span class="o">.</span><span class="n">ServiceServer</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;ConnectionManager&#39;</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">ConnectionManagerControl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scpd_url</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">scpdXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">control_url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_connection_id</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_avt_id</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_rcs_id</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">connections</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SinkProtocolInfo&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CurrentConnectionIDs&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">does_playcontainer</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;playcontainer-0-1&#39;</span> <span class="ow">in</span> <span class="n">backend</span><span class="o">.</span><span class="n">dlna_caps</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">does_playcontainer</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_lingering_connections_loop</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">LoopingCall</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_lingering_connections</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_lingering_connections_loop</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">now</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConnectionManagerServer.release"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.release">[docs]</a>    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_lingering_connections_loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.add_connection"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.add_connection">[docs]</a>    <span class="k">def</span> <span class="nf">add_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">RemoteProtocolInfo</span><span class="p">,</span>
+                       <span class="n">Direction</span><span class="p">,</span>
+                       <span class="n">PeerConnectionID</span><span class="p">,</span>
+                       <span class="n">PeerConnectionManager</span><span class="p">):</span>
+
+        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_connection_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_connection_id</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">avt_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">rcs_id</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s1">&#39;MediaServer&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="p">{</span><span class="s1">&#39;ProtocolInfo&#39;</span><span class="p">:</span> <span class="n">RemoteProtocolInfo</span><span class="p">,</span>
+                 <span class="s1">&#39;Direction&#39;</span><span class="p">:</span> <span class="n">Direction</span><span class="p">,</span>
+                 <span class="s1">&#39;PeerConnectionID&#39;</span><span class="p">:</span> <span class="n">PeerConnectionID</span><span class="p">,</span>
+                 <span class="s1">&#39;PeerConnectionManager&#39;</span><span class="p">:</span> <span class="n">PeerConnectionManager</span><span class="p">,</span>
+                 <span class="s1">&#39;AVTransportID&#39;</span><span class="p">:</span> <span class="n">avt_id</span><span class="p">,</span>
+                 <span class="s1">&#39;RcsID&#39;</span><span class="p">:</span> <span class="n">rcs_id</span><span class="p">,</span>
+                 <span class="s1">&#39;Status&#39;</span><span class="p">:</span> <span class="s1">&#39;OK&#39;</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s1">&#39;MediaRenderer&#39;</span><span class="p">:</span>
+            <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            this is the place to instantiate AVTransport and RenderingControl</span>
+<span class="sd">            for this connection</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="n">avt_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_avt_id</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next_avt_id</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">create_new_instance</span><span class="p">(</span><span class="n">avt_id</span><span class="p">)</span>
+            <span class="n">rcs_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_rcs_id</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next_rcs_id</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">rendering_control_server</span><span class="o">.</span><span class="n">create_new_instance</span><span class="p">(</span><span class="n">rcs_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="p">{</span><span class="s1">&#39;ProtocolInfo&#39;</span><span class="p">:</span> <span class="n">RemoteProtocolInfo</span><span class="p">,</span>
+                 <span class="s1">&#39;Direction&#39;</span><span class="p">:</span> <span class="n">Direction</span><span class="p">,</span>
+                 <span class="s1">&#39;PeerConnectionID&#39;</span><span class="p">:</span> <span class="n">PeerConnectionID</span><span class="p">,</span>
+                 <span class="s1">&#39;PeerConnectionManager&#39;</span><span class="p">:</span> <span class="n">PeerConnectionManager</span><span class="p">,</span>
+                 <span class="s1">&#39;AVTransportID&#39;</span><span class="p">:</span> <span class="n">avt_id</span><span class="p">,</span>
+                 <span class="s1">&#39;RcsID&#39;</span><span class="p">:</span> <span class="n">rcs_id</span><span class="p">,</span>
+                 <span class="s1">&#39;Status&#39;</span><span class="p">:</span> <span class="s1">&#39;OK&#39;</span><span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="nb">id</span>
+
+        <span class="n">csv_ids</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CurrentConnectionIDs&#39;</span><span class="p">,</span> <span class="n">csv_ids</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">id</span><span class="p">,</span> <span class="n">avt_id</span><span class="p">,</span> <span class="n">rcs_id</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.remove_connection"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.remove_connection">[docs]</a>    <span class="k">def</span> <span class="nf">remove_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s1">&#39;MediaRenderer&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lookup_avt_id</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">rendering_control_server</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lookup_rcs_id</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ConnectionManagerServer.remove_connection: </span><span class="si">{e}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s1">&#39;MediaServer&#39;</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+
+        <span class="n">csv_ids</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CurrentConnectionIDs&#39;</span><span class="p">,</span> <span class="n">csv_ids</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.remove_lingering_connections"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.remove_lingering_connections">[docs]</a>    <span class="k">def</span> <span class="nf">remove_lingering_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Check if we have a connection that hasn&#39;t a StateVariable change</span>
+<span class="sd">        within the last 300 seconds, if so remove it.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">device_type</span> <span class="o">!=</span> <span class="s1">&#39;MediaRenderer&#39;</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">connection</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">avt_id</span> <span class="o">=</span> <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;AVTransportID&#39;</span><span class="p">]</span>
+            <span class="n">rcs_id</span> <span class="o">=</span> <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;RcsID&#39;</span><span class="p">]</span>
+            <span class="n">avt_active</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">rcs_active</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># print(&#39;remove_lingering_connections&#39;, id, avt_id, rcs_id)</span>
+            <span class="k">if</span> <span class="n">avt_id</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">avt_variables</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">get_variables</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">avt_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">avt_variables</span><span class="p">:</span>
+                    <span class="n">avt_active</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">avt_variables</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                        <span class="k">if</span> <span class="n">variable</span><span class="o">.</span><span class="n">last_time_touched</span> <span class="o">+</span> <span class="mi">300</span> <span class="o">&gt;=</span> <span class="n">now</span><span class="p">:</span>
+                            <span class="n">avt_active</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="k">break</span>
+            <span class="k">if</span> <span class="n">rcs_id</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">rcs_variables</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">rendering_control_server</span><span class="o">.</span><span class="n">get_variables</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="n">rcs_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">rcs_variables</span><span class="p">:</span>
+                    <span class="n">rcs_active</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">rcs_variables</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                        <span class="k">if</span> <span class="n">variable</span><span class="o">.</span><span class="n">last_time_touched</span> <span class="o">+</span> <span class="mi">300</span> <span class="o">&gt;=</span> <span class="n">now</span><span class="p">:</span>
+                            <span class="n">rcs_active</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">avt_active</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">rcs_active</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">remove_connection</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.lookup_connection"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.lookup_connection">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.lookup_avt_id"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.lookup_avt_id">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_avt_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s1">&#39;AVTransportID&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.lookup_rcs_id"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.lookup_rcs_id">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_rcs_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s1">&#39;RcsID&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.listchilds"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.listchilds">[docs]</a>    <span class="k">def</span> <span class="nf">listchilds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="n">cl</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">cl</span> <span class="o">+=</span> <span class="n">f</span><span class="s1">&#39;&lt;li&gt;&lt;a href=</span><span class="si">{uri}</span><span class="s1">/</span><span class="si">{c}</span><span class="s1">&gt;</span><span class="si">{c}</span><span class="s1">&lt;/a&gt;&lt;/li&gt;&#39;</span>
+        <span class="k">return</span> <span class="n">cl</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.render"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">        &lt;html&gt;</span>
+<span class="s1">        &lt;head&gt;</span>
+<span class="s1">            &lt;title&gt;Cohen3 (ConnectionManagerServer)&lt;/title&gt;</span>
+<span class="s1">            &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/styles/main.css&quot; /&gt;</span>
+<span class="s1">        &lt;/head&gt;</span>
+<span class="s1">        &lt;h5&gt;</span>
+<span class="s1">            &lt;img class=&quot;logo-icon&quot; src=&quot;/server-images/coherence-icon.svg&quot;&gt;</span>
+<span class="s1">            &lt;/img&gt;Root of the ConnectionManager&lt;/h5&gt;</span>
+<span class="s1">        &lt;div class=&quot;list&quot;&gt;&lt;ul&gt;{self.listchilds(request.uri)}&lt;/ul&gt;&lt;/div&gt;</span>
+<span class="s1">        &lt;/html&gt;&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">html</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.set_variable"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.set_variable">[docs]</a>    <span class="k">def</span> <span class="nf">set_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">variable_name</span> <span class="o">==</span> <span class="s1">&#39;SourceProtocolInfo&#39;</span> <span class="ow">or</span>
+                <span class="n">variable_name</span> <span class="o">==</span> <span class="s1">&#39;SinkProtocolInfo&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+            <span class="n">without_dlna_tags</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">protocol</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">content_format</span><span class="p">,</span> <span class="n">additional_info</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                    <span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">additional_info</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+                    <span class="n">without_dlna_tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">with_some_tag_already_there</span><span class="p">(</span><span class="n">protocolinfo</span><span class="p">):</span>
+                <span class="n">protocol</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">content_format</span><span class="p">,</span> <span class="n">additional_info</span> <span class="o">=</span> \
+                    <span class="n">protocolinfo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">v_protocol</span><span class="p">,</span> <span class="n">v_network</span><span class="p">,</span> \
+                        <span class="n">v_content_format</span><span class="p">,</span> <span class="n">v_additional_info</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">((</span><span class="n">protocol</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">content_format</span><span class="p">)</span> <span class="o">==</span>
+                            <span class="p">(</span><span class="n">v_protocol</span><span class="p">,</span> <span class="n">v_network</span><span class="p">,</span> <span class="n">v_content_format</span><span class="p">)</span> <span class="ow">and</span>
+                            <span class="n">v_additional_info</span> <span class="o">!=</span> <span class="s1">&#39;*&#39;</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">without_dlna_tags</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">with_some_tag_already_there</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+                    <span class="n">protocol</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">content_format</span><span class="p">,</span> <span class="n">additional_info</span> <span class="o">=</span> \
+                        <span class="n">w</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">variable_name</span> <span class="o">==</span> <span class="s1">&#39;SinkProtocolInfo&#39;</span><span class="p">:</span>
+                        <span class="n">value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                <span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">content_format</span><span class="p">,</span>
+                                 <span class="n">build_dlna_additional_info</span><span class="p">(</span>
+                                     <span class="n">content_format</span><span class="p">,</span>
+                                     <span class="n">does_playcontainer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">does_playcontainer</span>
+                                 <span class="p">))))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                                <span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">content_format</span><span class="p">,</span>
+                                 <span class="n">build_dlna_additional_info</span><span class="p">(</span>
+                                     <span class="n">content_format</span><span class="p">))))</span>
+
+        <span class="n">service</span><span class="o">.</span><span class="n">ServiceServer</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.upnp_PrepareForConnection"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.upnp_PrepareForConnection">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_PrepareForConnection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;upnp_PrepareForConnection&#39;</span><span class="p">)</span>
+        <span class="sd">&#39;&#39;&#39; check if we really support that mimetype &#39;&#39;&#39;</span>
+        <span class="n">RemoteProtocolInfo</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;RemoteProtocolInfo&#39;</span><span class="p">]</span>
+        <span class="sd">&#39;&#39;&#39; if we are a MR and this in not &#39;Input&#39;</span>
+<span class="sd">            then there is something strange going on</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">Direction</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;Direction&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s1">&#39;MediaRenderer&#39;</span> <span class="ow">and</span>
+                <span class="n">Direction</span> <span class="o">==</span> <span class="s1">&#39;Output&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">702</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s1">&#39;MediaServer&#39;</span> <span class="ow">and</span>
+                <span class="n">Direction</span> <span class="o">!=</span> <span class="s1">&#39;Input&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">702</span><span class="p">))</span>
+        <span class="sd">&#39;&#39;&#39; the InstanceID of the MS ? &#39;&#39;&#39;</span>
+        <span class="n">PeerConnectionID</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;PeerConnectionID&#39;</span><span class="p">]</span>
+        <span class="sd">&#39;&#39;&#39; ??? &#39;&#39;&#39;</span>
+        <span class="n">PeerConnectionManager</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;PeerConnectionManager&#39;</span><span class="p">]</span>
+        <span class="n">local_protocol_infos</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s1">&#39;MediaRenderer&#39;</span><span class="p">:</span>
+            <span class="n">local_protocol_infos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s1">&#39;SinkProtocolInfo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">device_type</span> <span class="o">==</span> <span class="s1">&#39;MediaServer&#39;</span><span class="p">:</span>
+            <span class="n">local_protocol_infos</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;ProtocalInfos: </span><span class="si">{RemoteProtocolInfo}</span><span class="s1"> -- </span><span class="si">{local_protocol_infos}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">remote_protocol</span><span class="p">,</span> <span class="n">remote_network</span><span class="p">,</span> <span class="n">remote_content_format</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> \
+                <span class="n">RemoteProtocolInfo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;unable to process RemoteProtocolInfo &#39;</span>
+                         <span class="n">f</span><span class="s1">&#39;</span><span class="si">{RemoteProtocolInfo}</span><span class="s1"> [error: </span><span class="si">{e}</span><span class="s1">]&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">701</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">protocol_info</span> <span class="ow">in</span> <span class="n">local_protocol_infos</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">):</span>
+            <span class="c1"># print remote_protocol,remote_network,remote_content_format</span>
+            <span class="c1"># print protocol_info</span>
+            <span class="n">local_protocol</span><span class="p">,</span> <span class="n">local_network</span><span class="p">,</span> <span class="n">local_content_format</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> \
+                <span class="n">protocol_info</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+            <span class="c1"># print local_protocol,local_network,local_content_format</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">remote_protocol</span> <span class="o">==</span> <span class="n">local_protocol</span> <span class="ow">or</span>
+                 <span class="n">remote_protocol</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span> <span class="ow">or</span>
+                 <span class="n">local_protocol</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">remote_network</span> <span class="o">==</span> <span class="n">local_network</span> <span class="ow">or</span>
+                     <span class="n">remote_network</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span> <span class="ow">or</span>
+                     <span class="n">local_network</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">remote_content_format</span> <span class="o">==</span> <span class="n">local_content_format</span> <span class="ow">or</span>
+                     <span class="n">remote_content_format</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span> <span class="ow">or</span>
+                     <span class="n">local_content_format</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">)):</span>
+                <span class="n">connection_id</span><span class="p">,</span> <span class="n">avt_id</span><span class="p">,</span> <span class="n">rcs_id</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
+                        <span class="n">RemoteProtocolInfo</span><span class="p">,</span>
+                        <span class="n">Direction</span><span class="p">,</span>
+                        <span class="n">PeerConnectionID</span><span class="p">,</span>
+                        <span class="n">PeerConnectionManager</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;ConnectionID&#39;</span><span class="p">:</span> <span class="n">connection_id</span><span class="p">,</span>
+                        <span class="s1">&#39;AVTransportID&#39;</span><span class="p">:</span> <span class="n">avt_id</span><span class="p">,</span>
+                        <span class="s1">&#39;RcsID&#39;</span><span class="p">:</span> <span class="n">rcs_id</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">701</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.upnp_ConnectionComplete"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.upnp_ConnectionComplete">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_ConnectionComplete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ConnectionID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ConnectionID&#39;</span><span class="p">])</span>
+        <span class="sd">&#39;&#39;&#39; remove this ConnectionID</span>
+<span class="sd">            and the associated instances @ AVTransportID and RcsID</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_connection</span><span class="p">(</span><span class="n">ConnectionID</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="ConnectionManagerServer.upnp_GetCurrentConnectionInfo"><a class="viewcode-back" href="../../../../../source/upnp/services/servers/connection_manager_server.html#coherence.upnp.services.servers.connection_manager_server.ConnectionManagerServer.upnp_GetCurrentConnectionInfo">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_GetCurrentConnectionInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ConnectionID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ConnectionID&#39;</span><span class="p">])</span>
+        <span class="sd">&#39;&#39;&#39; return for this ConnectionID</span>
+<span class="sd">            the associated InstanceIDs @ AVTransportID and RcsID</span>
+<span class="sd">            ProtocolInfo</span>
+<span class="sd">            PeerConnectionManager</span>
+<span class="sd">            PeerConnectionID</span>
+<span class="sd">            Direction</span>
+<span class="sd">            Status</span>
+
+<span class="sd">            or send a 706 if there isn&#39;t such a ConnectionID</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_connection</span><span class="p">(</span><span class="n">ConnectionID</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">706</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;AVTransportID&#39;</span><span class="p">:</span> <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;AVTransportID&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;RcsID&#39;</span><span class="p">:</span> <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;RcsID&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;ProtocolInfo&#39;</span><span class="p">:</span> <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;ProtocolInfo&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;PeerConnectionManager&#39;</span><span class="p">:</span> <span class="n">connection</span><span class="p">[</span>
+                        <span class="s1">&#39;PeerConnectionManager&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;PeerConnectionID&#39;</span><span class="p">:</span> <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;PeerConnectionID&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;Direction&#39;</span><span class="p">:</span> <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;Direction&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;Status&#39;</span><span class="p">:</span> <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;Status&#39;</span><span class="p">],</span>
+                    <span class="p">}</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

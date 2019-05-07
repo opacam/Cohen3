@@ -1,0 +1,959 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.device &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.device</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.core.device</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).</span>
+<span class="c1"># Copyright 2006, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Devices</span>
+<span class="sd">=======</span>
+
+<span class="sd">This module contains two classes describing UPnP devices.</span>
+
+<span class="sd">:class:`Device`</span>
+<span class="sd">---------------</span>
+
+<span class="sd">The base class for all devices.</span>
+
+<span class="sd">:class:`RootDevice`</span>
+<span class="sd">-------------------</span>
+
+<span class="sd">A device representing a root device.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">eventdispatcher</span> <span class="k">import</span> <span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">Property</span><span class="p">,</span> <span class="n">ListProperty</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">defer</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.service</span> <span class="k">import</span> <span class="n">Service</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">xml_constants</span>
+
+<span class="n">ns</span> <span class="o">=</span> <span class="n">xml_constants</span><span class="o">.</span><span class="n">UPNP_DEVICE_NS</span>
+
+
+<div class="viewcode-block" id="Device"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device">[docs]</a><span class="k">class</span> <span class="nc">Device</span><span class="p">(</span><span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Represents a UPnP&#39;s device, but this is not a root device, it&#39;s the base</span>
+<span class="sd">    class used for any device. See :class:`RootDevice` if you want a root</span>
+<span class="sd">    device.</span>
+
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">        * Migrated from louie/dispatcher to EventDispatcher</span>
+<span class="sd">        * The emitted events changed:</span>
+
+<span class="sd">            - Coherence.UPnP.Device.detection_completed =&gt;</span>
+<span class="sd">              device_detection_completed</span>
+<span class="sd">            - Coherence.UPnP.Device.remove_client =&gt;</span>
+<span class="sd">              device_remove_client</span>
+
+<span class="sd">        * New events: device_service_notified, device_got_client</span>
+<span class="sd">        * Changes some class variables to benefit from the EventDispatcher&#39;s</span>
+<span class="sd">          properties:</span>
+
+<span class="sd">            - :attr:`client`</span>
+<span class="sd">            - :attr:`devices`</span>
+<span class="sd">            - :attr:`services`</span>
+<span class="sd">            - :attr:`client`</span>
+<span class="sd">            - :attr:`detection_completed`</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;device&#39;</span>
+
+    <span class="n">client</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Defined by :class:`~coherence.upnp.devices.controlpoint.ControlPoint`.</span>
+<span class="sd">    It should be one of:</span>
+
+<span class="sd">        - Initialized instance of a class</span>
+<span class="sd">          :class:`~coherence.upnp.devices.media_server_client.MediaServerClient`</span>
+<span class="sd">        - Initialized instance of a class</span>
+<span class="sd">          :class:`~coherence.upnp.devices.media_renderer_client.MediaRendererClient`</span>
+<span class="sd">        - Initialized instance of a class</span>
+<span class="sd">          :class:`~coherence.upnp.devices.internet_gateway_device_client.InternetGatewayDeviceClient`</span>
+
+<span class="sd">    Whenever a client is set an event will be sent notifying it by</span>
+<span class="sd">    :meth:`on_client`.</span>
+<span class="sd">    &#39;&#39;&#39;</span>  <span class="c1"># noqa</span>
+
+    <span class="n">icons</span> <span class="o">=</span> <span class="n">ListProperty</span><span class="p">([])</span>
+    <span class="sd">&#39;&#39;&#39;A list of the device icons.&#39;&#39;&#39;</span>
+
+    <span class="n">devices</span> <span class="o">=</span> <span class="n">ListProperty</span><span class="p">([])</span>
+    <span class="sd">&#39;&#39;&#39;A list of the device devices.&#39;&#39;&#39;</span>
+
+    <span class="n">services</span> <span class="o">=</span> <span class="n">ListProperty</span><span class="p">([])</span>
+    <span class="sd">&#39;&#39;&#39;A list of the device services.&#39;&#39;&#39;</span>
+
+    <span class="n">detection_completed</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    To know whenever the device detection has completed. Defaults to `False`</span>
+<span class="sd">    and it will be set automatically to `True` by the class method</span>
+<span class="sd">    :meth:`receiver`.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">udn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">EventDispatcher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span>
+            <span class="s1">&#39;device_detection_completed&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;device_remove_client&#39;</span><span class="p">,</span>
+
+            <span class="s1">&#39;device_service_notified&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;device_got_client&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">udn</span> <span class="o">=</span> <span class="n">udn</span>
+        <span class="c1"># self.uid = self.usn[:-len(self.st)-2]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">friendly_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device_type</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upnp_version</span> <span class="o">=</span> <span class="s1">&#39;n/a&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">friendly_device_type</span> <span class="o">=</span> <span class="s1">&#39;[unknown]&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device_type_version</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;embedded device </span><span class="si">{self.friendly_name}</span><span class="s1"> &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.device_type}</span><span class="s1">, parent </span><span class="si">{self.parent}</span><span class="s1">&#39;</span>
+
+    <span class="c1"># def __del__(self):</span>
+    <span class="c1">#    # print(&#39;Device removal completed&#39;)</span>
+    <span class="c1">#    pass</span>
+
+<div class="viewcode-block" id="Device.as_dict"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;device_type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_device_type</span><span class="p">(),</span>
+             <span class="s1">&#39;friendly_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_friendly_name</span><span class="p">(),</span>
+             <span class="s1">&#39;udn&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span>
+             <span class="s1">&#39;services&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">]}</span>
+        <span class="n">icons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">icon</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">icons</span><span class="p">:</span>
+            <span class="n">icons</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;mimetype&#39;</span><span class="p">:</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">],</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">],</span>
+                          <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span>
+                          <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]})</span>
+        <span class="n">d</span><span class="p">[</span><span class="s1">&#39;icons&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">icons</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="Device.remove"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;removal of  </span><span class="si">{self.friendly_name}</span><span class="s1"> </span><span class="si">{self.udn}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;try to remove </span><span class="si">{device}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">device</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">service</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;try to remove </span><span class="si">{service}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">service</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+                <span class="s1">&#39;device_remove_client&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">udn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># del self</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Device.receiver"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.receiver">[docs]</a>    <span class="k">def</span> <span class="nf">receiver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">detection_completed</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">detection_completed</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+                <span class="s1">&#39;device_service_notified&#39;</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">udn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detection_completed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;embedded device </span><span class="si">{self.friendly_name}</span><span class="s1"> &#39;</span>
+                      <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.device_type}</span><span class="s1"> initialized, parent </span><span class="si">{self.parent}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span><span class="s1">&#39;device_detection_completed&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+                <span class="s1">&#39;device_detection_completed&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+                <span class="s1">&#39;device_detection_completed&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Device.service_detection_failed"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.service_detection_failed">[docs]</a>    <span class="k">def</span> <span class="nf">service_detection_failed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Device.get_id"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">udn</span></div>
+
+<div class="viewcode-block" id="Device.get_uuid"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_uuid">[docs]</a>    <span class="k">def</span> <span class="nf">get_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">udn</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span></div>
+
+<div class="viewcode-block" id="Device.get_embedded_devices"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_embedded_devices">[docs]</a>    <span class="k">def</span> <span class="nf">get_embedded_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span></div>
+
+<div class="viewcode-block" id="Device.get_embedded_device_by_type"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_embedded_device_by_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_embedded_device_by_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">device</span><span class="o">.</span><span class="n">friendly_device_type</span><span class="p">:</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span></div>
+
+<div class="viewcode-block" id="Device.get_services"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_services">[docs]</a>    <span class="k">def</span> <span class="nf">get_services</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span></div>
+
+<div class="viewcode-block" id="Device.get_service_by_type"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_service_by_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_service_by_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">service_class</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">service_type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">service_class</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">service</span></div>
+
+<div class="viewcode-block" id="Device.add_service"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.add_service">[docs]</a>    <span class="k">def</span> <span class="nf">add_service</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add a service to the device. Also we check if service already notified,</span>
+<span class="sd">        and trigger the callback if needed. We also connect the device to</span>
+<span class="sd">        service in case the service still not completed his detection in order</span>
+<span class="sd">        that the device knows when the service has completed his detection.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            service (object): A service which should be an initialized instance</span>
+<span class="sd">                              of :class:`~coherence.upnp.core.service.Service`</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;add_service </span><span class="si">{service}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">service</span><span class="o">.</span><span class="n">detection_completed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">receiver</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+        <span class="n">service</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">service_detection_completed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver</span><span class="p">,</span>
+                     <span class="n">service_detection_failed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service_detection_failed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">service</span><span class="p">)</span></div>
+
+    <span class="c1"># :fixme: This fails as Service.get_usn() is not implemented.</span>
+<div class="viewcode-block" id="Device.remove_service_with_usn"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.remove_service_with_usn">[docs]</a>    <span class="k">def</span> <span class="nf">remove_service_with_usn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_usn</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">service</span><span class="o">.</span><span class="n">get_usn</span><span class="p">()</span> <span class="o">==</span> <span class="n">service_usn</span><span class="p">:</span>
+                <span class="n">service</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span>
+                    <span class="n">service_detection_completed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver</span><span class="p">,</span>
+                    <span class="n">service_detection_failed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service_detection_failed</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+                <span class="n">service</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+                <span class="k">break</span></div>
+
+<div class="viewcode-block" id="Device.add_device"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.add_device">[docs]</a>    <span class="k">def</span> <span class="nf">add_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Device add_device </span><span class="si">{device}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">device</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Device.get_friendly_name"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_friendly_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_friendly_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">friendly_name</span></div>
+
+<div class="viewcode-block" id="Device.get_device_type"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_device_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_device_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_type</span></div>
+
+<div class="viewcode-block" id="Device.get_friendly_device_type"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_friendly_device_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_friendly_device_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">friendly_device_type</span></div>
+
+<div class="viewcode-block" id="Device.get_markup_name"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_markup_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_markup_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_markup_name</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_markup_name</span> <span class="o">=</span> \
+                <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.friendly_device_type}</span><span class="s1">:</span><span class="si">{self.device_type_version}</span><span class="s1"> &#39;</span> \
+                <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.friendly_name}</span><span class="s1">&#39;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_markup_name</span></div>
+
+<div class="viewcode-block" id="Device.get_device_type_version"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_device_type_version">[docs]</a>    <span class="k">def</span> <span class="nf">get_device_type_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_type_version</span></div>
+
+<div class="viewcode-block" id="Device.set_client"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.set_client">[docs]</a>    <span class="k">def</span> <span class="nf">set_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span></div>
+
+<div class="viewcode-block" id="Device.get_client"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_client">[docs]</a>    <span class="k">def</span> <span class="nf">get_client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span></div>
+
+<div class="viewcode-block" id="Device.on_client"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.on_client">[docs]</a>    <span class="k">def</span> <span class="nf">on_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Automatically triggered whenever a client is set or changed. Emmit</span>
+<span class="sd">        an event notifying that the client has changed.</span>
+
+<span class="sd">        .. versionadded:: 0.9.0</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+            <span class="s1">&#39;device_got_client&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Device.renew_service_subscriptions"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.renew_service_subscriptions">[docs]</a>    <span class="k">def</span> <span class="nf">renew_service_subscriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; iterate over device&#39;s services and renew subscriptions &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;renew service subscriptions for </span><span class="si">{self.friendly_name}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">services</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;check service </span><span class="si">{service.id}</span><span class="s1"> {service.get_sid()} &#39;</span>
+                      <span class="n">f</span><span class="s1">&#39;{service.get_timeout()} </span><span class="si">{now}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">service</span><span class="o">.</span><span class="n">get_sid</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">service</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">now</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;wow, we lost an event subscription for &#39;</span>
+                               <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.friendly_name}</span><span class="s1"> {service.get_id()}, &#39;</span>
+                               <span class="n">f</span><span class="s1">&#39;maybe we need to rethink the loop time and &#39;</span>
+                               <span class="n">f</span><span class="s1">&#39;timeout calculation?&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">service</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">now</span> <span class="o">+</span> <span class="mi">30</span><span class="p">:</span>
+                    <span class="n">service</span><span class="o">.</span><span class="n">renew_subscription</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">:</span>
+            <span class="n">device</span><span class="o">.</span><span class="n">renew_service_subscriptions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Device.unsubscribe_service_subscriptions"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.unsubscribe_service_subscriptions">[docs]</a>    <span class="k">def</span> <span class="nf">unsubscribe_service_subscriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Iterate over device&#39;s services and unsubscribe subscriptions &#39;&#39;&#39;</span>
+        <span class="n">sl</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_services</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">service</span><span class="o">.</span><span class="n">get_sid</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">sl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p">())</span>
+        <span class="n">dl</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">DeferredList</span><span class="p">(</span><span class="n">sl</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dl</span></div>
+
+<div class="viewcode-block" id="Device.parse_device"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.parse_device">[docs]</a>    <span class="k">def</span> <span class="nf">parse_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;parse_device </span><span class="si">{d}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device_type</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}deviceType&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">friendly_device_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_type_version</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">device_type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">friendly_name</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}friendlyName&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">udn</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}UDN&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;found udn </span><span class="si">{self.udn}</span><span class="s1"> </span><span class="si">{self.friendly_name}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manufacturer</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}manufacturer&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manufacturer_url</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}manufacturerURL&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}modelName&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_description</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}modelDescription&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_number</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}modelNumber&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_url</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}modelURL&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serial_number</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}serialNumber&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upc</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}UPC&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">presentation_url</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}presentationURL&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">dlna_doc</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+                    <span class="s1">&#39;./{urn:schemas-dlna-org:device-1-0}X_DLNADOC&#39;</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dlna_dc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlna_doc</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dlna_dc</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dlna_dc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dlna_doc</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">dlna_cap</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
+                    <span class="s1">&#39;./{urn:schemas-dlna-org:device-1-0}X_DLNACAP&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="n">dlna_cap</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dlna_cap</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cap</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dlna_cap</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dlna_cap</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cap</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="n">icon_list</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}iconList&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">icon_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlparse</span>
+            <span class="n">url_base</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">://</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_location</span><span class="p">())[:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">icon</span> <span class="ow">in</span> <span class="n">icon_list</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}icon&#39;</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">icon</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}mimetype&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">icon</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}width&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">icon</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}height&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">icon</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}depth&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;realurl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">icon</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}url&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                    <span class="n">i</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_fullyqualified</span><span class="p">(</span>
+                        <span class="n">i</span><span class="p">[</span><span class="s1">&#39;realurl&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">icons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;adding icon </span><span class="si">{i}</span><span class="s1"> for </span><span class="si">{self.friendly_name}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="kn">import</span> <span class="nn">traceback</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="n">f</span><span class="s1">&#39;device </span><span class="si">{self.friendly_name}</span><span class="s1"> seems to have an invalid&#39;</span>
+                        <span class="n">f</span><span class="s1">&#39; icon description, ignoring that icon [error: </span><span class="si">{e}</span><span class="s1">]&#39;</span><span class="p">)</span>
+
+        <span class="n">serviceList</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}serviceList&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">serviceList</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="n">serviceList</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}service&#39;</span><span class="p">):</span>
+                <span class="n">serviceType</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{{</span><span class="si">{ns}</span><span class="s1">}}serviceType&#39;</span><span class="p">)</span>
+                <span class="n">serviceId</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{{</span><span class="si">{ns}</span><span class="s1">}}serviceId&#39;</span><span class="p">)</span>
+                <span class="n">controlUrl</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{{</span><span class="si">{ns}</span><span class="s1">}}controlURL&#39;</span><span class="p">)</span>
+                <span class="n">eventSubUrl</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{{</span><span class="si">{ns}</span><span class="s1">}}eventSubURL&#39;</span><span class="p">)</span>
+                <span class="n">presentationUrl</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{{</span><span class="si">{ns}</span><span class="s1">}}presentationURL&#39;</span><span class="p">)</span>
+                <span class="n">scpdUrl</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{{</span><span class="si">{ns}</span><span class="s1">}}SCPDURL&#39;</span><span class="p">)</span>
+                <span class="c1"># check if values are somehow reasonable</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scpdUrl</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;service has no uri for its description&#39;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">eventSubUrl</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;service has no uri for eventing&#39;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">controlUrl</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;service has no uri for controling&#39;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_service</span><span class="p">(</span>
+                        <span class="n">Service</span><span class="p">(</span><span class="n">serviceType</span><span class="p">,</span> <span class="n">serviceId</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_location</span><span class="p">(),</span>
+                                <span class="n">controlUrl</span><span class="p">,</span>
+                                <span class="n">eventSubUrl</span><span class="p">,</span> <span class="n">presentationUrl</span><span class="p">,</span> <span class="n">scpdUrl</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="n">f</span><span class="s1">&#39;Error on adding service: </span><span class="si">{service}</span><span class="s1"> [ERROR: </span><span class="si">{e}</span><span class="s1">]&#39;</span><span class="p">)</span>
+
+            <span class="c1"># now look for all sub devices</span>
+            <span class="n">embedded_devices</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}deviceList&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">embedded_devices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">embedded_devices</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}device&#39;</span><span class="p">):</span>
+                    <span class="n">embedded_device</span> <span class="o">=</span> <span class="n">Device</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_device</span><span class="p">(</span><span class="n">embedded_device</span><span class="p">)</span>
+                    <span class="n">embedded_device</span><span class="o">.</span><span class="n">parse_device</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">receiver</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Device.get_location"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_location">[docs]</a>    <span class="k">def</span> <span class="nf">get_location</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_location</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Device.get_usn"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_usn">[docs]</a>    <span class="k">def</span> <span class="nf">get_usn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_usn</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Device.get_upnp_version"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_upnp_version">[docs]</a>    <span class="k">def</span> <span class="nf">get_upnp_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_upnp_version</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Device.get_urlbase"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_urlbase">[docs]</a>    <span class="k">def</span> <span class="nf">get_urlbase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_urlbase</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Device.get_presentation_url"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_presentation_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_presentation_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_fullyqualified</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">presentation_url</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="Device.get_parent_id"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.get_parent_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_parent_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="Device.make_fullyqualified"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.make_fullyqualified">[docs]</a>    <span class="k">def</span> <span class="nf">make_fullyqualified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">make_fullyqualified</span><span class="p">(</span><span class="n">url</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Device.as_tuples"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.Device.as_tuples">[docs]</a>    <span class="k">def</span> <span class="nf">as_tuples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attribute</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">attribute</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                        <span class="n">v1</span> <span class="o">=</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">0</span><span class="p">]()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">v1</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">v1</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">]:</span>
+                        <span class="k">return</span>
+                    <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">attribute</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                        <span class="n">v2</span> <span class="o">=</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">1</span><span class="p">]()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">v2</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">v2</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">]:</span>
+                        <span class="k">return</span>
+                    <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">)))</span>
+                    <span class="k">return</span>
+                <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">attribute</span><span class="p">):</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">attribute</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">]:</span>
+                    <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Device.as_tuples: </span><span class="si">{e}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="kn">import</span> <span class="nn">traceback</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Location&#39;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_location</span><span class="p">(),</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">get_location</span><span class="p">())))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">append</span><span class="p">(</span><span class="s1">&#39;URL base&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_urlbase</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;UDN&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">()))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device_type</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;UPnP Version&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">upnp_version</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;DLNA Device Class&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dlna_dc</span><span class="p">)))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;DLNA Device Capability&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dlna_cap</span><span class="p">)))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Friendly Name&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">friendly_name</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">append</span><span class="p">(</span><span class="s1">&#39;Manufacturer&#39;</span><span class="p">,</span> <span class="s1">&#39;manufacturer&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">append</span><span class="p">(</span><span class="s1">&#39;Manufacturer URL&#39;</span><span class="p">,</span>
+                   <span class="p">(</span><span class="s1">&#39;manufacturer_url&#39;</span><span class="p">,</span> <span class="s1">&#39;manufacturer_url&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">append</span><span class="p">(</span><span class="s1">&#39;Model Description&#39;</span><span class="p">,</span> <span class="s1">&#39;model_description&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">append</span><span class="p">(</span><span class="s1">&#39;Model Name&#39;</span><span class="p">,</span> <span class="s1">&#39;model_name&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">append</span><span class="p">(</span><span class="s1">&#39;Model Number&#39;</span><span class="p">,</span> <span class="s1">&#39;model_number&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">append</span><span class="p">(</span><span class="s1">&#39;Model URL&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;model_url&#39;</span><span class="p">,</span> <span class="s1">&#39;model_url&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">append</span><span class="p">(</span><span class="s1">&#39;Serial Number&#39;</span><span class="p">,</span> <span class="s1">&#39;serial_number&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">append</span><span class="p">(</span><span class="s1">&#39;UPC&#39;</span><span class="p">,</span> <span class="s1">&#39;upc&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">append</span><span class="p">(</span><span class="s1">&#39;Presentation URL&#39;</span><span class="p">,</span>
+                   <span class="p">(</span><span class="s1">&#39;presentation_url&#39;</span><span class="p">,</span>
+                    <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_fullyqualified</span><span class="p">(</span>
+                        <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;presentation_url&#39;</span><span class="p">))))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">for</span> <span class="n">icon</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">icons</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Icon&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;realurl&#39;</span><span class="p">],</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">make_fullyqualified</span><span class="p">(</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;realurl&#39;</span><span class="p">]),</span>
+                               <span class="p">{</span><span class="s1">&#39;Mimetype&#39;</span><span class="p">:</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">],</span>
+                                <span class="s1">&#39;Width&#39;</span><span class="p">:</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span>
+                                <span class="s1">&#39;Height&#39;</span><span class="p">:</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span>
+                                <span class="s1">&#39;Depth&#39;</span><span class="p">:</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]})))</span>
+
+        <span class="k">return</span> <span class="n">r</span></div></div>
+
+
+<div class="viewcode-block" id="RootDevice"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice">[docs]</a><span class="k">class</span> <span class="nc">RootDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Description for a root device.</span>
+
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">        * Migrated from louie/dispatcher to EventDispatcher</span>
+<span class="sd">        * The emitted events changed:</span>
+
+<span class="sd">            - Coherence.UPnP.RootDevice.detection_completed =&gt;</span>
+<span class="sd">              root_device_detection_completed</span>
+<span class="sd">            - Coherence.UPnP.RootDevice.removed =&gt; root_device_removed</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">root_detection_completed</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    To know whenever the root device detection has completed. Defaults to</span>
+<span class="sd">    `False` and it will be set automatically to `True` by the class method</span>
+<span class="sd">    :meth:`device_detect`.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infos</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">usn</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;USN&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">udn</span> <span class="o">=</span> <span class="n">infos</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;UDN&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;SERVER&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">st</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;LOCATION&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifestation</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;MANIFESTATION&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;HOST&#39;</span><span class="p">]</span>
+        <span class="n">Device</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span>
+            <span class="s1">&#39;root_device_detection_completed&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;root_device_removed&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">detection_completed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device_detect</span><span class="p">)</span>
+        <span class="c1"># we need to handle root device completion</span>
+        <span class="c1"># these events could be our self or our children.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_description</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;RootDevice initialized: </span><span class="si">{self.location}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;rootdevice </span><span class="si">{self.friendly_name}</span><span class="s1"> </span><span class="si">{self.udn}</span><span class="s1"> </span><span class="si">{self.st}</span><span class="s1"> &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.host}</span><span class="s1">, manifestation </span><span class="si">{self.manifestation}</span><span class="s1">&#39;</span>
+
+<div class="viewcode-block" id="RootDevice.remove"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">Device</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span><span class="s1">&#39;root_device_removed&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">usn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_usn</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="RootDevice.get_usn"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.get_usn">[docs]</a>    <span class="k">def</span> <span class="nf">get_usn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">usn</span></div>
+
+<div class="viewcode-block" id="RootDevice.get_st"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.get_st">[docs]</a>    <span class="k">def</span> <span class="nf">get_st</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">st</span></div>
+
+<div class="viewcode-block" id="RootDevice.get_location"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.get_location">[docs]</a>    <span class="k">def</span> <span class="nf">get_location</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RootDevice.get_upnp_version"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.get_upnp_version">[docs]</a>    <span class="k">def</span> <span class="nf">get_upnp_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">upnp_version</span></div>
+
+<div class="viewcode-block" id="RootDevice.get_urlbase"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.get_urlbase">[docs]</a>    <span class="k">def</span> <span class="nf">get_urlbase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RootDevice.get_host"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.get_host">[docs]</a>    <span class="k">def</span> <span class="nf">get_host</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span></div>
+
+<div class="viewcode-block" id="RootDevice.is_local"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.is_local">[docs]</a>    <span class="k">def</span> <span class="nf">is_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">manifestation</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="RootDevice.is_remote"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.is_remote">[docs]</a>    <span class="k">def</span> <span class="nf">is_remote</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">manifestation</span> <span class="o">!=</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="RootDevice.device_detect"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.device_detect">[docs]</a>    <span class="k">def</span> <span class="nf">device_detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This method is automatically triggered whenever the property of the</span>
+<span class="sd">        base class :attr:`Device.detection_completed` is set to `True`. Here we</span>
+<span class="sd">        perform some more operations, before the :class:`RootDevice` emits</span>
+<span class="sd">        an event notifying that the root device detection has completed.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;device_detect </span><span class="si">{kwargs}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;root_detection_completed </span><span class="si">{self.root_detection_completed}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_detection_completed</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># our self is not complete yet</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;detection_completed </span><span class="si">{self.detection_completed}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">detection_completed</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># now check child devices.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;self.devices </span><span class="si">{self.devices}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;check device </span><span class="si">{d.detection_completed}</span><span class="s1"> </span><span class="si">{d}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">detection_completed</span><span class="p">:</span>
+                <span class="k">return</span>
+        <span class="c1"># now must be done, so notify root done</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_detection_completed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;rootdevice </span><span class="si">{self.friendly_name}</span><span class="s1"> </span><span class="si">{self.st}</span><span class="s1"> </span><span class="si">{self.host}</span><span class="s1"> &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;initialized, manifestation </span><span class="si">{self.manifestation}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+            <span class="s1">&#39;root_device_detection_completed&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RootDevice.add_device"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.add_device">[docs]</a>    <span class="k">def</span> <span class="nf">add_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;RootDevice add_device </span><span class="si">{device}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">device</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RootDevice.get_devices"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.get_devices">[docs]</a>    <span class="k">def</span> <span class="nf">get_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;RootDevice get_devices: </span><span class="si">{self.devices}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span></div>
+
+<div class="viewcode-block" id="RootDevice.parse_description"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.parse_description">[docs]</a>    <span class="k">def</span> <span class="nf">parse_description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">gotPage</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;got device description from </span><span class="si">{self.location}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;data is </span><span class="si">{x}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">xml_data</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">xml_data</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Invalid device description received from &#39;</span>
+                             <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.location}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="kn">import</span> <span class="nn">traceback</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+
+            <span class="k">if</span> <span class="n">xml_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">tree</span> <span class="o">=</span> <span class="n">xml_data</span>
+                <span class="n">major</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}specVersion/{{</span><span class="si">{ns}</span><span class="s1">}}major&#39;</span><span class="p">)</span>
+                <span class="n">minor</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}specVersion/{{</span><span class="si">{ns}</span><span class="s1">}}minor&#39;</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">upnp_version</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">major</span><span class="p">,</span> <span class="n">minor</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">upnp_version</span> <span class="o">=</span> <span class="s1">&#39;n/a&#39;</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">findtext</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}URLBase&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="kn">import</span> <span class="nn">traceback</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+
+                <span class="n">d</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./{{</span><span class="si">{ns}</span><span class="s1">}}device&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parse_device</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>  <span class="c1"># root device</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;device parsed successfully </span><span class="si">{self.location}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">failure</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;error getting device description from </span><span class="si">{url}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">failure</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">)</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span>
+                <span class="n">gotPage</span><span class="p">,</span> <span class="n">gotError</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Error on parsing device description: </span><span class="si">{e}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RootDevice.make_fullyqualified"><a class="viewcode-back" href="../../../../source/upnp/core/device.html#coherence.upnp.core.device.RootDevice.make_fullyqualified">[docs]</a>    <span class="k">def</span> <span class="nf">make_fullyqualified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Be aware that this function returns a byte string&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;make_fullyqualified: </span><span class="si">{url}</span><span class="s1"> [{type(url)}]&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;http://&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">url</span>
+        <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urljoin</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_urlbase</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">base</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="sa">b</span><span class="s1">&#39;/&#39;</span><span class="p">:</span>
+                <span class="n">base</span> <span class="o">+=</span> <span class="sa">b</span><span class="s1">&#39;/&#39;</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_location</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">loc</span> <span class="o">=</span> <span class="n">loc</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

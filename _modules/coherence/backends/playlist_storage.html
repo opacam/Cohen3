@@ -1,0 +1,400 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.playlist_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.playlist_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.playlist_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># a backend</span>
+
+<span class="c1"># Copyright 2007, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2008, Jean-Michel Sizun &lt;jm.sizun@free.fr&gt;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendItem</span><span class="p">,</span> <span class="n">Container</span><span class="p">,</span> <span class="n">AbstractBackendStore</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.DIDLLite</span> <span class="k">import</span> <span class="n">classChooser</span><span class="p">,</span> <span class="n">Resource</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">getPage</span>
+
+
+<div class="viewcode-block" id="PlaylistItem"><a class="viewcode-back" href="../../../source/backends/playlist.html#coherence.backends.playlist_storage.PlaylistItem">[docs]</a><span class="k">class</span> <span class="nc">PlaylistItem</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;playlist_store&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">stream_url</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="o">=</span> <span class="n">stream_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">mimetype</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">stream_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;item&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;update_id&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PlaylistItem.get_id"><a class="viewcode-back" href="../../../source/backends/playlist.html#coherence.backends.playlist_storage.PlaylistItem.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span></div>
+
+<div class="viewcode-block" id="PlaylistItem.get_item"><a class="viewcode-back" href="../../../source/backends/playlist.html#coherence.backends.playlist_storage.PlaylistItem.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upnp_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="n">upnp_parent_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;video/&#39;</span><span class="p">):</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">VideoItem</span><span class="p">(</span><span class="n">upnp_id</span><span class="p">,</span> <span class="n">upnp_parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">AudioItem</span><span class="p">(</span><span class="n">upnp_id</span><span class="p">,</span> <span class="n">upnp_parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="c1"># what to do with MMS:// feeds?</span>
+            <span class="n">protocol</span> <span class="o">=</span> <span class="s1">&#39;http-get&#39;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;rtsp://&#39;</span><span class="p">):</span>
+                <span class="n">protocol</span> <span class="o">=</span> <span class="s1">&#39;rtsp-rtp-udp&#39;</span>
+
+            <span class="n">res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="p">,</span>
+                           <span class="n">f</span><span class="s1">&#39;</span><span class="si">{protocol}</span><span class="s1">:*:</span><span class="si">{self.mimetype}</span><span class="s1">:*&#39;</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="PlaylistItem.get_url"><a class="viewcode-back" href="../../../source/backends/playlist.html#coherence.backends.playlist_storage.PlaylistItem.get_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span></div></div>
+
+
+<div class="viewcode-block" id="PlaylistStore"><a class="viewcode-back" href="../../../source/backends/playlist.html#coherence.backends.playlist_storage.PlaylistStore">[docs]</a><span class="k">class</span> <span class="nc">PlaylistStore</span><span class="p">(</span><span class="n">AbstractBackendStore</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+<span class="sd">        Migrated from louie/dispatcher to EventDispatcher</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;playlist_store&#39;</span>
+
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="n">wmc_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;16&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">}</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;Playlist&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exposes the list of video/audio streams from a m3u playlist (e.g. &#39;</span>
+        <span class="s1">&#39;web TV listings published by french ISPs such as Free, SFR...).&#39;</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Server Name:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;my media&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the name under this MediaServer &#39;</span>
+                 <span class="s1">&#39;shall show up with on other UPnP clients&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UPnP Version:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the highest UPnP version this MediaServer shall support&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;uuid&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UUID Identifier:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the unique (UPnP) identifier for this MediaServer, &#39;</span>
+                 <span class="s1">&#39;usually automatically set&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;playlist_url&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Playlist file URL:&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;URL to the playlist file (M3U).&#39;</span><span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="n">playlist_url</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">AbstractBackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">playlist_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;playlist_url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;https://mafreebox.freebox.fr/freeboxtv/playlist.m3u&#39;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;playlist&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+<div class="viewcode-block" id="PlaylistStore.append"><a class="viewcode-back" href="../../../source/backends/playlist.html#coherence.backends.playlist_storage.PlaylistStore.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;directory&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mimetype</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">]</span>
+
+        <span class="n">UPnPClass</span> <span class="o">=</span> <span class="n">classChooser</span><span class="p">(</span><span class="n">mimetype</span><span class="p">)</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getnextID</span><span class="p">()</span>
+        <span class="n">update</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+            <span class="n">update</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">item</span> <span class="o">=</span> <span class="n">PlaylistItem</span><span class="p">(</span>
+            <span class="nb">id</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">,</span>
+            <span class="n">storageid</span><span class="o">=</span><span class="n">parent</span><span class="p">,</span>
+            <span class="n">upnpclass</span><span class="o">=</span><span class="n">UPnPClass</span><span class="p">,</span>
+            <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SystemUpdateID&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_update_id</span><span class="p">())</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ContainerUpdateIDs&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mimetype</span> <span class="o">==</span> <span class="s1">&#39;directory&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="PlaylistStore.upnp_init"><a class="viewcode-back" href="../../../source/backends/playlist.html#coherence.backends.playlist_storage.PlaylistStore.upnp_init">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span>
+                <span class="p">[</span><span class="s1">&#39;rtsp-rtp-udp:*:video/mpeg:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:video/mpeg:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;rtsp-rtp-udp:*:audio/mpeg:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:audio/mpeg:*&#39;</span><span class="p">],</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">rootItem</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_root_item</span><span class="p">(</span><span class="n">rootItem</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrievePlaylistItems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">playlist_url</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PlaylistStore.retrievePlaylistItems"><a class="viewcode-back" href="../../../source/backends/playlist.html#coherence.backends.playlist_storage.PlaylistStore.retrievePlaylistItems">[docs]</a>    <span class="k">def</span> <span class="nf">retrievePlaylistItems</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">parent_item</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">gotPlaylist</span><span class="p">(</span><span class="n">playlist</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;got playlist&#39;</span><span class="p">)</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">playlist</span><span class="p">:</span>
+                <span class="n">content</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="n">playlist</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">()</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+                <span class="k">while</span> <span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;#EXTINF&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                        <span class="n">channel</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;#EXTINF:.*,(.*)&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;video/mpeg&#39;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">- channel found: [</span><span class="si">%r</span><span class="s1">] =&gt; </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                            <span class="n">mimetype</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+                        <span class="k">while</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;#EXTVLCOPT&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                            <span class="n">option</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;#EXTVLCOPT:(.*)&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">option</span> <span class="o">==</span> <span class="s1">&#39;no-video&#39;</span><span class="p">:</span>
+                                <span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;audio/mpeg&#39;</span>
+                            <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+                        <span class="n">url</span> <span class="o">=</span> <span class="n">line</span>
+                        <span class="n">item</span> <span class="o">=</span> <span class="n">PlaylistItem</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">)</span>
+                        <span class="n">parent_item</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                        <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">items</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to retrieve playlist: </span><span class="si">{url}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Error: </span><span class="si">{error}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">getPage</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">gotPlaylist</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">gotError</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

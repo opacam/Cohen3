@@ -1,0 +1,527 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.yamj_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.yamj_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.yamj_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># a backend to expose a YMAJ library via UPnP</span>
+<span class="c1"># see http://code.google.com/p/moviejukebox/ for</span>
+<span class="c1"># more info on YAMJ (Yet Another Movie Jukebox):</span>
+
+<span class="kn">import</span> <span class="nn">mimetypes</span>
+<span class="kn">import</span> <span class="nn">urllib.error</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+
+<span class="c1"># Copyright 2007, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2009, Jean-Michel Sizun &lt;jm.sizun AT free.fr&gt;</span>
+<span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendItem</span><span class="p">,</span> <span class="n">Container</span><span class="p">,</span> <span class="n">LazyContainer</span><span class="p">,</span> \
+    <span class="n">AbstractBackendStore</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">getPage</span>
+
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;audio/x-m4a&#39;</span><span class="p">,</span> <span class="s1">&#39;.m4a&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;video/mp4&#39;</span><span class="p">,</span> <span class="s1">&#39;.mp4&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;video/mpegts&#39;</span><span class="p">,</span> <span class="s1">&#39;.ts&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;video/divx&#39;</span><span class="p">,</span> <span class="s1">&#39;.divx&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;video/divx&#39;</span><span class="p">,</span> <span class="s1">&#39;.avi&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;video/x-matroska&#39;</span><span class="p">,</span> <span class="s1">&#39;.mkv&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MovieItem"><a class="viewcode-back" href="../../../source/backends/yamj.html#coherence.backends.yamj_storage.MovieItem">[docs]</a><span class="k">class</span> <span class="nc">MovieItem</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">movie</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">movie_id</span> <span class="o">=</span> <span class="s1">&#39;UNK&#39;</span>
+        <span class="k">if</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./id&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">movie_id</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./title&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseFilename</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./baseFilename&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./plot&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outline</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./outline&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posterFilename</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./posterFile&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thumbnailFilename</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./thumbnail&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./rating&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">director</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./director&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genres</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;./genres/genre&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actors</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;./cast/actor&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audioChannels</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;audioChannels&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;resolution&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">season</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;season&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upnp_title</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upnp_title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span>
+
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">movie_url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">movie_url</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./files/file/fileURL&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">posterURL</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{store.jukebox_url}</span><span class="s1">/</span><span class="si">{self.posterFilename}</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thumbnailURL</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{store.jukebox_url}</span><span class="s1">/</span><span class="si">{self.thumbnailFilename}</span><span class="s1">&#39;</span>
+        <span class="c1"># print self.movie_id, self.title, self.url, self.posterURL</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">str_genres</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">genre</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">genres</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">str_genres</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">genre</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">str_actors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">str_actors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actor</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="n">url_mimetype</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">movie_url</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">url_mimetype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">url_mimetype</span> <span class="o">=</span> <span class="s1">&#39;video&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">url_mimetype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MovieItem.get_item"><a class="viewcode-back" href="../../../source/backends/yamj.html#coherence.backends.yamj_storage.MovieItem.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upnp_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="n">upnp_parent_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Movie</span><span class="p">(</span>
+                <span class="n">upnp_id</span><span class="p">,</span> <span class="n">upnp_parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">upnp_title</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">album</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">posterURL</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">artist</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">creator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">director</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">year</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">director</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">director</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">longDescription</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outline</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">originalTrackNumber</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">restricted</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upnp_title</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">writeStatus</span> <span class="o">=</span> <span class="s1">&#39;PROTECTED&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thumbnailURL</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">genre</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">genres</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">str_genres</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">actors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">str_actors</span>
+
+            <span class="n">res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">movie_url</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{self.mimetype}</span><span class="s1">:*&#39;</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">nrAudioChannels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">audioChannels</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="MovieItem.get_path"><a class="viewcode-back" href="../../../source/backends/yamj.html#coherence.backends.yamj_storage.MovieItem.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">movie_url</span></div>
+
+<div class="viewcode-block" id="MovieItem.get_id"><a class="viewcode-back" href="../../../source/backends/yamj.html#coherence.backends.yamj_storage.MovieItem.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span></div></div>
+
+
+<div class="viewcode-block" id="YamjStore"><a class="viewcode-back" href="../../../source/backends/yamj.html#coherence.backends.yamj_storage.YamjStore">[docs]</a><span class="k">class</span> <span class="nc">YamjStore</span><span class="p">(</span><span class="n">AbstractBackendStore</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;yamj_store&#39;</span>
+
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;YAMJ&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exposes the movie/TV series data files and metadata from &#39;</span>
+        <span class="s1">&#39;a given YAMJ (Yet Another Movie Jukebox) library.&#39;</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Server Name:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;my media&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the name under this MediaServer shall &#39;</span>
+                 <span class="s1">&#39;show up with on other UPnP clients&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UPnP Version:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the highest UPnP version this MediaServer shall support&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;uuid&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UUID Identifier:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the unique (UPnP) identifier for this MediaServer, &#39;</span>
+                 <span class="s1">&#39;usually automatically set&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;refresh&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Refresh period&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;yamj_url&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Library URL:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;URL to the library root directory.&#39;</span><span class="p">}</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">AbstractBackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;YAMJ&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yamj_url</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;yamj_url&#39;</span><span class="p">,</span> <span class="s1">&#39;http://localhost/yamj&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jukebox_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yamj_url</span> <span class="o">+</span> <span class="s1">&#39;/Jukebox/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;refresh&#39;</span><span class="p">,</span> <span class="mi">60</span><span class="p">))</span> <span class="o">*</span> <span class="mi">60</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nbMoviesPerFile</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">rootItem</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_root_item</span><span class="p">(</span><span class="n">rootItem</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieveCategories</span><span class="p">(</span><span class="n">rootItem</span><span class="p">)</span>
+
+<div class="viewcode-block" id="YamjStore.upnp_init"><a class="viewcode-back" href="../../../source/backends/yamj.html#coherence.backends.yamj_storage.YamjStore.upnp_init">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">presentationURL</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yamj_url</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/mp4:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:video/mp4:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/x-msvideo:*&#39;</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                 <span class="s1">&#39;http-get:*:video/x-msvideo:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/mpeg:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:video/mpeg:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/avi:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:video/avi:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/divx:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:video/divx:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/quicktime:*&#39;</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                 <span class="s1">&#39;http-get:*:video/quicktime:*&#39;</span><span class="p">],</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SystemUpdateID&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span><span class="p">)</span></div>
+            <span class="c1"># self.server.content_directory_server.set_variable(</span>
+            <span class="c1">#     0, &#39;SortCapabilities&#39;, &#39;*&#39;)</span>
+
+<div class="viewcode-block" id="YamjStore.retrieveCategories"><a class="viewcode-back" href="../../../source/backends/yamj.html#coherence.backends.yamj_storage.YamjStore.retrieveCategories">[docs]</a>    <span class="k">def</span> <span class="nf">retrieveCategories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">jukebox_url</span> <span class="o">+</span> <span class="s1">&#39;Categories.xml&#39;</span>
+        <span class="n">dfr</span> <span class="o">=</span> <span class="n">getPage</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">read_categories</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">parent_item</span><span class="p">,</span> <span class="n">jukebox_url</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">):</span>
+                <span class="nb">type</span> <span class="o">=</span> <span class="n">category</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+                <span class="n">category_title</span> <span class="o">=</span> <span class="nb">type</span>
+                <span class="k">if</span> <span class="nb">type</span> <span class="o">!=</span> <span class="s1">&#39;Other&#39;</span><span class="p">:</span>
+                    <span class="n">category_title</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;By </span><span class="si">{category_title}</span><span class="s1">&#39;</span>
+                <span class="n">categoryItem</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="n">parent_item</span><span class="p">,</span> <span class="n">category_title</span><span class="p">)</span>
+                <span class="n">parent_item</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">categoryItem</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">category</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;./index&#39;</span><span class="p">):</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+                    <span class="n">first_filename</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">text</span>
+                    <span class="n">root_name</span> <span class="o">=</span> <span class="n">first_filename</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;adding index </span><span class="si">{type}</span><span class="s1">:</span><span class="si">{name}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">parent</span> <span class="o">=</span> <span class="n">categoryItem</span>
+                    <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;Other&#39;</span><span class="p">:</span>
+                        <span class="n">parent</span> <span class="o">=</span> <span class="n">parent_item</span>
+                    <span class="n">indexItem</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span>
+                        <span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">retrieveIndexMovies</span><span class="p">,</span>
+                        <span class="n">per_page</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                        <span class="n">root_name</span><span class="o">=</span><span class="n">root_name</span><span class="p">)</span>
+                    <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">indexItem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">fail_categories_read</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;failure reading yamj categories &#39;</span>
+                <span class="n">f</span><span class="s1">&#39;(</span><span class="si">{filepath}</span><span class="s1">): {f.getErrorMessage()!r}&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">f</span>
+
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">)</span>
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">fail_categories_read</span><span class="p">)</span>
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">read_categories</span><span class="p">,</span> <span class="n">parent_item</span><span class="o">=</span><span class="n">parent</span><span class="p">,</span>
+                        <span class="n">jukebox_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">jukebox_url</span><span class="p">)</span>
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">fail_categories_read</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dfr</span></div>
+
+<div class="viewcode-block" id="YamjStore.retrieveIndexMovies"><a class="viewcode-back" href="../../../source/backends/yamj.html#coherence.backends.yamj_storage.YamjStore.retrieveIndexMovies">[docs]</a>    <span class="k">def</span> <span class="nf">retrieveIndexMovies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">root_name</span><span class="p">,</span>
+                            <span class="n">per_page</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">page</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># print offset, per_page</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbMoviesPerFile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">counter</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">counter</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">offset</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbMoviesPerFile</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">fileUrl</span> <span class="o">=</span> \
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.jukebox_url}</span><span class="s1">/{urllib.parse.quote(root_name)}&#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;_</span><span class="si">{counter:d}</span><span class="s1">.xml&#39;</span>
+
+        <span class="k">def</span> <span class="nf">fail_readPage</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;failure reading yamj index (</span><span class="si">{fileUrl}</span><span class="s1">): &#39;</span>
+                         <span class="n">f</span><span class="s1">&#39;{f.getErrorMessage()!r}&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">f</span>
+
+        <span class="k">def</span> <span class="nf">fail_parseIndex</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;failure parsing yamj index (</span><span class="si">{fileUrl}</span><span class="s1">): &#39;</span>
+                         <span class="n">f</span><span class="s1">&#39;{f.getErrorMessage()!r}&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">f</span>
+
+        <span class="k">def</span> <span class="nf">readIndex</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;category/index&#39;</span><span class="p">):</span>
+                <span class="n">current</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;current&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">current</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+                    <span class="n">currentIndex</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;currentIndex&#39;</span><span class="p">)</span>
+                    <span class="n">lastIndex</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lastIndex&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">currentIndex</span> <span class="o">!=</span> <span class="n">lastIndex</span><span class="p">:</span>
+                        <span class="n">parent</span><span class="o">.</span><span class="n">childrenRetrievingNeeded</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{root_name}</span><span class="s1">: </span><span class="si">{currentIndex}</span><span class="s1">/</span><span class="si">{lastIndex}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="n">movies</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;movies/movie&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbMoviesPerFile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nbMoviesPerFile</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">movies</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">movie</span> <span class="ow">in</span> <span class="n">movies</span><span class="p">:</span>
+                <span class="n">isSet</span> <span class="o">=</span> <span class="p">(</span><span class="n">movie</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;isSet&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">isSet</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="c1"># the movie corresponds to a set</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./title&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                    <span class="n">index_name</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./baseFilename&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                    <span class="n">set_root_name</span> <span class="o">=</span> <span class="n">index_name</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;adding set </span><span class="si">{name}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">indexItem</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span>
+                        <span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">retrieveIndexMovies</span><span class="p">,</span>
+                        <span class="n">per_page</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">root_name</span><span class="o">=</span><span class="n">set_root_name</span><span class="p">)</span>
+                    <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">indexItem</span><span class="p">,</span> <span class="n">set_root_name</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># this is a real movie</span>
+                    <span class="n">movie_id</span> <span class="o">=</span> <span class="s1">&#39;UNK&#39;</span>
+                    <span class="n">movie_id_xml</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./id&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">movie_id_xml</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">movie_id</span> <span class="o">=</span> <span class="n">movie_id_xml</span><span class="o">.</span><span class="n">text</span>
+
+                    <span class="n">files</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;./files/file&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">url</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./fileURL&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                        <span class="n">external_id</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{movie_id}</span><span class="s1">/</span><span class="si">{url}</span><span class="s1">&#39;</span>
+                        <span class="n">movieItem</span> <span class="o">=</span> <span class="n">MovieItem</span><span class="p">(</span><span class="n">movie</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+                        <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">movieItem</span><span class="p">,</span> <span class="n">external_id</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./title&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                            <span class="n">name</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./baseFilename&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                        <span class="n">season</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;season&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                        <span class="k">if</span> <span class="n">season</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">season</span> <span class="o">!=</span> <span class="s1">&#39;-1&#39;</span><span class="p">:</span>
+                            <span class="n">name</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> - season </span><span class="si">{season}</span><span class="s1">&#39;</span>
+                        <span class="n">container_item</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                        <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">container_item</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                        <span class="n">container_item</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="bp">self</span>
+                        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                            <span class="n">episodeIndex</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;firstPart&#39;</span><span class="p">]</span>
+                            <span class="n">episodeTitle</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="n">episodeTitle</span> <span class="o">==</span> <span class="s1">&#39;UNKNOWN&#39;</span><span class="p">:</span>
+                                <span class="n">title</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{name}</span><span class="s1"> - </span><span class="si">{episodeIndex}</span><span class="s1">&#39;</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">title</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{episodeIndex}</span><span class="s1"> - </span><span class="si">{episodeTitle}</span><span class="s1"> &#39;</span>
+                            <span class="n">episodeUrl</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./fileURL&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+                            <span class="n">fileItem</span> <span class="o">=</span> <span class="n">MovieItem</span><span class="p">(</span>
+                                <span class="n">movie</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">episodeUrl</span><span class="p">)</span>
+                            <span class="n">file_external_id</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{movie_id}</span><span class="s1">/</span><span class="si">{episodeUrl}</span><span class="s1">&#39;</span>
+                            <span class="n">container_item</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span>
+                                <span class="n">fileItem</span><span class="p">,</span> <span class="n">file_external_id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Reading index file </span><span class="si">{fileUrl}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">getPage</span><span class="p">(</span><span class="n">fileUrl</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">fail_readPage</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">readIndex</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">fail_parseIndex</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

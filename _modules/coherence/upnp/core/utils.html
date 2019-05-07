@@ -1,0 +1,1142 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.utils &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.core.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).</span>
+<span class="c1"># Copyright 2006, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Utils</span>
+<span class="sd">=====</span>
+
+<span class="sd">Set of utilities to help process the data and the assets of the Cohen3 project.</span>
+<span class="sd">It includes several methods which covers different fields, here are grouped by</span>
+<span class="sd">his functionality:</span>
+
+<span class="sd">    - encode/decode strings:</span>
+<span class="sd">        - :meth:`~coherence.upnp.core.utils.to_string`</span>
+<span class="sd">        - :meth:`~coherence.upnp.core.utils.to_bytes`</span>
+<span class="sd">    - parse xml/html data:</span>
+<span class="sd">        - :meth:`~coherence.upnp.core.utils.parse_xml`</span>
+<span class="sd">        - :meth:`~coherence.upnp.core.utils.parse_http`</span>
+<span class="sd">        - :meth:`~coherence.upnp.core.utils.de_chunk_payload`</span>
+<span class="sd">    - get ip/host:</span>
+<span class="sd">        - :meth:`~coherence.upnp.core.utils.get_ip_address`</span>
+<span class="sd">        - :meth:`~coherence.upnp.core.utils.get_host_address`</span>
+<span class="sd">    - get/download page related:</span>
+<span class="sd">        - :meth:`~coherence.upnp.core.utils.getPage`</span>
+<span class="sd">        - :meth:`~coherence.upnp.core.utils.downloadPage`</span>
+<span class="sd">        - :class:`~coherence.upnp.core.utils.myHTTPPageGetter`</span>
+<span class="sd">        - :class:`~coherence.upnp.core.utils.HeaderAwareHTTPClientFactory`</span>
+<span class="sd">    - proxy clients and resources:</span>
+<span class="sd">        - :class:`~coherence.upnp.core.utils.ProxyClient`</span>
+<span class="sd">        - :class:`~coherence.upnp.core.utils.ProxyClientFactory`</span>
+<span class="sd">        - :class:`~coherence.upnp.core.utils.ReverseProxyResource`</span>
+<span class="sd">        - :class:`~coherence.upnp.core.utils.ReverseProxyUriResource`</span>
+<span class="sd">    - file assets:</span>
+<span class="sd">        - :attr:`~coherence.upnp.core.utils.StaticFile`</span>
+<span class="sd">        - :class:`~coherence.upnp.core.utils.BufferFile`</span>
+<span class="sd">        - :class:`~coherence.upnp.core.utils.BufferFileTransfer`</span>
+<span class="sd">    - date/time operations:</span>
+<span class="sd">        - :class:`~coherence.upnp.core.utils._tz`</span>
+<span class="sd">        - :class:`~coherence.upnp.core.utils._CET`</span>
+<span class="sd">        - :class:`~coherence.upnp.core.utils._CEST`</span>
+<span class="sd">        - :meth:`~coherence.upnp.core.utils.datefaker`</span>
+<span class="sd">        - :attr:`~coherence.upnp.core.utils._bdates`</span>
+<span class="sd">    - python 2to3 compatibility methods:</span>
+<span class="sd">        - :meth:`~coherence.upnp.core.utils.cmp`</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">BytesIO</span>
+
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlsplit</span><span class="p">,</span> <span class="n">urlparse</span>
+
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span><span class="p">,</span> <span class="n">defer</span><span class="p">,</span> <span class="n">abstract</span>
+<span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">failure</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">client</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">http</span><span class="p">,</span> <span class="n">static</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">proxy</span><span class="p">,</span> <span class="n">resource</span><span class="p">,</span> <span class="n">server</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">SERVER_ID</span>
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="s1">&#39;utils&#39;</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">twisted.protocols._c_urlarg</span> <span class="k">import</span> <span class="n">unquote</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">unquote</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">netifaces</span>
+
+    <span class="n">have_netifaces</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">have_netifaces</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="to_string"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.to_string">[docs]</a><span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This method is a helper function that takes care of converting into a</span>
+<span class="sd">    string any string or bytes string or integer. This is useful for</span>
+<span class="sd">    decoding twisted responses into the default python 3 string encoding or</span>
+<span class="sd">    to get a string representation of an object.</span>
+
+<span class="sd">    .. versionadded:: 0.8.2</span>
+
+<span class="sd">    .. note:: If the argument passed is not of type str, bytes or int,</span>
+<span class="sd">              it will try to get the string representation of the object.</span>
+
+<span class="sd">    .. warning:: This is similar to :meth:`~coherence.upnp.core.utils.to_bytes`</span>
+<span class="sd">                 but with the difference that the returned result it will be</span>
+<span class="sd">                 always a string.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="to_bytes"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.to_bytes">[docs]</a><span class="k">def</span> <span class="nf">to_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This method is a helper function that takes care of converting a string</span>
+<span class="sd">    or string of bytes into bytes, needed for most of the write operations for</span>
+<span class="sd">    twisted responses. It is useful when we don&#39;t know the type of the</span>
+<span class="sd">    processed string.</span>
+
+<span class="sd">    .. versionadded:: 0.8.2</span>
+
+<span class="sd">    .. versionchanged:: 0.8.3</span>
+<span class="sd">       Errors will be bypassed with a warning</span>
+
+<span class="sd">    .. note:: If the argument passed is not of type str or bytes, it will be</span>
+<span class="sd">              converted to his string representation and then it will be</span>
+<span class="sd">              converted into bytes.</span>
+
+<span class="sd">    .. warning:: If, while encoding, some error is encountered, it will be</span>
+<span class="sd">                 bypassed and user will be notified with a log warning. The</span>
+<span class="sd">                 conflicting character will be replaced for the symbol &quot;?&quot;</span>
+<span class="sd">                 (U+FFFD)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">UnicodeEncodeError</span><span class="p">:</span>
+            <span class="n">new_x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                <span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">UnicodeEncodeError</span><span class="p">:</span>
+        <span class="n">new_x</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+            <span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+        <span class="n">f</span><span class="s1">&#39;to_bytes: Some characters could not be encoded to bytes...those will&#39;</span>
+        <span class="n">f</span><span class="s1">&#39; be replaced by the symbol &quot;?&quot; [string before encode is: </span><span class="si">{x}</span><span class="s1">]&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_x</span></div>
+
+
+<div class="viewcode-block" id="means_true"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.means_true">[docs]</a><span class="k">def</span> <span class="nf">means_true</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Transform a value representing a boolean into a boolean.</span>
+
+<span class="sd">    The valid expressions are:</span>
+<span class="sd">        - True or &#39;True&#39;</span>
+<span class="sd">        - 1 or &#39;1&#39;</span>
+<span class="sd">        - &#39;yes&#39; or &#39;ok&#39;</span>
+
+<span class="sd">    .. note:: the string expressions are not case sensitive</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="generalise_boolean"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.generalise_boolean">[docs]</a><span class="k">def</span> <span class="nf">generalise_boolean</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; standardize the different boolean incarnations</span>
+
+<span class="sd">        transform anything that looks like a &#39;True&#39; into a &#39;1&#39;,</span>
+<span class="sd">        and everything else into a &#39;0&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">means_true</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;1&#39;</span>
+    <span class="k">return</span> <span class="s1">&#39;0&#39;</span></div>
+
+
+<span class="n">generalize_boolean</span> <span class="o">=</span> <span class="n">generalise_boolean</span>
+
+
+<div class="viewcode-block" id="parse_xml"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.parse_xml">[docs]</a><span class="k">def</span> <span class="nf">parse_xml</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">dump_invalid_data</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Takes an xml string and returns an XML element hierarchy</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">XMLParser</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+
+    <span class="c1"># my version of twisted.web returns page_infos as a dictionary in</span>
+    <span class="c1"># the second item of the data list</span>
+    <span class="c1"># :fixme: This must be handled where twisted.web is fetching the data</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># Guess from who we&#39;re getting this?</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">feed</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dump_invalid_data</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">raise</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ET</span><span class="o">.</span><span class="n">ElementTree</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">close</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="parse_with_lxml"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.parse_with_lxml">[docs]</a><span class="k">def</span> <span class="nf">parse_with_lxml</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Takes an xml string or a response as argument and returns a root tree.</span>
+<span class="sd">    This method is similar to :meth:`~coherence.upnp.core.utils.parse_xml` but</span>
+<span class="sd">    here we use the lxml module and a custom parser method to return an</span>
+<span class="sd">    lxml&#39;s ElementTree object.</span>
+
+<span class="sd">    .. versionadded:: 0.8.3</span>
+
+<span class="sd">    .. note:: This parser allow us to parse successfully some responses which</span>
+<span class="sd">              contain encoding defined (ex: soap messages) and also has the</span>
+<span class="sd">              ability to parse a broken xml. This method could be useful to</span>
+<span class="sd">              parse some small pieces of html code into an xml tree in order</span>
+<span class="sd">              to extract some info.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLParser</span><span class="p">(</span>
+        <span class="n">recover</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">parser</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tree</span></div>
+
+
+<div class="viewcode-block" id="parse_http_response"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.parse_http_response">[docs]</a><span class="k">def</span> <span class="nf">parse_http_response</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">     Takes a response as argument and returns a tuple: cmd, headers</span>
+
+<span class="sd">     The first value of the tuple (cmd) will contain the server response and</span>
+<span class="sd">     the second one the headers.</span>
+
+<span class="sd">     .. note:: don&#39;t try to get the body, there are responses without &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n\r\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                     <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">headers</span></div>
+
+
+<div class="viewcode-block" id="get_ip_address"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.get_ip_address">[docs]</a><span class="k">def</span> <span class="nf">get_ip_address</span><span class="p">(</span><span class="n">ifname</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Determine the IP address by interface name</span>
+
+<span class="sd">    http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/439094</span>
+<span class="sd">    (c) Paul Cannon</span>
+<span class="sd">    Uses the Linux SIOCGIFADDR ioctl to find the IP address associated</span>
+<span class="sd">    with a network interface, given the name of that interface, e.g. &quot;eth0&quot;.</span>
+<span class="sd">    The address is returned as a string containing a dotted quad.</span>
+
+<span class="sd">    Updated to work on BSD. OpenBSD and OSX share the same value for</span>
+<span class="sd">    SIOCGIFADDR, and its likely that other BSDs do too.</span>
+
+<span class="sd">    Updated to work on Windows,</span>
+<span class="sd">    using the optional Python module netifaces</span>
+<span class="sd">    http://alastairs-place.net/netifaces/</span>
+
+<span class="sd">    Thx Lawrence for that patch!</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="n">have_netifaces</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ifname</span> <span class="ow">in</span> <span class="n">netifaces</span><span class="o">.</span><span class="n">interfaces</span><span class="p">():</span>
+            <span class="n">iface</span> <span class="o">=</span> <span class="n">netifaces</span><span class="o">.</span><span class="n">ifaddresses</span><span class="p">(</span><span class="n">ifname</span><span class="p">)</span>
+            <span class="n">ifaceadr</span> <span class="o">=</span> <span class="n">iface</span><span class="p">[</span><span class="n">netifaces</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">]</span>
+            <span class="c1"># we now have a list of address dictionaries,</span>
+            <span class="c1"># there may be multiple addresses bound</span>
+            <span class="k">return</span> <span class="n">ifaceadr</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;addr&#39;</span><span class="p">]</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;win32&#39;</span><span class="p">,</span> <span class="s1">&#39;sunos5&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;127.0.0.1&#39;</span>
+
+    <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">uname</span>
+    <span class="kn">import</span> <span class="nn">socket</span>
+    <span class="kn">import</span> <span class="nn">fcntl</span>
+    <span class="kn">import</span> <span class="nn">struct</span>
+
+    <span class="n">system_type</span> <span class="o">=</span> <span class="n">uname</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">system_type</span> <span class="o">==</span> <span class="s1">&#39;Linux&#39;</span><span class="p">:</span>
+        <span class="n">SIOCGIFADDR</span> <span class="o">=</span> <span class="mh">0x8915</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">SIOCGIFADDR</span> <span class="o">=</span> <span class="mh">0xc0206921</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">inet_ntoa</span><span class="p">(</span><span class="n">fcntl</span><span class="o">.</span><span class="n">ioctl</span><span class="p">(</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span>
+            <span class="n">SIOCGIFADDR</span><span class="p">,</span>
+            <span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;256s&#39;</span><span class="p">,</span> <span class="n">ifname</span><span class="p">[:</span><span class="mi">15</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+        <span class="p">)[</span><span class="mi">20</span><span class="p">:</span><span class="mi">24</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="s1">&#39;127.0.0.1&#39;</span>
+    <span class="c1"># print(f&#39;ip is: {ip}&#39;)</span>
+    <span class="k">return</span> <span class="n">ip</span></div>
+
+
+<div class="viewcode-block" id="get_host_address"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.get_host_address">[docs]</a><span class="k">def</span> <span class="nf">get_host_address</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39; try to get determine the interface used for</span>
+<span class="sd">        the default route, as this is most likely</span>
+<span class="sd">        the interface we should bind to (on a single homed host!)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;win32&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">have_netifaces</span><span class="p">:</span>
+            <span class="n">interfaces</span> <span class="o">=</span> <span class="n">netifaces</span><span class="o">.</span><span class="n">interfaces</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">interfaces</span><span class="p">):</span>
+                <span class="c1"># on windows assume first interface is primary</span>
+                <span class="k">return</span> <span class="n">get_ip_address</span><span class="p">(</span><span class="n">interfaces</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">route_file</span> <span class="o">=</span> <span class="s1">&#39;/proc/net/route&#39;</span>
+            <span class="n">route</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">route_file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">route</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">route</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>  <span class="c1"># skip first line</span>
+                <span class="k">while</span> <span class="n">tmp</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="n">tmp</span> <span class="o">=</span> <span class="n">route</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                    <span class="n">li</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">li</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">li</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;00000000&#39;</span><span class="p">:</span>  <span class="c1"># default route...</span>
+                            <span class="n">route</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                            <span class="k">return</span> <span class="n">get_ip_address</span><span class="p">(</span><span class="n">li</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="sd">&#39;&#39;&#39; fallback to parsing the output of netstat &#39;&#39;&#39;</span>
+            <span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">utils</span>
+
+            <span class="k">def</span> <span class="nf">result</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+                <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">uname</span>
+                <span class="p">(</span><span class="n">osname</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">uname</span><span class="p">()</span>
+                <span class="n">osname</span> <span class="o">=</span> <span class="n">osname</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                    <span class="n">li</span> <span class="o">=</span> <span class="n">li</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39; </span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">li</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">osname</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;darwin&#39;</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">get_ip_address</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">get_ip_address</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">return</span> <span class="s1">&#39;127.0.0.1&#39;</span>
+
+            <span class="k">def</span> <span class="nf">fail</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="k">return</span> <span class="s1">&#39;127.0.0.1&#39;</span>
+
+            <span class="n">d</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getProcessOutput</span><span class="p">(</span><span class="s1">&#39;netstat&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;-rn&#39;</span><span class="p">])</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">fail</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">d</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">traceback</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+
+    <span class="sd">&#39;&#39;&#39; return localhost if we haven&#39;t found anything &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="s1">&#39;127.0.0.1&#39;</span></div>
+
+
+<div class="viewcode-block" id="de_chunk_payload"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.de_chunk_payload">[docs]</a><span class="k">def</span> <span class="nf">de_chunk_payload</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">io</span>
+    <span class="sd">&#39;&#39;&#39; This method takes a chunked HTTP data object and unchunks it.&#39;&#39;&#39;</span>
+    <span class="n">newresponse</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+    <span class="c1"># chunked encoding consists of a bunch of lines with</span>
+    <span class="c1"># a length in hex followed by a data chunk and a CRLF pair.</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">read_chunk_length</span><span class="p">():</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">len</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="mi">16</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="nb">len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="nb">len</span>
+
+    <span class="nb">len</span> <span class="o">=</span> <span class="n">read_chunk_length</span><span class="p">()</span>
+    <span class="k">while</span> <span class="p">(</span><span class="nb">len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">newresponse</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">len</span><span class="p">))</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>  <span class="c1"># after chunk and before next chunk length</span>
+        <span class="nb">len</span> <span class="o">=</span> <span class="n">read_chunk_length</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">newresponse</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Request"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.Request">[docs]</a><span class="k">class</span> <span class="nc">Request</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">Request</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Custom implementation of twisted.web.server.Request which takes care of</span>
+<span class="sd">    process data for our needs.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="Request.process"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.Request.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Process a request.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># get site from channel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">site</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">site</span>
+
+        <span class="c1"># set various default headers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="n">SERVER_ID</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">http</span><span class="o">.</span><span class="n">datetimeToString</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;content-type&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Resource Identification</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="c1"># remove trailing &#39;/&#39;, if ever</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+        <span class="n">scheme</span><span class="p">,</span> <span class="n">netloc</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">fragment</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">clean_path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepath</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">postpath</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">raw_p</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">unquote</span><span class="p">,</span> <span class="n">clean_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">postpath</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">raw_p</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">deferred_rendering</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+            <span class="n">resrc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">getResourceFor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">resrc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span>
+                    <span class="n">http</span><span class="o">.</span><span class="n">NOT_FOUND</span><span class="p">,</span>
+                    <span class="n">f</span><span class="s1">&#39;Error: No resource for path </span><span class="si">{path}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resrc</span><span class="p">,</span> <span class="n">defer</span><span class="o">.</span><span class="n">Deferred</span><span class="p">):</span>
+                <span class="n">resrc</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">deferred_rendering</span><span class="p">)</span>
+                <span class="n">resrc</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processingFailed</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">resrc</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Error on render Request: </span><span class="si">{e}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processingFailed</span><span class="p">(</span><span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="Site"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.Site">[docs]</a><span class="k">class</span> <span class="nc">Site</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">Site</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Custom implementation of :obj:`twisted.web.server.Site`&#39;&#39;&#39;</span>
+    <span class="n">noisy</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">requestFactory</span> <span class="o">=</span> <span class="n">Request</span>
+
+<div class="viewcode-block" id="Site.startFactory"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.Site.startFactory">[docs]</a>    <span class="k">def</span> <span class="nf">startFactory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+        <span class="c1"># http._logDateTimeStart()</span>
+
+
+<div class="viewcode-block" id="ProxyClient"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ProxyClient">[docs]</a><span class="k">class</span> <span class="nc">ProxyClient</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">ProxyClient</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">rest</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">father</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># headers[&#39;connection&#39;] = &#39;close&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_data</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">proxy</span><span class="o">.</span><span class="n">ProxyClient</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">rest</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span>
+                                   <span class="n">headers</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">father</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProxyClient.handleStatus"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ProxyClient.handleStatus">[docs]</a>    <span class="k">def</span> <span class="nf">handleStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">message</span><span class="p">:</span>
+            <span class="c1"># Add a whitespace to message, this allows empty messages</span>
+            <span class="c1"># transparently</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39; </span><span class="si">{message}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s1">&#39;ICY&#39;</span><span class="p">:</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="s1">&#39;HTTP/1.1&#39;</span>
+        <span class="n">proxy</span><span class="o">.</span><span class="n">ProxyClient</span><span class="o">.</span><span class="n">handleStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProxyClient.handleHeader"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ProxyClient.handleHeader">[docs]</a>    <span class="k">def</span> <span class="nf">handleHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;icy-&#39;</span><span class="p">):</span>
+            <span class="n">proxy</span><span class="o">.</span><span class="n">ProxyClient</span><span class="o">.</span><span class="n">handleHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProxyClient.handleResponsePart"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ProxyClient.handleResponsePart">[docs]</a>    <span class="k">def</span> <span class="nf">handleResponsePart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_data</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
+        <span class="n">proxy</span><span class="o">.</span><span class="n">ProxyClient</span><span class="o">.</span><span class="n">handleResponsePart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ProxyClientFactory"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ProxyClientFactory">[docs]</a><span class="k">class</span> <span class="nc">ProxyClientFactory</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">ProxyClientFactory</span><span class="p">):</span>
+    <span class="c1"># :fixme: Why here proxy.ProxyClient is used instad of our own</span>
+    <span class="c1"># ProxyClent? Is out ProxyClient used at all?</span>
+    <span class="n">protocol</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">ProxyClient</span></div>
+
+
+<div class="viewcode-block" id="ReverseProxyResource"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ReverseProxyResource">[docs]</a><span class="k">class</span> <span class="nc">ReverseProxyResource</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">ReverseProxyResource</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Resource that renders the results gotten from another server.</span>
+
+<span class="sd">    Put this resource in the tree to cause everything below it to be relayed</span>
+<span class="sd">    to a different server.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">proxyClientFactoryClass</span> <span class="o">=</span> <span class="n">ProxyClientFactory</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    proxyClientFactoryClass (:obj:`twisted.web.proxy.ProxyClientFactory`):</span>
+<span class="sd">    a proxy client factory class, used to create new connections.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="ReverseProxyResource.__init__"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ReverseProxyResource.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">reactor</span><span class="o">=</span><span class="n">reactor</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Args:</span>
+<span class="sd">          host (str): the host of the web server to proxy.</span>
+<span class="sd">          port (int): the port of the web server to proxy.</span>
+<span class="sd">          path (str): the base path to fetch data from. Note that you shouldn&#39;t</span>
+<span class="sd">                      put any trailing slashes in it, it will be added</span>
+<span class="sd">                      automatically in request. For example, if you put</span>
+<span class="sd">                      B{/foo}, a request on B{/bar} will be proxied to</span>
+<span class="sd">                      B{/foo/bar}.</span>
+<span class="sd">          reactor (:obj:`twisted.internet.interfaces.IReactorTCP`):</span>
+<span class="sd">              the reactor used to create connections.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qs</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reactor</span> <span class="o">=</span> <span class="n">reactor</span></div>
+
+<div class="viewcode-block" id="ReverseProxyResource.getChild"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ReverseProxyResource.getChild">[docs]</a>    <span class="k">def</span> <span class="nf">getChild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ReverseProxyResource</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReverseProxyResource.render"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ReverseProxyResource.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Render a request by forwarding it to the proxied server.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># RFC 2616 tells us that we can omit the port if it&#39;s the default port,</span>
+        <span class="c1"># but we have to provide it otherwise</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">==</span> <span class="mi">80</span><span class="p">:</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">requestHeaders</span><span class="o">.</span><span class="n">setRawHeaders</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">host</span><span class="p">])</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">qs</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">uri</span><span class="p">)[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">qs</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">qs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qs</span>
+        <span class="k">if</span> <span class="n">qs</span><span class="p">:</span>
+            <span class="n">rest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="n">qs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+        <span class="n">clientFactory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxyClientFactoryClass</span><span class="p">(</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">rest</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">clientproto</span><span class="p">,</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">getAllHeaders</span><span class="p">(),</span> <span class="n">request</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reactor</span><span class="o">.</span><span class="n">connectTCP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="n">clientFactory</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span></div>
+
+<div class="viewcode-block" id="ReverseProxyResource.resetTarget"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ReverseProxyResource.resetTarget">[docs]</a>    <span class="k">def</span> <span class="nf">resetTarget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">qs</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qs</span> <span class="o">=</span> <span class="n">qs</span></div></div>
+
+
+<div class="viewcode-block" id="ReverseProxyUriResource"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ReverseProxyUriResource">[docs]</a><span class="k">class</span> <span class="nc">ReverseProxyUriResource</span><span class="p">(</span><span class="n">ReverseProxyResource</span><span class="p">):</span>
+    <span class="n">uri</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">reactor</span><span class="o">=</span><span class="n">reactor</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">host_port</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">host_port</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;:&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">host</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">host_port</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;:&#39;</span><span class="p">))</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">host_port</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="mi">80</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;/&#39;</span>
+        <span class="k">if</span> <span class="n">params</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">rest</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rest</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;?&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
+        <span class="n">ReverseProxyResource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">rest</span><span class="p">,</span> <span class="n">reactor</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ReverseProxyUriResource.resetUri"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.ReverseProxyUriResource.resetUri">[docs]</a>    <span class="k">def</span> <span class="nf">resetUri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">host_port</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">host_port</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;:&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">host</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">host_port</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;:&#39;</span><span class="p">))</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">host_port</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="mi">80</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resetTarget</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span></div></div>
+
+
+<span class="c1"># already on twisted.web since at least 8.0.0</span>
+<div class="viewcode-block" id="myHTTPPageGetter"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.myHTTPPageGetter">[docs]</a><span class="k">class</span> <span class="nc">myHTTPPageGetter</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">HTTPPageGetter</span><span class="p">):</span>
+    <span class="n">followRedirect</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="HeaderAwareHTTPClientFactory"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.HeaderAwareHTTPClientFactory">[docs]</a><span class="k">class</span> <span class="nc">HeaderAwareHTTPClientFactory</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">HTTPClientFactory</span><span class="p">):</span>
+    <span class="n">protocol</span> <span class="o">=</span> <span class="n">myHTTPPageGetter</span>
+    <span class="n">noisy</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="HeaderAwareHTTPClientFactory.buildProtocol"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.HeaderAwareHTTPClientFactory.buildProtocol">[docs]</a>    <span class="k">def</span> <span class="nf">buildProtocol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">HTTPClientFactory</span><span class="o">.</span><span class="n">buildProtocol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">followRedirect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">followRedirect</span>
+        <span class="k">return</span> <span class="n">p</span></div>
+
+<div class="viewcode-block" id="HeaderAwareHTTPClientFactory.page"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.HeaderAwareHTTPClientFactory.page">[docs]</a>    <span class="k">def</span> <span class="nf">page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">):</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">HTTPClientFactory</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_headers</span><span class="p">))</span></div></div>
+
+
+<span class="c1"># deprecated, do not use</span>
+<span class="c1"># already in twisted.web since at least 1.3.0</span>
+<span class="n">HeaderAwareHTTPDownloader</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">HTTPDownloader</span>
+
+
+<div class="viewcode-block" id="getPage"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.getPage">[docs]</a><span class="k">def</span> <span class="nf">getPage</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">contextFactory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Download a web page as a string.</span>
+
+<span class="sd">    Download a page. Return a deferred, which will callback with a</span>
+<span class="sd">    page (as a string) or errback with a description of the error.</span>
+
+<span class="sd">    See :obj:`twisted.web.client.HTTPClientFactory` to see what extra args</span>
+<span class="sd">    can be passed.</span>
+
+<span class="sd">    .. note:: This function is like `twisted.web.client.getPage`, except it</span>
+<span class="sd">              uses our HeaderAwareHTTPClientFactory instead of</span>
+<span class="sd">              HTTPClientFactory and sets the user agent.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">url_bytes</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">if</span> <span class="s1">&#39;headers&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="s1">&#39;user-agent&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">]:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">][</span><span class="s1">&#39;user-agent&#39;</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="s1">&#39;agent&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Coherence PageGetter&#39;</span>
+    <span class="n">new_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;headers&#39;</span><span class="p">:</span>
+            <span class="n">new_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">kh</span><span class="p">,</span> <span class="n">vh</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">h_key</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">kh</span><span class="p">)</span>
+                <span class="n">h_val</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">vh</span><span class="p">)</span>
+                <span class="n">new_kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">][</span><span class="n">h_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">h_val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;getPage [url]: </span><span class="si">{url}</span><span class="s1"> [type: {type(url)}]&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-&gt;[args]: </span><span class="si">{args}</span><span class="s1"> [type: {type(args)}]&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-&gt;[kwargs]: </span><span class="si">{kwargs}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-&gt;[new_kwargs]: </span><span class="si">{new_kwargs}</span><span class="s1">]&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">_makeGetterFactory</span><span class="p">(</span>
+        <span class="n">url_bytes</span><span class="p">,</span>
+        <span class="n">HeaderAwareHTTPClientFactory</span><span class="p">,</span>
+        <span class="n">contextFactory</span><span class="o">=</span><span class="n">contextFactory</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">new_kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">deferred</span></div>
+
+
+<div class="viewcode-block" id="downloadPage"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.downloadPage">[docs]</a><span class="k">def</span> <span class="nf">downloadPage</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">contextFactory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Download a web page to a file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url (str or bytes): target url to download.</span>
+<span class="sd">        file (str or file-like object): path to file on filesystem, or a</span>
+<span class="sd">                                        file-like object.</span>
+
+<span class="sd">    .. note:: See `twisted.web.client.HTTPDownloader` to see what extra args</span>
+<span class="sd">              can be passed.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">url_bytes</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;headers&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="s1">&#39;user-agent&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">]:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">][</span><span class="s1">&#39;user-agent&#39;</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="s1">&#39;agent&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;agent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Coherence PageGetter&#39;</span>
+    <span class="n">new_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;headers&#39;</span><span class="p">:</span>
+            <span class="n">new_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">kh</span><span class="p">,</span> <span class="n">vh</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">h_key</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">kh</span><span class="p">)</span>
+                <span class="n">h_val</span> <span class="o">=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">vh</span><span class="p">)</span>
+                <span class="n">new_kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">][</span><span class="n">h_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">h_val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;downloadPage [url]: </span><span class="si">{url}</span><span class="s1"> [type: {type(url)}]&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-&gt;[args]: </span><span class="si">{args}</span><span class="s1"> [type: {type(args)}]&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-&gt;[kwargs]: </span><span class="si">{kwargs}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-&gt;[new_kwargs]: </span><span class="si">{new_kwargs}</span><span class="s1">]&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">downloadPage</span><span class="p">(</span>
+        <span class="n">url_bytes</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">contextFactory</span><span class="o">=</span><span class="n">contextFactory</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">new_kwargs</span><span class="p">)</span></div>
+
+
+<span class="c1"># StaticFile used to be a patched version of static.File. The later</span>
+<span class="c1"># was fixed in TwistedWeb 8.2.0 and 9.0.0, while the patched variant</span>
+<span class="c1"># contained deprecated and removed code.</span>
+<span class="n">StaticFile</span> <span class="o">=</span> <span class="n">static</span><span class="o">.</span><span class="n">File</span>
+
+
+<div class="viewcode-block" id="BufferFile"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.BufferFile">[docs]</a><span class="k">class</span> <span class="nc">BufferFile</span><span class="p">(</span><span class="n">static</span><span class="o">.</span><span class="n">File</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Custom implementation of `twisted.web.static.File` and modified accordingly</span>
+<span class="sd">    to the patch by John-Mark Gurney (</span>
+<span class="sd">    http://resnet.uoregon.edu/~gurney_j/jmpc/dist/twisted.web.static.patch)</span>
+
+<span class="sd">    .. note:: See `twisted.web.static.File` to see what extra args can be</span>
+<span class="sd">              passed.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">target_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">static</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_size</span> <span class="o">=</span> <span class="n">target_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upnp_retry</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="BufferFile.render"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.BufferFile.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="c1"># print &#39;&#39;</span>
+        <span class="c1"># print &#39;BufferFile&#39;, request</span>
+
+        <span class="c1"># FIXME detect when request is REALLY finished</span>
+        <span class="k">if</span> <span class="n">request</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No request to render!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="sd">&#39;&#39;&#39;You know what you doing.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restat</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">static</span><span class="o">.</span><span class="n">getTypeAndEncoding</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">basename</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">contentTypes</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">contentEncodings</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">defaultType</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">childNotFound</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="c1"># for content-length</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">fsize</span> <span class="o">=</span> <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fsize</span> <span class="o">=</span> <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getFileSize</span><span class="p">())</span>
+
+        <span class="c1"># print fsize</span>
+
+        <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getFileSize</span><span class="p">()):</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;accept-ranges&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;bytes&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;content-type&#39;</span><span class="p">,</span> <span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;content-encoding&#39;</span><span class="p">,</span> <span class="n">to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoding</span><span class="p">))</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">openForReading</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">errno</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EACCES</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">resource</span><span class="o">.</span><span class="n">ForbiddenResource</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">setLastModified</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getmtime</span><span class="p">())</span> <span class="ow">is</span> <span class="n">http</span><span class="o">.</span><span class="n">CACHED</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">trans</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="nb">range</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">getHeader</span><span class="p">(</span><span class="s1">&#39;range&#39;</span><span class="p">)</span>
+        <span class="c1"># print &#39;StaticFile&#39;, range</span>
+
+        <span class="n">tsize</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="k">if</span> <span class="nb">range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># This is a request for partial data...</span>
+            <span class="n">bytesrange</span> <span class="o">=</span> <span class="nb">range</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">bytesrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;bytes&#39;</span><span class="p">,</span> \
+                <span class="s1">&#39;Syntactically invalid http range header!&#39;</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">bytesrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">start</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+                <span class="c1"># Are we requesting something</span>
+                <span class="c1"># beyond the current size of the file?</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">start</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileSize</span><span class="p">()):</span>
+                    <span class="c1"># Retry later!</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bytesrange</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s1">&#39;Requesting data beyond current scope -&gt; &#39;</span>
+                        <span class="s1">&#39;postpone rendering!&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">upnp_retry</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span>
+                        <span class="mf">1.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span>
+
+                <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">end</span><span class="p">:</span>
+                    <span class="c1"># print(f&#39;:{end}&#39;)</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lastbytes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">size</span> <span class="o">&lt;</span> <span class="n">lastbytes</span><span class="p">:</span>
+                    <span class="n">lastbytes</span> <span class="o">=</span> <span class="n">size</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="n">lastbytes</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+                <span class="n">fsize</span> <span class="o">=</span> <span class="n">lastbytes</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">end</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">fsize</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="c1"># start is the byte offset to begin, and end is the byte offset</span>
+            <span class="c1"># to end..  fsize is size to send, tsize is the real size of</span>
+            <span class="c1"># the file, and size is the byte position to stop sending.</span>
+            <span class="k">if</span> <span class="n">fsize</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="n">http</span><span class="o">.</span><span class="n">REQUESTED_RANGE_NOT_SATISFIABLE</span><span class="p">)</span>
+                <span class="n">fsize</span> <span class="o">=</span> <span class="n">tsize</span>
+                <span class="n">trans</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="n">http</span><span class="o">.</span><span class="n">PARTIAL_CONTENT</span><span class="p">)</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;content-range&#39;</span><span class="p">,</span> <span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;bytes {str(start)}-{str(end)}/{str(tsize)} &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                        <span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+                <span class="c1"># print &#39;StaticFile&#39;, start, end, tsize</span>
+
+        <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="s1">&#39;content-length&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fsize</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;HEAD&#39;</span> <span class="ow">or</span> <span class="n">trans</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="c1"># pretend we&#39;re a HEAD request, so content-length</span>
+            <span class="c1"># won&#39;t be overwritten.</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;HEAD&#39;</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="c1"># print &#39;StaticFile out&#39;, request.headers, request.code</span>
+
+        <span class="c1"># return data</span>
+        <span class="c1"># size is the byte position to stop sending, not how many bytes to send</span>
+
+        <span class="n">BufferFileTransfer</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">size</span> <span class="o">-</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">(),</span> <span class="n">request</span><span class="p">)</span>
+        <span class="c1"># and make sure the connection doesn&#39;t get closed</span>
+        <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span></div></div>
+
+
+<div class="viewcode-block" id="BufferFileTransfer"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.BufferFileTransfer">[docs]</a><span class="k">class</span> <span class="nc">BufferFileTransfer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A class to represent the transfer of a file over the network.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">request</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">registerProducer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BufferFileTransfer.resumeProducing"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.BufferFileTransfer.resumeProducing">[docs]</a>    <span class="k">def</span> <span class="nf">resumeProducing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print &#39;resumeProducing&#39;, self.request,self.size,self.written</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+            <span class="nb">min</span><span class="p">(</span><span class="n">abstract</span><span class="o">.</span><span class="n">FileDescriptor</span><span class="o">.</span><span class="n">bufferSize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">written</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">written</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="c1"># this .write will spin the reactor, calling .doWrite and then</span>
+            <span class="c1"># .resumeProducing again, so be prepared for a re-entrant call</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">unregisterProducer</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="BufferFileTransfer.pauseProducing"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.BufferFileTransfer.pauseProducing">[docs]</a>    <span class="k">def</span> <span class="nf">pauseProducing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="BufferFileTransfer.stopProducing"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.BufferFileTransfer.stopProducing">[docs]</a>    <span class="k">def</span> <span class="nf">stopProducing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print &#39;stopProducing&#39;,self.request</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">unregisterProducer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+
+
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">tzinfo</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+
+<div class="viewcode-block" id="_tz"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items._tz">[docs]</a><span class="k">class</span> <span class="nc">_tz</span><span class="p">(</span><span class="n">tzinfo</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Custom base class for time zone info classes.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="_tz.utcoffset"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items._tz.utcoffset">[docs]</a>    <span class="k">def</span> <span class="nf">utcoffset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span></div>
+
+<div class="viewcode-block" id="_tz.tzname"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items._tz.tzname">[docs]</a>    <span class="k">def</span> <span class="nf">tzname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
+
+<div class="viewcode-block" id="_tz.dst"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items._tz.dst">[docs]</a>    <span class="k">def</span> <span class="nf">dst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="_CET"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items._CET">[docs]</a><span class="k">class</span> <span class="nc">_CET</span><span class="p">(</span><span class="n">_tz</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Custom class for time zone representing Central European Time.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">_offset</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="n">_name</span> <span class="o">=</span> <span class="s1">&#39;CET&#39;</span></div>
+
+
+<div class="viewcode-block" id="_CEST"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items._CEST">[docs]</a><span class="k">class</span> <span class="nc">_CEST</span><span class="p">(</span><span class="n">_tz</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Custom class for time zone representing Central European Summer Time.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">_offset</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+    <span class="n">_name</span> <span class="o">=</span> <span class="s1">&#39;CEST&#39;</span></div>
+
+
+<span class="n">_bdates</span> <span class="o">=</span> <span class="p">[</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1997</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">_CET</span><span class="p">()),</span>  <span class="c1"># Sebastian Oliver</span>
+           <span class="n">datetime</span><span class="p">(</span><span class="mi">1999</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">_CEST</span><span class="p">()),</span>  <span class="c1"># Patrick Niklas</span>
+           <span class="n">datetime</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">_CEST</span><span class="p">()),</span>  <span class="c1"># Saskia Alexa</span>
+           <span class="n">datetime</span><span class="p">(</span><span class="mi">2003</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">_CEST</span><span class="p">()),</span>  <span class="c1"># Mara Sophie</span>
+           <span class="c1"># you are the best!</span>
+           <span class="p">]</span>
+
+
+<div class="viewcode-block" id="datefaker"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.datefaker">[docs]</a><span class="k">def</span> <span class="nf">datefaker</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Choose a random datetime from :attr:`~coherence.upnp.core.utils._bdates`</span>
+
+<span class="sd">    .. note:: Used inside class :class:`~coherence.upnp.core.DIDLLite.Object`,</span>
+<span class="sd">              method :meth:`~coherence.upnp.core.DIDLLite.Object.toElement`</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">_bdates</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cmp"><a class="viewcode-back" href="../../../../source/upnp/core/utils.html#coherence.backends.models.items.cmp">[docs]</a><span class="k">def</span> <span class="nf">cmp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Replacement for built-in function cmp that was removed in Python 3</span>
+
+<span class="sd">    Compare the two objects x and y and return an integer according to</span>
+<span class="sd">    the outcome. The return value is negative if x &lt; y, zero if x == y</span>
+<span class="sd">    and strictly positive if x &gt; y.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (object): An object</span>
+<span class="sd">        y (object): Another object to compare with x</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">y</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

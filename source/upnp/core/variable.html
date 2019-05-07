@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.variable (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.upnp.core.xml_constants (module)" href="xml_constants.html" />
+    <link rel="prev" title="coherence.upnp.core.uuid (module)" href="uuid.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-core-package">coherence.upnp.core (package)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="action.html">coherence.upnp.core.action (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="device.html">coherence.upnp.core.device (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="didllite.html">coherence.upnp.core.DIDLLite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dlna.html">coherence.upnp.core.dlna (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="event.html">coherence.upnp.core.event (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="msearch.html">coherence.upnp.core.msearch (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="service.html">coherence.upnp.core.service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_lite.html">coherence.upnp.core.soap_lite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_proxy.html">coherence.upnp.core.soap_proxy (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_service.html">coherence.upnp.core.soap_service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ssdp.html">coherence.upnp.core.ssdp (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html">coherence.upnp.core.utils (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="uuid.html">coherence.upnp.core.uuid (module)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.upnp.core.variable (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xml_constants.html">coherence.upnp.core.xml_constants (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-devices-package">coherence.upnp.devices (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-package">coherence.upnp.services (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-clients-subpackage">coherence.upnp.services.clients (subpackage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-servers-subpackage">coherence.upnp.services.servers (subpackage)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.upnp.html">coherence.upnp (package)</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.variable (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/upnp/core/variable.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="module-coherence.upnp.core.variable">
+<span id="coherence-upnp-core-variable-module"></span><span id="upnp-core-variable"></span><h1>coherence.upnp.core.variable (module)<a class="headerlink" href="#module-coherence.upnp.core.variable" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="statevariable">
+<h2><a class="reference internal" href="#coherence.upnp.core.variable.StateVariable" title="coherence.upnp.core.variable.StateVariable"><code class="xref py py-class docutils literal notranslate"><span class="pre">StateVariable</span></code></a><a class="headerlink" href="#statevariable" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="#coherence.upnp.core.variable.StateVariable" title="coherence.upnp.core.variable.StateVariable"><code class="xref py py-class docutils literal notranslate"><span class="pre">StateVariable</span></code></a> implements an UPnP variable with the ability to
+emmit changes via EventDispatcher whenever some class variable changes.</p>
+<dl class="class">
+<dt id="coherence.upnp.core.variable.StateVariable">
+<em class="property">class </em><code class="descname">StateVariable</code><span class="sig-paren">(</span><em>upnp_service</em>, <em>name</em>, <em>implementation</em>, <em>instance</em>, <em>send_events</em>, <em>data_type</em>, <em>allowed_values</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/variable.html#StateVariable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>Represents a UPnP variable. It has the ability to dispatch changes whenever
+some class variable changes.</p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Migrated from louie/dispatcher to EventDispatcher</p></li>
+<li><p>Added two more class variables:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="#coherence.upnp.core.variable.StateVariable.dispatch_targets" title="coherence.upnp.core.variable.StateVariable.dispatch_targets"><code class="xref py py-attr docutils literal notranslate"><span class="pre">StateVariable.dispatch_targets</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.variable.StateVariable.dispatch_events" title="coherence.upnp.core.variable.StateVariable.dispatch_events"><code class="xref py py-attr docutils literal notranslate"><span class="pre">StateVariable.dispatch_events</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>The emitted events changed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.StateVariable.changed =&gt;
+state_variable_changed</p></li>
+<li><p>Coherence.UPnP.StateVariable.{var name}.changed =&gt;
+state_variable_{var name}_changed</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.upnp.core.variable.StateVariable.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'variable'</em><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.variable.StateVariable.dispatch_events">
+<code class="descname">dispatch_events</code><em class="property"> = []</em><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.dispatch_events" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.variable.StateVariable.dispatch_targets">
+<code class="descname">dispatch_targets</code><em class="property"> = []</em><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.dispatch_targets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.variable.StateVariable.as_tuples">
+<code class="descname">as_tuples</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/variable.html#StateVariable.as_tuples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.as_tuples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.variable.StateVariable.set_default_value">
+<code class="descname">set_default_value</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/variable.html#StateVariable.set_default_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.set_default_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.variable.StateVariable.set_allowed_values">
+<code class="descname">set_allowed_values</code><span class="sig-paren">(</span><em>values</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/variable.html#StateVariable.set_allowed_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.set_allowed_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.variable.StateVariable.set_allowed_value_range">
+<code class="descname">set_allowed_value_range</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/variable.html#StateVariable.set_allowed_value_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.set_allowed_value_range" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.variable.StateVariable.get_allowed_values">
+<code class="descname">get_allowed_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/variable.html#StateVariable.get_allowed_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.get_allowed_values" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.variable.StateVariable.set_never_evented">
+<code class="descname">set_never_evented</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/variable.html#StateVariable.set_never_evented"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.set_never_evented" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.variable.StateVariable.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/variable.html#StateVariable.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.variable.StateVariable.subscribe">
+<code class="descname">subscribe</code><span class="sig-paren">(</span><em>callback</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/variable.html#StateVariable.subscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.subscribe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.variable.StateVariable.notify">
+<code class="descname">notify</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/variable.html#StateVariable.notify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.variable.StateVariable.notify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="xml_constants.html" class="btn btn-neutral float-right" title="coherence.upnp.core.xml_constants (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="uuid.html" class="btn btn-neutral float-left" title="coherence.upnp.core.uuid (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

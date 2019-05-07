@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.models.containers (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.backends.models.stores (module)" href="stores.html" />
+    <link rel="prev" title="coherence.backends.models.items (module)" href="items.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../ampache.html">coherence.backends.ampache_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../appletrailers.html">coherence.backends.appletrailers_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../audiocd.html">coherence.backends.audiocd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../axiscam.html">coherence.backends.axiscam_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../banshee.html">coherence.backends.banshee_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../bbc.html">coherence.backends.bbc_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../buzztard.html">coherence.backends.buzztard_control (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dvbd.html">coherence.backends.dvbd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elisarenderer.html">coherence.backends.elisa_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elisastorage.html">coherence.backends.elisa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../feed.html">coherence.backends.feed_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../flickr.html">coherence.backends.flickr_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fs.html">coherence.backends.fs_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gallery2.html">coherence.backends.gallery2_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gstreamer_renderer.html">coherence.backends.gstreamer_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iradio.html">coherence.backends.iradio_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../itv.html">coherence.backends.itv_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lastfm.html">coherence.backends.lastfm_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lolcats.html">coherence.backends.lolcats_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mediadb.html">coherence.backends.mediadb_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../miroguide.html">coherence.backends.miroguide_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../picasa.html">coherence.backends.picasa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../playlist.html">coherence.backends.playlist_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../radiotime.html">coherence.backends.radiotime_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swr3.html">coherence.backends.swr3_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ted.html">coherence.backends.ted_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../test.html">coherence.backends.test_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tracker.html">coherence.backends.tracker_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../twitch.html">coherence.backends.twitch_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../yamj.html">coherence.backends.yamj_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../youtube.html">coherence.backends.youtube_storage (module)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.backends.html#coherence-backends-models-package">coherence.backends.models (package)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="items.html">coherence.backends.models.items (module)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.backends.models.containers (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="stores.html">coherence.backends.models.stores (module)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.backends.html">coherence.backends (package)</a> &raquo;</li>
+        
+      <li>coherence.backends.models.containers (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/backends/models/containers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.backends.models.containers">
+<span id="coherence-backends-models-containers-module"></span><span id="coherence-backends-models-containers"></span><h1>coherence.backends.models.containers (module)<a class="headerlink" href="#module-coherence.backends.models.containers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="backend-models-for-container">
+<h2>Backend models for Container<a class="headerlink" href="#backend-models-for-container" title="Permalink to this headline">¶</a></h2>
+<p>Backend container to be used as a container for backend items, used by backend
+store <a class="reference internal" href="stores.html#coherence.backends.models.stores.BackendBaseStore" title="coherence.backends.models.stores.BackendBaseStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendBaseStore</span></code></a>.</p>
+<p>The <cite>BackendContainer</cite> inherits from <a class="reference internal" href="../../modules.html#coherence.backend.Container" title="coherence.backend.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code></a> and
+will initialize a <a class="reference internal" href="../../upnp/core/didllite.html#coherence.upnp.core.DIDLLite.Container" title="coherence.upnp.core.DIDLLite.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code></a> stored into
+variable <a class="reference internal" href="#coherence.backends.models.containers.BackendContainer.item" title="coherence.backends.models.containers.BackendContainer.item"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BackendContainer.item</span></code></a>. This is the base class for our
+containers.</p>
+<p>We also provide some more containers:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="#coherence.backends.models.containers.BackendMusicAlbum" title="coherence.backends.models.containers.BackendMusicAlbum"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendMusicAlbum</span></code></a>: Container which will contain audio items
+from an album</p></li>
+<li><p><a class="reference internal" href="#coherence.backends.models.containers.BackendBasePlaylist" title="coherence.backends.models.containers.BackendBasePlaylist"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendBasePlaylist</span></code></a>: Container which will contain items to be
+played</p></li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To write this module, some of the the old backends has been taken
+as a reference:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="../appletrailers.html#module-coherence.backends.appletrailers_storage" title="coherence.backends.appletrailers_storage"><code class="xref py py-mod docutils literal notranslate"><span class="pre">appletrailers_storage</span></code></a></p></li>
+<li><p><a class="reference internal" href="../lolcats.html#module-coherence.backends.lolcats_storage" title="coherence.backends.lolcats_storage"><code class="xref py py-mod docutils literal notranslate"><span class="pre">lolcats_storage</span></code></a></p></li>
+<li><p><a class="reference internal" href="../banshee.html#module-coherence.backends.banshee_storage" title="coherence.backends.banshee_storage"><code class="xref py py-mod docutils literal notranslate"><span class="pre">banshee_storage</span></code></a></p></li>
+<li><p><a class="reference internal" href="../fs.html#module-coherence.backends.fs_storage" title="coherence.backends.fs_storage"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fs_storage</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Be aware that we use super to initialize all the classes of this
+module in order to have a better MRO class resolution…so…take
+it into account if you inherit from one of this classes.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.3.</span></p>
+</div>
+<dl class="class">
+<dt id="coherence.backends.models.containers.BackendContainer">
+<em class="property">class </em><code class="descname">BackendContainer</code><span class="sig-paren">(</span><em>item_id</em>, <em>parent_id</em>, <em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/containers.html#BackendContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.containers.BackendContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../modules.html#coherence.backend.Container" title="coherence.backend.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.Container</span></code></a></p>
+<p>The BackendContainer will hold the reference to all your instances of
+BackendItem/s. This class could be used as a container for a simple
+backend. It is almost the same as a <a class="reference internal" href="../../modules.html#coherence.backend.Container" title="coherence.backend.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code></a>
+but with some slight differences that will make easier to create an
+inherited class form BackendContainer:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The arguments to initialize the BackendContainer are</p></li>
+<li><p>When we initialize the BackendContainer we also create an attribute
+item whim will be of <a class="reference internal" href="../../upnp/core/didllite.html#coherence.upnp.core.DIDLLite.Container" title="coherence.upnp.core.DIDLLite.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code></a>
+which will allow us to perform most of the operations we need to
+operate with your BackendItem/s</p></li>
+</ul>
+</div></blockquote>
+<dl class="attribute">
+<dt id="coherence.backends.models.containers.BackendContainer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'BackendContainer'</em><a class="headerlink" href="#coherence.backends.models.containers.BackendContainer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.containers.BackendContainer.item_cls">
+<code class="descname">item_cls</code><a class="headerlink" href="#coherence.backends.models.containers.BackendContainer.item_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="../../upnp/core/didllite.html#coherence.upnp.core.DIDLLite.Container" title="coherence.upnp.core.DIDLLite.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Container</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.containers.BackendContainer.item">
+<code class="descname">item</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backends.models.containers.BackendContainer.item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the initialized <a class="reference internal" href="#coherence.backends.models.containers.BackendContainer.item_cls" title="coherence.backends.models.containers.BackendContainer.item_cls"><code class="xref py py-attr docutils literal notranslate"><span class="pre">item_cls</span></code></a>. It will be set when the class
+<a class="reference internal" href="#coherence.backends.models.containers.BackendContainer" title="coherence.backends.models.containers.BackendContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendContainer</span></code></a> is initialized based on the attribute
+<a class="reference internal" href="#coherence.backends.models.containers.BackendContainer.item_cls" title="coherence.backends.models.containers.BackendContainer.item_cls"><code class="xref py py-attr docutils literal notranslate"><span class="pre">item_cls</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.models.containers.BackendMusicAlbum">
+<em class="property">class </em><code class="descname">BackendMusicAlbum</code><span class="sig-paren">(</span><em>item_id</em>, <em>parent_id</em>, <em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/containers.html#BackendMusicAlbum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.containers.BackendMusicAlbum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.backends.models.containers.BackendContainer" title="coherence.backends.models.containers.BackendContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.containers.BackendContainer</span></code></a></p>
+<p>Definition for a music album. This is an inherited class from
+<a class="reference internal" href="#coherence.backends.models.containers.BackendContainer" title="coherence.backends.models.containers.BackendContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendContainer</span></code></a> but we use a different item class
+<a class="reference internal" href="../../upnp/core/didllite.html#coherence.upnp.core.DIDLLite.MusicAlbum" title="coherence.upnp.core.DIDLLite.MusicAlbum"><code class="xref py py-class docutils literal notranslate"><span class="pre">MusicAlbum</span></code></a> to create our item</p>
+<dl class="attribute">
+<dt id="coherence.backends.models.containers.BackendMusicAlbum.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'BackendMusicAlbum'</em><a class="headerlink" href="#coherence.backends.models.containers.BackendMusicAlbum.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.containers.BackendMusicAlbum.item_cls">
+<code class="descname">item_cls</code><a class="headerlink" href="#coherence.backends.models.containers.BackendMusicAlbum.item_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="../../upnp/core/didllite.html#coherence.upnp.core.DIDLLite.MusicAlbum" title="coherence.upnp.core.DIDLLite.MusicAlbum"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.MusicAlbum</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.models.containers.BackendMusicAlbum.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/containers.html#BackendMusicAlbum.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.containers.BackendMusicAlbum.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the name of the item, it is always expected to be in unicode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.models.containers.BackendMusicAlbum.get_cover">
+<code class="descname">get_cover</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/containers.html#BackendMusicAlbum.get_cover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.containers.BackendMusicAlbum.get_cover" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the filepath where to find the album art file</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>only needed when we have created for that item an
+albumArtURI property that does point back to us.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.models.containers.BackendBasePlaylist">
+<em class="property">class </em><code class="descname">BackendBasePlaylist</code><span class="sig-paren">(</span><em>item_id</em>, <em>parent_id</em>, <em>name</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/containers.html#BackendBasePlaylist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.containers.BackendBasePlaylist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.backends.models.containers.BackendContainer" title="coherence.backends.models.containers.BackendContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.containers.BackendContainer</span></code></a></p>
+<p>Definition for a playlist. This is an inherited class from
+<a class="reference internal" href="#coherence.backends.models.containers.BackendContainer" title="coherence.backends.models.containers.BackendContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendContainer</span></code></a> but we use a different item class
+<a class="reference internal" href="../../upnp/core/didllite.html#coherence.upnp.core.DIDLLite.PlaylistContainer" title="coherence.upnp.core.DIDLLite.PlaylistContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlaylistContainer</span></code></a> to create our item</p>
+<dl class="attribute">
+<dt id="coherence.backends.models.containers.BackendBasePlaylist.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'BackendBasePlaylist'</em><a class="headerlink" href="#coherence.backends.models.containers.BackendBasePlaylist.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.containers.BackendBasePlaylist.item_cls">
+<code class="descname">item_cls</code><a class="headerlink" href="#coherence.backends.models.containers.BackendBasePlaylist.item_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="../../upnp/core/didllite.html#coherence.upnp.core.DIDLLite.PlaylistContainer" title="coherence.upnp.core.DIDLLite.PlaylistContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.PlaylistContainer</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.models.containers.BackendBasePlaylist.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/containers.html#BackendBasePlaylist.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.containers.BackendBasePlaylist.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the name of the item, it is always expected to be in unicode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="stores.html" class="btn btn-neutral float-right" title="coherence.backends.models.stores (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="items.html" class="btn btn-neutral float-left" title="coherence.backends.models.items (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

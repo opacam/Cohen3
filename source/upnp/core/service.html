@@ -1,0 +1,760 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.service (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.upnp.core.soap_lite (module)" href="soap_lite.html" />
+    <link rel="prev" title="coherence.upnp.core.msearch (module)" href="msearch.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-core-package">coherence.upnp.core (package)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="action.html">coherence.upnp.core.action (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="device.html">coherence.upnp.core.device (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="didllite.html">coherence.upnp.core.DIDLLite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dlna.html">coherence.upnp.core.dlna (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="event.html">coherence.upnp.core.event (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="msearch.html">coherence.upnp.core.msearch (module)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.upnp.core.service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_lite.html">coherence.upnp.core.soap_lite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_proxy.html">coherence.upnp.core.soap_proxy (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_service.html">coherence.upnp.core.soap_service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ssdp.html">coherence.upnp.core.ssdp (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html">coherence.upnp.core.utils (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="uuid.html">coherence.upnp.core.uuid (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="variable.html">coherence.upnp.core.variable (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xml_constants.html">coherence.upnp.core.xml_constants (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-devices-package">coherence.upnp.devices (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-package">coherence.upnp.services (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-clients-subpackage">coherence.upnp.services.clients (subpackage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-servers-subpackage">coherence.upnp.services.servers (subpackage)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.upnp.html">coherence.upnp (package)</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.service (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/upnp/core/service.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="module-coherence.upnp.core.service">
+<span id="coherence-upnp-core-service-module"></span><span id="upnp-core-service"></span><h1>coherence.upnp.core.service (module)<a class="headerlink" href="#module-coherence.upnp.core.service" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="services">
+<h2>Services<a class="headerlink" href="#services" title="Permalink to this headline">¶</a></h2>
+<p>This module contains several classes related to services:</p>
+<div class="section" id="service">
+<h3><a class="reference internal" href="#coherence.upnp.core.service.Service" title="coherence.upnp.core.service.Service"><code class="xref py py-class docutils literal notranslate"><span class="pre">Service</span></code></a><a class="headerlink" href="#service" title="Permalink to this headline">¶</a></h3>
+<p>Object representing a device’s service.</p>
+</div>
+<div class="section" id="serviceserver">
+<h3><a class="reference internal" href="#coherence.upnp.core.service.ServiceServer" title="coherence.upnp.core.service.ServiceServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceServer</span></code></a><a class="headerlink" href="#serviceserver" title="Permalink to this headline">¶</a></h3>
+<p>A Service’s server.</p>
+</div>
+<div class="section" id="scpdxml">
+<h3><a class="reference internal" href="#coherence.upnp.core.service.scpdXML" title="coherence.upnp.core.service.scpdXML"><code class="xref py py-class docutils literal notranslate"><span class="pre">scpdXML</span></code></a><a class="headerlink" href="#scpdxml" title="Permalink to this headline">¶</a></h3>
+<p>A <cite>twisted.web.resource.Resource</cite> representing xml’s data for SCPD.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SCPD is a Service Control Point Definition, for defining the actions
+offered by the various services in a UPnP’s network.</p>
+</div>
+</div>
+<div class="section" id="servicecontrol">
+<h3><a class="reference internal" href="#coherence.upnp.core.service.ServiceControl" title="coherence.upnp.core.service.ServiceControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceControl</span></code></a><a class="headerlink" href="#servicecontrol" title="Permalink to this headline">¶</a></h3>
+<p>Object to control service’s SOAP actions.</p>
+<dl class="function">
+<dt id="coherence.upnp.core.service.subscribe">
+<code class="descname">subscribe</code><span class="sig-paren">(</span><em>service</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#subscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.subscribe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.service.unsubscribe">
+<code class="descname">unsubscribe</code><span class="sig-paren">(</span><em>service</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#unsubscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.unsubscribe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.service.Service">
+<em class="property">class </em><code class="descname">Service</code><span class="sig-paren">(</span><em>service_type</em>, <em>service_id</em>, <em>location</em>, <em>control_url</em>, <em>event_sub_url</em>, <em>presentation_url</em>, <em>scpd_url</em>, <em>device</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>This class represents a Device’s service. Emits events which will be
+received by class <a class="reference internal" href="device.html#coherence.upnp.core.device.Device" title="coherence.upnp.core.device.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code></a>.</p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Migrated from louie/dispatcher to EventDispatcher</p></li>
+<li><p>The emitted events changed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.Service.detection_completed =&gt;
+service_detection_completed</p></li>
+<li><p>Coherence.UPnP.Service.detection_failed =&gt;
+service_detection_failed</p></li>
+<li><p>Coherence.UPnP.DeviceClient.Service.Event.processed =&gt;
+service_event_processed</p></li>
+<li><p>Coherence.UPnP.DeviceClient.Service.notified =&gt;
+service_notified</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>changed class variable <a class="reference internal" href="#coherence.upnp.core.service.Service.detection_completed" title="coherence.upnp.core.service.Service.detection_completed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detection_completed</span></code></a> to benefit from
+the EventDispatcher’s properties</p></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class initializes some events outside this class. This is
+done this way to make easier to make connections between
+this service and the module <code class="xref py py-mod docutils literal notranslate"><span class="pre">dbus_service</span></code>,
+which uses some events triggered by
+<a class="reference internal" href="variable.html#coherence.upnp.core.variable.StateVariable" title="coherence.upnp.core.variable.StateVariable"><code class="xref py py-class docutils literal notranslate"><span class="pre">StateVariable</span></code></a>. The
+mentioned events are (old =&gt; new):</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.StateVariable.changed =&gt;
+state_variable_changed</p></li>
+<li><p>Coherence.UPnP.StateVariable.{var name}.changed =&gt;
+state_variable_{var name}_changed</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This class is special regarding EventDispatcher, because some
+events are initialized outside this class by the class
+<a class="reference internal" href="variable.html#coherence.upnp.core.variable.StateVariable" title="coherence.upnp.core.variable.StateVariable"><code class="xref py py-class docutils literal notranslate"><span class="pre">StateVariable</span></code></a>.</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.upnp.core.service.Service.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'service_client'</em><a class="headerlink" href="#coherence.upnp.core.service.Service.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.service.Service.detection_completed">
+<code class="descname">detection_completed</code><a class="headerlink" href="#coherence.upnp.core.service.Service.detection_completed" title="Permalink to this definition">¶</a></dt>
+<dd><p>To know whenever the service detection has completed. Defaults to <cite>False</cite>
+and it will be set automatically to <cite>True</cite> by the class method
+<a class="reference internal" href="#coherence.upnp.core.service.Service.parse_actions" title="coherence.upnp.core.service.Service.parse_actions"><code class="xref py py-meth docutils literal notranslate"><span class="pre">parse_actions()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.as_tuples">
+<code class="descname">as_tuples</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.as_tuples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.as_tuples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.as_dict">
+<code class="descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service._get_client">
+<code class="descname">_get_client</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service._get_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service._get_client" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_device">
+<code class="descname">get_device</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_type">
+<code class="descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.set_timeout">
+<code class="descname">set_timeout</code><span class="sig-paren">(</span><em>timeout</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.set_timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.set_timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_timeout">
+<code class="descname">get_timeout</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_id">
+<code class="descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_sid">
+<code class="descname">get_sid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_sid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_sid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.set_sid">
+<code class="descname">set_sid</code><span class="sig-paren">(</span><em>sid</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.set_sid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.set_sid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_actions">
+<code class="descname">get_actions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_actions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_scpdXML">
+<code class="descname">get_scpdXML</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_scpdXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_scpdXML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_action">
+<code class="descname">get_action</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_state_variables">
+<code class="descname">get_state_variables</code><span class="sig-paren">(</span><em>instance</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_state_variables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_state_variable">
+<code class="descname">get_state_variable</code><span class="sig-paren">(</span><em>name</em>, <em>instance=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_state_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_state_variable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_control_url">
+<code class="descname">get_control_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_control_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_control_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_event_sub_url">
+<code class="descname">get_event_sub_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_event_sub_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_event_sub_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_presentation_url">
+<code class="descname">get_presentation_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_presentation_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_presentation_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_scpd_url">
+<code class="descname">get_scpd_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_scpd_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_scpd_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.get_base_url">
+<code class="descname">get_base_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.get_base_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.get_base_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.subscribe">
+<code class="descname">subscribe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.subscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.subscribe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.unsubscribe">
+<code class="descname">unsubscribe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.unsubscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.unsubscribe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.subscribe_for_variable">
+<code class="descname">subscribe_for_variable</code><span class="sig-paren">(</span><em>var_name</em>, <em>instance=0</em>, <em>callback=None</em>, <em>signal=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.subscribe_for_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.subscribe_for_variable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.renew_subscription">
+<code class="descname">renew_subscription</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.renew_subscription"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.renew_subscription" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.process_event">
+<code class="descname">process_event</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.process_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.process_event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.Service.parse_actions">
+<code class="descname">parse_actions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#Service.parse_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.Service.parse_actions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.service.ServiceServer">
+<em class="property">class </em><code class="descname">ServiceServer</code><span class="sig-paren">(</span><em>id</em>, <em>version</em>, <em>backend</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.service.ServiceServer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'service_server'</em><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer._release">
+<code class="descname">_release</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer._release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer._release" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.get_action">
+<code class="descname">get_action</code><span class="sig-paren">(</span><em>action_name</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.get_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.get_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.get_actions">
+<code class="descname">get_actions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.get_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.get_actions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.get_variables">
+<code class="descname">get_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.get_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.get_variables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.get_subscribers">
+<code class="descname">get_subscribers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.get_subscribers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.get_subscribers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.rm_notification">
+<code class="descname">rm_notification</code><span class="sig-paren">(</span><em>result</em>, <em>d</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.rm_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.rm_notification" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.new_subscriber">
+<code class="descname">new_subscriber</code><span class="sig-paren">(</span><em>subscriber</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.new_subscriber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.new_subscriber" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.get_id">
+<code class="descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.get_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.get_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.get_type">
+<code class="descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.get_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.create_new_instance">
+<code class="descname">create_new_instance</code><span class="sig-paren">(</span><em>instance</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.create_new_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.create_new_instance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.remove_instance">
+<code class="descname">remove_instance</code><span class="sig-paren">(</span><em>instance</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.remove_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.remove_instance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.set_variable">
+<code class="descname">set_variable</code><span class="sig-paren">(</span><em>instance</em>, <em>variable_name</em>, <em>value</em>, <em>default=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.set_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.set_variable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.get_variable">
+<code class="descname">get_variable</code><span class="sig-paren">(</span><em>variable_name</em>, <em>instance=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.get_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.get_variable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.build_single_notification">
+<code class="descname">build_single_notification</code><span class="sig-paren">(</span><em>instance</em>, <em>variable_name</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.build_single_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.build_single_notification" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.build_last_change_event">
+<code class="descname">build_last_change_event</code><span class="sig-paren">(</span><em>instance=0</em>, <em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.build_last_change_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.build_last_change_event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.propagate_notification">
+<code class="descname">propagate_notification</code><span class="sig-paren">(</span><em>notify</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.propagate_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.propagate_notification" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.check_subscribers">
+<code class="descname">check_subscribers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.check_subscribers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.check_subscribers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.check_moderated_variables">
+<code class="descname">check_moderated_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.check_moderated_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.check_moderated_variables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.is_variable_moderated">
+<code class="descname">is_variable_moderated</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.is_variable_moderated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.is_variable_moderated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.simulate_notification">
+<code class="descname">simulate_notification</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.simulate_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.simulate_notification" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.get_scpdXML">
+<code class="descname">get_scpdXML</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.get_scpdXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.get_scpdXML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.register_vendor_variable">
+<code class="descname">register_vendor_variable</code><span class="sig-paren">(</span><em>name</em>, <em>implementation='optional'</em>, <em>instance=0</em>, <em>evented='no'</em>, <em>data_type='string'</em>, <em>dependant_variable=None</em>, <em>default_value=None</em>, <em>allowed_values=None</em>, <em>has_vendor_values=False</em>, <em>allowed_value_range=None</em>, <em>moderated=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.register_vendor_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.register_vendor_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables a backend to add an own, vendor defined,
+<a class="reference internal" href="variable.html#coherence.upnp.core.variable.StateVariable" title="coherence.upnp.core.variable.StateVariable"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.variable.StateVariable</span></code></a> to the service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the name of the new StateVariable</p></li>
+<li><p><strong>implementation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – either ‘optional’ or ‘required’</p></li>
+<li><p><strong>instance</strong> – the instance number of the service that variable
+should be assigned to, usually ‘0’</p></li>
+<li><p><strong>evented</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – boolean as string ‘yes’ ‘no’ or the special keyword
+‘never’ if the variable doesn’t show up in a
+LastChange event too</p></li>
+<li><p><strong>data_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – <cite>string</cite>, <cite>boolean</cite>, <cite>bin.base64</cite> or
+various number formats</p></li>
+<li><p><strong>dependant_variable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – the name of another StateVariable that
+depends on this one</p></li>
+<li><p><strong>default_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – the value this StateVariable should have by
+default when created for another instance
+of in the service</p></li>
+<li><p><strong>allowed_values</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – a list of values this StateVariable can have</p></li>
+<li><p><strong>has_vendor_values</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – if there are values outside the
+allowed_values list too</p></li>
+<li><p><strong>allowed_value_range</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – a dict of ‘minimum’,’maximum’ and
+‘step’ values</p></li>
+<li><p><strong>moderated</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – True if this StateVariable should only be emitted
+via a LastChange event</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A new variable of class
+<a class="reference internal" href="variable.html#coherence.upnp.core.variable.StateVariable" title="coherence.upnp.core.variable.StateVariable"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.variable.StateVariable</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.register_vendor_action">
+<code class="descname">register_vendor_action</code><span class="sig-paren">(</span><em>name</em>, <em>implementation</em>, <em>arguments=None</em>, <em>needs_callback=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.register_vendor_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.register_vendor_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enables a backend to add an own, vendor defined, Action to the service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the name of the new Action</p></li>
+<li><p><strong>implementation</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – either ‘optional’ or ‘required’</p></li>
+<li><p><strong>arguments</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – a C{list} if argument C{tuples},
+like (name,direction,relatedStateVariable)</p></li>
+<li><p><strong>needs_callback</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – this Action needs a method in the backend
+or service class</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An action of class <a class="reference internal" href="action.html#coherence.upnp.core.action.Action" title="coherence.upnp.core.action.Action"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.action.Action</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceServer.init_var_and_actions">
+<code class="descname">init_var_and_actions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceServer.init_var_and_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceServer.init_var_and_actions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.service.scpdXML">
+<em class="property">class </em><code class="descname">scpdXML</code><span class="sig-paren">(</span><em>server</em>, <em>control=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#scpdXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.scpdXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.static.Data</span></code>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.service.scpdXML.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'service_scpdxml'</em><a class="headerlink" href="#coherence.upnp.core.service.scpdXML.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.scpdXML.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#scpdXML.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.scpdXML.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a given resource. See L{IResource}’s render method.</p>
+<p>I delegate to methods of self with the form ‘render_METHOD’
+where METHOD is the HTTP that was used to make the
+request. Examples: render_GET, render_HEAD, render_POST, and
+so on. Generally you should implement those methods instead of
+overriding this one.</p>
+<p>render_METHOD methods are expected to return a byte string which will be
+the rendered page, unless the return value is C{server.NOT_DONE_YET}, in
+which case it is this class’s responsibility to write the results using
+C{request.write(data)} and then call C{request.finish()}.</p>
+<p>Old code that overrides render() directly is likewise expected
+to return a byte string or NOT_DONE_YET.</p>
+<p>&#64;see: L{IResource.render}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.scpdXML.build_xml">
+<code class="descname">build_xml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#scpdXML.build_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.scpdXML.build_xml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.service.ServiceControl">
+<em class="property">class </em><code class="descname">ServiceControl</code><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceControl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceControl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceControl.get_action_results">
+<code class="descname">get_action_results</code><span class="sig-paren">(</span><em>result</em>, <em>action</em>, <em>instance</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceControl.get_action_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceControl.get_action_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>check for out arguments if yes:</p>
+<blockquote>
+<div><ul>
+<li><p>check if there are related ones to StateVariables with non
+<cite>A_ARG_TYPE_</cite> prefix:</p>
+<blockquote>
+<div><p>if yes:</p>
+<blockquote>
+<div><ul>
+<li><p>check if there is a call plugin method for this action:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>if yes: update StateVariable values with call result</p></li>
+<li><p>if no:  get StateVariable values and add them to
+result dict</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – The result from an action</p></li>
+<li><p><strong>action</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – An instance of class
+<a class="reference internal" href="action.html#coherence.upnp.core.action.Action" title="coherence.upnp.core.action.Action"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.action.Action</span></code></a></p></li>
+<li><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – An instance of
+<a class="reference internal" href="variable.html#coherence.upnp.core.variable.StateVariable" title="coherence.upnp.core.variable.StateVariable"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.variable.StateVariable</span></code></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An <cite>OrderedDict</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.service.ServiceControl.soap__generic">
+<code class="descname">soap__generic</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/service.html#ServiceControl.soap__generic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.service.ServiceControl.soap__generic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic UPnP service control method, which will be used
+if no soap_ACTIONNAME method in the server service control
+class can be found</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="soap_lite.html" class="btn btn-neutral float-right" title="coherence.upnp.core.soap_lite (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="msearch.html" class="btn btn-neutral float-left" title="coherence.upnp.core.msearch (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

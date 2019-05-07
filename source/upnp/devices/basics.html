@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.devices.basics (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.upnp.devices.control_point (module)" href="control_point.html" />
+    <link rel="prev" title="coherence.upnp.core.xml_constants (module)" href="../core/xml_constants.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-core-package">coherence.upnp.core (package)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-devices-package">coherence.upnp.devices (package)</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.upnp.devices.basics (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="control_point.html">coherence.upnp.devices.control_point (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="internet_gateway_device_client.html">coherence.upnp.devices.internet_gateway_device_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="media_renderer.html">coherence.upnp.devices.media_renderer (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="media_renderer_client.html">coherence.upnp.devices.media_renderer_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="media_server.html">coherence.upnp.devices.media_server (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="media_server_client.html">coherence.upnp.devices.media_server_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="wan_connection_device_client.html">coherence.upnp.devices.wan_connection_device_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="wan_device_client.html">coherence.upnp.devices.wan_device_client (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-package">coherence.upnp.services (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-clients-subpackage">coherence.upnp.services.clients (subpackage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-servers-subpackage">coherence.upnp.services.servers (subpackage)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.upnp.html">coherence.upnp (package)</a> &raquo;</li>
+        
+      <li>coherence.upnp.devices.basics (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/upnp/devices/basics.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="module-coherence.upnp.devices.basics">
+<span id="coherence-upnp-devices-basics-module"></span><span id="upnp-devices-basics"></span><h1>coherence.upnp.devices.basics (module)<a class="headerlink" href="#module-coherence.upnp.devices.basics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h2>
+<p>This module contains two classes which will be used as a base classes which
+will be useful to create our device classes: MediaRenderer and MediaServer.</p>
+<div class="section" id="devicehttproot">
+<h3><a class="reference internal" href="#coherence.upnp.devices.basics.DeviceHttpRoot" title="coherence.upnp.devices.basics.DeviceHttpRoot"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceHttpRoot</span></code></a><a class="headerlink" href="#devicehttproot" title="Permalink to this headline">¶</a></h3>
+<p>Inherits from <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code> and is used as a a base
+class by class the <a class="reference internal" href="media_renderer.html#coherence.upnp.devices.media_renderer.HttpRoot" title="coherence.upnp.devices.media_renderer.HttpRoot"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRoot</span></code></a>.</p>
+</div>
+<div class="section" id="basicdevicemixin">
+<h3><a class="reference internal" href="#coherence.upnp.devices.basics.BasicDeviceMixin" title="coherence.upnp.devices.basics.BasicDeviceMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicDeviceMixin</span></code></a><a class="headerlink" href="#basicdevicemixin" title="Permalink to this headline">¶</a></h3>
+<p>This is an EventDispatcher object used as a base class by the classes
+<a class="reference internal" href="media_renderer.html#coherence.upnp.devices.media_renderer.MediaRenderer" title="coherence.upnp.devices.media_renderer.MediaRenderer"><code class="xref py py-class docutils literal notranslate"><span class="pre">MediaRenderer</span></code></a> and
+<a class="reference internal" href="media_server.html#coherence.upnp.devices.media_server.MediaServer" title="coherence.upnp.devices.media_server.MediaServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">MediaServer</span></code></a>. It contains some
+methods that will help us to initialize the backend as well as the methods
+<a class="reference internal" href="#coherence.upnp.devices.basics.BasicDeviceMixin.register" title="coherence.upnp.devices.basics.BasicDeviceMixin.register"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BasicDeviceMixin.register()</span></code></a> and <a class="reference internal" href="#coherence.upnp.devices.basics.BasicDeviceMixin.unregister" title="coherence.upnp.devices.basics.BasicDeviceMixin.unregister"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BasicDeviceMixin.unregister()</span></code></a> which
+will take care to register/unregister our device.</p>
+<dl class="class">
+<dt id="coherence.upnp.devices.basics.DeviceHttpRoot">
+<em class="property">class </em><code class="descname">DeviceHttpRoot</code><span class="sig-paren">(</span><em>server</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/basics.html#DeviceHttpRoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.basics.DeviceHttpRoot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.devices.basics.DeviceHttpRoot.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'basicdevice'</em><a class="headerlink" href="#coherence.upnp.devices.basics.DeviceHttpRoot.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.basics.DeviceHttpRoot.getChildWithDefault">
+<code class="descname">getChildWithDefault</code><span class="sig-paren">(</span><em>path</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/basics.html#DeviceHttpRoot.getChildWithDefault"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.basics.DeviceHttpRoot.getChildWithDefault" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a static or dynamically generated child resource from me.</p>
+<p>First checks if a resource was added manually by putChild, and then
+call getChild to check for dynamic resources. Only override if you want
+to affect behaviour of all child lookups, rather than just dynamic
+ones.</p>
+<p>This will check to see if I have a pre-registered child resource of the
+given name, and call getChild if I do not.</p>
+<p>&#64;see: L{IResource.getChildWithDefault}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.basics.DeviceHttpRoot.getChild">
+<code class="descname">getChild</code><span class="sig-paren">(</span><em>name</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/basics.html#DeviceHttpRoot.getChild"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.basics.DeviceHttpRoot.getChild" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a ‘child’ resource from me.</p>
+<p>Implement this to create dynamic resource generation – resources which
+are always available may be registered with self.putChild().</p>
+<p>This will not be called if the class-level variable ‘isLeaf’ is set in
+your subclass; instead, the ‘postpath’ attribute of the request will be
+left as a list of the remaining path elements.</p>
+<p>For example, the URL /foo/bar/baz will normally be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span> <span class="n">site</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>However, if the resource returned by ‘bar’ has isLeaf set to true, then
+the getChild call will never be made on it.</p>
+<p>Parameters and return value have the same meaning and requirements as
+those defined by L{IResource.getChildWithDefault}.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.basics.DeviceHttpRoot.listchilds">
+<code class="descname">listchilds</code><span class="sig-paren">(</span><em>uri</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/basics.html#DeviceHttpRoot.listchilds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.basics.DeviceHttpRoot.listchilds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.basics.DeviceHttpRoot.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/basics.html#DeviceHttpRoot.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.basics.DeviceHttpRoot.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a given resource. See L{IResource}’s render method.</p>
+<p>I delegate to methods of self with the form ‘render_METHOD’
+where METHOD is the HTTP that was used to make the
+request. Examples: render_GET, render_HEAD, render_POST, and
+so on. Generally you should implement those methods instead of
+overriding this one.</p>
+<p>render_METHOD methods are expected to return a byte string which will be
+the rendered page, unless the return value is C{server.NOT_DONE_YET}, in
+which case it is this class’s responsibility to write the results using
+C{request.write(data)} and then call C{request.finish()}.</p>
+<p>Old code that overrides render() directly is likewise expected
+to return a byte string or NOT_DONE_YET.</p>
+<p>&#64;see: L{IResource.render}</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.devices.basics.BasicDeviceMixin">
+<em class="property">class </em><code class="descname">BasicDeviceMixin</code><span class="sig-paren">(</span><em>coherence</em>, <em>backend</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/basics.html#BasicDeviceMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.basics.BasicDeviceMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code></p>
+<p>This is used as a base class for the following classes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="media_renderer.html#coherence.upnp.devices.media_renderer.MediaRenderer" title="coherence.upnp.devices.media_renderer.MediaRenderer"><code class="xref py py-class docutils literal notranslate"><span class="pre">MediaRenderer</span></code></a></p></li>
+<li><p><a class="reference internal" href="media_server.html#coherence.upnp.devices.media_server.MediaServer" title="coherence.upnp.devices.media_server.MediaServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">MediaServer</span></code></a></p></li>
+</ul>
+</div></blockquote>
+<p>It contains some methods that will help us to initialize the backend
+(<a class="reference internal" href="#coherence.upnp.devices.basics.BasicDeviceMixin.on_backend" title="coherence.upnp.devices.basics.BasicDeviceMixin.on_backend"><code class="xref py py-meth docutils literal notranslate"><span class="pre">on_backend()</span></code></a>, <a class="reference internal" href="#coherence.upnp.devices.basics.BasicDeviceMixin.init_complete" title="coherence.upnp.devices.basics.BasicDeviceMixin.init_complete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">init_complete()</span></code></a> and <a class="reference internal" href="#coherence.upnp.devices.basics.BasicDeviceMixin.init_failed" title="coherence.upnp.devices.basics.BasicDeviceMixin.init_failed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">init_failed()</span></code></a>). There
+is no need to call those methods, because it will be automatically
+triggered based on the backend status.</p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Introduced inheritance from EventDispatcher</p></li>
+<li><p>Changed class variable <a class="reference internal" href="#coherence.upnp.devices.basics.BasicDeviceMixin.backend" title="coherence.upnp.devices.basics.BasicDeviceMixin.backend"><code class="xref py py-attr docutils literal notranslate"><span class="pre">backend</span></code></a> to benefit from the
+EventDispatcher’s properties</p></li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.upnp.devices.basics.BasicDeviceMixin.backend">
+<code class="descname">backend</code><a class="headerlink" href="#coherence.upnp.devices.basics.BasicDeviceMixin.backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>The device’s backend. When this variable is filled it will automatically
+trigger the method <a class="reference internal" href="#coherence.upnp.devices.basics.BasicDeviceMixin.on_backend" title="coherence.upnp.devices.basics.BasicDeviceMixin.on_backend"><code class="xref py py-meth docutils literal notranslate"><span class="pre">on_backend()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.basics.BasicDeviceMixin.on_backend">
+<code class="descname">on_backend</code><span class="sig-paren">(</span><em>*arsg</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/basics.html#BasicDeviceMixin.on_backend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.basics.BasicDeviceMixin.on_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is automatically triggered whenever the <a class="reference internal" href="#coherence.upnp.devices.basics.BasicDeviceMixin.backend" title="coherence.upnp.devices.basics.BasicDeviceMixin.backend"><code class="xref py py-attr docutils literal notranslate"><span class="pre">backend</span></code></a>
+class variable changes. Here we connect the backend initialization
+with the device.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.basics.BasicDeviceMixin.init_complete">
+<code class="descname">init_complete</code><span class="sig-paren">(</span><em>backend</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/basics.html#BasicDeviceMixin.init_complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.basics.BasicDeviceMixin.init_complete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.basics.BasicDeviceMixin.init_failed">
+<code class="descname">init_failed</code><span class="sig-paren">(</span><em>backend</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/basics.html#BasicDeviceMixin.init_failed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.basics.BasicDeviceMixin.init_failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.basics.BasicDeviceMixin.register">
+<code class="descname">register</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/basics.html#BasicDeviceMixin.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.basics.BasicDeviceMixin.register" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.basics.BasicDeviceMixin.unregister">
+<code class="descname">unregister</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/basics.html#BasicDeviceMixin.unregister"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.basics.BasicDeviceMixin.unregister" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="control_point.html" class="btn btn-neutral float-right" title="coherence.upnp.devices.control_point (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../core/xml_constants.html" class="btn btn-neutral float-left" title="coherence.upnp.core.xml_constants (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

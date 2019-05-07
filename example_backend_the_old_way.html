@@ -1,0 +1,646 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Writing a backend (the old way) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Writing a backend (the new way)" href="example_backend_the_new_way.html" />
+    <link rel="prev" title="Write a backend" href="write_a_backend.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">Backends</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="write_a_backend.html">Write a backend</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Writing a backend (the old way)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#introduction-the-old-way">Introduction (the old way)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-imports-the-old-way">The imports (the old way)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-models-the-old-way">The models (the old way)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-server-the-old-way">The server (the old way)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-testing-the-old-way">The testing (the old way)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="example_backend_the_new_way.html">Writing a backend (the new way)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="write_a_backend.html">Write a backend</a> &raquo;</li>
+        
+      <li>Writing a backend (the old way)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/example_backend_the_old_way.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="writing-a-backend-the-old-way">
+<span id="example-backend-the-old-way"></span><h1>Writing a backend (the old way)<a class="headerlink" href="#writing-a-backend-the-old-way" title="Permalink to this headline">¶</a></h1>
+<p>Here you will learn  how to write a backend from the scratch using the Cohen3
+module <a class="reference internal" href="source/modules.html#coherence-backend"><span class="std std-ref">backend</span></a>. We will try to explain it step by
+step, using as a model the classic backend LolcatsStore. You must know that
+this way is not the best way to implement this kind of media server, you can
+achieve the same result by using the newer tools
+<a class="reference internal" href="source/coherence.backends.html#coherence-backends-models-package"><span class="std std-ref">models</span></a>, but… it’s recommended to
+read this document, because you will get an idea of what is happening behind
+the new way, using the <a class="reference internal" href="source/coherence.backends.html#coherence-backends-models-package"><span class="std std-ref">models</span></a>
+which, in matter fact, uses the tools from <a class="reference internal" href="source/modules.html#coherence-backend"><span class="std std-ref">backend</span></a>
+so, it will be useful to write more complex backends and to understand the
+basics of the Cohen3 Project.</p>
+<div class="section" id="introduction-the-old-way">
+<h2>Introduction (the old way)<a class="headerlink" href="#introduction-the-old-way" title="Permalink to this headline">¶</a></h2>
+<p>This Media Backend will allow you to access the cool and cute pictures
+from lolcats.com. This is mainly meant as a Sample Media Backend to learn
+how to write a Media Backend using the backend tools directly. Be aware that
+this could be done more easily using the modules from
+<a class="reference internal" href="source/coherence.backends.html#coherence-backends-models-package"><span class="std std-ref">models</span></a>.</p>
+<p>So. You are still reading which allows me to assume that you want to learn how
+to write a Media Backend for Coherence. NICE :) .</p>
+<p>Once again: This is a SIMPLE Media Backend. It does not contain any big
+requests, searches or even transcoding. The only thing we want to do in this
+simple example, is to fetch a rss link on startup, parse it, save it and
+restart the process one hour later again. Well, on top of this, we also want
+to provide these information as a Media Server in the UPnP/DLNA
+Network of course ;) .</p>
+<p>Wow. You are still reading. You must be really interested. Then let’s go…
+check the source code for this backend line by line, you will see that all
+the code has been commented in order to make easier to understand how to
+write a backend. Let’s start…</p>
+</div>
+<div class="section" id="the-imports-the-old-way">
+<h2>The imports (the old way)<a class="headerlink" href="#the-imports-the-old-way" title="Permalink to this headline">¶</a></h2>
+<p>We import the reactor, that allows us to specify an action to happen later:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+</pre></div>
+</div>
+<p>We import the re module to clean up quotes in some html code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">re</span>
+</pre></div>
+</div>
+<p>Import task in order no iterate over items without blocking the application:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">task</span>
+</pre></div>
+</div>
+<p>And to parse the RSS-Data (which is XML), we use our custom function
+parse_with_lxml:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">parse_with_lxml</span>
+</pre></div>
+</div>
+<p>The data itself is stored in BackendItems. They are also the first things we
+are going to create:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendItem</span>
+</pre></div>
+</div>
+<p>The entry point for each kind of Backend is a ‘BackendStore’. The BackendStore
+is the instance that does everything Usually. In this Example it can be
+understood as the ‘Server’, the object retrieving and serving the data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendStore</span>
+</pre></div>
+</div>
+<p>And we will store our items into a container which will be the root for all
+our items:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">coherence.backends.models.containers</span> <span class="k">import</span> <span class="n">BackendContainer</span>
+</pre></div>
+</div>
+<p>To make the data ‘renderable’ we need to define the DIDLite-Class of the Media
+we are providing. For that we have a bunch of helpers that we also want to
+import:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+</pre></div>
+</div>
+<p>Coherence relies on the Twisted backend. I hope you are familiar with the
+concept of deferreds. If not please read:</p>
+<blockquote>
+<div><p><a class="reference external" href="http://twistedmatrix.com/projects/core/documentation/howto/async.html">http://twistedmatrix.com/projects/core/documentation/howto/async.html</a></p>
+</div></blockquote>
+<p>It is a basic concept that you need to understand the following code. But why
+am I talking about it? Oh, right, because we use a http-client based on the
+twisted.web.client module to do our requests:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">getPage</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-models-the-old-way">
+<h2>The models (the old way)<a class="headerlink" href="#the-models-the-old-way" title="Permalink to this headline">¶</a></h2>
+<p>After the download and parsing of the data is done, we want to save it. In
+this case, we want to fetch the images and store their URL and the title of
+the image. That is the LolCatsImage class. We inherit from BackendItem as it
+already contains a lot of helper methods and implementations. For this simple
+example, we only have to fill the item with data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LolCatsImage</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The LolCatsImage server. Takes care of fetching data and creating the</span>
+<span class="sd">    backend items.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parentid</span> <span class="o">=</span> <span class="n">parent_id</span>  <span class="c1"># used to be able to &#39;go back&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>  <span class="c1"># each item has its own and unique id</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">url</span>  <span class="c1"># the url of the picture</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">title</span>  <span class="c1"># the title of the picture. Inside</span>
+        <span class="c1"># coherence this is called &#39;name&#39;</span>
+
+        <span class="c1"># Item.item is a special thing. This is used to explain the client what</span>
+        <span class="c1"># kind of data this is. For e.g. A VideoItem or a MusicTrack. In our</span>
+        <span class="c1"># case, we have an image.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">ImageItem</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># each Item.item has to have one or more Resource objects these hold</span>
+        <span class="c1"># detailed information about the media data and can represent variants</span>
+        <span class="c1">#  of it (different sizes, transcoded formats)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="s1">&#39;http-get:*:image/jpeg:*&#39;</span><span class="p">)</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># FIXME: we should have a size here</span>
+        <span class="c1">#       and a resolution entry would be nice too</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-server-the-old-way">
+<h2>The server (the old way)<a class="headerlink" href="#the-server-the-old-way" title="Permalink to this headline">¶</a></h2>
+<p>The LolcatsStore is a media server. As already said before the implementation
+of the server is done in an inheritance of a BackendStore. This is where the
+real code happens (usually). In our case this would be: downloading the page,
+parsing the content, saving it in the models and returning them on request:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LolcatsStore</span><span class="p">(</span><span class="n">BackendStore</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># this *must* be set. Because the (most used) MediaServer Coherence also</span>
+    <span class="c1"># allows other kind of Backends (like remote lights).</span>
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="c1"># This is only for this implementation: the http link to the lolcats rss</span>
+    <span class="c1"># feed that we want to read and parse:</span>
+    <span class="n">rss_url</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;https://icanhas.cheezburger.com/lolcats/rss&quot;</span>
+
+    <span class="c1"># As we are going to build a (very small) tree with the items, we need to</span>
+    <span class="c1"># define the first (the root) item:</span>
+    <span class="n">ROOT_ID</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># First we initialize our heritage</span>
+        <span class="n">BackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># When a Backend is initialized, the configuration is given as keyword</span>
+        <span class="c1"># arguments to the initialization. We receive it here as a dictionary</span>
+        <span class="c1"># and allow some values to be set:</span>
+        <span class="c1">#       the name of the MediaServer as it appears in the network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;LolCats&#39;</span><span class="p">)</span>
+
+        <span class="c1"># timeout between updates in hours:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;refresh&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+        <span class="c1"># the UPnP device that&#39;s hosting that backend, that&#39;s already done</span>
+        <span class="c1"># in the BackendStore.__init__, just left here the sake of completeness</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">server</span>
+
+        <span class="c1"># internally used to have a new id for each item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span> <span class="o">=</span> <span class="mi">1000</span>
+
+        <span class="c1"># we store the last update from the rss feed so that we know</span>
+        <span class="c1"># if we have to parse again, or not:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_updated</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># initialize our lolcats container (no parent, this is the root)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">BackendContainer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ROOT_ID</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># but as we also have to return them on &#39;get_by_id&#39;, we have our local</span>
+        <span class="c1"># store of images per id:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">images</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># we tell that if an XBox sends a request for images we&#39;ll</span>
+        <span class="c1"># map the WMC id of that request to our local one</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmc_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;16&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+        <span class="c1"># and trigger an update of the data</span>
+        <span class="n">dfr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">()</span>
+
+        <span class="c1"># So, even though the initialize is kind of done,</span>
+        <span class="c1"># Coherence does not yet announce our Media Server.</span>
+        <span class="c1"># Coherence does wait for signal send by us that we are ready now.</span>
+        <span class="c1"># And we don&#39;t want that to happen as long as we don&#39;t have succeeded</span>
+        <span class="c1"># in fetching some first data, so we delay this signaling after</span>
+        <span class="c1"># the update is done:</span>
+        <span class="k">def</span> <span class="nf">init_completed</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="c1"># by setting the following variable to value True, the event</span>
+            <span class="c1"># system will automatically emmit the corresponding event</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">def</span> <span class="nf">init_failed</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;init_failed: </span><span class="si">{args}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_init_failed</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;Error on fetching data&#39;</span><span class="p">)</span>
+
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">init_completed</span><span class="p">)</span>
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">init_failed</span><span class="p">)</span>
+
+        <span class="c1"># Now we trigger a function to update the data</span>
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue_update</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;asked for&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span>
+        <span class="c1"># what ever we are asked for,</span>
+        <span class="c1">#  we want to return the container only</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROOT_ID</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># After the signal was triggered,</span>
+        <span class="c1"># this method is called by coherence and</span>
+        <span class="c1"># from now on self.server is existing and we can do the</span>
+        <span class="c1"># necessary setup here that allows us to specify our server</span>
+        <span class="c1"># options in more detail.</span>
+
+        <span class="c1"># Here we define what kind of media content we do provide</span>
+        <span class="c1"># mostly needed to make some naughty DLNA devices behave</span>
+        <span class="c1"># will probably move into Coherence internals one day</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span>
+            <span class="p">[</span><span class="s1">&#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;&#39;</span>
+             <span class="s1">&#39;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;&#39;</span>
+             <span class="s1">&#39;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;&#39;</span>
+             <span class="s1">&#39;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;&#39;</span>
+             <span class="s1">&#39;DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;http-get:*:image/jpeg:*&#39;</span><span class="p">])</span>
+
+        <span class="c1"># and as it was done after we fetched the data the first time</span>
+        <span class="c1"># we want to take care about the server wide updates as well</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_container</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_update_container</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># we need to inform Coherence about these changes</span>
+        <span class="c1"># again this is something that will probably move</span>
+        <span class="c1"># into Coherence internals one day</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SystemUpdateID&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ROOT_ID</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">update_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ContainerUpdateIDs&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">update_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># in the loop we want to call update_data</span>
+        <span class="n">dfr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">()</span>
+        <span class="c1"># after it was done we want to take care about updating</span>
+        <span class="c1"># the container</span>
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_update_container</span><span class="p">)</span>
+        <span class="c1"># in ANY case queue an update of the data</span>
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue_update</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># trigger an update of the data</span>
+
+        <span class="c1"># fetch the rss</span>
+        <span class="n">dfr</span> <span class="o">=</span> <span class="n">getPage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rss_url</span><span class="p">)</span>
+
+        <span class="c1"># push it through our xml parser</span>
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">parse_with_lxml</span><span class="p">)</span>
+
+        <span class="c1"># then parse the data into our models</span>
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parse_data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dfr</span>
+
+    <span class="k">def</span> <span class="nf">parse_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="c1"># from there, we look for the newest update and compare it with the one</span>
+        <span class="c1"># we have saved. If they are the same, we don&#39;t need to go on:</span>
+        <span class="n">pub_date</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;./channel/lastBuildDate&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="k">if</span> <span class="n">pub_date</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_updated</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># not the case, set this as the last update and continue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_updated</span> <span class="o">=</span> <span class="n">pub_date</span>
+
+        <span class="c1"># and reset the children list of the container and the local storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">images</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">def</span> <span class="nf">iterate</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;./channel/item&#39;</span><span class="p">):</span>
+                <span class="n">lol_cat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_into_lol_cat</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">lol_cat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">yield</span> <span class="n">lol_cat</span>
+
+        <span class="c1"># we go through our entries and do something specific to the</span>
+        <span class="c1"># lolcats-rss-feed to fetch the data out of it with a task,</span>
+        <span class="c1"># which will not block our app.</span>
+        <span class="k">return</span> <span class="n">task</span><span class="o">.</span><span class="n">coiterate</span><span class="p">(</span><span class="n">iterate</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_parse_into_lol_cat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Convenient method to extract data from an item, create a LolCatsImage</span>
+<span class="sd">        instance and append this into the LolCatsContainer</span>
+
+<span class="sd">        .. versionadded:: 0.8.3</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+        <span class="c1"># Some titles contains non ascii quotes...we fix by replacing it</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;(</span><span class="se">\u2018</span><span class="s2">|</span><span class="se">\u2019</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+
+        <span class="c1"># We parse the html content of the item in order to extract</span>
+        <span class="c1"># the image link which is inside of the element parsed below</span>
+        <span class="c1"># into form of standard html, that is why we parse again.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">img_html</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+                <span class="s1">&#39;{http://purl.org/rss/1.0/modules/content/}encoded&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+            <span class="n">img_xml</span> <span class="o">=</span> <span class="n">parse_with_lxml</span><span class="p">(</span><span class="n">img_html</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Something happen when trying to find the link...</span>
+            <span class="c1"># so... we skip this item by returning None.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Error on searching lol cat image: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - parser fails on:</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">img_html</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Now gets the image tag and extract the src property</span>
+        <span class="c1"># from the parsed html block in the previous step.</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">img_xml</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;img&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># It seems that we can find the link...so...</span>
+            <span class="c1"># again we skip this item by returning None.</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Create the LolCatsImage from the info we just extracted,</span>
+        <span class="c1"># we add it into our container and we register into our</span>
+        <span class="c1"># self.images dictionary.</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">LolCatsImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ROOT_ID</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">next_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">image</span>
+
+        <span class="c1"># increase the next_id entry every time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># and increase the container update id and the system update id</span>
+        <span class="c1"># so that the clients can refresh with the new data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Finally we return the image</span>
+        <span class="k">return</span> <span class="n">image</span>
+
+    <span class="k">def</span> <span class="nf">queue_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_or_failure</span><span class="p">):</span>
+        <span class="c1"># We use the reactor to queue another updating of our data</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">error_or_failure</span><span class="p">)</span>
+        <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_loop</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-testing-the-old-way">
+<h2>The testing (the old way)<a class="headerlink" href="#the-testing-the-old-way" title="Permalink to this headline">¶</a></h2>
+<p>Now you are ready to test your media backend, to do so you can dot it
+in different ways but you can tests it directly from the backend script,
+like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="c1"># First we import some modules:</span>
+    <span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span><span class="p">,</span> <span class="n">dirname</span>
+    <span class="kn">from</span> <span class="nn">coherence.base</span> <span class="k">import</span> <span class="n">Coherence</span>
+    <span class="kn">from</span> <span class="nn">coherence.upnp.core.uuid</span> <span class="k">import</span> <span class="n">UUID</span>
+
+    <span class="c1"># Generate a unique ID for our server (optional)</span>
+    <span class="c1"># Note: this can be done by coherence directly</span>
+    <span class="n">new_uuid</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">()</span>
+
+    <span class="c1"># The path of the icon for our backend server (optional),</span>
+    <span class="c1"># and notice that this should be set as a file url</span>
+    <span class="n">icon_url</span> <span class="o">=</span> <span class="s1">&#39;file://</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;static&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="s1">&#39;coherence-icon.png&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Initialize Coherence and our server by passing the keyword plugin</span>
+    <span class="c1"># into our coherence instance with the right config:</span>
+    <span class="c1">#     - backend: Should point to your new BackendStore class</span>
+    <span class="c1">#     - name: Whatever the name you want to set to your new server</span>
+    <span class="c1">#     - uuid: Unique id to identify your server</span>
+    <span class="c1">#     - icon: The properties of your server&#39;s icon as a dict</span>
+    <span class="n">coherence</span> <span class="o">=</span> <span class="n">Coherence</span><span class="p">(</span>
+        <span class="p">{</span><span class="s1">&#39;logmode&#39;</span><span class="p">:</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;plugin&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;backend&#39;</span><span class="p">:</span> <span class="s1">&#39;LolcatsStore&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Cohen3 LolcatsStore&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;proxy&#39;</span><span class="p">:</span> <span class="s1">&#39;no&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;uuid&#39;</span><span class="p">:</span> <span class="n">new_uuid</span><span class="p">,</span>
+                    <span class="s1">&#39;icon&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;mimetype&#39;</span><span class="p">:</span> <span class="s1">&#39;image/png&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;256&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="s1">&#39;256&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="s1">&#39;24&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">icon_url</span><span class="p">}</span>
+                    <span class="p">}</span>
+         <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="c1"># initialize the main loop</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now you should be able to see your new server with a dlna/UPnP client, but you
+can check if it is working via your web browser going to your server ip at port
+8080 or use one of this (which should point to your testing machine:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="http://127.0.0.1:8080">http://127.0.0.1:8080</a></p></li>
+<li><p><a class="reference external" href="http://localhost:8080">http://localhost:8080</a></p></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="example_backend_the_new_way.html" class="btn btn-neutral float-right" title="Writing a backend (the new way)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="write_a_backend.html" class="btn btn-neutral float-left" title="Write a backend" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

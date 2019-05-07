@@ -1,0 +1,888 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.utils (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.upnp.core.uuid (module)" href="uuid.html" />
+    <link rel="prev" title="coherence.upnp.core.ssdp (module)" href="ssdp.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-core-package">coherence.upnp.core (package)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="action.html">coherence.upnp.core.action (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="device.html">coherence.upnp.core.device (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="didllite.html">coherence.upnp.core.DIDLLite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dlna.html">coherence.upnp.core.dlna (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="event.html">coherence.upnp.core.event (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="msearch.html">coherence.upnp.core.msearch (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="service.html">coherence.upnp.core.service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_lite.html">coherence.upnp.core.soap_lite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_proxy.html">coherence.upnp.core.soap_proxy (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_service.html">coherence.upnp.core.soap_service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ssdp.html">coherence.upnp.core.ssdp (module)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.upnp.core.utils (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="uuid.html">coherence.upnp.core.uuid (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="variable.html">coherence.upnp.core.variable (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xml_constants.html">coherence.upnp.core.xml_constants (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-devices-package">coherence.upnp.devices (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-package">coherence.upnp.services (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-clients-subpackage">coherence.upnp.services.clients (subpackage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-servers-subpackage">coherence.upnp.services.servers (subpackage)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.upnp.html">coherence.upnp (package)</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.utils (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/upnp/core/utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="module-coherence.upnp.core.utils">
+<span id="coherence-upnp-core-utils-module"></span><span id="upnp-core-utils"></span><h1>coherence.upnp.core.utils (module)<a class="headerlink" href="#module-coherence.upnp.core.utils" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="utils">
+<h2>Utils<a class="headerlink" href="#utils" title="Permalink to this headline">¶</a></h2>
+<p>Set of utilities to help process the data and the assets of the Cohen3 project.
+It includes several methods which covers different fields, here are grouped by
+his functionality:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>encode/decode strings:</dt><dd><ul>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.to_string" title="coherence.upnp.core.utils.to_string"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_string()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.to_bytes" title="coherence.upnp.core.utils.to_bytes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_bytes()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>parse xml/html data:</dt><dd><ul>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.parse_xml" title="coherence.upnp.core.utils.parse_xml"><code class="xref py py-meth docutils literal notranslate"><span class="pre">parse_xml()</span></code></a></p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">parse_http()</span></code></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.de_chunk_payload" title="coherence.upnp.core.utils.de_chunk_payload"><code class="xref py py-meth docutils literal notranslate"><span class="pre">de_chunk_payload()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>get ip/host:</dt><dd><ul>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.get_ip_address" title="coherence.upnp.core.utils.get_ip_address"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_ip_address()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.get_host_address" title="coherence.upnp.core.utils.get_host_address"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_host_address()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>get/download page related:</dt><dd><ul>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.getPage" title="coherence.upnp.core.utils.getPage"><code class="xref py py-meth docutils literal notranslate"><span class="pre">getPage()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.downloadPage" title="coherence.upnp.core.utils.downloadPage"><code class="xref py py-meth docutils literal notranslate"><span class="pre">downloadPage()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.myHTTPPageGetter" title="coherence.upnp.core.utils.myHTTPPageGetter"><code class="xref py py-class docutils literal notranslate"><span class="pre">myHTTPPageGetter</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.HeaderAwareHTTPClientFactory" title="coherence.upnp.core.utils.HeaderAwareHTTPClientFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">HeaderAwareHTTPClientFactory</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>proxy clients and resources:</dt><dd><ul>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.ProxyClient" title="coherence.upnp.core.utils.ProxyClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProxyClient</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.ProxyClientFactory" title="coherence.upnp.core.utils.ProxyClientFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProxyClientFactory</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.ReverseProxyResource" title="coherence.upnp.core.utils.ReverseProxyResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReverseProxyResource</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.ReverseProxyUriResource" title="coherence.upnp.core.utils.ReverseProxyUriResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReverseProxyUriResource</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>file assets:</dt><dd><ul>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">StaticFile</span></code></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.BufferFile" title="coherence.upnp.core.utils.BufferFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferFile</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.BufferFileTransfer" title="coherence.upnp.core.utils.BufferFileTransfer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BufferFileTransfer</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>date/time operations:</dt><dd><ul>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils._tz" title="coherence.upnp.core.utils._tz"><code class="xref py py-class docutils literal notranslate"><span class="pre">_tz</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils._CET" title="coherence.upnp.core.utils._CET"><code class="xref py py-class docutils literal notranslate"><span class="pre">_CET</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils._CEST" title="coherence.upnp.core.utils._CEST"><code class="xref py py-class docutils literal notranslate"><span class="pre">_CEST</span></code></a></p></li>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.datefaker" title="coherence.upnp.core.utils.datefaker"><code class="xref py py-meth docutils literal notranslate"><span class="pre">datefaker()</span></code></a></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">_bdates</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>python 2to3 compatibility methods:</dt><dd><ul>
+<li><p><a class="reference internal" href="#coherence.upnp.core.utils.cmp" title="coherence.upnp.core.utils.cmp"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cmp()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="function">
+<dt id="coherence.upnp.core.utils.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is a helper function that takes care of converting into a
+string any string or bytes string or integer. This is useful for
+decoding twisted responses into the default python 3 string encoding or
+to get a string representation of an object.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.2.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the argument passed is not of type str, bytes or int,
+it will try to get the string representation of the object.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is similar to <a class="reference internal" href="#coherence.upnp.core.utils.to_bytes" title="coherence.upnp.core.utils.to_bytes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_bytes()</span></code></a>
+but with the difference that the returned result it will be
+always a string.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.to_bytes">
+<code class="descname">to_bytes</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#to_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.to_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is a helper function that takes care of converting a string
+or string of bytes into bytes, needed for most of the write operations for
+twisted responses. It is useful when we don’t know the type of the
+processed string.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.2.</span></p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.8.3: </span>Errors will be bypassed with a warning</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the argument passed is not of type str or bytes, it will be
+converted to his string representation and then it will be
+converted into bytes.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If, while encoding, some error is encountered, it will be
+bypassed and user will be notified with a log warning. The
+conflicting character will be replaced for the symbol “?”
+(U+FFFD)</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.means_true">
+<code class="descname">means_true</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#means_true"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.means_true" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform a value representing a boolean into a boolean.</p>
+<dl class="simple">
+<dt>The valid expressions are:</dt><dd><ul class="simple">
+<li><p>True or ‘True’</p></li>
+<li><p>1 or ‘1’</p></li>
+<li><p>‘yes’ or ‘ok’</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>the string expressions are not case sensitive</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.generalise_boolean">
+<code class="descname">generalise_boolean</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#generalise_boolean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.generalise_boolean" title="Permalink to this definition">¶</a></dt>
+<dd><p>standardize the different boolean incarnations</p>
+<p>transform anything that looks like a ‘True’ into a ‘1’,
+and everything else into a ‘0’</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.generalize_boolean">
+<code class="descname">generalize_boolean</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#coherence.upnp.core.utils.generalize_boolean" title="Permalink to this definition">¶</a></dt>
+<dd><p>standardize the different boolean incarnations</p>
+<p>transform anything that looks like a ‘True’ into a ‘1’,
+and everything else into a ‘0’</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.parse_xml">
+<code class="descname">parse_xml</code><span class="sig-paren">(</span><em>data</em>, <em>encoding='utf-8'</em>, <em>dump_invalid_data=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#parse_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.parse_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an xml string and returns an XML element hierarchy</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.parse_with_lxml">
+<code class="descname">parse_with_lxml</code><span class="sig-paren">(</span><em>data</em>, <em>encoding='utf-8'</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#parse_with_lxml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.parse_with_lxml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes an xml string or a response as argument and returns a root tree.
+This method is similar to <a class="reference internal" href="#coherence.upnp.core.utils.parse_xml" title="coherence.upnp.core.utils.parse_xml"><code class="xref py py-meth docutils literal notranslate"><span class="pre">parse_xml()</span></code></a> but
+here we use the lxml module and a custom parser method to return an
+lxml’s ElementTree object.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This parser allow us to parse successfully some responses which
+contain encoding defined (ex: soap messages) and also has the
+ability to parse a broken xml. This method could be useful to
+parse some small pieces of html code into an xml tree in order
+to extract some info.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.parse_http_response">
+<code class="descname">parse_http_response</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#parse_http_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.parse_http_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a response as argument and returns a tuple: cmd, headers</p>
+<p>The first value of the tuple (cmd) will contain the server response and
+the second one the headers.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>don’t try to get the body, there are responses without</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.get_ip_address">
+<code class="descname">get_ip_address</code><span class="sig-paren">(</span><em>ifname</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#get_ip_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.get_ip_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the IP address by interface name</p>
+<p><a class="reference external" href="http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/439094">http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/439094</a>
+(c) Paul Cannon
+Uses the Linux SIOCGIFADDR ioctl to find the IP address associated
+with a network interface, given the name of that interface, e.g. “eth0”.
+The address is returned as a string containing a dotted quad.</p>
+<p>Updated to work on BSD. OpenBSD and OSX share the same value for
+SIOCGIFADDR, and its likely that other BSDs do too.</p>
+<p>Updated to work on Windows,
+using the optional Python module netifaces
+<a class="reference external" href="http://alastairs-place.net/netifaces/">http://alastairs-place.net/netifaces/</a></p>
+<p>Thx Lawrence for that patch!</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.get_host_address">
+<code class="descname">get_host_address</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#get_host_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.get_host_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>try to get determine the interface used for
+the default route, as this is most likely
+the interface we should bind to (on a single homed host!)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.de_chunk_payload">
+<code class="descname">de_chunk_payload</code><span class="sig-paren">(</span><em>response</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#de_chunk_payload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.de_chunk_payload" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils.Request">
+<em class="property">class </em><code class="descname">Request</code><span class="sig-paren">(</span><em>*args</em>, <em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#Request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.Request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.server.Request</span></code></p>
+<p>Custom implementation of twisted.web.server.Request which takes care of
+process data for our needs.</p>
+<dl class="method">
+<dt id="coherence.upnp.core.utils.Request.process">
+<code class="descname">process</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#Request.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.Request.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a request.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils.Site">
+<em class="property">class </em><code class="descname">Site</code><span class="sig-paren">(</span><em>resource</em>, <em>requestFactory=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#Site"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.Site" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.server.Site</span></code></p>
+<p>Custom implementation of <code class="xref py py-obj docutils literal notranslate"><span class="pre">twisted.web.server.Site</span></code></p>
+<dl class="simple">
+<dt>&#64;param resource: The root of the resource hierarchy.  All request</dt><dd><p>traversal for requests received by this factory will begin at this
+resource.</p>
+</dd>
+</dl>
+<p>&#64;type resource: L{IResource} provider
+&#64;param requestFactory: Overwrite for default requestFactory.
+&#64;type requestFactory: C{callable} or C{class}.</p>
+<p>&#64;see: L{twisted.web.http.HTTPFactory.__init__}</p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils.Site.noisy">
+<code class="descname">noisy</code><em class="property"> = False</em><a class="headerlink" href="#coherence.upnp.core.utils.Site.noisy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils.Site.requestFactory">
+<code class="descname">requestFactory</code><a class="headerlink" href="#coherence.upnp.core.utils.Site.requestFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#coherence.upnp.core.utils.Request" title="coherence.upnp.core.utils.Request"><code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.Site.startFactory">
+<code class="descname">startFactory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#Site.startFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.Site.startFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up request logging if necessary.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils.ProxyClient">
+<em class="property">class </em><code class="descname">ProxyClient</code><span class="sig-paren">(</span><em>command</em>, <em>rest</em>, <em>version</em>, <em>headers</em>, <em>data</em>, <em>father</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ProxyClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ProxyClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.proxy.ProxyClient</span></code>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="method">
+<dt id="coherence.upnp.core.utils.ProxyClient.handleStatus">
+<code class="descname">handleStatus</code><span class="sig-paren">(</span><em>version</em>, <em>code</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ProxyClient.handleStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ProxyClient.handleStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the status-line is received.</p>
+<p>&#64;param version: e.g. ‘HTTP/1.0’
+&#64;param status: e.g. ‘200’
+&#64;type status: C{bytes}
+&#64;param message: e.g. ‘OK’</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.ProxyClient.handleHeader">
+<code class="descname">handleHeader</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ProxyClient.handleHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ProxyClient.handleHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called every time a header is received.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.ProxyClient.handleResponsePart">
+<code class="descname">handleResponsePart</code><span class="sig-paren">(</span><em>buffer</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ProxyClient.handleResponsePart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ProxyClient.handleResponsePart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils.ProxyClientFactory">
+<em class="property">class </em><code class="descname">ProxyClientFactory</code><span class="sig-paren">(</span><em>command</em>, <em>rest</em>, <em>version</em>, <em>headers</em>, <em>data</em>, <em>father</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ProxyClientFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ProxyClientFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.proxy.ProxyClientFactory</span></code></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils.ProxyClientFactory.protocol">
+<code class="descname">protocol</code><a class="headerlink" href="#coherence.upnp.core.utils.ProxyClientFactory.protocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.proxy.ProxyClient</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils.ReverseProxyResource">
+<em class="property">class </em><code class="descname">ReverseProxyResource</code><span class="sig-paren">(</span><em>host</em>, <em>port</em>, <em>path</em>, <em>reactor=&lt;twisted.internet.epollreactor.EPollReactor object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ReverseProxyResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ReverseProxyResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.proxy.ReverseProxyResource</span></code></p>
+<p>Resource that renders the results gotten from another server.</p>
+<p>Put this resource in the tree to cause everything below it to be relayed
+to a different server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the host of the web server to proxy.</p></li>
+<li><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the port of the web server to proxy.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the base path to fetch data from. Note that you shouldn’t
+put any trailing slashes in it, it will be added
+automatically in request. For example, if you put
+B{/foo}, a request on B{/bar} will be proxied to
+B{/foo/bar}.</p></li>
+<li><p><strong>reactor</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">twisted.internet.interfaces.IReactorTCP</span></code>) – the reactor used to create connections.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils.ReverseProxyResource.proxyClientFactoryClass">
+<code class="descname">proxyClientFactoryClass</code><a class="headerlink" href="#coherence.upnp.core.utils.ReverseProxyResource.proxyClientFactoryClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>proxyClientFactoryClass (<code class="xref py py-obj docutils literal notranslate"><span class="pre">twisted.web.proxy.ProxyClientFactory</span></code>):
+a proxy client factory class, used to create new connections.</p>
+<p>alias of <a class="reference internal" href="#coherence.upnp.core.utils.ProxyClientFactory" title="coherence.upnp.core.utils.ProxyClientFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProxyClientFactory</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.ReverseProxyResource.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>host</em>, <em>port</em>, <em>path</em>, <em>reactor=&lt;twisted.internet.epollreactor.EPollReactor object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ReverseProxyResource.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ReverseProxyResource.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the host of the web server to proxy.</p></li>
+<li><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the port of the web server to proxy.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – the base path to fetch data from. Note that you shouldn’t
+put any trailing slashes in it, it will be added
+automatically in request. For example, if you put
+B{/foo}, a request on B{/bar} will be proxied to
+B{/foo/bar}.</p></li>
+<li><p><strong>reactor</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">twisted.internet.interfaces.IReactorTCP</span></code>) – the reactor used to create connections.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.ReverseProxyResource.getChild">
+<code class="descname">getChild</code><span class="sig-paren">(</span><em>path</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ReverseProxyResource.getChild"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ReverseProxyResource.getChild" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and return a proxy resource with the same proxy configuration
+as this one, except that its path also contains the segment given by
+C{path} at the end.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.ReverseProxyResource.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ReverseProxyResource.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ReverseProxyResource.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a request by forwarding it to the proxied server.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.ReverseProxyResource.resetTarget">
+<code class="descname">resetTarget</code><span class="sig-paren">(</span><em>host</em>, <em>port</em>, <em>path</em>, <em>qs=''</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ReverseProxyResource.resetTarget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ReverseProxyResource.resetTarget" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils.ReverseProxyUriResource">
+<em class="property">class </em><code class="descname">ReverseProxyUriResource</code><span class="sig-paren">(</span><em>uri</em>, <em>reactor=&lt;twisted.internet.epollreactor.EPollReactor object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ReverseProxyUriResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ReverseProxyUriResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.utils.ReverseProxyResource" title="coherence.upnp.core.utils.ReverseProxyResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.utils.ReverseProxyResource</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils.ReverseProxyUriResource.uri">
+<code class="descname">uri</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.utils.ReverseProxyUriResource.uri" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.ReverseProxyUriResource.resetUri">
+<code class="descname">resetUri</code><span class="sig-paren">(</span><em>uri</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#ReverseProxyUriResource.resetUri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.ReverseProxyUriResource.resetUri" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils.myHTTPPageGetter">
+<em class="property">class </em><code class="descname">myHTTPPageGetter</code><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#myHTTPPageGetter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.myHTTPPageGetter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.client.HTTPPageGetter</span></code></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils.myHTTPPageGetter.followRedirect">
+<code class="descname">followRedirect</code><em class="property"> = True</em><a class="headerlink" href="#coherence.upnp.core.utils.myHTTPPageGetter.followRedirect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils.HeaderAwareHTTPClientFactory">
+<em class="property">class </em><code class="descname">HeaderAwareHTTPClientFactory</code><span class="sig-paren">(</span><em>url</em>, <em>method=b'GET'</em>, <em>postdata=None</em>, <em>headers=None</em>, <em>agent=b'Twisted PageGetter'</em>, <em>timeout=0</em>, <em>cookies=None</em>, <em>followRedirect=True</em>, <em>redirectLimit=20</em>, <em>afterFoundGet=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#HeaderAwareHTTPClientFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.HeaderAwareHTTPClientFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.client.HTTPClientFactory</span></code></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils.HeaderAwareHTTPClientFactory.protocol">
+<code class="descname">protocol</code><a class="headerlink" href="#coherence.upnp.core.utils.HeaderAwareHTTPClientFactory.protocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#coherence.upnp.core.utils.myHTTPPageGetter" title="coherence.upnp.core.utils.myHTTPPageGetter"><code class="xref py py-class docutils literal notranslate"><span class="pre">myHTTPPageGetter</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils.HeaderAwareHTTPClientFactory.noisy">
+<code class="descname">noisy</code><em class="property"> = False</em><a class="headerlink" href="#coherence.upnp.core.utils.HeaderAwareHTTPClientFactory.noisy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.HeaderAwareHTTPClientFactory.buildProtocol">
+<code class="descname">buildProtocol</code><span class="sig-paren">(</span><em>addr</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#HeaderAwareHTTPClientFactory.buildProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.HeaderAwareHTTPClientFactory.buildProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an instance of a subclass of Protocol.</p>
+<p>The returned instance will handle input on an incoming server
+connection, and an attribute “factory” pointing to the creating
+factory.</p>
+<p>Alternatively, L{None} may be returned to immediately close the
+new connection.</p>
+<p>Override this method to alter how Protocol instances get created.</p>
+<p>&#64;param addr: an object implementing L{twisted.internet.interfaces.IAddress}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.HeaderAwareHTTPClientFactory.page">
+<code class="descname">page</code><span class="sig-paren">(</span><em>page</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#HeaderAwareHTTPClientFactory.page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.HeaderAwareHTTPClientFactory.page" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.getPage">
+<code class="descname">getPage</code><span class="sig-paren">(</span><em>url</em>, <em>contextFactory=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#getPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.getPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a web page as a string.</p>
+<p>Download a page. Return a deferred, which will callback with a
+page (as a string) or errback with a description of the error.</p>
+<p>See <code class="xref py py-obj docutils literal notranslate"><span class="pre">twisted.web.client.HTTPClientFactory</span></code> to see what extra args
+can be passed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is like <cite>twisted.web.client.getPage</cite>, except it
+uses our HeaderAwareHTTPClientFactory instead of
+HTTPClientFactory and sets the user agent.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.downloadPage">
+<code class="descname">downloadPage</code><span class="sig-paren">(</span><em>url</em>, <em>file</em>, <em>contextFactory=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#downloadPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.downloadPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a web page to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a>) – target url to download.</p></li>
+<li><p><strong>file</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><em>file-like object</em>) – path to file on filesystem, or a
+file-like object.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See <cite>twisted.web.client.HTTPDownloader</cite> to see what extra args
+can be passed.</p>
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils.BufferFile">
+<em class="property">class </em><code class="descname">BufferFile</code><span class="sig-paren">(</span><em>path</em>, <em>target_size=0</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#BufferFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.BufferFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.static.File</span></code></p>
+<p>Custom implementation of <cite>twisted.web.static.File</cite> and modified accordingly
+to the patch by John-Mark Gurney (
+<a class="reference external" href="http://resnet.uoregon.edu/~gurney_j/jmpc/dist/twisted.web.static.patch">http://resnet.uoregon.edu/~gurney_j/jmpc/dist/twisted.web.static.patch</a>)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See <cite>twisted.web.static.File</cite> to see what extra args can be
+passed.</p>
+</div>
+<dl class="method">
+<dt id="coherence.upnp.core.utils.BufferFile.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#BufferFile.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.BufferFile.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a given resource. See L{IResource}’s render method.</p>
+<p>I delegate to methods of self with the form ‘render_METHOD’
+where METHOD is the HTTP that was used to make the
+request. Examples: render_GET, render_HEAD, render_POST, and
+so on. Generally you should implement those methods instead of
+overriding this one.</p>
+<p>render_METHOD methods are expected to return a byte string which will be
+the rendered page, unless the return value is C{server.NOT_DONE_YET}, in
+which case it is this class’s responsibility to write the results using
+C{request.write(data)} and then call C{request.finish()}.</p>
+<p>Old code that overrides render() directly is likewise expected
+to return a byte string or NOT_DONE_YET.</p>
+<p>&#64;see: L{IResource.render}</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils.BufferFileTransfer">
+<em class="property">class </em><code class="descname">BufferFileTransfer</code><span class="sig-paren">(</span><em>file</em>, <em>size</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#BufferFileTransfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.BufferFileTransfer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A class to represent the transfer of a file over the network.</p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils.BufferFileTransfer.request">
+<code class="descname">request</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.utils.BufferFileTransfer.request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.BufferFileTransfer.resumeProducing">
+<code class="descname">resumeProducing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#BufferFileTransfer.resumeProducing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.BufferFileTransfer.resumeProducing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.BufferFileTransfer.pauseProducing">
+<code class="descname">pauseProducing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#BufferFileTransfer.pauseProducing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.BufferFileTransfer.pauseProducing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils.BufferFileTransfer.stopProducing">
+<code class="descname">stopProducing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#BufferFileTransfer.stopProducing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.BufferFileTransfer.stopProducing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils._tz">
+<em class="property">class </em><code class="descname">_tz</code><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#_tz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils._tz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.tzinfo</span></code></a></p>
+<p>Custom base class for time zone info classes.</p>
+<dl class="method">
+<dt id="coherence.upnp.core.utils._tz.utcoffset">
+<code class="descname">utcoffset</code><span class="sig-paren">(</span><em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#_tz.utcoffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils._tz.utcoffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>datetime -&gt; timedelta showing offset from UTC, negative values indicating West of UTC</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils._tz.tzname">
+<code class="descname">tzname</code><span class="sig-paren">(</span><em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#_tz.tzname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils._tz.tzname" title="Permalink to this definition">¶</a></dt>
+<dd><p>datetime -&gt; string name of time zone.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.utils._tz.dst">
+<code class="descname">dst</code><span class="sig-paren">(</span><em>dt</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#_tz.dst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils._tz.dst" title="Permalink to this definition">¶</a></dt>
+<dd><p>datetime -&gt; DST offset in minutes east of UTC.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils._CET">
+<em class="property">class </em><code class="descname">_CET</code><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#_CET"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils._CET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.utils._tz" title="coherence.upnp.core.utils._tz"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.utils._tz</span></code></a></p>
+<p>Custom class for time zone representing Central European Time.</p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils._CET._offset">
+<code class="descname">_offset</code><em class="property"> = datetime.timedelta(0, 3600)</em><a class="headerlink" href="#coherence.upnp.core.utils._CET._offset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils._CET._name">
+<code class="descname">_name</code><em class="property"> = 'CET'</em><a class="headerlink" href="#coherence.upnp.core.utils._CET._name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.utils._CEST">
+<em class="property">class </em><code class="descname">_CEST</code><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#_CEST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils._CEST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.utils._tz" title="coherence.upnp.core.utils._tz"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.utils._tz</span></code></a></p>
+<p>Custom class for time zone representing Central European Summer Time.</p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils._CEST._offset">
+<code class="descname">_offset</code><em class="property"> = datetime.timedelta(0, 7200)</em><a class="headerlink" href="#coherence.upnp.core.utils._CEST._offset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.utils._CEST._name">
+<code class="descname">_name</code><em class="property"> = 'CEST'</em><a class="headerlink" href="#coherence.upnp.core.utils._CEST._name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.datefaker">
+<code class="descname">datefaker</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#datefaker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.datefaker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Choose a random datetime from <code class="xref py py-attr docutils literal notranslate"><span class="pre">_bdates</span></code></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Used inside class <a class="reference internal" href="didllite.html#coherence.upnp.core.DIDLLite.Object" title="coherence.upnp.core.DIDLLite.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a>,
+method <a class="reference internal" href="didllite.html#coherence.upnp.core.DIDLLite.Object.toElement" title="coherence.upnp.core.DIDLLite.Object.toElement"><code class="xref py py-meth docutils literal notranslate"><span class="pre">toElement()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.utils.cmp">
+<code class="descname">cmp</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/utils.html#cmp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.utils.cmp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replacement for built-in function cmp that was removed in Python 3</p>
+<p>Compare the two objects x and y and return an integer according to
+the outcome. The return value is negative if x &lt; y, zero if x == y
+and strictly positive if x &gt; y.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – An object</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Another object to compare with x</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="uuid.html" class="btn btn-neutral float-right" title="coherence.upnp.core.uuid (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ssdp.html" class="btn btn-neutral float-left" title="coherence.upnp.core.ssdp (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

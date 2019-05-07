@@ -1,0 +1,859 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.youtube_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.youtube_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.youtube_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2009, Jean-Michel Sizun</span>
+<span class="c1"># Copyright 2009 Frank Scholz &lt;coherence@beebits.net&gt;</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">from</span> <span class="nn">gdata.youtube.service</span> <span class="k">import</span> <span class="n">YouTubeService</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span><span class="p">,</span> <span class="n">threads</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">server</span>
+<span class="kn">from</span> <span class="nn">twisted.web.error</span> <span class="k">import</span> <span class="n">PageRedirect</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendItem</span>
+<span class="kn">from</span> <span class="nn">coherence.backends.picasa_storage</span> <span class="k">import</span> <span class="n">Container</span><span class="p">,</span> <span class="n">LazyContainer</span><span class="p">,</span> \
+    <span class="n">AbstractBackendStore</span>
+<span class="kn">from</span> <span class="nn">coherence.extern.youtubedl</span> <span class="k">import</span> <span class="n">FileDownloader</span><span class="p">,</span> <span class="n">YoutubeIE</span><span class="p">,</span> <span class="n">MetacafeIE</span><span class="p">,</span> \
+    <span class="n">YoutubePlaylistIE</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">ReverseProxyUriResource</span><span class="p">,</span> \
+    <span class="n">ReverseProxyResource</span>
+
+<span class="n">MPEG4_MIMETYPE</span> <span class="o">=</span> <span class="s1">&#39;video/mp4&#39;</span>
+<span class="n">MPEG4_EXTENSION</span> <span class="o">=</span> <span class="s1">&#39;mp4&#39;</span>
+
+
+<div class="viewcode-block" id="TestVideoProxy"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy">[docs]</a><span class="k">class</span> <span class="nc">TestVideoProxy</span><span class="p">(</span><span class="n">ReverseProxyUriResource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;internetVideoProxy&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span>
+                 <span class="n">proxy_mode</span><span class="p">,</span>
+                 <span class="n">cache_directory</span><span class="p">,</span>
+                 <span class="n">cache_maxsize</span><span class="o">=</span><span class="mi">100000000</span><span class="p">,</span>
+                 <span class="n">buffer_size</span><span class="o">=</span><span class="mi">2000000</span><span class="p">,</span>
+                 <span class="n">fct</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">ReverseProxyUriResource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.id:d}</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy_mode</span> <span class="o">=</span> <span class="n">proxy_mode</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_directory</span> <span class="o">=</span> <span class="n">cache_directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_maxsize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cache_maxsize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">buffer_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">downloader</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_url</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># the url we get from the youtube page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># the real video stream, cached somewhere</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">filesize</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_in_cache</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">url_extractor_fct</span> <span class="o">=</span> <span class="n">fct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url_extractor_params</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+<div class="viewcode-block" id="TestVideoProxy.requestFinished"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy.requestFinished">[docs]</a>    <span class="k">def</span> <span class="nf">requestFinished</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; self.connection is set in utils.ReverseProxyResource.render &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ProxyStream requestFinished: </span><span class="si">{result}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">loseConnection</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TestVideoProxy.render"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;VideoProxy render </span><span class="si">{request}</span><span class="s1"> </span><span class="si">{self.stream_url}</span><span class="s1"> </span><span class="si">{self.video_url}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;VideoProxy headers: {request.getAllHeaders()}&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;VideoProxy id: </span><span class="si">{self.id}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="n">web_url</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;http://</span><span class="si">{self.host}{self.path}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Web_url: </span><span class="si">{web_url}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">got_real_urls</span><span class="p">(</span><span class="n">real_urls</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">real_urls</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Unable to retrieve any URL for video stream&#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">got_real_url</span><span class="p">(</span><span class="n">real_urls</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">def</span> <span class="nf">got_real_url</span><span class="p">(</span><span class="n">real_url</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Real URL is </span><span class="si">{real_url}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="o">=</span> <span class="n">real_url</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s1">&#39;Unable to retrieve URL - inconsistent web page&#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># FIXME</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;strict&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resetUri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Video URL: </span><span class="si">{self.stream_url}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">video_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="p">[:]</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">followRedirects</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">proxyURL</span><span class="p">)</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_extractor_fct</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_extractor_fct</span><span class="p">(</span>
+                    <span class="n">web_url</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">url_extractor_params</span><span class="p">)</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">got_real_urls</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">got_real_url</span><span class="p">(</span><span class="n">web_url</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span>
+
+        <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxyURL</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span></div>
+
+<div class="viewcode-block" id="TestVideoProxy.followRedirects"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy.followRedirects">[docs]</a>    <span class="k">def</span> <span class="nf">followRedirects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;HTTP redirect  </span><span class="si">{request}</span><span class="s1"> </span><span class="si">{self.stream_url}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="n">followRedirect</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotHeader</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;finally got something </span><span class="si">{header}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="c1"># FIXME what do we do here if the headers aren&#39;t there?</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filesize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;content-length&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">request</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+            <span class="c1"># error should be a &#39;Failure&#39; instance at this point</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;gotError </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+            <span class="n">error_value</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error_value</span><span class="p">,</span> <span class="n">PageRedirect</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;got PageRedirect </span><span class="si">{error_value.location}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="o">=</span> <span class="n">error_value</span><span class="o">.</span><span class="n">location</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resetUri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">followRedirects</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Error while retrieving page header &#39;</span>
+                             <span class="n">f</span><span class="s1">&#39;for URI  </span><span class="si">{self.stream_url}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">error</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">gotHeader</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">gotError</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="TestVideoProxy.proxyURL"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy.proxyURL">[docs]</a>    <span class="k">def</span> <span class="nf">proxyURL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;proxy_mode: </span><span class="si">{self.proxy_mode}</span><span class="s1">, request </span><span class="si">{request.method}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy_mode</span> <span class="o">==</span> <span class="s1">&#39;redirect&#39;</span><span class="p">:</span>
+            <span class="c1"># send stream url to client for redirection</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="p">)</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy_mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;proxy&#39;</span><span class="p">,):</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">ReverseProxyResource</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">res</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy_mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;buffer&#39;</span><span class="p">,</span> <span class="s1">&#39;buffered&#39;</span><span class="p">):</span>
+            <span class="c1"># download stream to cache,</span>
+            <span class="c1"># and send it to the client in // after X bytes</span>
+            <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_directory</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+            <span class="n">file_is_already_available</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">filesize</span><span class="p">):</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderFile</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">res</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">downloadFile</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="nb">range</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">getHeader</span><span class="p">(</span><span class="s1">&#39;range&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">bytesrange</span> <span class="o">=</span> <span class="nb">range</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+                        <span class="k">assert</span> <span class="n">bytesrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;bytes&#39;</span><span class="p">,</span> \
+                            <span class="s1">&#39;Syntactically invalid http range header!&#39;</span>
+                        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">bytesrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="c1"># print(&#39;%r %r&#39; %(start,end))</span>
+                        <span class="k">if</span> <span class="n">start</span><span class="p">:</span>
+                            <span class="n">start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">end</span><span class="p">:</span>
+                                <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filesize</span> <span class="o">-</span> <span class="mi">1</span>
+                            <span class="c1"># Are we requesting something</span>
+                            <span class="c1"># beyond the current size of the file?</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                                <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+                            <span class="k">if</span> <span class="p">(</span><span class="n">start</span> <span class="o">&gt;=</span> <span class="n">size</span> <span class="ow">and</span>
+                                    <span class="n">end</span> <span class="o">+</span> <span class="mi">10</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">filesize</span> <span class="ow">and</span>
+                                    <span class="n">end</span> <span class="o">-</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">200000</span><span class="p">):</span>
+                                <span class="c1"># print &#39;let&#39;s hand that through,</span>
+                                <span class="c1"># it is probably a mp4 index request&#39;</span>
+                                <span class="n">res</span> <span class="o">=</span> <span class="n">ReverseProxyResource</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                                    <span class="k">return</span> <span class="n">res</span>
+                                <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                                <span class="k">return</span>
+
+                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderBufferFile</span><span class="p">(</span>
+                    <span class="n">request</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer_size</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">:</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unsupported Proxy Mode: </span><span class="si">{self.proxy_mode}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestVideoProxy.getMimetype"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy.getMimetype">[docs]</a>    <span class="k">def</span> <span class="nf">getMimetype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="n">MPEG4_MIMETYPE</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span>
+        <span class="k">return</span> <span class="nb">type</span></div>
+
+<div class="viewcode-block" id="TestVideoProxy.renderFile"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy.renderFile">[docs]</a>    <span class="k">def</span> <span class="nf">renderFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Cache file available </span><span class="si">{request}</span><span class="s1"> </span><span class="si">{filepath}</span><span class="s1"> &#39;</span><span class="p">)</span>
+        <span class="n">downloadedFile</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">StaticFile</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span><span class="p">)</span>
+        <span class="n">downloadedFile</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMimetype</span><span class="p">()</span>
+        <span class="n">downloadedFile</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">downloadedFile</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestVideoProxy.renderBufferFile"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy.renderBufferFile">[docs]</a>    <span class="k">def</span> <span class="nf">renderBufferFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">):</span>
+        <span class="c1"># Try to render file(if we have enough data)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;renderBufferFile </span><span class="si">{filepath}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">rendering</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">filesize</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">filesize</span> <span class="o">&gt;=</span> <span class="n">buffer_size</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">filesize</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">filesize</span><span class="p">):</span>
+                <span class="n">rendering</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Render file </span><span class="si">{filepath}</span><span class="s1"> </span><span class="si">{self.filesize}</span><span class="s1"> &#39;</span>
+                          <span class="n">f</span><span class="s1">&#39;</span><span class="si">{filesize}</span><span class="s1"> </span><span class="si">{buffer_size}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">bufferFile</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">BufferFile</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filesize</span><span class="p">,</span>
+                                              <span class="n">MPEG4_MIMETYPE</span><span class="p">)</span>
+                <span class="n">bufferFile</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMimetype</span><span class="p">()</span>
+                <span class="n">bufferFile</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">bufferFile</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Will retry later to render buffer file&#39;</span><span class="p">)</span>
+            <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderBufferFile</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span>
+                              <span class="n">buffer_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="TestVideoProxy.downloadFinished"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy.downloadFinished">[docs]</a>    <span class="k">def</span> <span class="nf">downloadFinished</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Download finished!&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">downloader</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TestVideoProxy.gotDownloadError"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy.gotDownloadError">[docs]</a>    <span class="k">def</span> <span class="nf">gotDownloadError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to download stream to file: </span><span class="si">{self.stream_url}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestVideoProxy.downloadFile"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy.downloadFile">[docs]</a>    <span class="k">def</span> <span class="nf">downloadFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">downloader</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Proxy: download data to cache file </span><span class="si">{filepath}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkCacheSize</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">downloader</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">downloadPage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span>
+                                                 <span class="n">supportPartial</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">downloadFinished</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gotDownloadError</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">downloader</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">downloader</span></div>
+
+<div class="viewcode-block" id="TestVideoProxy.checkCacheSize"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.TestVideoProxy.checkCacheSize">[docs]</a>    <span class="k">def</span> <span class="nf">checkCacheSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cache_listdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_directory</span><span class="p">)</span>
+
+        <span class="n">cache_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">cache_listdir</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.cache_directory}{os.sep}{filename}</span><span class="s1">&#39;</span>
+            <span class="n">statinfo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">cache_size</span> <span class="o">+=</span> <span class="n">statinfo</span><span class="o">.</span><span class="n">st_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Cache size: </span><span class="si">{cache_size:d}</span><span class="s1"> (max is </span><span class="si">{self.cache_maxsize}</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">cache_size</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_maxsize</span><span class="p">:</span>
+            <span class="n">cache_targetsize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_maxsize</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;Cache above max size: Reducing to </span><span class="si">{cache_targetsize:d}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">compare_atime</span><span class="p">(</span><span class="n">filename1</span><span class="p">,</span> <span class="n">filename2</span><span class="p">):</span>
+                <span class="n">path1</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.cache_directory}{os.sep}{filename1}</span><span class="s1">&#39;</span>
+                <span class="n">path2</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.cache_directory}{os.sep}{filename2}</span><span class="s1">&#39;</span>
+                <span class="nb">cmp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path1</span><span class="p">)</span><span class="o">.</span><span class="n">st_atime</span> <span class="o">-</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path2</span><span class="p">)</span><span class="o">.</span><span class="n">st_atime</span><span class="p">)</span>
+                <span class="k">return</span> <span class="nb">cmp</span>
+
+            <span class="n">cache_listdir</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cache_listdir</span><span class="p">,</span> <span class="n">compare_atime</span><span class="p">)</span>
+
+            <span class="k">while</span> <span class="n">cache_size</span> <span class="o">&gt;</span> <span class="n">cache_targetsize</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">cache_listdir</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.cache_directory}{os.sep}{filename}</span><span class="s1">&#39;</span>
+                <span class="n">cache_size</span> <span class="o">-=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;removed </span><span class="si">{filename}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;new cache size is </span><span class="si">{cache_size:d}</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="YoutubeVideoItem"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YoutubeVideoItem">[docs]</a><span class="k">class</span> <span class="nc">YoutubeVideoItem</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">external_id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">store</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_id</span> <span class="o">=</span> <span class="n">external_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">mimetype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">youtube_entry</span> <span class="o">=</span> <span class="n">entry</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+
+        <span class="k">def</span> <span class="nf">extractDataURL</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">quality</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">quality</span> <span class="o">==</span> <span class="s1">&#39;hd&#39;</span><span class="p">:</span>
+                <span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;22&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;18&#39;</span>
+
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;usenetrc&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;quiet&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;forceurl&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;forcetitle&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;simulate&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="nb">format</span><span class="p">,</span>
+                <span class="s1">&#39;outtmpl&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%(id)s</span><span class="s1">.</span><span class="si">%(ext)s</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ignoreerrors&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;ratelimit&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">login</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">login</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">password</span>
+            <span class="n">fd</span> <span class="o">=</span> <span class="n">FileDownloader</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="n">youtube_ie</span> <span class="o">=</span> <span class="n">YoutubeIE</span><span class="p">()</span>
+            <span class="n">fd</span><span class="o">.</span><span class="n">add_info_extractor</span><span class="p">(</span><span class="n">YoutubePlaylistIE</span><span class="p">(</span><span class="n">youtube_ie</span><span class="p">))</span>
+            <span class="n">fd</span><span class="o">.</span><span class="n">add_info_extractor</span><span class="p">(</span><span class="n">MetacafeIE</span><span class="p">(</span><span class="n">youtube_ie</span><span class="p">))</span>
+            <span class="n">fd</span><span class="o">.</span><span class="n">add_info_extractor</span><span class="p">(</span><span class="n">youtube_ie</span><span class="p">)</span>
+
+            <span class="n">deferred</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">get_real_urls</span><span class="p">([</span><span class="n">url</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">deferred</span>
+
+        <span class="c1"># self.location = VideoProxy(</span>
+        <span class="c1">#     url, self.external_id,</span>
+        <span class="c1">#     store.proxy_mode,</span>
+        <span class="c1">#     store.cache_directory, store.cache_maxsize, store.buffer_size,</span>
+        <span class="c1">#     extractDataURL, quality=self.store.quality)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">TestVideoProxy</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_id</span><span class="p">,</span>
+            <span class="n">store</span><span class="o">.</span><span class="n">proxy_mode</span><span class="p">,</span>
+            <span class="n">store</span><span class="o">.</span><span class="n">cache_directory</span><span class="p">,</span>
+            <span class="n">store</span><span class="o">.</span><span class="n">cache_maxsize</span><span class="p">,</span> <span class="n">store</span><span class="o">.</span><span class="n">buffer_size</span><span class="p">,</span>
+            <span class="n">extractDataURL</span><span class="p">,</span>
+            <span class="n">quality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">quality</span><span class="p">)</span>
+
+<div class="viewcode-block" id="YoutubeVideoItem.get_item"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YoutubeVideoItem.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upnp_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="n">upnp_parent_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">VideoItem</span><span class="p">(</span><span class="n">upnp_id</span><span class="p">,</span> <span class="n">upnp_parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
+
+            <span class="c1"># extract thumbnail from youtube entry</span>
+            <span class="c1"># we take the last one, hoping this is the bigger one</span>
+            <span class="n">thumbnail_url</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">youtube_entry</span><span class="o">.</span><span class="n">media</span><span class="o">.</span><span class="n">thumbnail</span><span class="p">:</span>
+                <span class="n">thumbnail_url</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">url</span>
+            <span class="k">if</span> <span class="n">thumbnail_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span> <span class="o">=</span> <span class="n">thumbnail_url</span>
+
+            <span class="n">res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{self.mimetype}</span><span class="s1">:*&#39;</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="YoutubeVideoItem.get_path"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YoutubeVideoItem.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">MPEG4_EXTENSION</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span></div>
+
+<div class="viewcode-block" id="YoutubeVideoItem.get_id"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YoutubeVideoItem.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span></div></div>
+
+
+<div class="viewcode-block" id="YouTubeStore"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YouTubeStore">[docs]</a><span class="k">class</span> <span class="nc">YouTubeStore</span><span class="p">(</span><span class="n">AbstractBackendStore</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;youtube_store&#39;</span>
+
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;Youtube&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;connects to the YouTube service and exposes the standard feeds &#39;</span>
+        <span class="s1">&#39;(public) and the uploads/favorites/playlists/subscriptions &#39;</span>
+        <span class="s1">&#39;of a given user.&#39;</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Server Name:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;my media&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the name under this MediaServer shall &#39;</span>
+                 <span class="s1">&#39;show up with on other UPnP clients&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UPnP Version:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the highest UPnP version this MediaServer shall support&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;uuid&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UUID Identifier:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the unique (UPnP) identifier for this MediaServer, &#39;</span>
+                 <span class="s1">&#39;usually automatically set&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;refresh&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Refresh period&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;login&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;User ID:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="s1">&#39;User Account&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Password:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="s1">&#39;User Account&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Locale:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;quality&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Video quality:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;sd&#39;</span><span class="p">,</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;sd&#39;</span><span class="p">,</span> <span class="s1">&#39;hd&#39;</span><span class="p">)},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;standard_feeds&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Include standard feeds:&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bool&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;proxy_mode&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Proxy mode:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;redirect&#39;</span><span class="p">,</span> <span class="s1">&#39;proxy&#39;</span><span class="p">,</span> <span class="s1">&#39;cache&#39;</span><span class="p">,</span> <span class="s1">&#39;buffered&#39;</span><span class="p">)},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;buffer_size&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Buffering size:&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;cache_directory&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Cache directory:&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;dir&#39;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="s1">&#39;Cache&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;cache_maxsize&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Cache max size:&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="s1">&#39;Cache&#39;</span><span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">AbstractBackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;YouTube&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">login</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;userid&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;login&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locale</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quality</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;quality&#39;</span><span class="p">,</span> <span class="s1">&#39;sd&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">showStandardFeeds</span> <span class="o">=</span> \
+            <span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;standard_feeds&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s1">&#39;Yes&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;refresh&#39;</span><span class="p">,</span> <span class="mi">60</span><span class="p">))</span> <span class="o">*</span> <span class="mi">60</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy_mode</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;proxy_mode&#39;</span><span class="p">,</span> <span class="s1">&#39;redirect&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_directory</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cache_directory&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;/tmp/coherence-cache&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy_mode</span> <span class="o">!=</span> <span class="s1">&#39;redirect&#39;</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_directory</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_maxsize</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cache_maxsize&#39;</span><span class="p">,</span> <span class="mi">100000000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buffer_size</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;buffer_size&#39;</span><span class="p">,</span> <span class="mi">750000</span><span class="p">)</span>
+
+        <span class="n">rootItem</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_root_item</span><span class="p">(</span><span class="n">rootItem</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">showStandardFeeds</span><span class="p">:</span>
+            <span class="n">base_uri</span> <span class="o">=</span> <span class="s1">&#39;http://gdata.youtube.com/feeds/api/standardfeeds&#39;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">locale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">base_uri</span> <span class="o">+=</span> <span class="n">f</span><span class="s1">&#39;/</span><span class="si">{self.locale}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">(</span>
+                <span class="s1">&#39;Most Viewed&#39;</span><span class="p">,</span> <span class="n">base_uri</span> <span class="o">+</span> <span class="s1">&#39;/most_viewed&#39;</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">(</span>
+                <span class="s1">&#39;Top Rated&#39;</span><span class="p">,</span> <span class="n">base_uri</span> <span class="o">+</span> <span class="s1">&#39;/top_rated&#39;</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">(</span>
+                <span class="s1">&#39;Recently Featured&#39;</span><span class="p">,</span> <span class="n">base_uri</span> <span class="o">+</span> <span class="s1">&#39;/recently_featured&#39;</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">(</span>
+                <span class="s1">&#39;Watch On Mobile&#39;</span><span class="p">,</span> <span class="n">base_uri</span> <span class="o">+</span> <span class="s1">&#39;/watch_on_mobile&#39;</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">(</span>
+                <span class="s1">&#39;Most Discussed&#39;</span><span class="p">,</span> <span class="n">base_uri</span> <span class="o">+</span> <span class="s1">&#39;/most_discussed&#39;</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">(</span>
+                <span class="s1">&#39;Top Favorites&#39;</span><span class="p">,</span> <span class="n">base_uri</span> <span class="o">+</span> <span class="s1">&#39;/top_favorites&#39;</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">(</span>
+                <span class="s1">&#39;Most Linked&#39;</span><span class="p">,</span> <span class="n">base_uri</span> <span class="o">+</span> <span class="s1">&#39;/most_linked&#39;</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">(</span>
+                <span class="s1">&#39;Most Responded&#39;</span><span class="p">,</span> <span class="n">base_uri</span> <span class="o">+</span> <span class="s1">&#39;/most_responded&#39;</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">(</span>
+                <span class="s1">&#39;Most Recent&#39;</span><span class="p">,</span> <span class="n">base_uri</span> <span class="o">+</span> <span class="s1">&#39;/most_recent&#39;</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">user_uri</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;http://gdata.youtube.com/feeds/api/users/</span><span class="si">{self.login}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">(</span><span class="s1">&#39;My Uploads&#39;</span><span class="p">,</span> <span class="n">user_uri</span> <span class="o">+</span> <span class="s1">&#39;/uploads&#39;</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">(</span><span class="s1">&#39;My Favorites&#39;</span><span class="p">,</span> <span class="n">user_uri</span> <span class="o">+</span> <span class="s1">&#39;/favorites&#39;</span><span class="p">,</span> <span class="n">rootItem</span><span class="p">)</span>
+            <span class="n">playlistsItem</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span>
+                <span class="n">rootItem</span><span class="p">,</span> <span class="s1">&#39;My Playlists&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">retrievePlaylistFeeds</span><span class="p">)</span>
+            <span class="n">rootItem</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">playlistsItem</span><span class="p">)</span>
+            <span class="n">subscriptionsItem</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span>
+                <span class="n">rootItem</span><span class="p">,</span> <span class="s1">&#39;My Subscriptions&#39;</span><span class="p">,</span>
+                <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">retrieveSubscriptionFeeds</span><span class="p">)</span>
+            <span class="n">rootItem</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">subscriptionsItem</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+<div class="viewcode-block" id="YouTubeStore.appendFeed"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YouTubeStore.appendFeed">[docs]</a>    <span class="k">def</span> <span class="nf">appendFeed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">feed_uri</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">retrieveFeedItems</span><span class="p">,</span> <span class="n">feed_uri</span><span class="o">=</span><span class="n">feed_uri</span><span class="p">)</span>
+        <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">feed_uri</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YouTubeStore.appendVideoEntry"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YouTubeStore.appendVideoEntry">[docs]</a>    <span class="k">def</span> <span class="nf">appendVideoEntry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">external_id</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">media</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">media</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">url</span>
+        <span class="n">mimetype</span> <span class="o">=</span> <span class="n">MPEG4_MIMETYPE</span>
+
+        <span class="c1"># mimetype = &#39;video/mpeg&#39;</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">YoutubeVideoItem</span><span class="p">(</span>
+            <span class="n">external_id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">item</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">external_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YouTubeStore.upnp_init"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YouTubeStore.upnp_init">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{MPEG4_MIMETYPE}</span><span class="s1">:*&#39;</span><span class="p">],</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmc_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;15&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_root_id</span><span class="p">()}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span> <span class="o">=</span> <span class="n">YouTubeService</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span><span class="o">.</span><span class="n">client_id</span> <span class="o">=</span> \
+            <span class="s1">&#39;ytapi-JeanMichelSizun-youtubebackendpl-ruabstu7-0&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span><span class="o">.</span><span class="n">developer_key</span> <span class="o">=</span> \
+            <span class="s1">&#39;AI39si7dv2WWffH-s3pfvmw8fTND-cPWeqF1DOcZ8rwTg&#39;</span> \
+            <span class="s1">&#39;TPi4fheX7jjQXpn7SG61Ido0Zm_9gYR52TcGog9Pt3iG9Sa88-1yg&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">login</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;Coherence UPnP backend&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span><span class="o">.</span><span class="n">ProgrammaticLogin</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="YouTubeStore.retrieveFeedItems"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YouTubeStore.retrieveFeedItems">[docs]</a>    <span class="k">def</span> <span class="nf">retrieveFeedItems</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feed_uri</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">feed</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span><span class="o">.</span><span class="n">GetYouTubeVideoFeed</span><span class="p">,</span>
+                                     <span class="n">feed_uri</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotFeed</span><span class="p">(</span><span class="n">feed</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">feed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to retrieve feed </span><span class="si">{feed_uri}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">feed</span><span class="o">.</span><span class="n">entry</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">appendVideoEntry</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ERROR: </span><span class="si">{error}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">feed</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">gotFeed</span><span class="p">,</span> <span class="n">gotError</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">feed</span></div>
+
+<div class="viewcode-block" id="YouTubeStore.retrievePlaylistFeedItems"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YouTubeStore.retrievePlaylistFeedItems">[docs]</a>    <span class="k">def</span> <span class="nf">retrievePlaylistFeedItems</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">playlist_id</span><span class="p">):</span>
+
+        <span class="n">feed</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span><span class="o">.</span><span class="n">GetYouTubePlaylistVideoFeed</span><span class="p">,</span>
+            <span class="n">playlist_id</span><span class="o">=</span><span class="n">playlist_id</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotFeed</span><span class="p">(</span><span class="n">feed</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">feed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;Unable to retrieve playlist items for feed </span><span class="si">{feed}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">feed</span><span class="o">.</span><span class="n">entry</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">appendVideoEntry</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ERROR: </span><span class="si">{error}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">feed</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">gotFeed</span><span class="p">,</span> <span class="n">gotError</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">feed</span></div>
+
+<div class="viewcode-block" id="YouTubeStore.retrieveSubscriptionFeedItems"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YouTubeStore.retrieveSubscriptionFeedItems">[docs]</a>    <span class="k">def</span> <span class="nf">retrieveSubscriptionFeedItems</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span><span class="o">.</span><span class="n">GetYouTubeSubscriptionEntry</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotEntry</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to retrieve subscription items </span><span class="si">{uri}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="n">feed_uri</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">feed_link</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">href</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieveFeedItems</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">feed_uri</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ERROR: </span><span class="si">{error}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">entry</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">gotEntry</span><span class="p">,</span> <span class="n">gotError</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">entry</span></div>
+
+<div class="viewcode-block" id="YouTubeStore.retrievePlaylistFeeds"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YouTubeStore.retrievePlaylistFeeds">[docs]</a>    <span class="k">def</span> <span class="nf">retrievePlaylistFeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">playlists_feed</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span><span class="o">.</span><span class="n">GetYouTubePlaylistFeed</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotPlaylists</span><span class="p">(</span><span class="n">playlist_video_feed</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">playlist_video_feed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Unable to retrieve playlists feed&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">for</span> <span class="n">playlist_video_entry</span> <span class="ow">in</span> <span class="n">playlist_video_feed</span><span class="o">.</span><span class="n">entry</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">playlist_video_entry</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">playlist_id</span> <span class="o">=</span> <span class="n">playlist_video_entry</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span>
+                    <span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># FIXME find better way to retrieve the playlist ID</span>
+
+                <span class="n">item</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span>
+                    <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">playlist_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">retrievePlaylistFeedItems</span><span class="p">,</span>
+                    <span class="n">playlist_id</span><span class="o">=</span><span class="n">playlist_id</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">playlist_id</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ERROR: </span><span class="si">{error}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">playlists_feed</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">gotPlaylists</span><span class="p">,</span> <span class="n">gotError</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">playlists_feed</span></div>
+
+<div class="viewcode-block" id="YouTubeStore.retrieveSubscriptionFeeds"><a class="viewcode-back" href="../../../source/backends/youtube.html#coherence.backends.youtube_storage.YouTubeStore.retrieveSubscriptionFeeds">[docs]</a>    <span class="k">def</span> <span class="nf">retrieveSubscriptionFeeds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">playlists_feed</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yt_service</span><span class="o">.</span><span class="n">GetYouTubeSubscriptionFeed</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotPlaylists</span><span class="p">(</span><span class="n">playlist_video_feed</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">playlist_video_feed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Unable to retrieve subscriptions feed&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">playlist_video_feed</span><span class="o">.</span><span class="n">entry</span><span class="p">:</span>
+                <span class="nb">type</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">GetSubscriptionType</span><span class="p">()</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">uri</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;[</span><span class="si">{type}</span><span class="s1">] </span><span class="si">{title}</span><span class="s1">&#39;</span>
+
+                <span class="n">item</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">retrieveSubscriptionFeedItems</span><span class="p">,</span>
+                                     <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ERROR: </span><span class="si">{error}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">playlists_feed</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">gotPlaylists</span><span class="p">,</span> <span class="n">gotError</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">playlists_feed</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,637 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.lastfm_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.lastfm_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.lastfm_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2007, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2007, Moritz Struebe &lt;morty@gmx.net&gt;</span>
+
+<span class="c1"># TODO: remove the below &quot;terminal output&quot; sample when this backend get fixed</span>
+<span class="c1"># INFO  lastFM_user                 Dez 14 17:35:27  Got new sessionid:</span>
+<span class="c1">#     &#39;1488f34a1cbed7c9f4232f8fd563c3bd&#39;</span>
+<span class="c1">#     (coherence/backends/lastfm_storage.py:60)</span>
+<span class="c1"># DEBUG lastFM_stream               Dez 14 17:35:53  render</span>
+<span class="c1">#     &lt;GET /da525474-5357-4d1b-a894-76b1293224c9/1005 HTTP/1.1&gt;</span>
+<span class="c1">#     (coherence/backends/lastfm_storage.py:148)</span>
+<span class="c1"># command GET</span>
+<span class="c1"># rest /user/e0362c757ef49169e9a0f0970cc2d367.mp3</span>
+<span class="c1"># headers {&#39;icy-metadata&#39;: &#39;1&#39;, &#39;host&#39;: &#39;kingpin5.last.fm&#39;,</span>
+<span class="c1">#          &#39;te&#39;: &#39;trailers&#39;, &#39;connection&#39;: &#39;TE&#39;,</span>
+<span class="c1">#          &#39;user-agent&#39;: &#39;gnome-vfs/2.12.0.19 neon/0.24.7&#39;}</span>
+<span class="c1"># ProxyClient handleStatus HTTP/1.1 200 OK</span>
+<span class="c1"># ProxyClient handleHeader Content-Type audio/mpeg</span>
+<span class="c1"># ProxyClient handleHeader Content-Length 4050441</span>
+<span class="c1"># ProxyClient handleHeader Cache-Control no-cache, must-revalidate</span>
+<span class="c1"># DEBUG lastFM_stream               Dez 14 17:35:53  render</span>
+<span class="c1">#     &lt;GET /da525474-5357-4d1b-a894-76b1293224c9/1005 HTTP/1.1&gt;</span>
+<span class="c1">#     (coherence/backends/lastfm_storage.py:148)</span>
+<span class="c1"># command GET</span>
+<span class="c1"># rest /user/e0362c757ef49169e9a0f0970cc2d367.mp3</span>
+<span class="c1"># headers {&#39;icy-metadata&#39;: &#39;1&#39;, &#39;host&#39;: &#39;kingpin5.last.fm&#39;,</span>
+<span class="c1">#          &#39;te&#39;: &#39;trailers&#39;, &#39;connection&#39;: &#39;TE&#39;,</span>
+<span class="c1">#          &#39;user-agent&#39;: &#39;gnome-vfs/2.12.0.19 neon/0.24.7&#39;}</span>
+<span class="c1"># ProxyClient handleStatus HTTP/1.1 403 Invalid ticket</span>
+
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">md5</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlsplit</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">Backend</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.DIDLLite</span> <span class="k">import</span> <span class="n">classChooser</span><span class="p">,</span> <span class="n">Container</span><span class="p">,</span> <span class="n">Resource</span>
+
+
+<div class="viewcode-block" id="LastFMUser"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMUser">[docs]</a><span class="k">class</span> <span class="nc">LastFMUser</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;lastFM_user&#39;</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">passwd</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;ws.audioscrobbler.com&#39;</span>
+    <span class="n">basepath</span> <span class="o">=</span> <span class="s1">&#39;/radio&#39;</span>
+    <span class="n">sessionid</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">getting_tracks</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">tracks</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">passwd</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No User&#39;</span><span class="p">,</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">passwd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No Passwd&#39;</span><span class="p">,</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">passwd</span> <span class="o">=</span> <span class="n">passwd</span>
+
+<div class="viewcode-block" id="LastFMUser.login"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMUser.login">[docs]</a>    <span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessionid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Session seems to be valid&#39;</span><span class="p">,</span> <span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">def</span> <span class="nf">got_page</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="nb">tuple</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">tuple</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;session&#39;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">sessionid</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Got new sessionid: </span><span class="si">{self.sessionid}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;base_url&#39;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">!=</span> <span class="nb">tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Got new host: </span><span class="si">{self.host}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;base_path&#39;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basepath</span> <span class="o">!=</span> <span class="nb">tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">basepath</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Got new path: </span><span class="si">{self.basepath}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_tracks</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">got_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Login to LastFM Failed! </span><span class="si">{error}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{error.getTraceback()}&#39;</span><span class="p">)</span>
+
+        <span class="c1"># This function might be GPL!</span>
+        <span class="c1"># Found this code in some other Projects, too.</span>
+        <span class="k">def</span> <span class="nf">hexify</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%02x</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="n">password</span> <span class="o">=</span> <span class="n">hexify</span><span class="p">(</span><span class="n">md5</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">passwd</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span>
+        <span class="n">req</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">basepath</span> <span class="o">+</span> <span class="s1">&#39;/handshake.php/?version=1&amp;platform=win&amp;username=&#39;</span>\
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">+</span> <span class="s1">&#39;&amp;passwordmd5=&#39;</span> <span class="o">+</span> <span class="n">password</span>\
+            <span class="o">+</span> <span class="s1">&#39;&amp;language=en&amp;player=coherence&#39;</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="s1">&#39;http://&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">+</span> <span class="n">req</span><span class="p">)</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span>
+            <span class="n">got_page</span><span class="p">,</span> <span class="n">got_error</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LastFMUser.get_tracks"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMUser.get_tracks">[docs]</a>    <span class="k">def</span> <span class="nf">get_tracks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getting_tracks</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">def</span> <span class="nf">got_page</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">parse_xml</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getting_tracks</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getting_tracks</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;got Tracks&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;trackList/track&#39;</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+
+                <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+                    <span class="c1"># print track.find(name).text.encode(&#39;utf-8&#39;)</span>
+                    <span class="k">return</span> <span class="n">track</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+                <span class="c1"># Fixme: This section needs some work</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;adding Track&#39;</span><span class="p">)</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;audio/mpeg&#39;</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="s1">&#39;creator&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; - &#39;</span> <span class="o">+</span> <span class="n">get_data</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="s1">&#39;creator&#39;</span><span class="p">)</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;creator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="s1">&#39;creator&#39;</span><span class="p">)</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;album&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">)</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="s1">&#39;duration&#39;</span><span class="p">)</span>
+                <span class="c1"># FIXME: Image is the wrong tag.</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">)</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">track</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tracks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">got_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Problem getting Tracks! </span><span class="si">{error}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{error.getTraceback()}&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getting_tracks</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">getting_tracks</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">req</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">basepath</span> <span class="o">+</span> <span class="s1">&#39;/xspf.php?sk=&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessionid</span> \
+            <span class="o">+</span> <span class="s1">&#39;&amp;discovery=0&amp;desktop=1.3.1.1&#39;</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="s1">&#39;http://&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">+</span> <span class="n">req</span><span class="p">)</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span>
+            <span class="n">got_page</span><span class="p">,</span> <span class="n">got_error</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LastFMUser.update"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMUser.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracks</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">track</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">track</span> <span class="o">==</span> <span class="n">item</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tracks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">track</span><span class="p">)</span>
+                <span class="c1"># Do not remove so the tracks to answer the browse</span>
+                <span class="c1"># request correctly.</span>
+                <span class="c1"># track.store.remove(track)</span>
+                <span class="c1"># del track</span>
+
+        <span class="c1"># if len(self.tracks) &lt; 5:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_tracks</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="LFMProxyStream"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LFMProxyStream">[docs]</a><span class="k">class</span> <span class="nc">LFMProxyStream</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">ReverseProxyResource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;lastFM_stream&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">host_port</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">host_port</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">host</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">host_port</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">))</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">host_port</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="mi">80</span>
+
+        <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>
+
+        <span class="c1"># print(f&#39;ProxyStream init {host} {port} {path}&#39;)</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">ReverseProxyResource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LFMProxyStream.render"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LFMProxyStream.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;render </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">LFM</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">played</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">ReverseProxyResource</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="LastFMItem"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem">[docs]</a><span class="k">class</span> <span class="nc">LastFMItem</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;LastFM_item&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="n">UPnPClass</span><span class="p">,</span>
+                 <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">creator</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;creator&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">album</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;duration&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">mimetype</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parent_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parent_id</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">UPnPClass</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">creator</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">Container</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">child_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urlbase</span><span class="p">)</span> <span class="ow">and</span> <span class="n">urlbase</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+            <span class="n">urlbase</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">==</span> <span class="s1">&#39;directory&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">LFMProxyStream</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="c1"># self.url = obj.get(&#39;url&#39;)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">==</span> <span class="s1">&#39;directory&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">protocols</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;DLNA.ORG_PN=MP3&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;DLNA.ORG_CI=0&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;DLNA.ORG_OP=01&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;DLNA.ORG_FLAGS=01700000000000000000000000000000&#39;</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                <span class="n">f</span><span class="s1">&#39;http-get:*:{obj.get(&quot;mimetype&quot;)}:{&quot;;&quot;.join(protocols)}&#39;</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LastFMItem.remove"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">remove_child</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="LastFMItem.add_child"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.add_child">[docs]</a>    <span class="k">def</span> <span class="nf">add_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">child_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">Container</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="LastFMItem.remove_child"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.remove_child">[docs]</a>    <span class="k">def</span> <span class="nf">remove_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;remove_from </span><span class="si">{self.id:d}</span><span class="s1"> ({self.get_name()}) &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;child </span><span class="si">{child.id:d}</span><span class="s1"> ({child.get_name()})&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">child_count</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">Container</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="LastFMItem.get_children"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.get_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">request_count</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">request_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">start</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">request_count</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LastFMItem.get_child_count"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.get_child_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_child_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">==</span> <span class="s1">&#39;directory&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">100</span>  <span class="c1"># Some Testing, with strange Numbers: 0/lots</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_count</span></div>
+
+<div class="viewcode-block" id="LastFMItem.get_id"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
+
+<div class="viewcode-block" id="LastFMItem.get_update_id"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.get_update_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_update_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="LastFMItem.get_path"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span></div>
+
+<div class="viewcode-block" id="LastFMItem.get_name"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+<div class="viewcode-block" id="LastFMItem.get_parent"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.get_parent">[docs]</a>    <span class="k">def</span> <span class="nf">get_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span></div>
+
+<div class="viewcode-block" id="LastFMItem.get_item"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="LastFMItem.get_xml"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMItem.get_xml">[docs]</a>    <span class="k">def</span> <span class="nf">get_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">toString</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;id: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; @ &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="LastFMStore"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMStore">[docs]</a><span class="k">class</span> <span class="nc">LastFMStore</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is a backend to the LastFM.</span>
+
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">        * Migrated from louie/dispatcher to EventDispatcher</span>
+<span class="sd">        * Introduced :class:`~coherence.backend.Backend`&#39;s inheritance</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;lastFM_store&#39;</span>
+
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Backend</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;LastFMStore&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">server</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">=</span> <span class="s1">&#39;http://ws.audioscrobbler.com/2.0/&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmc_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;4&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<div class="viewcode-block" id="LastFMStore.append"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMStore.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;directory&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mimetype</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">]</span>
+
+        <span class="n">UPnPClass</span> <span class="o">=</span> <span class="n">classChooser</span><span class="p">(</span><span class="n">mimetype</span><span class="p">)</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getnextID</span><span class="p">()</span>
+        <span class="n">update</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+            <span class="n">update</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">LastFMItem</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span><span class="p">,</span>
+                                    <span class="n">UPnPClass</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SystemUpdateID&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="c1"># value = &#39;%d,%d&#39; % (parent.get_id(),parent_get_update_id())</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_update_id</span><span class="p">())</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ContainerUpdateIDs&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LastFMStore.remove"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMStore.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get_parent</span><span class="p">()</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SystemUpdateID&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span><span class="p">)</span>
+                <span class="c1"># value = &#39;%d,%d&#39; % (parent.get_id(),parent_get_update_id())</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_update_id</span><span class="p">())</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ContainerUpdateIDs&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+            <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="LastFMStore.len"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMStore.len">[docs]</a>    <span class="k">def</span> <span class="nf">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LastFMStore.get_by_id"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMStore.get_by_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="LastFMStore.getnextID"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMStore.getnextID">[docs]</a>    <span class="k">def</span> <span class="nf">getnextID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="LastFMStore.upnp_init"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.LastFMStore.upnp_init">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;LastFM&#39;</span><span class="p">,</span> <span class="s1">&#39;mimetype&#39;</span><span class="p">:</span> <span class="s1">&#39;directory&#39;</span><span class="p">},</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">LFM</span> <span class="o">=</span> <span class="n">LastFMUser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;login&#39;</span><span class="p">),</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LFM</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LFM</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;http-get:*:audio/mpeg:*&#39;</span><span class="p">],</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../source/backends/lastfm.html#coherence.backends.lastfm_storage.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">LastFMStore</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">got_upnp_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;upnp </span><span class="si">{result}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">f</span><span class="o">.</span><span class="n">upnp_init</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callWhenRunning</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

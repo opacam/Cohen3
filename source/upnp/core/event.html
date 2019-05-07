@@ -1,0 +1,522 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.event (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.upnp.core.msearch (module)" href="msearch.html" />
+    <link rel="prev" title="coherence.upnp.core.dlna (module)" href="dlna.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-core-package">coherence.upnp.core (package)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="action.html">coherence.upnp.core.action (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="device.html">coherence.upnp.core.device (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="didllite.html">coherence.upnp.core.DIDLLite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dlna.html">coherence.upnp.core.dlna (module)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.upnp.core.event (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="msearch.html">coherence.upnp.core.msearch (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="service.html">coherence.upnp.core.service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_lite.html">coherence.upnp.core.soap_lite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_proxy.html">coherence.upnp.core.soap_proxy (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_service.html">coherence.upnp.core.soap_service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ssdp.html">coherence.upnp.core.ssdp (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html">coherence.upnp.core.utils (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="uuid.html">coherence.upnp.core.uuid (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="variable.html">coherence.upnp.core.variable (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xml_constants.html">coherence.upnp.core.xml_constants (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-devices-package">coherence.upnp.devices (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-package">coherence.upnp.services (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-clients-subpackage">coherence.upnp.services.clients (subpackage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-servers-subpackage">coherence.upnp.services.servers (subpackage)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.upnp.html">coherence.upnp (package)</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.event (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/upnp/core/event.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="module-coherence.upnp.core.event">
+<span id="coherence-upnp-core-event-module"></span><span id="upnp-core-event"></span><h1>coherence.upnp.core.event (module)<a class="headerlink" href="#module-coherence.upnp.core.event" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="events">
+<h2>Events<a class="headerlink" href="#events" title="Permalink to this headline">¶</a></h2>
+<p>This module contains several classes related to UPnP events.</p>
+<div class="section" id="eventserver">
+<h3><a class="reference internal" href="#coherence.upnp.core.event.EventServer" title="coherence.upnp.core.event.EventServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventServer</span></code></a><a class="headerlink" href="#eventserver" title="Permalink to this headline">¶</a></h3>
+<p>A class inherited from <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code> representing an
+event’s server with dispatch events capabilities via EventsDispatcher.</p>
+</div>
+<div class="section" id="eventsubscriptionserver">
+<h3><a class="reference internal" href="#coherence.upnp.core.event.EventSubscriptionServer" title="coherence.upnp.core.event.EventSubscriptionServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventSubscriptionServer</span></code></a><a class="headerlink" href="#eventsubscriptionserver" title="Permalink to this headline">¶</a></h3>
+<p>This class is the server part on the device side. It listens to subscribe
+requests and registering the subscriber to send event messages to the device.</p>
+</div>
+<div class="section" id="event">
+<h3><a class="reference internal" href="#coherence.upnp.core.event.Event" title="coherence.upnp.core.event.Event"><code class="xref py py-class docutils literal notranslate"><span class="pre">Event</span></code></a><a class="headerlink" href="#event" title="Permalink to this headline">¶</a></h3>
+<p>A dictionary representing an UPnP’s Event.</p>
+</div>
+<div class="section" id="eventprotocol">
+<h3><a class="reference internal" href="#coherence.upnp.core.event.EventProtocol" title="coherence.upnp.core.event.EventProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventProtocol</span></code></a><a class="headerlink" href="#eventprotocol" title="Permalink to this headline">¶</a></h3>
+<p>The Event’s Protocol.</p>
+</div>
+<div class="section" id="notificationprotocol">
+<h3><a class="reference internal" href="#coherence.upnp.core.event.NotificationProtocol" title="coherence.upnp.core.event.NotificationProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">NotificationProtocol</span></code></a><a class="headerlink" href="#notificationprotocol" title="Permalink to this headline">¶</a></h3>
+<p>The Notification protocol used to by <a class="reference internal" href="#coherence.upnp.core.event.send_notification" title="coherence.upnp.core.event.send_notification"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_notification()</span></code></a>.</p>
+<dl class="class">
+<dt id="coherence.upnp.core.event.EventServer">
+<em class="property">class </em><code class="descname">EventServer</code><span class="sig-paren">(</span><em>control_point</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#EventServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.EventServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Migrated from louie/dispatcher to EventDispatcher</p></li>
+<li><p>The emitted events changed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>UPnP.Event.Server.message_received =&gt;
+event_server_message_received</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.upnp.core.event.EventServer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'event_server'</em><a class="headerlink" href="#coherence.upnp.core.event.EventServer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.EventServer.render_NOTIFY">
+<code class="descname">render_NOTIFY</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#EventServer.render_NOTIFY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.EventServer.render_NOTIFY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.event.EventSubscriptionServer">
+<em class="property">class </em><code class="descname">EventSubscriptionServer</code><span class="sig-paren">(</span><em>service</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#EventSubscriptionServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.EventSubscriptionServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>This class is the server part on the device side. It listens
+to subscribe requests and registers the subscriber to send
+event messages to this device.
+If an unsubscribe request is received, the subscription is cancelled
+and no more event messages will be sent.</p>
+<p>we receive a subscription request like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;callback&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;&lt;http://192.168.213.130:9083/BYvZMzfTSQkjHwzOThaP/ConnectionManager&gt;&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;192.168.213.107:30020&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;nt&#39;</span><span class="p">:</span> <span class="s1">&#39;upnp:event&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;content-length&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="s1">&#39;Second-300&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>modify the callback value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">callback</span> <span class="o">=</span> <span class="n">callback</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>and pack it into a subscriber dict:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;uuid:oAQbxiNlyYojCAdznJnC&#39;</span><span class="p">:</span>
+    <span class="p">{</span>
+    <span class="s1">&#39;callback&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;&lt;http://192.168.213.130:9083/BYvZMzfTSQkjHwzOThaP/ConnectionManager&gt;&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;created&#39;</span><span class="p">:</span> <span class="mf">1162374189.257338</span><span class="p">,</span>
+    <span class="s1">&#39;timeout&#39;</span><span class="p">:</span> <span class="s1">&#39;Second-300&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;sid&#39;</span><span class="p">:</span> <span class="s1">&#39;uuid:oAQbxiNlyYojCAdznJnC&#39;</span><span class="p">}}</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Migrated from louie/dispatcher to EventDispatcher</p></li>
+<li><p>The emitted events changed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>UPnP.Event.Client.message_received =&gt;
+event_client_message_received</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.upnp.core.event.EventSubscriptionServer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'event_subscription_server'</em><a class="headerlink" href="#coherence.upnp.core.event.EventSubscriptionServer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.EventSubscriptionServer.render_SUBSCRIBE">
+<code class="descname">render_SUBSCRIBE</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#EventSubscriptionServer.render_SUBSCRIBE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.EventSubscriptionServer.render_SUBSCRIBE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.EventSubscriptionServer.render_UNSUBSCRIBE">
+<code class="descname">render_UNSUBSCRIBE</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#EventSubscriptionServer.render_UNSUBSCRIBE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.EventSubscriptionServer.render_UNSUBSCRIBE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.event.Event">
+<em class="property">class </em><code class="descname">Event</code><span class="sig-paren">(</span><em>sid</em>, <em>elements=None</em>, <em>raw=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#Event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.Event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.event.Event.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'event'</em><a class="headerlink" href="#coherence.upnp.core.event.Event.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.event.Event.ns">
+<code class="descname">ns</code><em class="property"> = 'urn:schemas-upnp-org:event-1-0'</em><a class="headerlink" href="#coherence.upnp.core.event.Event.ns" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.Event.get_sid">
+<code class="descname">get_sid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#Event.get_sid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.Event.get_sid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.Event.from_elements">
+<code class="descname">from_elements</code><span class="sig-paren">(</span><em>elements</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#Event.from_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.Event.from_elements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.Event._update_event">
+<code class="descname">_update_event</code><span class="sig-paren">(</span><em>prop</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#Event._update_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.Event._update_event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.event.EventProtocol">
+<em class="property">class </em><code class="descname">EventProtocol</code><span class="sig-paren">(</span><em>service</em>, <em>action</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#EventProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.EventProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.internet.protocol.Protocol</span></code>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.event.EventProtocol.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'event_protocol'</em><a class="headerlink" href="#coherence.upnp.core.event.EventProtocol.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.EventProtocol.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#EventProtocol.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.EventProtocol.teardown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.EventProtocol.connectionMade">
+<code class="descname">connectionMade</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#EventProtocol.connectionMade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.EventProtocol.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a connection is made.</p>
+<p>This may be considered the initializer of the protocol, because
+it is called when the connection is completed.  For clients,
+this is called once the connection to the server has been
+established; for servers, this is called after an accept() call
+stops blocking and a socket has been received.  If you need to
+send any greeting or initial message, do it here.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.EventProtocol.dataReceived">
+<code class="descname">dataReceived</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#EventProtocol.dataReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.EventProtocol.dataReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called whenever data is received.</p>
+<p>Use this method to translate to a higher-level message.  Usually, some
+callback will be made upon the receipt of each complete protocol
+message.</p>
+<dl class="simple">
+<dt>&#64;param data: a string of indeterminate length.  Please keep in mind</dt><dd><p>that you will probably need to buffer some data, as partial
+(or multiple) protocol messages may be received!  I recommend
+that unit tests for protocols call through to this method with
+differing chunk sizes, down to one byte at a time.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.EventProtocol.connectionLost">
+<code class="descname">connectionLost</code><span class="sig-paren">(</span><em>reason</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#EventProtocol.connectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.EventProtocol.connectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the connection is shut down.</p>
+<p>Clear any circular references here, and any external references
+to this Protocol.  The connection has been closed.</p>
+<p>&#64;type reason: L{twisted.python.failure.Failure}</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.event.unsubscribe">
+<code class="descname">unsubscribe</code><span class="sig-paren">(</span><em>service</em>, <em>action='unsubscribe'</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#unsubscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.unsubscribe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.event.subscribe">
+<code class="descname">subscribe</code><span class="sig-paren">(</span><em>service</em>, <em>action='subscribe'</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#subscribe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.subscribe" title="Permalink to this definition">¶</a></dt>
+<dd><p>send a subscribe/renewal/unsubscribe request to a service
+return the device response</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.event.NotificationProtocol">
+<em class="property">class </em><code class="descname">NotificationProtocol</code><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#NotificationProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.NotificationProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.internet.protocol.Protocol</span></code>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.event.NotificationProtocol.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'notification_protocol'</em><a class="headerlink" href="#coherence.upnp.core.event.NotificationProtocol.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.NotificationProtocol.connectionMade">
+<code class="descname">connectionMade</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#NotificationProtocol.connectionMade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.NotificationProtocol.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a connection is made.</p>
+<p>This may be considered the initializer of the protocol, because
+it is called when the connection is completed.  For clients,
+this is called once the connection to the server has been
+established; for servers, this is called after an accept() call
+stops blocking and a socket has been received.  If you need to
+send any greeting or initial message, do it here.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.NotificationProtocol.dataReceived">
+<code class="descname">dataReceived</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#NotificationProtocol.dataReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.NotificationProtocol.dataReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called whenever data is received.</p>
+<p>Use this method to translate to a higher-level message.  Usually, some
+callback will be made upon the receipt of each complete protocol
+message.</p>
+<dl class="simple">
+<dt>&#64;param data: a string of indeterminate length.  Please keep in mind</dt><dd><p>that you will probably need to buffer some data, as partial
+(or multiple) protocol messages may be received!  I recommend
+that unit tests for protocols call through to this method with
+differing chunk sizes, down to one byte at a time.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.event.NotificationProtocol.connectionLost">
+<code class="descname">connectionLost</code><span class="sig-paren">(</span><em>reason</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#NotificationProtocol.connectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.NotificationProtocol.connectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the connection is shut down.</p>
+<p>Clear any circular references here, and any external references
+to this Protocol.  The connection has been closed.</p>
+<p>&#64;type reason: L{twisted.python.failure.Failure}</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.event.send_notification">
+<code class="descname">send_notification</code><span class="sig-paren">(</span><em>s</em>, <em>xml</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/event.html#send_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.event.send_notification" title="Permalink to this definition">¶</a></dt>
+<dd><p>send a notification a subscriber
+return its response</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="msearch.html" class="btn btn-neutral float-right" title="coherence.upnp.core.msearch (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dlna.html" class="btn btn-neutral float-left" title="coherence.upnp.core.dlna (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

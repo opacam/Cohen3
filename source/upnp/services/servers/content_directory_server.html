@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.services.servers.content_directory_server (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="coherence.upnp.services.servers.dimming_server (module)" href="dimming_server.html" />
+    <link rel="prev" title="coherence.upnp.services.servers.connection_manager_server (module)" href="connection_manager_server.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../coherence.upnp.html">coherence.upnp (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../coherence.upnp.html#coherence-upnp-core-package">coherence.upnp.core (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../coherence.upnp.html#coherence-upnp-devices-package">coherence.upnp.devices (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../coherence.upnp.html#coherence-upnp-services-package">coherence.upnp.services (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../coherence.upnp.html#coherence-upnp-services-clients-subpackage">coherence.upnp.services.clients (subpackage)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../coherence.upnp.html#coherence-upnp-services-servers-subpackage">coherence.upnp.services.servers (subpackage)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="av_transport_server.html">coherence.upnp.services.servers.av_transport_server (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="connection_manager_server.html">coherence.upnp.services.servers.connection_manager_server (module)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.upnp.services.servers.content_directory_server (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dimming_server.html">coherence.upnp.services.servers.dimming_server (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="media_receiver_registrar_server.html">coherence.upnp.services.servers.media_receiver_registrar_server (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rendering_control_server.html">coherence.upnp.services.servers.rendering_control_server (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="scheduled_recording_server.html">coherence.upnp.services.servers.scheduled_recording_server (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="switch_power_server.html">coherence.upnp.services.servers.switch_power_server (module)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../../coherence.upnp.html">coherence.upnp (package)</a> &raquo;</li>
+        
+      <li>coherence.upnp.services.servers.content_directory_server (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../../_sources/source/upnp/services/servers/content_directory_server.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="module-coherence.upnp.services.servers.content_directory_server">
+<span id="coherence-upnp-services-servers-content-directory-server-module"></span><span id="upnp-services-servers-content-directory-server"></span><h1>coherence.upnp.services.servers.content_directory_server (module)<a class="headerlink" href="#module-coherence.upnp.services.servers.content_directory_server" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="content-directory-service">
+<h2>Content Directory service<a class="headerlink" href="#content-directory-service" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="coherence.upnp.services.servers.content_directory_server.ContentDirectoryControl">
+<em class="property">class </em><code class="descname">ContentDirectoryControl</code><span class="sig-paren">(</span><em>server</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/servers/content_directory_server.html#ContentDirectoryControl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.servers.content_directory_server.ContentDirectoryControl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../core/service.html#coherence.upnp.core.service.ServiceControl" title="coherence.upnp.core.service.ServiceControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.service.ServiceControl</span></code></a>, <a class="reference internal" href="../../core/soap_service.html#coherence.upnp.core.soap_service.UPnPPublisher" title="coherence.upnp.core.soap_service.UPnPPublisher"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.soap_service.UPnPPublisher</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer">
+<em class="property">class </em><code class="descname">ContentDirectoryServer</code><span class="sig-paren">(</span><em>device</em>, <em>backend=None</em>, <em>transcoding=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/servers/content_directory_server.html#ContentDirectoryServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../core/service.html#coherence.upnp.core.service.ServiceServer" title="coherence.upnp.core.service.ServiceServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.service.ServiceServer</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code></p>
+<dl class="attribute">
+<dt id="coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'content_directory_server'</em><a class="headerlink" href="#coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.listchilds">
+<code class="descname">listchilds</code><span class="sig-paren">(</span><em>uri</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/servers/content_directory_server.html#ContentDirectoryServer.listchilds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.listchilds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/servers/content_directory_server.html#ContentDirectoryServer.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a given resource. See L{IResource}’s render method.</p>
+<p>I delegate to methods of self with the form ‘render_METHOD’
+where METHOD is the HTTP that was used to make the
+request. Examples: render_GET, render_HEAD, render_POST, and
+so on. Generally you should implement those methods instead of
+overriding this one.</p>
+<p>render_METHOD methods are expected to return a byte string which will be
+the rendered page, unless the return value is C{server.NOT_DONE_YET}, in
+which case it is this class’s responsibility to write the results using
+C{request.write(data)} and then call C{request.finish()}.</p>
+<p>Old code that overrides render() directly is likewise expected
+to return a byte string or NOT_DONE_YET.</p>
+<p>&#64;see: L{IResource.render}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.upnp_Search">
+<code class="descname">upnp_Search</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/servers/content_directory_server.html#ContentDirectoryServer.upnp_Search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.upnp_Search" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.upnp_Browse">
+<code class="descname">upnp_Browse</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/servers/content_directory_server.html#ContentDirectoryServer.upnp_Browse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.servers.content_directory_server.ContentDirectoryServer.upnp_Browse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dimming_server.html" class="btn btn-neutral float-right" title="coherence.upnp.services.servers.dimming_server (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="connection_manager_server.html" class="btn btn-neutral float-left" title="coherence.upnp.services.servers.connection_manager_server (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

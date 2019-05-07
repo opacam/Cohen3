@@ -1,0 +1,700 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.buzztard_control (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="coherence.backends.dvbd_storage (module)" href="dvbd.html" />
+    <link rel="prev" title="coherence.backends.bbc_storage (module)" href="bbc.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../coherence.backends.html">coherence.backends (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ampache.html">coherence.backends.ampache_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appletrailers.html">coherence.backends.appletrailers_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="audiocd.html">coherence.backends.audiocd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="axiscam.html">coherence.backends.axiscam_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="banshee.html">coherence.backends.banshee_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bbc.html">coherence.backends.bbc_storage (module)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">coherence.backends.buzztard_control (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dvbd.html">coherence.backends.dvbd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elisarenderer.html">coherence.backends.elisa_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elisastorage.html">coherence.backends.elisa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="feed.html">coherence.backends.feed_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="flickr.html">coherence.backends.flickr_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fs.html">coherence.backends.fs_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gallery2.html">coherence.backends.gallery2_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gstreamer_renderer.html">coherence.backends.gstreamer_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iradio.html">coherence.backends.iradio_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="itv.html">coherence.backends.itv_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lastfm.html">coherence.backends.lastfm_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lolcats.html">coherence.backends.lolcats_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mediadb.html">coherence.backends.mediadb_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="miroguide.html">coherence.backends.miroguide_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="picasa.html">coherence.backends.picasa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="playlist.html">coherence.backends.playlist_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="radiotime.html">coherence.backends.radiotime_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="swr3.html">coherence.backends.swr3_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ted.html">coherence.backends.ted_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="test.html">coherence.backends.test_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracker.html">coherence.backends.tracker_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="twitch.html">coherence.backends.twitch_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="yamj.html">coherence.backends.yamj_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="youtube.html">coherence.backends.youtube_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coherence.backends.html#coherence-backends-models-package">coherence.backends.models (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../coherence.backends.html">coherence.backends (package)</a> &raquo;</li>
+        
+      <li>coherence.backends.buzztard_control (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/source/backends/buzztard.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.backends.buzztard_control">
+<span id="coherence-backends-buzztard-control-module"></span><span id="coherence-backends-buzztard"></span><h1>coherence.backends.buzztard_control (module)<a class="headerlink" href="#module-coherence.backends.buzztard_control" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="coherence.backends.buzztard_control.BzClient">
+<em class="property">class </em><code class="descname">BzClient</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.protocols.basic.LineReceiver</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code>, <a class="reference internal" href="../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Migrated from louie/dispatcher to EventDispatcher</p></li>
+<li><p>The emitted events changed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Buzztard.Response.flush =&gt; response_flush</p></li>
+<li><p>Buzztard.Response.event =&gt; response_event</p></li>
+<li><p>Buzztard.Response.volume =&gt; response_volume</p></li>
+<li><p>Buzztard.Response.mute=&gt; response_mute</p></li>
+<li><p>Buzztard.Response.repeat =&gt; response_repeat</p></li>
+<li><p>Buzztard.Response.browse =&gt; response_browse</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BzClient.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'buzztard_client'</em><a class="headerlink" href="#coherence.backends.buzztard_control.BzClient.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BzClient.factory">
+<code class="descname">factory</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backends.buzztard_control.BzClient.factory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BzClient.connectionMade">
+<code class="descname">connectionMade</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzClient.connectionMade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzClient.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a connection is made.</p>
+<p>This may be considered the initializer of the protocol, because
+it is called when the connection is completed.  For clients,
+this is called once the connection to the server has been
+established; for servers, this is called after an accept() call
+stops blocking and a socket has been received.  If you need to
+send any greeting or initial message, do it here.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BzClient.lineReceived">
+<code class="descname">lineReceived</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzClient.lineReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzClient.lineReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override this for when each line is received.</p>
+<p>&#64;param line: The line which was received with the delimiter removed.
+&#64;type line: C{bytes}</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.buzztard_control.BzFactory">
+<em class="property">class </em><code class="descname">BzFactory</code><span class="sig-paren">(</span><em>backend</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.internet.protocol.ClientFactory</span></code>, <a class="reference internal" href="../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span>Migrated from louie/dispatcher to EventDispatcher</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BzFactory.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'buzztard_factory'</em><a class="headerlink" href="#coherence.backends.buzztard_control.BzFactory.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BzFactory.protocol">
+<code class="descname">protocol</code><a class="headerlink" href="#coherence.backends.buzztard_control.BzFactory.protocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#coherence.backends.buzztard_control.BzClient" title="coherence.backends.buzztard_control.BzClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">BzClient</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BzFactory.clientConnectionFailed">
+<code class="descname">clientConnectionFailed</code><span class="sig-paren">(</span><em>connector</em>, <em>reason</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzFactory.clientConnectionFailed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzFactory.clientConnectionFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a connection has failed to connect.</p>
+<p>It may be useful to call connector.connect() - this will reconnect.</p>
+<p>&#64;type reason: L{twisted.python.failure.Failure}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BzFactory.clientConnectionLost">
+<code class="descname">clientConnectionLost</code><span class="sig-paren">(</span><em>connector</em>, <em>reason</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzFactory.clientConnectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzFactory.clientConnectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when an established connection is lost.</p>
+<p>It may be useful to call connector.connect() - this will reconnect.</p>
+<p>&#64;type reason: L{twisted.python.failure.Failure}</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BzFactory.startFactory">
+<code class="descname">startFactory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzFactory.startFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzFactory.startFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will be called before I begin listening on a Port or Connector.</p>
+<p>It will only be called once, even if the factory is connected
+to multiple ports.</p>
+<p>This can be used to perform ‘unserialization’ tasks that
+are best put off until things are actually running, such
+as connecting to a database, opening files, etcetera.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BzFactory.clientReady">
+<code class="descname">clientReady</code><span class="sig-paren">(</span><em>instance</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzFactory.clientReady"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzFactory.clientReady" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BzFactory.sendMessage">
+<code class="descname">sendMessage</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzFactory.sendMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzFactory.sendMessage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BzFactory.rebrowse">
+<code class="descname">rebrowse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzFactory.rebrowse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzFactory.rebrowse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BzFactory.browse">
+<code class="descname">browse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzFactory.browse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzFactory.browse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.buzztard_control.BzConnection">
+<em class="property">class </em><code class="descname">BzConnection</code><span class="sig-paren">(</span><em>backend=None</em>, <em>host='localhost'</em>, <em>port=7654</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BzConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BzConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>A singleton class</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span>Migrated from louie/dispatcher to EventDispatcher</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BzConnection.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'buzztard_connection'</em><a class="headerlink" href="#coherence.backends.buzztard_control.BzConnection.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BzConnection.connection">
+<code class="descname">connection</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backends.buzztard_control.BzConnection.connection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.buzztard_control.BuzztardItem">
+<em class="property">class </em><code class="descname">BuzztardItem</code><span class="sig-paren">(</span><em>id</em>, <em>name</em>, <em>parent</em>, <em>mimetype</em>, <em>urlbase</em>, <em>host</em>, <em>update=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'buzztard_item'</em><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>store</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.add_child">
+<code class="descname">add_child</code><span class="sig-paren">(</span><em>child</em>, <em>update=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.add_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.add_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.remove_child">
+<code class="descname">remove_child</code><span class="sig-paren">(</span><em>child</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.remove_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.remove_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.get_children">
+<code class="descname">get_children</code><span class="sig-paren">(</span><em>start=0</em>, <em>request_count=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.get_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.get_children" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.get_child_count">
+<code class="descname">get_child_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.get_child_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.get_child_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.get_id">
+<code class="descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.get_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.get_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.get_update_id">
+<code class="descname">get_update_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.get_update_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.get_update_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.get_path">
+<code class="descname">get_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.get_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.get_parent">
+<code class="descname">get_parent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.get_parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.get_parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.get_item">
+<code class="descname">get_item</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.get_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.get_item" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardItem.get_xml">
+<code class="descname">get_xml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardItem.get_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardItem.get_xml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.buzztard_control.BuzztardStore">
+<em class="property">class </em><code class="descname">BuzztardStore</code><span class="sig-paren">(</span><em>server</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.Backend</span></code></a></p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Migrated from louie/dispatcher to EventDispatcher</p></li>
+<li><p>Introduced <a class="reference internal" href="../modules.html#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>’s inheritance</p></li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BuzztardStore.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'buzztard_store'</em><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardStore.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BuzztardStore.implements">
+<code class="descname">implements</code><em class="property"> = ['MediaServer']</em><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardStore.implements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardStore.add_content">
+<code class="descname">add_content</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardStore.add_content"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardStore.add_content" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardStore.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>name</em>, <em>mimetype</em>, <em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardStore.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardStore.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardStore.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardStore.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardStore.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardStore.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardStore.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardStore.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardStore.len">
+<code class="descname">len</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardStore.len"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardStore.len" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardStore.get_by_id">
+<code class="descname">get_by_id</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardStore.get_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardStore.get_by_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardStore.getnextID">
+<code class="descname">getnextID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardStore.getnextID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardStore.getnextID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardStore.upnp_init">
+<code class="descname">upnp_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardStore.upnp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardStore.upnp_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method gets called after the device is fired, here all
+initializations of service related state variables should happen, as
+the services aren’t available before that point.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer">
+<em class="property">class </em><code class="descname">BuzztardPlayer</code><span class="sig-paren">(</span><em>device</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span>Migrated from louie/dispatcher to EventDispatcher</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'buzztard_player'</em><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.implements">
+<code class="descname">implements</code><em class="property"> = ['MediaRenderer']</em><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.implements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.vendor_value_defaults">
+<code class="descname">vendor_value_defaults</code><em class="property"> = {'RenderingControl': {'A_ARG_TYPE_Channel': 'Master'}}</em><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.vendor_value_defaults" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.vendor_range_defaults">
+<code class="descname">vendor_range_defaults</code><em class="property"> = {'RenderingControl': {'Volume': {'maximum': 100}}}</em><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.vendor_range_defaults" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.event">
+<code class="descname">event</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.event" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.poll_player">
+<code class="descname">poll_player</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.poll_player"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.poll_player" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.load">
+<code class="descname">load</code><span class="sig-paren">(</span><em>uri</em>, <em>metadata=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.load" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>uri</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.play">
+<code class="descname">play</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.play"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.play" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.pause">
+<code class="descname">pause</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.pause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.pause" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.seek">
+<code class="descname">seek</code><span class="sig-paren">(</span><em>location</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.seek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.seek" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>location</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – <p>time to seek to, in seconds:</p>
+<ul class="simple">
+<li><p>+nL = relative seek forward n seconds</p></li>
+<li><p>-nL = relative seek backwards n seconds</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.mute">
+<code class="descname">mute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.mute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.mute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.unmute">
+<code class="descname">unmute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.unmute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.unmute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.get_mute">
+<code class="descname">get_mute</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.get_mute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.get_mute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.get_repeat">
+<code class="descname">get_repeat</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.get_repeat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.get_repeat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.set_repeat">
+<code class="descname">set_repeat</code><span class="sig-paren">(</span><em>playmode</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.set_repeat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.set_repeat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.get_volume">
+<code class="descname">get_volume</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.get_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.get_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.set_volume">
+<code class="descname">set_volume</code><span class="sig-paren">(</span><em>volume</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.set_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.set_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.upnp_init">
+<code class="descname">upnp_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.upnp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.upnp_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.upnp_Play">
+<code class="descname">upnp_Play</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.upnp_Play"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.upnp_Play" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.upnp_Pause">
+<code class="descname">upnp_Pause</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.upnp_Pause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.upnp_Pause" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.upnp_Stop">
+<code class="descname">upnp_Stop</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.upnp_Stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.upnp_Stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.upnp_SetAVTransportURI">
+<code class="descname">upnp_SetAVTransportURI</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.upnp_SetAVTransportURI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.upnp_SetAVTransportURI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.upnp_SetMute">
+<code class="descname">upnp_SetMute</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.upnp_SetMute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.upnp_SetMute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.buzztard_control.BuzztardPlayer.upnp_SetVolume">
+<code class="descname">upnp_SetVolume</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#BuzztardPlayer.upnp_SetVolume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.BuzztardPlayer.upnp_SetVolume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.backends.buzztard_control.on_init_complete">
+<code class="descname">on_init_complete</code><span class="sig-paren">(</span><em>backend</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#on_init_complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.on_init_complete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="coherence.backends.buzztard_control.main">
+<code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/buzztard_control.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.buzztard_control.main" title="Permalink to this definition">¶</a></dt>
+<dd><div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span>Migrated from louie/dispatcher to EventDispatcher</p>
+</div>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dvbd.html" class="btn btn-neutral float-right" title="coherence.backends.dvbd_storage (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="bbc.html" class="btn btn-neutral float-left" title="coherence.backends.bbc_storage (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

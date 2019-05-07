@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.devices.control_point (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.upnp.devices.internet_gateway_device_client (module)" href="internet_gateway_device_client.html" />
+    <link rel="prev" title="coherence.upnp.devices.basics (module)" href="basics.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-core-package">coherence.upnp.core (package)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-devices-package">coherence.upnp.devices (package)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="basics.html">coherence.upnp.devices.basics (module)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.upnp.devices.control_point (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="internet_gateway_device_client.html">coherence.upnp.devices.internet_gateway_device_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="media_renderer.html">coherence.upnp.devices.media_renderer (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="media_renderer_client.html">coherence.upnp.devices.media_renderer_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="media_server.html">coherence.upnp.devices.media_server (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="media_server_client.html">coherence.upnp.devices.media_server_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="wan_connection_device_client.html">coherence.upnp.devices.wan_connection_device_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="wan_device_client.html">coherence.upnp.devices.wan_device_client (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-package">coherence.upnp.services (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-clients-subpackage">coherence.upnp.services.clients (subpackage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-servers-subpackage">coherence.upnp.services.servers (subpackage)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.upnp.html">coherence.upnp (package)</a> &raquo;</li>
+        
+      <li>coherence.upnp.devices.control_point (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/upnp/devices/control_point.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="module-coherence.upnp.devices.control_point">
+<span id="coherence-upnp-devices-control-point-module"></span><span id="upnp-devices-control-point"></span><h1>coherence.upnp.devices.control_point (module)<a class="headerlink" href="#module-coherence.upnp.devices.control_point" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="control-point">
+<h2>Control Point<a class="headerlink" href="#control-point" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="devicequery">
+<h3><a class="reference internal" href="#coherence.upnp.devices.control_point.DeviceQuery" title="coherence.upnp.devices.control_point.DeviceQuery"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceQuery</span></code></a><a class="headerlink" href="#devicequery" title="Permalink to this headline">¶</a></h3>
+<p>A convenient class that allow us to create request queries to control point.</p>
+</div>
+<div class="section" id="controlpoint">
+<h3><a class="reference internal" href="#coherence.upnp.devices.control_point.ControlPoint" title="coherence.upnp.devices.control_point.ControlPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ControlPoint</span></code></a><a class="headerlink" href="#controlpoint" title="Permalink to this headline">¶</a></h3>
+<p>Takes care of managing the different devices detected by our instance
+of class <a class="reference internal" href="../../modules.html#coherence.base.Coherence" title="coherence.base.Coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a>.</p>
+</div>
+<div class="section" id="xmlrpc">
+<h3><a class="reference internal" href="#coherence.upnp.devices.control_point.XMLRPC" title="coherence.upnp.devices.control_point.XMLRPC"><code class="xref py py-class docutils literal notranslate"><span class="pre">XMLRPC</span></code></a><a class="headerlink" href="#xmlrpc" title="Permalink to this headline">¶</a></h3>
+<p>A resource that implements XML-RPC.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>XML-RPC is a remote procedure call (RPC) protocol which uses XML to encode
+its calls and HTTP as a transport mechanism. “XML-RPC” also refers
+generically to the use of XML for remote procedure call, independently
+of the specific protocol.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>XML-RPC information extracted from: <a class="reference external" href="https://en.wikipedia.org/wiki/XML-RPC">https://en.wikipedia.org/wiki/XML-RPC</a></p>
+</div>
+<dl class="class">
+<dt id="coherence.upnp.devices.control_point.DeviceQuery">
+<em class="property">class </em><code class="descname">DeviceQuery</code><span class="sig-paren">(</span><em>type</em>, <em>pattern</em>, <em>callback</em>, <em>timeout=0</em>, <em>oneshot=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#DeviceQuery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.DeviceQuery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code></p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Introduced inheritance from EventDispatcher</p></li>
+<li><p>Changed class variable <a class="reference internal" href="#coherence.upnp.devices.control_point.DeviceQuery.fired" title="coherence.upnp.devices.control_point.DeviceQuery.fired"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fired</span></code></a> to benefit from the
+EventDispatcher’s properties</p></li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.upnp.devices.control_point.DeviceQuery.fired">
+<code class="descname">fired</code><a class="headerlink" href="#coherence.upnp.devices.control_point.DeviceQuery.fired" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.DeviceQuery.fire">
+<code class="descname">fire</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#DeviceQuery.fire"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.DeviceQuery.fire" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.DeviceQuery.check">
+<code class="descname">check</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#DeviceQuery.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.DeviceQuery.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.devices.control_point.ControlPoint">
+<em class="property">class </em><code class="descname">ControlPoint</code><span class="sig-paren">(</span><em>coherence</em>, <em>auto_client=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">eventdispatcher.eventdispatcher.EventDispatcher</span></code>, <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Introduced inheritance from EventDispatcher, emitted events changed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.ControlPoint.{client.device_type}.detected =&gt;
+control_point_client_detected’</p></li>
+<li><p>Coherence.UPnP.ControlPoint.{client.device_type}.removed =&gt;
+control_point_client_removed</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Changed class variable <a class="reference internal" href="#coherence.upnp.devices.control_point.ControlPoint.queries" title="coherence.upnp.devices.control_point.ControlPoint.queries"><code class="xref py py-attr docutils literal notranslate"><span class="pre">queries</span></code></a> to benefit from the
+EventDispatcher’s properties</p></li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Be aware that some events are removed, with the new dispatcher we
+remove the detection for specific device type in flavour of a global
+detection.</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'controlpoint'</em><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.queries">
+<code class="descname">queries</code><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.queries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.shutdown">
+<code class="descname">shutdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.shutdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.auto_client_append">
+<code class="descname">auto_client_append</code><span class="sig-paren">(</span><em>device_type</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.auto_client_append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.auto_client_append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.browse">
+<code class="descname">browse</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.browse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.browse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.process_queries">
+<code class="descname">process_queries</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.process_queries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.process_queries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.add_query">
+<code class="descname">add_query</code><span class="sig-paren">(</span><em>query</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.add_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.add_query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.check_louie">
+<em class="property">static </em><code class="descname">check_louie</code><span class="sig-paren">(</span><em>receiver</em>, <em>signal</em>, <em>method='connect'</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.check_louie"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.check_louie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the connect or disconnect method’s arguments are valid in
+order to automatically convert to EventDispatcher’s bind method.
+The old valid signals are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.ControlPoint.MediaServer.detected</p></li>
+<li><p>Coherence.UPnP.ControlPoint.MediaServer.removed</p></li>
+<li><p>Coherence.UPnP.ControlPoint.MediaRenderer.detected</p></li>
+<li><p>Coherence.UPnP.ControlPoint.MediaRenderer.removed</p></li>
+<li><p>Coherence.UPnP.ControlPoint.InternetGatewayDevice.detected</p></li>
+<li><p>Coherence.UPnP.ControlPoint.InternetGatewayDevice.removed</p></li>
+</ul>
+</div></blockquote>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.9.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>receiver</em>, <em>signal=None</em>, <em>sender=None</em>, <em>weak=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper method around the deprecated method louie.connect. It will
+check if the passed signal is supported by executing the method
+<a class="reference internal" href="#coherence.upnp.devices.control_point.ControlPoint.check_louie" title="coherence.upnp.devices.control_point.ControlPoint.check_louie"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_louie()</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This will probably be removed at some point, if you use
+the connect method you should consider to migrate to the
+new event system EventDispatcher.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span>Added EventDispatcher’s compatibility for some basic signals</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.disconnect">
+<code class="descname">disconnect</code><span class="sig-paren">(</span><em>receiver</em>, <em>signal=None</em>, <em>sender=None</em>, <em>weak=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.disconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper method around the deprecated method louie.disconnect. It will
+check if the passed signal is supported by executing the method
+<a class="reference internal" href="#coherence.upnp.devices.control_point.ControlPoint.check_louie" title="coherence.upnp.devices.control_point.ControlPoint.check_louie"><code class="xref py py-meth docutils literal notranslate"><span class="pre">check_louie()</span></code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This will probably be removed at some point, if you use
+the disconnect method you should migrate to the new event
+system EventDispatcher.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span>Added EventDispatcher’s compatibility for some basic signals</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.get_devices">
+<code class="descname">get_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.get_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.get_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.get_device_with_id">
+<code class="descname">get_device_with_id</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.get_device_with_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.get_device_with_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.get_device_by_host">
+<code class="descname">get_device_by_host</code><span class="sig-paren">(</span><em>host</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.get_device_by_host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.get_device_by_host" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.check_device">
+<code class="descname">check_device</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.check_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.check_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.completed">
+<code class="descname">completed</code><span class="sig-paren">(</span><em>client</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.completed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.remove_client">
+<code class="descname">remove_client</code><span class="sig-paren">(</span><em>udn</em>, <em>client</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.remove_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.remove_client" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.propagate">
+<code class="descname">propagate</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.propagate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.propagate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.ControlPoint.put_resource">
+<code class="descname">put_resource</code><span class="sig-paren">(</span><em>url</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#ControlPoint.put_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.ControlPoint.put_resource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.devices.control_point.XMLRPC">
+<em class="property">class </em><code class="descname">XMLRPC</code><span class="sig-paren">(</span><em>control_point</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.xmlrpc.XMLRPC</span></code></p>
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_list_devices">
+<code class="descname">xmlrpc_list_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_list_devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_list_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_mute_device">
+<code class="descname">xmlrpc_mute_device</code><span class="sig-paren">(</span><em>device_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_mute_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_mute_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_unmute_device">
+<code class="descname">xmlrpc_unmute_device</code><span class="sig-paren">(</span><em>device_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_unmute_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_unmute_device" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_set_volume">
+<code class="descname">xmlrpc_set_volume</code><span class="sig-paren">(</span><em>device_id</em>, <em>volume</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_set_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_set_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_play">
+<code class="descname">xmlrpc_play</code><span class="sig-paren">(</span><em>device_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_play"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_play" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_pause">
+<code class="descname">xmlrpc_pause</code><span class="sig-paren">(</span><em>device_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_pause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_pause" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_stop">
+<code class="descname">xmlrpc_stop</code><span class="sig-paren">(</span><em>device_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_next">
+<code class="descname">xmlrpc_next</code><span class="sig-paren">(</span><em>device_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_next" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_previous">
+<code class="descname">xmlrpc_previous</code><span class="sig-paren">(</span><em>device_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_previous"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_previous" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_set_av_transport_uri">
+<code class="descname">xmlrpc_set_av_transport_uri</code><span class="sig-paren">(</span><em>device_id</em>, <em>uri</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_set_av_transport_uri"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_set_av_transport_uri" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_create_object">
+<code class="descname">xmlrpc_create_object</code><span class="sig-paren">(</span><em>device_id</em>, <em>container_id</em>, <em>arguments</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_create_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_create_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_import_resource">
+<code class="descname">xmlrpc_import_resource</code><span class="sig-paren">(</span><em>device_id</em>, <em>source_uri</em>, <em>destination_uri</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_import_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_import_resource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_put_resource">
+<code class="descname">xmlrpc_put_resource</code><span class="sig-paren">(</span><em>url</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_put_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_put_resource" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.devices.control_point.XMLRPC.xmlrpc_ping">
+<code class="descname">xmlrpc_ping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#XMLRPC.xmlrpc_ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_ping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.devices.control_point.startXMLRPC">
+<code class="descname">startXMLRPC</code><span class="sig-paren">(</span><em>control_point</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/devices/control_point.html#startXMLRPC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.devices.control_point.startXMLRPC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="internet_gateway_device_client.html" class="btn btn-neutral float-right" title="coherence.upnp.devices.internet_gateway_device_client (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="basics.html" class="btn btn-neutral float-left" title="coherence.upnp.devices.basics (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,423 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.log &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.log</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.log</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2013, Hartmut Goebel &lt;h.goebel@crazy-compilers.com&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="c1"># If you want to debug cohen,</span>
+<span class="c1"># set the below variable to: logging.DEBUG</span>
+<span class="n">DEFAULT_COHEN_LOG_LEVEL</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span>
+
+<span class="n">LOG_FORMAT</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;[</span><span class="si">%(levelname)-18s</span><span class="s1">][$BOLD</span><span class="si">%(name)-15s</span><span class="s1">$RESET]  &#39;</span>
+              <span class="s1">&#39;</span><span class="si">%(message)s</span><span class="s1">    ($BOLD</span><span class="si">%(filename)s</span><span class="s1">$RESET:</span><span class="si">%(lineno)d</span><span class="s1">)&#39;</span><span class="p">)</span>
+
+<span class="n">ENV_VAR_NAME</span> <span class="o">=</span> <span class="s1">&#39;COHEN_DEBUG&#39;</span>
+
+<span class="n">BLACK</span><span class="p">,</span> <span class="n">RED</span><span class="p">,</span> <span class="n">GREEN</span><span class="p">,</span> <span class="n">YELLOW</span><span class="p">,</span> <span class="n">BLUE</span><span class="p">,</span> <span class="n">MAGENTA</span><span class="p">,</span> <span class="n">CYAN</span><span class="p">,</span> <span class="n">WHITE</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="c1"># The background is set with 40 plus the number of the color,</span>
+<span class="c1"># and the foreground with 30</span>
+
+<span class="c1"># These are the sequences need to get colored output</span>
+<span class="n">RESET_SEQ</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span>
+<span class="n">COLOR_SEQ</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[1;</span><span class="si">%d</span><span class="s1">m&#39;</span>
+<span class="n">BOLD_SEQ</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[1m&#39;</span>
+
+<span class="n">COLORS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;WARNING&#39;</span><span class="p">:</span> <span class="n">YELLOW</span><span class="p">,</span>
+    <span class="s1">&#39;INFO&#39;</span><span class="p">:</span> <span class="n">WHITE</span><span class="p">,</span>
+    <span class="s1">&#39;DEBUG&#39;</span><span class="p">:</span> <span class="n">BLUE</span><span class="p">,</span>
+    <span class="s1">&#39;CRITICAL&#39;</span><span class="p">:</span> <span class="n">YELLOW</span><span class="p">,</span>
+    <span class="s1">&#39;ERROR&#39;</span><span class="p">:</span> <span class="n">RED</span>
+<span class="p">}</span>
+
+<span class="c1"># This is taken from std.-module logging, see Logger.findCaller below.</span>
+<span class="c1"># _srcfile is used when walking the stack to check when we&#39;ve got the first</span>
+<span class="c1"># caller stack frame.</span>
+<span class="c1">#</span>
+<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="s1">&#39;frozen&#39;</span><span class="p">):</span>  <span class="c1"># support for py2exe</span>
+    <span class="n">_srcfile</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;coherence</span><span class="si">{os.sep}</span><span class="s1">log</span><span class="si">{__file__[-4:]}</span><span class="s1">&#39;</span>
+<span class="k">elif</span> <span class="vm">__file__</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;.pyc&#39;</span><span class="p">,</span> <span class="s1">&#39;.pyo&#39;</span><span class="p">]:</span>
+    <span class="n">_srcfile</span> <span class="o">=</span> <span class="vm">__file__</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.py&#39;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">_srcfile</span> <span class="o">=</span> <span class="vm">__file__</span>
+<span class="n">_srcfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normcase</span><span class="p">(</span><span class="n">_srcfile</span><span class="p">)</span>
+<span class="n">_srcfiles</span> <span class="o">=</span> <span class="p">(</span><span class="n">_srcfile</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">_srcfile</span><span class="p">)</span>
+
+<span class="n">loggers</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="get_main_log_level"><a class="viewcode-back" href="../../source/modules.html#coherence.log.get_main_log_level">[docs]</a><span class="k">def</span> <span class="nf">get_main_log_level</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">loggers</span>
+    <span class="k">if</span> <span class="n">ENV_VAR_NAME</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">ENV_VAR_NAME</span><span class="p">]</span>
+    <span class="n">log_root</span> <span class="o">=</span> <span class="n">loggers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;coherence&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">log_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">log_level</span> <span class="o">=</span> <span class="n">DEFAULT_COHEN_LOG_LEVEL</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log_level</span> <span class="o">=</span> <span class="n">log_root</span><span class="o">.</span><span class="n">level</span>
+    <span class="k">return</span> <span class="n">log_level</span></div>
+
+
+<div class="viewcode-block" id="formatter_message"><a class="viewcode-back" href="../../source/modules.html#coherence.log.formatter_message">[docs]</a><span class="k">def</span> <span class="nf">formatter_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">use_color</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">use_color</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="s1">&#39;$RESET&#39;</span><span class="p">,</span> <span class="n">RESET_SEQ</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="s1">&#39;$BOLD&#39;</span><span class="p">,</span> <span class="n">BOLD_SEQ</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="s1">&#39;$RESET&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="s1">&#39;$BOLD&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">message</span></div>
+
+
+<div class="viewcode-block" id="ColoredFormatter"><a class="viewcode-back" href="../../source/modules.html#coherence.log.ColoredFormatter">[docs]</a><span class="k">class</span> <span class="nc">ColoredFormatter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">use_color</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_color</span> <span class="o">=</span> <span class="n">use_color</span>
+
+<div class="viewcode-block" id="ColoredFormatter.format"><a class="viewcode-back" href="../../source/modules.html#coherence.log.ColoredFormatter.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="n">levelname</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">levelname</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_color</span> <span class="ow">and</span> <span class="n">levelname</span> <span class="ow">in</span> <span class="n">COLORS</span><span class="p">:</span>
+            <span class="n">levelname_color</span> <span class="o">=</span> \
+                <span class="n">COLOR_SEQ</span> <span class="o">%</span> <span class="p">(</span><span class="mi">30</span> <span class="o">+</span> <span class="n">COLORS</span><span class="p">[</span><span class="n">levelname</span><span class="p">])</span> <span class="o">+</span> <span class="n">levelname</span> <span class="o">+</span> <span class="n">RESET_SEQ</span>
+            <span class="n">record</span><span class="o">.</span><span class="n">levelname</span> <span class="o">=</span> <span class="n">levelname_color</span>
+        <span class="k">return</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ColoredLogger"><a class="viewcode-back" href="../../source/modules.html#coherence.log.ColoredLogger">[docs]</a><span class="k">class</span> <span class="nc">ColoredLogger</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+    <span class="n">FORMAT</span> <span class="o">=</span> <span class="n">LOG_FORMAT</span>
+    <span class="n">COLOR_FORMAT</span> <span class="o">=</span> <span class="n">formatter_message</span><span class="p">(</span><span class="n">FORMAT</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">get_main_log_level</span><span class="p">())</span>
+
+        <span class="n">color_formatter</span> <span class="o">=</span> <span class="n">ColoredFormatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COLOR_FORMAT</span><span class="p">)</span>
+
+        <span class="n">console</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">color_formatter</span><span class="p">)</span>
+
+        <span class="c1"># print(self.handlers)</span>
+        <span class="k">if</span> <span class="n">console</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console</span><span class="p">)</span>
+        <span class="c1"># print(self.handlers)</span>
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="ColoredLogger.findCaller"><a class="viewcode-back" href="../../source/modules.html#coherence.log.ColoredLogger.findCaller">[docs]</a>    <span class="k">def</span> <span class="nf">findCaller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stack_info</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_color</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Find the stack frame of the caller so that we can note the source</span>
+<span class="sd">        file name, line number and function name.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span>
+        <span class="c1"># On some versions of IronPython, currentframe() returns None if</span>
+        <span class="c1"># IronPython isn&#39;t run with -X:Frames.</span>
+        <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">f_back</span>
+        <span class="n">rv</span> <span class="o">=</span> <span class="s1">&#39;(unknown file)&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;(unknown function)&#39;</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">while</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;f_code&#39;</span><span class="p">):</span>
+            <span class="n">co</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">f_code</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normcase</span><span class="p">(</span><span class="n">co</span><span class="o">.</span><span class="n">co_filename</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">_srcfiles</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">f_back</span>
+                <span class="k">continue</span>
+            <span class="n">sinfo</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">stack_info</span><span class="p">:</span>
+                <span class="n">sio</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+                <span class="n">sio</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Stack (most recent call last):</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">traceback</span><span class="o">.</span><span class="n">print_stack</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sio</span><span class="p">)</span>
+                <span class="n">sinfo</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">sinfo</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span>
+                    <span class="n">sinfo</span> <span class="o">=</span> <span class="n">sinfo</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">sio</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">rv</span> <span class="o">=</span> <span class="p">(</span><span class="n">co</span><span class="o">.</span><span class="n">co_filename</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">f_lineno</span><span class="p">,</span> <span class="n">co</span><span class="o">.</span><span class="n">co_name</span><span class="p">,</span> <span class="n">sinfo</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="k">return</span> <span class="n">rv</span></div></div>
+
+
+<span class="n">logging</span><span class="o">.</span><span class="n">setLoggerClass</span><span class="p">(</span><span class="n">ColoredLogger</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LogAble"><a class="viewcode-back" href="../../source/modules.html#coherence.log.LogAble">[docs]</a><span class="k">class</span> <span class="nc">LogAble</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Base class for objects that want to be able to log messages with</span>
+<span class="sd">    different level of severity.  The levels are, in order from least</span>
+<span class="sd">    to most: log, debug, info, warning, error.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span>
+    <span class="sd">&#39;&#39;&#39;Implementors can provide a category to log their messages under.&#39;&#39;&#39;</span>
+
+    <span class="n">_Loggable__logger</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">FORMAT</span> <span class="o">=</span> <span class="n">LOG_FORMAT</span>
+    <span class="n">COLOR_FORMAT</span> <span class="o">=</span> <span class="n">formatter_message</span><span class="p">(</span><span class="n">FORMAT</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">loggers</span>
+        <span class="k">if</span> <span class="n">loggers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logCategory</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">loggers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logCategory</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logCategory</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">loggers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">logCategory</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Added logger with logCategory: </span><span class="si">{self.logCategory}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="LogAble.log"><a class="viewcode-back" href="../../source/modules.html#coherence.log.LogAble.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogAble.warning"><a class="viewcode-back" href="../../source/modules.html#coherence.log.LogAble.warning">[docs]</a>    <span class="k">def</span> <span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogAble.info"><a class="viewcode-back" href="../../source/modules.html#coherence.log.LogAble.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogAble.critical"><a class="viewcode-back" href="../../source/modules.html#coherence.log.LogAble.critical">[docs]</a>    <span class="k">def</span> <span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogAble.debug"><a class="viewcode-back" href="../../source/modules.html#coherence.log.LogAble.debug">[docs]</a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogAble.error"><a class="viewcode-back" href="../../source/modules.html#coherence.log.LogAble.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogAble.exception"><a class="viewcode-back" href="../../source/modules.html#coherence.log.LogAble.exception">[docs]</a>    <span class="k">def</span> <span class="nf">exception</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="n">fatal</span> <span class="o">=</span> <span class="n">critical</span>
+    <span class="n">warn</span> <span class="o">=</span> <span class="n">warning</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">info</span></div>
+
+
+<div class="viewcode-block" id="get_logger"><a class="viewcode-back" href="../../source/modules.html#coherence.log.get_logger">[docs]</a><span class="k">def</span> <span class="nf">get_logger</span><span class="p">(</span><span class="n">log_category</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">loggers</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">loggers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">log_category</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">log</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">log_category</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">get_main_log_level</span><span class="p">())</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">log</span></div>
+
+
+<div class="viewcode-block" id="init"><a class="viewcode-back" href="../../source/modules.html#coherence.log.init">[docs]</a><span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">logfilename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loglevel</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">loggers</span>
+    <span class="k">if</span> <span class="n">loggers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;coherence&#39;</span><span class="p">):</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">loggers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;coherence&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">loglevel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">log</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">addLevelName</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;NONE&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">logfilename</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span>
+            <span class="nb">format</span><span class="o">=</span><span class="n">LOG_FORMAT</span><span class="p">)</span>
+
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">loglevel</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">loggers</span><span class="p">[</span><span class="s1">&#39;coherence&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Added logger with logCategory: {&quot;coherence&quot;}&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

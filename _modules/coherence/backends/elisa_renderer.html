@@ -1,0 +1,575 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.elisa_renderer &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.elisa_renderer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.elisa_renderer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2006, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+
+<span class="kn">from</span> <span class="nn">twisted.internet.defer</span> <span class="k">import</span> <span class="n">Deferred</span>
+<span class="kn">from</span> <span class="nn">twisted.internet.task</span> <span class="k">import</span> <span class="n">LoopingCall</span>
+<span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">failure</span>
+<span class="kn">from</span> <span class="nn">twisted.spread</span> <span class="k">import</span> <span class="n">pb</span>
+
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">Backend</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.soap_service</span> <span class="k">import</span> <span class="n">errorCode</span>
+
+
+<div class="viewcode-block" id="ElisaPlayer"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer">[docs]</a><span class="k">class</span> <span class="nc">ElisaPlayer</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;a backend to the Elisa player</span>
+
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">        * Migrated from louie/dispatcher to EventDispatcher</span>
+<span class="sd">        * Introduced :class:`~coherence.backend.Backend`&#39;s inheritance</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;elisa_player&#39;</span>
+
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaRenderer&#39;</span><span class="p">]</span>
+    <span class="n">vendor_value_defaults</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;RenderingControl&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;A_ARG_TYPE_Channel&#39;</span><span class="p">:</span> <span class="s1">&#39;Master&#39;</span><span class="p">}}</span>
+    <span class="n">vendor_range_defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;RenderingControl&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Volume&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;maximum&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">}}}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">Backend</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;Elisa MediaRenderer&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;127.0.0.1&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">player</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">==</span> <span class="s1">&#39;internal&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">elisa.core</span> <span class="k">import</span> <span class="n">common</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">player</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">get_application</span><span class="p">()</span><span class="o">.</span><span class="n">get_player</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;this works only from within Elisa&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">factory</span> <span class="o">=</span> <span class="n">pb</span><span class="o">.</span><span class="n">PBClientFactory</span><span class="p">()</span>
+            <span class="n">factory</span><span class="o">.</span><span class="n">noisy</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">reactor</span><span class="o">.</span><span class="n">connectTCP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="mi">8789</span><span class="p">,</span> <span class="n">factory</span><span class="p">)</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">getRootObject</span><span class="p">()</span>
+
+            <span class="k">def</span> <span class="nf">result</span><span class="p">(</span><span class="n">player</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">player</span> <span class="o">=</span> <span class="n">player</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">def</span> <span class="nf">got_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;connection to Elisa failed!&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_init_failed</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">error</span><span class="p">)</span>
+
+            <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="k">lambda</span> <span class="nb">object</span><span class="p">:</span> <span class="nb">object</span><span class="o">.</span><span class="n">callRemote</span><span class="p">(</span><span class="s1">&#39;get_player&#39;</span><span class="p">))</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">got_error</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">playing</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poll_LC</span> <span class="o">=</span> <span class="n">LoopingCall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">poll_player</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ElisaPlayer.call_player"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.call_player">[docs]</a>    <span class="k">def</span> <span class="nf">call_player</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;call player.</span><span class="si">{method}{args}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">==</span> <span class="s1">&#39;internal&#39;</span><span class="p">:</span>
+            <span class="n">dfr</span> <span class="o">=</span> <span class="n">Deferred</span><span class="p">()</span>
+            <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="p">,</span> <span class="n">method</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">dfr</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dfr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">callRemote</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dfr</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ElisaPlayer.poll_player"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.poll_player">[docs]</a>    <span class="k">def</span> <span class="nf">poll_player</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">got_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;poll_player </span><span class="si">{result}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">connection_id</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">lookup_avt_id</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;STOPPED&#39;</span><span class="p">,</span> <span class="s1">&#39;READY&#39;</span><span class="p">):</span>
+                <span class="n">transport_state</span> <span class="o">=</span> <span class="s1">&#39;STOPPED&#39;</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s1">&#39;PLAYING&#39;</span><span class="p">:</span>
+                <span class="n">transport_state</span> <span class="o">=</span> <span class="s1">&#39;PLAYING&#39;</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="s1">&#39;PAUSED&#39;</span><span class="p">:</span>
+                <span class="n">transport_state</span> <span class="o">=</span> <span class="s1">&#39;PAUSED_PLAYBACK&#39;</span>
+
+            <span class="k">if</span> <span class="n">transport_state</span> <span class="o">==</span> <span class="s1">&#39;PLAYING&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">query_position</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="n">transport_state</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">transport_state</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;TransportState&#39;</span><span class="p">,</span> <span class="n">transport_state</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">call_player</span><span class="p">(</span><span class="s1">&#39;get_readable_state&#39;</span><span class="p">,</span> <span class="n">got_result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.query_position"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.query_position">[docs]</a>    <span class="k">def</span> <span class="nf">query_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">got_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;query_position </span><span class="si">{result}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">position</span><span class="p">,</span> <span class="n">duration</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">connection_id</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">lookup_avt_id</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                    <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;CurrentTrack&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">position</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">position</span> <span class="o">/</span> <span class="mi">1000000000</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+                <span class="n">h</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;RelativeTimePosition&#39;</span><span class="p">,</span>
+                        <span class="n">f</span><span class="s1">&#39;</span><span class="si">{h:02d}</span><span class="s1">:</span><span class="si">{m:02d}</span><span class="s1">:</span><span class="si">{s:02d}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;AbsoluteTimePosition&#39;</span><span class="p">,</span>
+                        <span class="n">f</span><span class="s1">&#39;</span><span class="si">{h:02d}</span><span class="s1">:</span><span class="si">{m:02d}</span><span class="s1">:</span><span class="si">{s:02d}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">m</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">duration</span> <span class="o">/</span> <span class="mi">1000000000</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+                <span class="n">h</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;CurrentTrackDuration&#39;</span><span class="p">,</span>
+                        <span class="n">f</span><span class="s1">&#39;</span><span class="si">{h:02d}</span><span class="s1">:</span><span class="si">{m:02d}</span><span class="s1">:</span><span class="si">{s:02d}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;CurrentMediaDuration&#39;</span><span class="p">,</span>
+                        <span class="n">f</span><span class="s1">&#39;</span><span class="si">{h:02d}</span><span class="s1">:</span><span class="si">{m:02d}</span><span class="s1">:</span><span class="si">{s:02d}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">elt</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">DIDLElement</span><span class="o">.</span><span class="n">fromString</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">elt</span><span class="o">.</span><span class="n">getItems</span><span class="p">():</span>
+                            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;res&#39;</span><span class="p">):</span>
+                                <span class="n">res</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                                    <span class="n">f</span><span class="s1">&#39;</span><span class="si">{h:d}</span><span class="s1">:</span><span class="si">{m:02d}</span><span class="s1">:</span><span class="si">{s:02d}</span><span class="s1">&#39;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">elt</span><span class="o">.</span><span class="n">toString</span><span class="p">()</span>
+
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                                <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;AVTransportURIMetaData&#39;</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                                <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;CurrentTrackMetaData&#39;</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">call_player</span><span class="p">(</span><span class="s1">&#39;get_status&#39;</span><span class="p">,</span> <span class="n">got_result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.load"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">got_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">connection_id</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">lookup_avt_id</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;CurrentTransportActions&#39;</span><span class="p">,</span> <span class="s1">&#39;Play,Stop,Pause&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;NumberOfTracks&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;CurrentTrackURI&#39;</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;AVTransportURI&#39;</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;AVTransportURIMetaData&#39;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;CurrentTrackURI&#39;</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="n">connection_id</span><span class="p">,</span> <span class="s1">&#39;CurrentTrackMetaData&#39;</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">call_player</span><span class="p">(</span><span class="s1">&#39;set_uri&#39;</span><span class="p">,</span> <span class="n">got_result</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.start"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">play</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.stop"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">got_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">lookup_avt_id</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span><span class="p">),</span>
+                <span class="s1">&#39;TransportState&#39;</span><span class="p">,</span> <span class="s1">&#39;STOPPED&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">call_player</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="n">got_result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.play"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.play">[docs]</a>    <span class="k">def</span> <span class="nf">play</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">got_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">lookup_avt_id</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span><span class="p">),</span>
+                <span class="s1">&#39;TransportState&#39;</span><span class="p">,</span> <span class="s1">&#39;PLAYING&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">call_player</span><span class="p">(</span><span class="s1">&#39;play&#39;</span><span class="p">,</span> <span class="n">got_result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.pause"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.pause">[docs]</a>    <span class="k">def</span> <span class="nf">pause</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">got_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">lookup_avt_id</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span><span class="p">),</span>
+                <span class="s1">&#39;TransportState&#39;</span><span class="p">,</span> <span class="s1">&#39;PAUSED_PLAYBACK&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">call_player</span><span class="p">(</span><span class="s1">&#39;pause&#39;</span><span class="p">,</span> <span class="n">got_result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.seek"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.seek">[docs]</a>    <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        @param location:    simple number = time to seek to, in seconds</span>
+<span class="sd">                            +nL = relative seek forward n seconds</span>
+<span class="sd">                            -nL = relative seek backwards n seconds</span>
+<span class="sd">        &#39;&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.mute"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.mute">[docs]</a>    <span class="k">def</span> <span class="nf">mute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">got_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="n">rcs_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">lookup_rcs_id</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span><span class="p">)</span>
+            <span class="c1"># FIXME: use result, not True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">rendering_control_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="n">rcs_id</span><span class="p">,</span> <span class="s1">&#39;Mute&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">call_player</span><span class="p">(</span><span class="s1">&#39;mute&#39;</span><span class="p">,</span> <span class="n">got_result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.unmute"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.unmute">[docs]</a>    <span class="k">def</span> <span class="nf">unmute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">got_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="n">rcs_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">lookup_rcs_id</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span><span class="p">)</span>
+            <span class="c1"># FIXME: use result, not False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">rendering_control_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="n">rcs_id</span><span class="p">,</span> <span class="s1">&#39;Mute&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">call_player</span><span class="p">(</span><span class="s1">&#39;un_mute&#39;</span><span class="p">,</span> <span class="n">got_result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.get_mute"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.get_mute">[docs]</a>    <span class="k">def</span> <span class="nf">get_mute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">got_infos</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;got_mute: </span><span class="si">{result}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_player</span><span class="p">(</span><span class="s1">&#39;get_mute&#39;</span><span class="p">,</span> <span class="n">got_infos</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.get_volume"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.get_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; playbin volume is a double from 0.0 - 10.0</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">def</span> <span class="nf">got_infos</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;got_volume: </span><span class="si">{result}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_player</span><span class="p">(</span><span class="s1">&#39;get_volume&#39;</span><span class="p">,</span> <span class="n">got_infos</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.set_volume"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.set_volume">[docs]</a>    <span class="k">def</span> <span class="nf">set_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">volume</span><span class="p">):</span>
+        <span class="n">volume</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">volume</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">volume</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">volume</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">volume</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">volume</span> <span class="o">=</span> <span class="mi">100</span>
+
+        <span class="k">def</span> <span class="nf">got_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="n">rcs_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">lookup_rcs_id</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span><span class="p">)</span>
+            <span class="c1"># FIXME: use result, not volume</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">rendering_control_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span><span class="n">rcs_id</span><span class="p">,</span> <span class="s1">&#39;Volume&#39;</span><span class="p">,</span>
+                                                              <span class="n">volume</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">call_player</span><span class="p">(</span><span class="s1">&#39;set_volume&#39;</span><span class="p">,</span> <span class="n">got_result</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.upnp_init"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.upnp_init">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SinkProtocolInfo&#39;</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.host}</span><span class="s1">:*:*&#39;</span><span class="p">,</span> <span class="s1">&#39;http-get:*:audio/mpeg:*&#39;</span><span class="p">],</span>
+            <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;TransportState&#39;</span><span class="p">,</span> <span class="s1">&#39;NO_MEDIA_PRESENT&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;TransportStatus&#39;</span><span class="p">,</span> <span class="s1">&#39;OK&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CurrentPlayMode&#39;</span><span class="p">,</span> <span class="s1">&#39;NORMAL&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">av_transport_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;CurrentTransportActions&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">rendering_control_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Volume&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_volume</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">rendering_control_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Mute&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mute</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poll_LC</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.upnp_Play"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.upnp_Play">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_Play</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">InstanceID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;InstanceID&#39;</span><span class="p">])</span>
+        <span class="n">Speed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;Speed&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.upnp_Pause"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.upnp_Pause">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_Pause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">InstanceID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;InstanceID&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pause</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.upnp_Stop"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.upnp_Stop">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_Stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">InstanceID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;InstanceID&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.upnp_SetAVTransportURI"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.upnp_SetAVTransportURI">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_SetAVTransportURI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">InstanceID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;InstanceID&#39;</span><span class="p">])</span>
+        <span class="n">CurrentURI</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;CurrentURI&#39;</span><span class="p">]</span>
+        <span class="n">CurrentURIMetaData</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;CurrentURIMetaData&#39;</span><span class="p">]</span>
+        <span class="n">local_protocol_infos</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span>
+                <span class="s1">&#39;SinkProtocolInfo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="c1"># print &#39;&gt;&gt;&gt;&#39;, local_protocol_infos</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">CurrentURIMetaData</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">CurrentURI</span><span class="p">,</span> <span class="n">CurrentURIMetaData</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">elt</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">DIDLElement</span><span class="o">.</span><span class="n">fromString</span><span class="p">(</span><span class="n">CurrentURIMetaData</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">elt</span><span class="o">.</span><span class="n">numItems</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">elt</span><span class="o">.</span><span class="n">getItems</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">get_matching</span><span class="p">(</span><span class="n">local_protocol_infos</span><span class="p">,</span>
+                                            <span class="n">protocol_type</span><span class="o">=</span><span class="s1">&#39;internal&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">get_matching</span><span class="p">(</span><span class="n">local_protocol_infos</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">remote_protocol</span><span class="p">,</span> <span class="n">remote_network</span><span class="p">,</span> \
+                        <span class="n">remote_content_format</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">protocolInfo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                            <span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">CurrentURIMetaData</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">714</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.upnp_SetMute"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.upnp_SetMute">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_SetMute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">InstanceID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;InstanceID&#39;</span><span class="p">])</span>
+        <span class="n">Channel</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;Channel&#39;</span><span class="p">]</span>
+        <span class="n">DesiredMute</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;DesiredMute&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">DesiredMute</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;TRUE&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;Yes&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mute</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unmute</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="ElisaPlayer.upnp_SetVolume"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.ElisaPlayer.upnp_SetVolume">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_SetVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">InstanceID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;InstanceID&#39;</span><span class="p">])</span>
+        <span class="n">Channel</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;Channel&#39;</span><span class="p">]</span>
+        <span class="n">DesiredVolume</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;DesiredVolume&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="n">DesiredVolume</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{}</span></div></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../source/backends/elisarenderer.html#coherence.backends.elisa_renderer.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">ElisaPlayer</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">call_player</span><span class="p">():</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">get_mute</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">poll_player</span><span class="p">()</span>
+
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">call_player</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callWhenRunning</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

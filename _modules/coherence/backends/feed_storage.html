@@ -1,0 +1,418 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.feed_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.feed_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.feed_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2009, Dominik Ruf &lt;dominikruf at googlemail dot com&gt;</span>
+
+<span class="kn">import</span> <span class="nn">http.client</span>
+<span class="kn">import</span> <span class="nn">urllib.error</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlsplit</span>
+<span class="kn">from</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">import</span> <span class="n">ElementTree</span>
+
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendItem</span>
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendStore</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">ReverseProxyUriResource</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">feedparser</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">        This backend depends on the feedparser module.</span>
+<span class="s1">        You can get it at http://www.feedparser.org/.&#39;&#39;&#39;</span><span class="p">)</span>
+
+<span class="n">MIME_TYPES_EXTENTION_MAPPING</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mp3&#39;</span><span class="p">:</span> <span class="s1">&#39;audio/mpeg&#39;</span><span class="p">,</span> <span class="p">}</span>
+
+<span class="n">ROOT_CONTAINER_ID</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">AUDIO_ALL_CONTAINER_ID</span> <span class="o">=</span> <span class="mi">51</span>
+<span class="n">AUDIO_ARTIST_CONTAINER_ID</span> <span class="o">=</span> <span class="mi">52</span>
+<span class="n">AUDIO_ALBUM_CONTAINER_ID</span> <span class="o">=</span> <span class="mi">53</span>
+<span class="n">VIDEO_FOLDER_CONTAINER_ID</span> <span class="o">=</span> <span class="mi">54</span>
+
+
+<div class="viewcode-block" id="RedirectingReverseProxyUriResource"><a class="viewcode-back" href="../../../source/backends/feed.html#coherence.backends.feed_storage.RedirectingReverseProxyUriResource">[docs]</a><span class="k">class</span> <span class="nc">RedirectingReverseProxyUriResource</span><span class="p">(</span><span class="n">ReverseProxyUriResource</span><span class="p">):</span>
+<div class="viewcode-block" id="RedirectingReverseProxyUriResource.render"><a class="viewcode-back" href="../../../source/backends/feed.html#coherence.backends.feed_storage.RedirectingReverseProxyUriResource.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">follow_redirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resetUri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ReverseProxyUriResource</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RedirectingReverseProxyUriResource.follow_redirect"><a class="viewcode-back" href="../../../source/backends/feed.html#coherence.backends.feed_storage.RedirectingReverseProxyUriResource.follow_redirect">[docs]</a>    <span class="k">def</span> <span class="nf">follow_redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="n">netloc</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">fragment</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">uri</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">conn</span> <span class="o">=</span> <span class="n">http</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">HTTPConnection</span><span class="p">(</span><span class="n">netloc</span><span class="p">)</span>
+        <span class="n">conn</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{path}</span><span class="s1">?</span><span class="si">{query}</span><span class="s1">#</span><span class="si">{fragment}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">getresponse</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">301</span> <span class="ow">or</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">302</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">follow_redirect</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">getheader</span><span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">uri</span></div></div>
+
+
+<div class="viewcode-block" id="FeedStorageConfigurationException"><a class="viewcode-back" href="../../../source/backends/feed.html#coherence.backends.feed_storage.FeedStorageConfigurationException">[docs]</a><span class="k">class</span> <span class="nc">FeedStorageConfigurationException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="FeedContainer"><a class="viewcode-back" href="../../../source/backends/feed.html#coherence.backends.feed_storage.FeedContainer">[docs]</a><span class="k">class</span> <span class="nc">FeedContainer</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span> <span class="o">=</span> <span class="n">parent_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;directory&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="FeedContainer.get_children"><a class="viewcode-back" href="../../../source/backends/feed.html#coherence.backends.feed_storage.FeedContainer.get_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;returns all the chidlren of this container&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">start</span><span class="p">:]</span></div>
+
+<div class="viewcode-block" id="FeedContainer.get_child_count"><a class="viewcode-back" href="../../../source/backends/feed.html#coherence.backends.feed_storage.FeedContainer.get_child_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_child_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;returns the number of children in this container&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="FeedEnclosure"><a class="viewcode-back" href="../../../source/backends/feed.html#coherence.backends.feed_storage.FeedEnclosure">[docs]</a><span class="k">class</span> <span class="nc">FeedEnclosure</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">enclosure</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">RedirectingReverseProxyUriResource</span><span class="p">(</span>
+            <span class="n">enclosure</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;latin-1&#39;</span><span class="p">))</span>
+
+        <span class="c1"># doing this because some (Fraunhofer Podcast)</span>
+        <span class="c1"># feeds say there mime type is audio/x-mpeg</span>
+        <span class="c1"># which at least my XBOX doesn&#39;t like</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="n">enclosure</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">MIME_TYPES_EXTENTION_MAPPING</span><span class="p">:</span>
+            <span class="n">mime_type</span> <span class="o">=</span> <span class="n">MIME_TYPES_EXTENTION_MAPPING</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mime_type</span> <span class="o">=</span> <span class="n">enclosure</span><span class="o">.</span><span class="n">type</span>
+        <span class="k">if</span> <span class="n">enclosure</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;audio&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">AudioItem</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">enclosure</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;video&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">VideoItem</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">enclosure</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">ImageItem</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{store.urlbase}{id:d}</span><span class="s1">&#39;</span><span class="p">,</span>
+                                <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{mime_type}</span><span class="s1">:*&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FeedStore"><a class="viewcode-back" href="../../../source/backends/feed.html#coherence.backends.feed_storage.FeedStore">[docs]</a><span class="k">class</span> <span class="nc">FeedStore</span><span class="p">(</span><span class="n">BackendStore</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;a general feed store&#39;&#39;&#39;</span>
+
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;feed_store&#39;</span>
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">BackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;Feed Store&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;urlbase&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feed_urls</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;feed_urls&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opml_url</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;opml_url&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feed_urls</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">opml_url</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">FeedStorageConfigurationException</span><span class="p">(</span>
+                <span class="s1">&#39;either feed_urls or opml_url has to be set&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feed_urls</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">opml_url</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FeedStorageConfigurationException</span><span class="p">(</span>
+                <span class="s1">&#39;only feed_urls OR opml_url can be set&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">server</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span> <span class="o">=</span> \
+            <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;refresh&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>  <span class="c1"># TODO: not used yet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmc_mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;4&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">AUDIO_ALL_CONTAINER_ID</span><span class="p">),</span>  <span class="c1"># all tracks</span>
+            <span class="s1">&#39;7&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">AUDIO_ALBUM_CONTAINER_ID</span><span class="p">),</span>  <span class="c1"># all albums</span>
+            <span class="s1">&#39;6&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">AUDIO_ARTIST_CONTAINER_ID</span><span class="p">),</span>  <span class="c1"># all artists</span>
+            <span class="s1">&#39;15&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">VIDEO_FOLDER_CONTAINER_ID</span><span class="p">),</span>  <span class="c1"># all videos</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">FeedContainer</span><span class="p">(</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ROOT_CONTAINER_ID</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">AUDIO_ALL_CONTAINER_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">FeedContainer</span><span class="p">(</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">AUDIO_ALL_CONTAINER_ID</span><span class="p">,</span> <span class="s1">&#39;AUDIO_ALL_CONTAINER&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">AUDIO_ALBUM_CONTAINER_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">FeedContainer</span><span class="p">(</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">AUDIO_ALBUM_CONTAINER_ID</span><span class="p">,</span> <span class="s1">&#39;AUDIO_ALBUM_CONTAINER&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">VIDEO_FOLDER_CONTAINER_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">FeedContainer</span><span class="p">(</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">VIDEO_FOLDER_CONTAINER_ID</span><span class="p">,</span> <span class="s1">&#39;VIDEO_FOLDER_CONTAINER&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_data</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;error while updateing the feed &#39;</span>
+                       <span class="n">f</span><span class="s1">&#39;content for </span><span class="si">{self.name}</span><span class="s1">: {str(e)}&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span><span class="p">()</span>
+
+<div class="viewcode-block" id="FeedStore.get_by_id"><a class="viewcode-back" href="../../../source/backends/feed.html#coherence.backends.feed_storage.FeedStore.get_by_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;returns the item according to the DIDLite id&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">)]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;can</span><span class="se">\&#39;</span><span class="s1">t get item {int(id):d} from </span><span class="si">{self.name}</span><span class="s1"> feed storage&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="FeedStore._update_data"><a class="viewcode-back" href="../../../source/backends/feed.html#coherence.backends.feed_storage.FeedStore._update_data">[docs]</a>    <span class="k">def</span> <span class="nf">_update_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;get the feed xml, parse it, etc.&#39;&#39;&#39;</span>
+        <span class="n">feed_urls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opml_url</span><span class="p">):</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opml_url</span><span class="p">))</span>
+            <span class="n">body</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">outline</span> <span class="ow">in</span> <span class="n">body</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;outline&#39;</span><span class="p">):</span>
+                <span class="n">feed_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outline</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feed_urls</span><span class="p">):</span>
+            <span class="n">feed_urls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feed_urls</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">container_id</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="n">item_id</span> <span class="o">=</span> <span class="mi">1001</span>
+        <span class="k">for</span> <span class="n">feed_url</span> <span class="ow">in</span> <span class="n">feed_urls</span><span class="p">:</span>
+            <span class="n">netloc</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">fragment</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">feed_url</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">conn</span> <span class="o">=</span> <span class="n">http</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">HTTPConnection</span><span class="p">(</span><span class="n">netloc</span><span class="p">)</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{path}</span><span class="s1">?</span><span class="si">{query}</span><span class="s1">#</span><span class="si">{fragment}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">getresponse</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">status</span> <span class="o">&gt;=</span> <span class="mi">400</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;error getting </span><span class="si">{feed_url}</span><span class="s1"> status code: </span><span class="si">{res.status:d}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">fp_dict</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">feed_url</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">fp_dict</span><span class="o">.</span><span class="n">feed</span><span class="o">.</span><span class="n">title</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">container_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">FeedContainer</span><span class="p">(</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">,</span>
+                                                     <span class="n">container_id</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">container_id</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">VIDEO_FOLDER_CONTAINER_ID</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">container_id</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">AUDIO_ALBUM_CONTAINER_ID</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">container_id</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">fp_dict</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">enclosure</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">enclosures</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">item_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">FeedEnclosure</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span>
+                        <span class="n">f</span><span class="s1">&#39;</span><span class="si">{item_id:04d}</span><span class="s1"> - </span><span class="si">{item.title}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">enclosure</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">container_id</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">item_id</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">enclosure</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;audio&#39;</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">AUDIO_ALL_CONTAINER_ID</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">item_id</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">container_id</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">,</span>
+                                          <span class="n">DIDLLite</span><span class="o">.</span><span class="n">MusicAlbum</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">container_id</span><span class="p">]</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> \
+                                <span class="n">DIDLLite</span><span class="o">.</span><span class="n">MusicAlbum</span><span class="p">(</span>
+                                    <span class="n">container_id</span><span class="p">,</span> <span class="n">AUDIO_ALBUM_CONTAINER_ID</span><span class="p">,</span>
+                                    <span class="n">name</span><span class="p">)</span>
+
+                    <span class="n">item_id</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">container_id</span> <span class="o">&lt;=</span> <span class="mi">1000</span><span class="p">:</span>
+                <span class="n">container_id</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;to many containers&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

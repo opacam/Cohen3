@@ -1,0 +1,686 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.test_storage (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="coherence.backends.tracker_storage (module)" href="tracker.html" />
+    <link rel="prev" title="coherence.backends.ted_storage (module)" href="ted.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../coherence.backends.html">coherence.backends (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ampache.html">coherence.backends.ampache_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appletrailers.html">coherence.backends.appletrailers_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="audiocd.html">coherence.backends.audiocd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="axiscam.html">coherence.backends.axiscam_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="banshee.html">coherence.backends.banshee_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bbc.html">coherence.backends.bbc_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="buzztard.html">coherence.backends.buzztard_control (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dvbd.html">coherence.backends.dvbd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elisarenderer.html">coherence.backends.elisa_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elisastorage.html">coherence.backends.elisa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="feed.html">coherence.backends.feed_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="flickr.html">coherence.backends.flickr_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fs.html">coherence.backends.fs_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gallery2.html">coherence.backends.gallery2_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gstreamer_renderer.html">coherence.backends.gstreamer_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iradio.html">coherence.backends.iradio_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="itv.html">coherence.backends.itv_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lastfm.html">coherence.backends.lastfm_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lolcats.html">coherence.backends.lolcats_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mediadb.html">coherence.backends.mediadb_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="miroguide.html">coherence.backends.miroguide_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="picasa.html">coherence.backends.picasa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="playlist.html">coherence.backends.playlist_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="radiotime.html">coherence.backends.radiotime_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="swr3.html">coherence.backends.swr3_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ted.html">coherence.backends.ted_storage (module)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">coherence.backends.test_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracker.html">coherence.backends.tracker_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="twitch.html">coherence.backends.twitch_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="yamj.html">coherence.backends.yamj_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="youtube.html">coherence.backends.youtube_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coherence.backends.html#coherence-backends-models-package">coherence.backends.models (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../coherence.backends.html">coherence.backends (package)</a> &raquo;</li>
+        
+      <li>coherence.backends.test_storage (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/source/backends/test.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.backends.test_storage">
+<span id="coherence-backends-test-storage-module"></span><span id="coherence-backends-test"></span><h1>coherence.backends.test_storage (module)<a class="headerlink" href="#module-coherence.backends.test_storage" title="Permalink to this headline">¶</a></h1>
+<p>A MediaServer backend to test Items.</p>
+<p>Item information can be passed on the commandline or in the config as an XML
+fragment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">coherence</span> <span class="o">--</span><span class="n">plugin</span><span class="o">=</span><span class="n">backend</span><span class="p">:</span><span class="n">TestStore</span><span class="p">,</span><span class="n">name</span><span class="p">:</span><span class="n">Test</span><span class="p">,</span>\
+   <span class="n">item</span><span class="p">:</span><span class="o">&lt;</span><span class="n">item</span><span class="o">&gt;&lt;</span><span class="n">location</span><span class="o">&gt;</span><span class="n">audio</span><span class="o">.</span><span class="n">mp3</span><span class="o">&lt;/</span><span class="n">location</span><span class="o">&gt;</span>\
+        <span class="o">&lt;</span><span class="n">mimetype</span><span class="o">&gt;</span><span class="n">audio</span><span class="o">/</span><span class="n">mpeg</span><span class="o">&lt;/</span><span class="n">mimetype</span><span class="o">&gt;&lt;/</span><span class="n">item</span><span class="o">&gt;</span><span class="p">,</span>\
+   <span class="n">item</span><span class="p">:</span><span class="o">&lt;</span><span class="n">item</span><span class="o">&gt;&lt;</span><span class="n">location</span><span class="o">&gt;</span><span class="n">audio</span><span class="o">.</span><span class="n">ogg</span><span class="o">&lt;/</span><span class="n">location</span><span class="o">&gt;</span>\
+        <span class="o">&lt;</span><span class="n">mimetype</span><span class="o">&gt;</span><span class="n">audio</span><span class="o">/</span><span class="n">ogg</span><span class="o">&lt;/</span><span class="n">mimetype</span><span class="o">&gt;&lt;/</span><span class="n">item</span><span class="o">&gt;</span>
+
+<span class="n">coherence</span> <span class="o">--</span><span class="n">plugin</span><span class="o">=</span><span class="s1">&#39;backend:TestStore,name:Test,</span><span class="se">\</span>
+<span class="s1">   item:&lt;item&gt;&lt;type&gt;gstreamer&lt;/type&gt;</span><span class="se">\</span>
+<span class="s1">        &lt;pipeline&gt;v4l2src num-buffers=1 ! video/x-raw-yuv,width=640,</span><span class="se">\</span>
+<span class="s1">        height=480 ! ffmpegcolorspace ! jpegenc name=enc&lt;/pipeline&gt;</span><span class="se">\</span>
+<span class="s1">        &lt;mimetype&gt;image/jpeg&gt;&lt;/mimetype&gt;&lt;/item&gt;&#39;</span>
+</pre></div>
+</div>
+<p>‘video/x-raw-yuv,width=640,height=480’ won’t work here as it is a delimiter
+for the plugin string, so if you need things like that in the pipeline,
+you need to use a config file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">coherence</span> <span class="o">--</span><span class="n">plugin</span><span class="o">=</span><span class="s1">&#39;backend:TestStore,name:Test,</span><span class="se">\</span>
+<span class="s1">    item:&lt;item&gt;&lt;type&gt;process&lt;/type&gt;</span><span class="se">\</span>
+<span class="s1">        &lt;command&gt;man date&lt;/command&gt;</span><span class="se">\</span>
+<span class="s1">        &lt;mimetype&gt;text/html&lt;/mimetype&gt;&lt;/item&gt;&#39;</span>
+</pre></div>
+</div>
+<p>The XML fragment has these elements:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>type:</p>
+<ul>
+<li><p>file: the item is some file-system object (default)</p></li>
+<li><p>url: an item pointing to an object off-site</p></li>
+<li><p>gstreamer: the item is actually a GStreamer pipeline</p></li>
+<li><p>process: the items content is created by an external process</p></li>
+</ul>
+</li>
+<li><p>location: the filesystem path or an url (mandatory)</p></li>
+<li><p>mimetype: the mimetype of the item (mandatory)</p></li>
+<li><p>extension: an optional extension to append to the url created for the
+DIDLLite resource data</p></li>
+<li><p>title: the ‘title’ this item should have (optional)</p></li>
+<li><p>upnp_class: the DIDLLite class the item shall have, object.item will
+be taken as default</p></li>
+<li><p>fourth_field: value for the 4th field of the protocolInfo phalanx,
+default is ‘*’</p></li>
+<li><p>pipeline: a GStreamer pipeline that has to end with a bin named ‘enc’,
+some pipelines do only work properly when we have a glib mainloop
+running, so coherence needs to be started with <em>-o glib:yes</em></p></li>
+<li><p>command: the commandline for an external script to run, its output will
+be returned as the items content</p></li>
+</ul>
+</div></blockquote>
+<p>In the config file the definition of this backend could look like this:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;plugin</span> <span class="na">active=</span><span class="s">&#39;yes&#39;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;backend&gt;</span>TestStore<span class="nt">&lt;/backend&gt;</span>
+    <span class="nt">&lt;name&gt;</span>Test<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;item&gt;</span>
+        <span class="nt">&lt;location&gt;</span>/tmp/audio.mp3<span class="nt">&lt;/location&gt;</span>
+        <span class="nt">&lt;mimetype&gt;</span>audio/mpeg<span class="nt">&lt;/mimetype&gt;</span>
+    <span class="nt">&lt;/item&gt;</span>
+    <span class="nt">&lt;item&gt;</span>
+        <span class="nt">&lt;location&gt;</span>/tmp/audio.ogg<span class="nt">&lt;/location&gt;</span>
+        <span class="nt">&lt;mimetype&gt;</span>audio/ogg<span class="nt">&lt;/mimetype&gt;</span>
+     <span class="nt">&lt;/item&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="coherence.backends.test_storage.ExternalProcessProtocol">
+<em class="property">class </em><code class="descname">ExternalProcessProtocol</code><span class="sig-paren">(</span><em>caller</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.internet.protocol.ProcessProtocol</span></code></p>
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessProtocol.connectionMade">
+<code class="descname">connectionMade</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProtocol.connectionMade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProtocol.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a connection is made.</p>
+<p>This may be considered the initializer of the protocol, because
+it is called when the connection is completed.  For clients,
+this is called once the connection to the server has been
+established; for servers, this is called after an accept() call
+stops blocking and a socket has been received.  If you need to
+send any greeting or initial message, do it here.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessProtocol.outReceived">
+<code class="descname">outReceived</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProtocol.outReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProtocol.outReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Some data was received from stdout.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessProtocol.errReceived">
+<code class="descname">errReceived</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProtocol.errReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProtocol.errReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Some data was received from stderr.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessProtocol.inConnectionLost">
+<code class="descname">inConnectionLost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProtocol.inConnectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProtocol.inConnectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will be called when stdin is closed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessProtocol.outConnectionLost">
+<code class="descname">outConnectionLost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProtocol.outConnectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProtocol.outConnectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will be called when stdout is closed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessProtocol.errConnectionLost">
+<code class="descname">errConnectionLost</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProtocol.errConnectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProtocol.errConnectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>This will be called when stderr is closed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessProtocol.processEnded">
+<code class="descname">processEnded</code><span class="sig-paren">(</span><em>status_object</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProtocol.processEnded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProtocol.processEnded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the child process exits and all file descriptors
+associated with it have been closed.</p>
+<p>&#64;type reason: L{twisted.python.failure.Failure}</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.test_storage.ExternalProcessPipeline">
+<em class="property">class </em><code class="descname">ExternalProcessPipeline</code><span class="sig-paren">(</span><em>pipeline</em>, <em>mimetype</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessPipeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessPipeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.web.resource.Resource</span></code>, <a class="reference internal" href="../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.backends.test_storage.ExternalProcessPipeline.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'externalprocess'</em><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessPipeline.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.test_storage.ExternalProcessPipeline.addSlash">
+<code class="descname">addSlash</code><em class="property"> = True</em><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessPipeline.addSlash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessPipeline.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessPipeline.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessPipeline.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a given resource. See L{IResource}’s render method.</p>
+<p>I delegate to methods of self with the form ‘render_METHOD’
+where METHOD is the HTTP that was used to make the
+request. Examples: render_GET, render_HEAD, render_POST, and
+so on. Generally you should implement those methods instead of
+overriding this one.</p>
+<p>render_METHOD methods are expected to return a byte string which will be
+the rendered page, unless the return value is C{server.NOT_DONE_YET}, in
+which case it is this class’s responsibility to write the results using
+C{request.write(data)} and then call C{request.finish()}.</p>
+<p>Old code that overrides render() directly is likewise expected
+to return a byte string or NOT_DONE_YET.</p>
+<p>&#64;see: L{IResource.render}</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.test_storage.ExternalProcessProducer">
+<em class="property">class </em><code class="descname">ExternalProcessProducer</code><span class="sig-paren">(</span><em>pipeline</em>, <em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProducer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProducer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.backends.test_storage.ExternalProcessProducer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'externalprocess'</em><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProducer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.test_storage.ExternalProcessProducer.addSlash">
+<code class="descname">addSlash</code><em class="property"> = True</em><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProducer.addSlash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessProducer.write_data">
+<code class="descname">write_data</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProducer.write_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProducer.write_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessProducer.resumeProducing">
+<code class="descname">resumeProducing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProducer.resumeProducing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProducer.resumeProducing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessProducer.pauseProducing">
+<code class="descname">pauseProducing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProducer.pauseProducing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProducer.pauseProducing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ExternalProcessProducer.stopProducing">
+<code class="descname">stopProducing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ExternalProcessProducer.stopProducing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ExternalProcessProducer.stopProducing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.test_storage.Item">
+<em class="property">class </em><code class="descname">Item</code><span class="sig-paren">(</span><em>parent</em>, <em>id</em>, <em>title</em>, <em>location</em>, <em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.backend.BackendItem" title="coherence.backend.BackendItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.BackendItem</span></code></a></p>
+<dl class="method">
+<dt id="coherence.backends.test_storage.Item.get_item">
+<code class="descname">get_item</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Item.get_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Item.get_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS and the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>an UPnP ContentDirectoryServer DIDLLite object</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.Item.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Item.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Item.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the name of the item, it is always expected to be in unicode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.Item.get_path">
+<code class="descname">get_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Item.get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Item.get_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the filepath where to find the media file that this item does
+refer to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.Item.get_size">
+<code class="descname">get_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Item.get_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Item.get_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.test_storage.ResourceItem">
+<em class="property">class </em><code class="descname">ResourceItem</code><span class="sig-paren">(</span><em>parent</em>, <em>id</em>, <em>title</em>, <em>location</em>, <em>url</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ResourceItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ResourceItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.backends.test_storage.Item" title="coherence.backends.test_storage.Item"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.test_storage.Item</span></code></a></p>
+<dl class="method">
+<dt id="coherence.backends.test_storage.ResourceItem.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ResourceItem.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ResourceItem.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the name of the item, it is always expected to be in unicode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ResourceItem.get_path">
+<code class="descname">get_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ResourceItem.get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ResourceItem.get_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the filepath where to find the media file that this item does
+refer to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.ResourceItem.get_size">
+<code class="descname">get_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#ResourceItem.get_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.ResourceItem.get_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.test_storage.Container">
+<em class="property">class </em><code class="descname">Container</code><span class="sig-paren">(</span><em>id</em>, <em>store</em>, <em>parent_id</em>, <em>title</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Container"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Container" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.backend.BackendItem" title="coherence.backend.BackendItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.BackendItem</span></code></a></p>
+<dl class="method">
+<dt id="coherence.backends.test_storage.Container.add_child">
+<code class="descname">add_child</code><span class="sig-paren">(</span><em>child</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Container.add_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Container.add_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.Container.get_children">
+<code class="descname">get_children</code><span class="sig-paren">(</span><em>start=0</em>, <em>end=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Container.get_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Container.get_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS and the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the start.</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – the end.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>a list of its childs, from start to end.</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.Container.get_child_count">
+<code class="descname">get_child_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Container.get_child_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Container.get_child_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>the number of its childs - len(childs)</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.Container.get_path">
+<code class="descname">get_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Container.get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Container.get_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the filepath where to find the media file that this item does
+refer to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.Container.get_item">
+<code class="descname">get_item</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Container.get_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Container.get_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the CDS and the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>an UPnP ContentDirectoryServer DIDLLite object</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.Container.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Container.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Container.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by the MediaServer web.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the name of the item, it is always expected to be in unicode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.Container.get_id">
+<code class="descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#Container.get_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.Container.get_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.test_storage.TestStore">
+<em class="property">class </em><code class="descname">TestStore</code><span class="sig-paren">(</span><em>server</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#TestStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.TestStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.backend.BackendStore" title="coherence.backend.BackendStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.BackendStore</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.backends.test_storage.TestStore.implements">
+<code class="descname">implements</code><em class="property"> = ['MediaServer']</em><a class="headerlink" href="#coherence.backends.test_storage.TestStore.implements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.TestStore.get_upnp_class">
+<code class="descname">get_upnp_class</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#TestStore.get_upnp_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.TestStore.get_upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.TestStore.get_next_id">
+<code class="descname">get_next_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#TestStore.get_next_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.TestStore.get_next_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.test_storage.TestStore.get_by_id">
+<code class="descname">get_by_id</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/test_storage.html#TestStore.get_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.test_storage.TestStore.get_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – is the id property of our DIDLLite item</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>None when no matching item for that id is found,</p></li>
+<li><p>a BackendItem,</p></li>
+<li><p>or a Deferred</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p>Called by the CDS or the MediaServer web.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>if this MediaServer implements containers that can share their
+content, like ‘all tracks’, ‘album’ and ‘album_of_artist’ (they all
+have the same track item as content), then the id may be passed by
+the CDS like this:</p>
+<blockquote>
+<div><p><a class="reference external" href="mailto:'id&#37;&#52;&#48;container">‘id<span>&#64;</span>container</a>’ or ‘id&#64;container&#64;container&#64;container…’</p>
+</div></blockquote>
+<p>therefore a</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>may be appropriate as the first thing to do when entering this
+method.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tracker.html" class="btn btn-neutral float-right" title="coherence.backends.tracker_storage (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="ted.html" class="btn btn-neutral float-left" title="coherence.backends.ted_storage (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

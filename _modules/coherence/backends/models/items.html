@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.models.items &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.models.items</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.models.items</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Backend models for BackendItem</span>
+<span class="sd">------------------------------</span>
+
+<span class="sd">Backend items to be used directly or subclassed. This classes inherits from</span>
+<span class="sd">:class:`~coherence.backend.BackendItem`. This classes should cover the most</span>
+<span class="sd">basic needs for different types of media and goes one step further from the</span>
+<span class="sd">:mod:`~coherence.backend` by initializing the corresponding DIDLLite object.</span>
+
+<span class="sd">* For video backends:</span>
+
+<span class="sd">    - :class:`BackendVideoItem`: item representing a video resource</span>
+
+<span class="sd">* For audio backends:</span>
+
+<span class="sd">    - :class:`BackendAudioItem`: item representing a audio resource</span>
+<span class="sd">    - :class:`BackendMusicTrackItem`: item representing an audio resource</span>
+
+<span class="sd">* For image/photo backends:</span>
+
+<span class="sd">    - :class:`BackendImageItem`: item representing a image resource</span>
+<span class="sd">    - :class:`BackendPhotoItem`: item representing a photo resource</span>
+
+<span class="sd">* For create a custom backend:</span>
+
+<span class="sd">    - If the items described above does not meet your needs, you can subclass</span>
+<span class="sd">      them or you may use the base class :class:`BackendBaseItem`, used to</span>
+<span class="sd">      develop all those backend items described above.</span>
+
+<span class="sd">.. note::</span>
+<span class="sd">    To write this module, some of the the old backends has been taken</span>
+<span class="sd">    as a reference:</span>
+
+<span class="sd">        - :mod:`~coherence.backends.appletrailers_storage`</span>
+<span class="sd">        - :mod:`~coherence.backends.banshee_storage`</span>
+<span class="sd">        - :mod:`~coherence.backends.fs_storage`</span>
+
+<span class="sd">.. warning:: Be aware that we use super to initialize all the classes of this</span>
+<span class="sd">             module in order to have a better MRO class resolution...so...take</span>
+<span class="sd">             it into account if you inherit from one of this classes.</span>
+
+<span class="sd">.. versionadded:: 0.8.3</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">ReverseProxyUriResource</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendItem</span>
+
+
+<div class="viewcode-block" id="BackendBaseItem"><a class="viewcode-back" href="../../../../source/backends/models/items.html#coherence.backends.models.items.BackendBaseItem">[docs]</a><span class="k">class</span> <span class="nc">BackendBaseItem</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This class is intended to be used as a base class for creating a custom</span>
+<span class="sd">    backend item. It has the ability to support proxy or non-proxy items by</span>
+<span class="sd">    using the property proxy_cls.</span>
+
+<span class="sd">    .. warning:: ReverseProxyUriResource does not support https connections,</span>
+<span class="sd">                 so...better stick to non-proxy if the target resource is in a</span>
+<span class="sd">                 secure connection until... we grant support for https</span>
+<span class="sd">                 connections.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">is_proxy</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="sd">&#39;&#39;&#39;If the item should be considered a ReverseProxyUriResource. This</span>
+<span class="sd">    property is automatically set when the item is initialized&#39;&#39;&#39;</span>
+
+    <span class="n">location</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&#39;&#39;&#39;Represents a file path of our media file, or alternatively a FilePath or</span>
+<span class="sd">    a ReverseProxyResource object. It will be set automatically based on the</span>
+<span class="sd">    value of the class :attr:`proxy_cls` (if the property :attr:`is_proxy`</span>
+<span class="sd">    equals to True).&#39;&#39;&#39;</span>
+
+    <span class="n">proxy_cls</span> <span class="o">=</span> <span class="n">ReverseProxyUriResource</span>
+    <span class="sd">&#39;&#39;&#39;Define a class inherited from</span>
+<span class="sd">    :class:`~coherence.upnp.core.utils.ReverseProxyUriResource`. This property</span>
+<span class="sd">    will only be used if the property :attr:`is_proxy` equals True.</span>
+
+<span class="sd">    .. warning:: ReverseProxyResource does not support https. If your</span>
+<span class="sd">                 resources point to a secure site, it&#39;s recommended to</span>
+<span class="sd">                 not enable the :attr:`BackendBaseStore.proxy` (disabled</span>
+<span class="sd">                 by default)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&#39;&#39;&#39;Define the initialized :attr:`item_cls`. It will be set when the class</span>
+<span class="sd">    :class:`BackendBaseItem` is initialized based on the attribute</span>
+<span class="sd">    :attr:`item_cls`&#39;&#39;&#39;</span>
+
+    <span class="n">item_cls</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Item</span>
+    <span class="sd">&#39;&#39;&#39;Define an atomic object from :class:`~coherence.upnp.core.DIDLLite.Item`</span>
+<span class="sd">    to be used to initialize the :attr:`item`&#39;&#39;&#39;</span>
+
+    <span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="sd">&#39;&#39;&#39;The mimetype of your item&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BackendBaseItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">item_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span> <span class="o">=</span> <span class="n">parent_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> \
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span>
+                       <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;My Backend Item&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">http_url</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urlbase</span><span class="p">)</span> <span class="ow">and</span> <span class="n">urlbase</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+            <span class="n">urlbase</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;is_proxy&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_proxy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;is_proxy&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;mimetype&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_proxy</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy_cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy_cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">http_url</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_proxy</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;BackendBaseItem was unable to create a Proxy &#39;</span>
+                         <span class="s1">&#39;location, falling back to non proxy...&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_proxy</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">item_cls</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">attachments</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span>
+
+<div class="viewcode-block" id="BackendBaseItem.get_name"><a class="viewcode-back" href="../../../../source/backends/models/items.html#coherence.backends.models.items.BackendBaseItem.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span></div>
+
+<div class="viewcode-block" id="BackendBaseItem.get_children"><a class="viewcode-back" href="../../../../source/backends/models/items.html#coherence.backends.models.items.BackendBaseItem.get_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">request_count</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="BackendBaseItem.get_child_count"><a class="viewcode-back" href="../../../../source/backends/models/items.html#coherence.backends.models.items.BackendBaseItem.get_child_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_child_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="BackendBaseItem.get_path"><a class="viewcode-back" href="../../../../source/backends/models/items.html#coherence.backends.models.items.BackendBaseItem.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_proxy</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">http_url</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">http_url</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;&lt;BackendBaseItem </span><span class="si">{self.id}</span><span class="s1"> </span><span class="si">{self.title}</span><span class="s1">&#39;</span> \
+            <span class="n">f</span><span class="s1">&#39; [parent id: </span><span class="si">{self.parent_id}</span><span class="s1">]&gt;&#39;</span></div>
+
+
+<div class="viewcode-block" id="BackendVideoItem"><a class="viewcode-back" href="../../../../source/backends/models/items.html#coherence.backends.models.items.BackendVideoItem">[docs]</a><span class="k">class</span> <span class="nc">BackendVideoItem</span><span class="p">(</span><span class="n">BackendBaseItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This Represents a Backend Video Item.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">item_cls</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">VideoItem</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BackendVideoItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">director</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;director&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actors</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;actors&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genres</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;genres&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">director</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">director</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">actors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">genres</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genres</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;&lt;BackendVideoItem</span><span class="si">{self.id}</span><span class="s1"> title=&quot;</span><span class="si">{self.title}</span><span class="s1">&quot; &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;genres=&quot;{&quot;, &quot;.join(self.genres)}&quot; director=&quot;</span><span class="si">{self.director}</span><span class="s1">&quot;&gt;&#39;</span></div>
+
+
+<div class="viewcode-block" id="BackendAudioItem"><a class="viewcode-back" href="../../../../source/backends/models/items.html#coherence.backends.models.items.BackendAudioItem">[docs]</a><span class="k">class</span> <span class="nc">BackendAudioItem</span><span class="p">(</span><span class="n">BackendBaseItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This Represents an Audio Item. It supports those properties:</span>
+<span class="sd">        - :attr:`artist`: The name of the artist</span>
+<span class="sd">        - :attr:`album`: an instance of a</span>
+<span class="sd">            :class:`~coherence.backends.models.containers.BackendMusicAlbum`</span>
+<span class="sd">        - :attr:`genre`: The music genre for the audio</span>
+<span class="sd">        - :attr:`playlist`: Playlist</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">item_cls</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">AudioItem</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BackendAudioItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">album</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genre</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;genre&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">playlist</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;playlist&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">artist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">artist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">album</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">album</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">genre</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">playlist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">playlist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">album</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">album</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">album</span><span class="o">.</span><span class="n">title</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;&lt;BackendAudioItem</span><span class="si">{self.id}</span><span class="s1"> title=&quot;</span><span class="si">{self.title}</span><span class="s1">&quot; &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;album=</span><span class="si">{self.album}</span><span class="s1">&quot; genre=&quot;</span><span class="si">{self.genre}</span><span class="s1">&quot; &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;artist=&quot;</span><span class="si">{self.artist}</span><span class="s1">&quot; path=&quot;{self.get_path()}&quot;&gt;&#39;</span></div>
+
+
+<div class="viewcode-block" id="BackendMusicTrackItem"><a class="viewcode-back" href="../../../../source/backends/models/items.html#coherence.backends.models.items.BackendMusicTrackItem">[docs]</a><span class="k">class</span> <span class="nc">BackendMusicTrackItem</span><span class="p">(</span><span class="n">BackendAudioItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is like :class:`BackendAudioItem` but with a track number added.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">item_cls</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">MusicTrack</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BackendMusicTrackItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">track_number</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;track_number&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">originalTrackNumber</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">track_number</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">album</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">album</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">album</span><span class="o">.</span><span class="n">title</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;&lt;BackendMusicTrackItem</span><span class="si">{self.id}</span><span class="s1"> title=&quot;</span><span class="si">{self.title}</span><span class="s1">&quot; &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;track=&quot;</span><span class="si">{self.track_number}</span><span class="s1">&quot; album=</span><span class="si">{album}</span><span class="s1">&quot; &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;genre=&quot;</span><span class="si">{self.genre}</span><span class="s1">&quot; artist=&quot;</span><span class="si">{self.artist}</span><span class="s1">&quot; &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;path=&quot;{self.get_path()}&quot;&gt;&#39;</span></div>
+
+
+<div class="viewcode-block" id="BackendImageItem"><a class="viewcode-back" href="../../../../source/backends/models/items.html#coherence.backends.models.items.BackendImageItem">[docs]</a><span class="k">class</span> <span class="nc">BackendImageItem</span><span class="p">(</span><span class="n">BackendBaseItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This Represents a Backend Image Item.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">item_cls</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">ImageItem</span>
+    <span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BackendImageItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rating&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">publisher</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;publisher&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rights</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rights&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">artist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">artist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rating</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">publisher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">publisher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">rights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rights</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;&lt;BackendImageItem </span><span class="si">{self.id}</span><span class="s1"> artist=&quot;</span><span class="si">{self.artist}</span><span class="s1">&quot; &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;rating=&quot;</span><span class="si">{self.rating}</span><span class="s1">&quot; publisher=&quot;</span><span class="si">{self.publisher}</span><span class="s1">&quot;&gt;&#39;</span></div>
+
+
+<div class="viewcode-block" id="BackendPhotoItem"><a class="viewcode-back" href="../../../../source/backends/models/items.html#coherence.backends.models.items.BackendPhotoItem">[docs]</a><span class="k">class</span> <span class="nc">BackendPhotoItem</span><span class="p">(</span><span class="n">BackendImageItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This Represents a Backend Photo Item. Iis like :class:`BackendImageItem`</span>
+<span class="sd">    but with additional attribute added :attr:`album`.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">item_cls</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Photo</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BackendPhotoItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">album</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">album</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">album</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;&lt;BackendPhotoItem </span><span class="si">{self.id}</span><span class="s1"> artist=&quot;</span><span class="si">{self.artist}</span><span class="s1">&quot; &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;album=&quot;</span><span class="si">{self.album}</span><span class="s1">&quot; rating=&quot;</span><span class="si">{self.rating}</span><span class="s1">&quot;&gt;&#39;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

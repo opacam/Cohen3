@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Command-Line Interface" href="cli.html" />
+    <link rel="prev" title="Overview" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-install-pip">Basic install (pip)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-with-extra-dependencies">Install with extra dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-dependencies">Python dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#starting-as-service">Starting as Service</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/install.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation">
+<span id="install"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="basic-install-pip">
+<h2>Basic install (pip)<a class="headerlink" href="#basic-install-pip" title="Permalink to this headline">¶</a></h2>
+<p>Install from the git master branch zip package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --user https://github.com/opacam/Cohen3/archive/master.zip
+</pre></div>
+</div>
+<p>Or you can install directly from the git master branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --user git+git://github.com/opacam/Cohen3@master#egg=Cohen3
+</pre></div>
+</div>
+<p>Note: With the command above you will install the Cohen3 package with the
+standard dependencies</p>
+</div>
+<div class="section" id="install-with-extra-dependencies">
+<h2>Install with extra dependencies<a class="headerlink" href="#install-with-extra-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Some of the plugins will depend of system libraries that you must install
+in order to make it work the plugin.</p>
+<p>Note: the apt commands showed in this document are the ones used in our travis
+builds. The tests are made using a GNU Linux Os: ubuntu xenial.</p>
+<p>You must have an updated cython package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install --upgrade cython
+</pre></div>
+</div>
+<p>First of all yo must clone the repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/opacam/Cohen3.git
+</pre></div>
+</div>
+<p>Enter into the cloned repository, and run the proper commands, depending of the
+plugin/feature you want to use:</p>
+<blockquote>
+<div><ul>
+<li><p>Audiocd storage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install libdiscid0
+$ pip install -e .[audio]
+</pre></div>
+</div>
+</li>
+<li><p>For using dbus-python:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install libdbus-1-dev
+$ pip install -e .[dbus]
+</pre></div>
+</div>
+</li>
+<li><p>For using gstreamer:</p>
+<blockquote>
+<div><p>Install libraries and plugins for GStreamer1.0</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install --yes gstreamer1.0-alsa gstreamer1.0-plugins-bad gstreamer1.0-plugins-base gstreamer1.0-plugins-base-apps gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly gstreamer1.0-libav
+</pre></div>
+</div>
+<p>Install Dependencies for gi.repository: Gst, GObject, Cairo:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt-get install -y libgirepository1.0-dev libcairo2-dev gir1.2-gtk-3.0 gobject-introspection python3-gi python3-gi-cairo gir1.2-gtk-3.0 python3-gst-1.0
+</pre></div>
+</div>
+<p>Run the pip command to install the python bindings:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e .[gstreamer]
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>For using elisa:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e .[elisa]
+</pre></div>
+</div>
+</li>
+<li><p>For using picasa (<em>plugin obsolete, should be migrated to Google photos</em>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e .[picasa]
+</pre></div>
+</div>
+</li>
+<li><p>For using twitch storage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e .[twitch]
+</pre></div>
+</div>
+</li>
+<li><p>For using toutube storage (<em>plugin outdated</em>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e .[youtube]
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+<p>Also there are some special setup commands that can be useful for developers:</p>
+<blockquote>
+<div><ul>
+<li><p>Install all dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e .[dev]
+</pre></div>
+</div>
+</li>
+<li><p>Install all docs dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e .[doc]
+</pre></div>
+</div>
+</li>
+<li><p>Install all test dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e .[test]
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+<p><em>Note: If you have any doubt about how to install some dependencies, you can check the
+.travis.yml file, it can be useful in some cases.</em></p>
+</div>
+<div class="section" id="python-dependencies">
+<h2>Python dependencies<a class="headerlink" href="#python-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>The basic dependencies for the package are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>ConfigObj &gt;= 4.3</p></li>
+<li><p>Twisted &gt;= 18.7</p></li>
+<li><p>zope.interface</p></li>
+<li><p>lxml</p></li>
+<li><p>eventdispatcher &gt;= 1.9.4</p></li>
+<li><p>python-dateutil</p></li>
+<li><p>pyopenssl</p></li>
+</ul>
+</div></blockquote>
+<p>Depending of the plugin or module you want to use, you may need to install
+some extra dependencies:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>audio_store:</dt><dd><ul>
+<li><p>pycdb</p></li>
+<li><p>discid</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>elisa_store:</dt><dd><ul>
+<li><p>Epsilon</p></li>
+<li><p>Axiom</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>twitch storage:</dt><dd><ul>
+<li><p>livestreamer</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>picasa_store:</dt><dd><ul>
+<li><p>gdata</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>youtube_store:</dt><dd><ul>
+<li><p>gdata</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>web_ui:</dt><dd><ul>
+<li><p>autobahn</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>gstreamer_player:</dt><dd><ul>
+<li><p>pygobject&gt;= 3.30.0</p></li>
+<li><p>pycairo&gt;=1.17.1</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="starting-as-service">
+<h2>Starting as Service<a class="headerlink" href="#starting-as-service" title="Permalink to this headline">¶</a></h2>
+<p><em>Still not documented</em></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cli.html" class="btn btn-neutral float-right" title="Command-Line Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

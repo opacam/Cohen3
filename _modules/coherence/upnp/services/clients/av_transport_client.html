@@ -1,0 +1,308 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.services.clients.av_transport_client &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.services.clients.av_transport_client</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.services.clients.av_transport_client</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2006-2008, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+
+
+<div class="viewcode-block" id="AVTransportClient"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient">[docs]</a><span class="k">class</span> <span class="nc">AVTransportClient</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;avtransportclient&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">service</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_type</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_control_url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">subscribe</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="bp">self</span>
+
+    <span class="c1"># def __del__(self):</span>
+    <span class="c1">#    # print(&#39;AVTransportClient deleted&#39;)</span>
+    <span class="c1">#    pass</span>
+
+<div class="viewcode-block" id="AVTransportClient.remove"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">del</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.subscribe_for_variable"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.subscribe_for_variable">[docs]</a>    <span class="k">def</span> <span class="nf">subscribe_for_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">subscribe_for_variable</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                            <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">signal</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.set_av_transport_uri"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.set_av_transport_uri">[docs]</a>    <span class="k">def</span> <span class="nf">set_av_transport_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">current_uri</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                             <span class="n">current_uri_metadata</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;SetAVTransportURI&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">CurrentURI</span><span class="o">=</span><span class="n">current_uri</span><span class="p">,</span>
+                           <span class="n">CurrentURIMetaData</span><span class="o">=</span><span class="n">current_uri_metadata</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.set_next_av_transport_uri"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.set_next_av_transport_uri">[docs]</a>    <span class="k">def</span> <span class="nf">set_next_av_transport_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">next_uri</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                                  <span class="n">next_uri_metadata</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;SetNextAVTransportURI&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                               <span class="n">NextURI</span><span class="o">=</span><span class="n">next_uri</span><span class="p">,</span>
+                               <span class="n">NextURIMetaData</span><span class="o">=</span><span class="n">next_uri_metadata</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.get_media_info"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.get_media_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_media_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetMediaInfo&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.get_media_info_ext"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.get_media_info_ext">[docs]</a>    <span class="k">def</span> <span class="nf">get_media_info_ext</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetMediaInfo_Ext&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.get_transport_info"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.get_transport_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_transport_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetTransportInfo&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.get_position_info"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.get_position_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_position_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetPositionInfo&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.get_device_capabilities"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.get_device_capabilities">[docs]</a>    <span class="k">def</span> <span class="nf">get_device_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetDeviceCapabilities&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.get_transport_settings"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.get_transport_settings">[docs]</a>    <span class="k">def</span> <span class="nf">get_transport_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetTransportSettings&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.pause"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.pause">[docs]</a>    <span class="k">def</span> <span class="nf">pause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;Pause&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.play"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.play">[docs]</a>    <span class="k">def</span> <span class="nf">play</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;Play&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span> <span class="n">Speed</span><span class="o">=</span><span class="n">speed</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.stop"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;Stop&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.record"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;Record&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">action</span><span class="p">:</span>  <span class="c1"># optional</span>
+            <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.seek"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.seek">[docs]</a>    <span class="k">def</span> <span class="nf">seek</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;Seek&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                           <span class="n">Unit</span><span class="o">=</span><span class="n">unit</span><span class="p">,</span>
+                           <span class="n">Target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.next"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;Next&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.previous"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.previous">[docs]</a>    <span class="k">def</span> <span class="nf">previous</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;Previous&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AVTransportClient.get_current_transport_actions"><a class="viewcode-back" href="../../../../../source/upnp/services/clients/av_transport_client.html#coherence.upnp.services.clients.av_transport_client.AVTransportClient.get_current_transport_actions">[docs]</a>    <span class="k">def</span> <span class="nf">get_current_transport_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="s1">&#39;GetCurrentTransportActions&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">InstanceID</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

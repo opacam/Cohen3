@@ -1,0 +1,1233 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.base &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.base</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.base</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2006,2007,2008 Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Base</span>
+<span class="sd">====</span>
+
+<span class="sd">The core of the project. Holds the class :class:`Coherence` intended to be used</span>
+<span class="sd">to manage all the resources of the project. Also contains some other classes</span>
+<span class="sd">which are vital to the project.</span>
+
+<span class="sd">:class:`SimpleRoot`</span>
+<span class="sd">-------------------</span>
+
+<span class="sd">A web resource representing a web site. Used to build the contents browser for</span>
+<span class="sd">our instance of a :class:`WebServer` or :class:`WebServerUi`.</span>
+
+<span class="sd">:class:`WebServer`</span>
+<span class="sd">------------------</span>
+
+<span class="sd">A class which takes care of dealing with the web representation of the running</span>
+<span class="sd">:class:`Coherence`&#39;s instance. This is the default webserver used.</span>
+
+<span class="sd">:class:`WebServerUi`</span>
+<span class="sd">--------------------</span>
+
+<span class="sd">The default web server, :class:`WebServer`, can be replaced by this class which</span>
+<span class="sd">will do the same thing as the default web server, but with a more polished</span>
+<span class="sd">interface.</span>
+
+<span class="sd">:class:`Plugins`</span>
+<span class="sd">----------------</span>
+
+<span class="sd">Manage all the available plugins for the Cohen3 project.</span>
+
+<span class="sd">:class:`Coherence`</span>
+<span class="sd">------------------</span>
+
+<span class="sd">The Main class of the Cohen3 project. The Coherence class controls all the</span>
+<span class="sd">servers initialization depending on the configuration passed.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">defer</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">endpoints</span>
+<span class="kn">from</span> <span class="nn">twisted.internet.tcp</span> <span class="k">import</span> <span class="n">CannotListenError</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">resource</span><span class="p">,</span> <span class="n">static</span>
+<span class="kn">from</span> <span class="nn">twisted.python.util</span> <span class="k">import</span> <span class="n">sibpath</span>
+
+<span class="kn">from</span> <span class="nn">eventdispatcher</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">ListProperty</span><span class="p">,</span> <span class="n">DictProperty</span><span class="p">,</span> <span class="n">Property</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">__version__</span>
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.device</span> <span class="k">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">RootDevice</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.msearch</span> <span class="k">import</span> <span class="n">MSearch</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.ssdp</span> <span class="k">import</span> <span class="n">SSDPServer</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">to_string</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">Site</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">get_ip_address</span><span class="p">,</span> <span class="n">get_host_address</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.devices.control_point</span> <span class="k">import</span> <span class="n">ControlPoint</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.devices.media_renderer</span> <span class="k">import</span> <span class="n">MediaRenderer</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.devices.media_server</span> <span class="k">import</span> <span class="n">MediaServer</span>
+
+<span class="n">__import_devices__</span> <span class="o">=</span> <span class="n">ControlPoint</span><span class="p">,</span> <span class="n">MediaServer</span><span class="p">,</span> <span class="n">MediaRenderer</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">pkg_resources</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="SimpleRoot"><a class="viewcode-back" href="../../source/modules.html#coherence.base.SimpleRoot">[docs]</a><span class="k">class</span> <span class="nc">SimpleRoot</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">addSlash</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;coherence&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">):</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">coherence</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;styles&#39;</span><span class="p">,</span>
+                      <span class="n">static</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">sibpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="s1">&#39;web/static/styles&#39;</span><span class="p">),</span>
+                                  <span class="n">defaultType</span><span class="o">=</span><span class="s1">&#39;text/css&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;server-images&#39;</span><span class="p">,</span>
+                      <span class="n">static</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">sibpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="s1">&#39;web/static/images&#39;</span><span class="p">),</span>
+                                  <span class="n">defaultType</span><span class="o">=</span><span class="s1">&#39;text/css&#39;</span><span class="p">))</span>
+
+<div class="viewcode-block" id="SimpleRoot.getChild"><a class="viewcode-back" href="../../source/modules.html#coherence.base.SimpleRoot.getChild">[docs]</a>    <span class="k">def</span> <span class="nf">getChild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;SimpleRoot getChild </span><span class="si">{name}</span><span class="s1">, </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;oob&#39;</span><span class="p">:</span>
+            <span class="sd">&#39;&#39;&#39; we have an out-of-band request &#39;&#39;&#39;</span>
+            <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">File</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">dbus</span><span class="o">.</span><span class="n">pinboard</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]])</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="c1"># at this stage, name should be a device UUID</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Cannot find device for requested name: </span><span class="si">{name}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+            <span class="k">return</span> \
+                <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;No device for requested UUID: &#39;</span>
+                    <span class="n">f</span><span class="s1">&#39;{name.encode(&quot;ascii&quot;)}&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;text/html&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimpleRoot.listchilds"><a class="viewcode-back" href="../../source/modules.html#coherence.base.SimpleRoot.listchilds">[docs]</a>    <span class="k">def</span> <span class="nf">listchilds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;listchilds </span><span class="si">{uri}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">uri</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+            <span class="n">uri</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+
+        <span class="n">cl</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;&lt;li&gt;&lt;a href=</span><span class="si">{uri}{child}</span><span class="s1">&gt;&#39;</span>
+                    <span class="n">f</span><span class="s1">&#39;{device.get_friendly_device_type()}:&#39;</span>
+                    <span class="n">f</span><span class="s1">&#39;{device.get_device_type_version()} &#39;</span>
+                    <span class="n">f</span><span class="s1">&#39;{device.get_friendly_name()}&#39;</span>
+                    <span class="n">f</span><span class="s1">&#39;&lt;/a&gt;&lt;/li&gt;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># We put in a blacklist the styles and server-images folders,</span>
+        <span class="c1"># in order to avoid to appear into the generated html list</span>
+        <span class="n">blacklist</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;styles&#39;</span><span class="p">,</span> <span class="s1">&#39;server-images&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">blacklist</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">cl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;&lt;li&gt;&lt;a href=</span><span class="si">{uri}{c}</span><span class="s1">&gt;</span><span class="si">{c}</span><span class="s1">&lt;/a&gt;&lt;/li&gt;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SimpleRoot.render"><a class="viewcode-back" href="../../source/modules.html#coherence.base.SimpleRoot.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">        &lt;html&gt;</span>
+<span class="s1">        &lt;head profile=&quot;http://www.w3.org/2005/10/profile&quot;&gt;</span>
+<span class="s1">            &lt;title&gt;Cohen3 (SimpleRoot)&lt;/title&gt;</span>
+<span class="s1">            &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/styles/main.css&quot;/&gt;</span>
+<span class="s1">            &lt;link rel=&quot;icon&quot; type=&quot;image/png&quot;</span>
+<span class="s1">            href=&quot;/server-images/coherence-icon.ico&quot;/&gt;</span>
+<span class="s1">        &lt;/head&gt;</span>
+<span class="s1">        &lt;body&gt;</span>
+<span class="s1">            &lt;div class=&quot;text-center column col-100 bottom-0&quot;&gt;</span>
+<span class="s1">                &lt;h5&gt;Dlna/UPnP framework&lt;/h5&gt;</span>
+<span class="s1">                &lt;img id=&quot;logo-image&quot;</span>
+<span class="s1">                    src=&quot;/server-images/coherence-icon.svg&quot;/&gt;</span>
+<span class="s1">                &lt;h5&gt;For the Digital Living&lt;/h5&gt;</span>
+<span class="s1">            &lt;/div&gt;</span>
+<span class="s1">            &lt;div class=&quot;column col-100&quot;&gt;</span>
+<span class="s1">                    &lt;h6 class=&quot;title-head-lines&quot;&gt;</span>
+<span class="s1">                        &lt;img class=&quot;logo-icon&quot;</span>
+<span class="s1">                        src=&quot;/server-images/coherence-icon.svg&quot;&gt;&lt;/img&gt;</span>
+<span class="s1">                        Hosting:</span>
+<span class="s1">                    &lt;/h6&gt;</span>
+<span class="s1">                &lt;div class=&quot;list&quot;&gt;</span>
+<span class="s1">                    &lt;ul&gt;{self.listchilds(request.uri)}&lt;/ul&gt;</span>
+<span class="s1">                &lt;/div&gt;</span>
+<span class="s1">            &lt;/div&gt;</span>
+<span class="s1">        &lt;/body&gt;&lt;/html&gt;&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">html</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WebServer"><a class="viewcode-back" href="../../source/modules.html#coherence.base.WebServer">[docs]</a><span class="k">class</span> <span class="nc">WebServer</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;webserver&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ui</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">coherence</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">site</span> <span class="o">=</span> <span class="n">Site</span><span class="p">(</span><span class="n">SimpleRoot</span><span class="p">(</span><span class="n">coherence</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoints</span><span class="o">.</span><span class="n">TCP4ServerEndpoint</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint_listen</span><span class="p">(</span><span class="n">coherence</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WebServer._endpoint_listen"><a class="viewcode-back" href="../../source/modules.html#coherence.base.WebServer._endpoint_listen">[docs]</a>    <span class="k">def</span> <span class="nf">_endpoint_listen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_listen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">site</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">set_listen_port</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_port</span> <span class="o">=</span> <span class="n">p</span>
+            <span class="n">coherence</span><span class="o">.</span><span class="n">web_server_port</span> <span class="o">=</span> <span class="n">port</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;WebServer on ip &#39;</span>
+                <span class="n">f</span><span class="s1">&#39;http://</span><span class="si">{coherence.hostname}</span><span class="s1">:</span><span class="si">{coherence.web_server_port}</span><span class="s1">&#39;</span>
+                <span class="n">f</span><span class="s1">&#39; ready&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="n">whatever</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_listen</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">whatever</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_listen</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">set_listen_port</span><span class="p">)</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="n">clear</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WebServerUi"><a class="viewcode-back" href="../../source/modules.html#coherence.base.WebServerUi">[docs]</a><span class="k">class</span> <span class="nc">WebServerUi</span><span class="p">(</span><span class="n">WebServer</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;webserverui&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">coherence</span><span class="p">,</span> <span class="n">unittests</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">coherence</span>
+        <span class="kn">from</span> <span class="nn">coherence.web.ui</span> <span class="k">import</span> <span class="n">Web</span><span class="p">,</span> <span class="n">IWeb</span><span class="p">,</span> <span class="n">WebUI</span>
+        <span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">server</span><span class="p">,</span> <span class="n">resource</span>
+        <span class="kn">from</span> <span class="nn">twisted.python.components</span> <span class="k">import</span> <span class="n">registerAdapter</span>
+
+        <span class="k">def</span> <span class="nf">resource_factory</span><span class="p">(</span><span class="n">original</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">WebUI</span><span class="p">(</span><span class="n">IWeb</span><span class="p">,</span> <span class="n">original</span><span class="p">)</span>
+
+        <span class="n">registerAdapter</span><span class="p">(</span><span class="n">resource_factory</span><span class="p">,</span> <span class="n">Web</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">IResource</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_root_resource</span> <span class="o">=</span> <span class="n">WebUI</span><span class="p">(</span><span class="n">coherence</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">unittests</span><span class="p">:</span>
+            <span class="n">site_cls</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">Site</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">tests.web_utils</span> <span class="k">import</span> <span class="n">DummySite</span>
+            <span class="n">site_cls</span> <span class="o">=</span> <span class="n">DummySite</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">site</span> <span class="o">=</span> <span class="n">site_cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">web_root_resource</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoints</span><span class="o">.</span><span class="n">TCP4ServerEndpoint</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint_listen</span><span class="p">(</span><span class="n">coherence</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ws_endpoint</span> <span class="o">=</span> <span class="n">endpoints</span><span class="o">.</span><span class="n">TCP4ServerEndpoint</span><span class="p">(</span><span class="n">reactor</span><span class="p">,</span> <span class="mi">9000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ws_endpoint_listen</span><span class="p">(</span><span class="n">coherence</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WebServerUi._endpoint_listen"><a class="viewcode-back" href="../../source/modules.html#coherence.base.WebServerUi._endpoint_listen">[docs]</a>    <span class="k">def</span> <span class="nf">_endpoint_listen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_listen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">site</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">set_listen_port</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_port</span> <span class="o">=</span> <span class="n">p</span>
+            <span class="n">coherence</span><span class="o">.</span><span class="n">web_server_port</span> <span class="o">=</span> <span class="n">port</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;WebServerUi on ip &#39;</span>
+                <span class="n">f</span><span class="s1">&#39;http://</span><span class="si">{coherence.hostname}</span><span class="s1">:</span><span class="si">{coherence.web_server_port}</span><span class="s1">&#39;</span>
+                <span class="n">f</span><span class="s1">&#39; ready&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="n">whatever</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_listen</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">whatever</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_listen</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">set_listen_port</span><span class="p">)</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="n">clear</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WebServerUi._ws_endpoint_listen"><a class="viewcode-back" href="../../source/modules.html#coherence.base.WebServerUi._ws_endpoint_listen">[docs]</a>    <span class="k">def</span> <span class="nf">_ws_endpoint_listen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ws_endpoint_listen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ws_endpoint</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">web_root_resource</span><span class="o">.</span><span class="n">factory</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">set_ws_listen_port</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ws_endpoint_port</span> <span class="o">=</span> <span class="n">p</span>
+
+        <span class="k">def</span> <span class="nf">clear_ws</span><span class="p">(</span><span class="n">whatever</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ws_endpoint_listen</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">whatever</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ws_endpoint_listen</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span>
+            <span class="n">set_ws_listen_port</span><span class="p">)</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="n">clear_ws</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Plugins"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Plugins">[docs]</a><span class="k">class</span> <span class="nc">Plugins</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;plugins&#39;</span>
+    <span class="n">__instance</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Singleton</span>
+    <span class="n">__initialized</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">_valids</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;coherence.plugins.backend.media_server&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;coherence.plugins.backend.media_renderer&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;coherence.plugins.backend.binary_light&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;coherence.plugins.backend.dimmable_light&#39;</span><span class="p">)</span>
+
+    <span class="n">_plugins</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Plugins</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span><span class="o">.</span><span class="n">__initialized</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span><span class="o">.</span><span class="n">__cls</span> <span class="o">=</span> <span class="bp">cls</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="n">_valids</span><span class="p">):</span>
+        <span class="c1"># initialize only once</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initialized</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__initialized</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="p">(</span><span class="n">ids</span><span class="p">,)</span>
+        <span class="k">if</span> <span class="n">pkg_resources</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">entrypoint</span> <span class="ow">in</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">iter_entry_points</span><span class="p">(</span><span class="n">group</span><span class="p">):</span>
+                    <span class="c1"># set a placeholder for lazy loading</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_plugins</span><span class="p">[</span><span class="n">entrypoint</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">entrypoint</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;no pkg_resources, fallback to simple plugin handling&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plugins</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_collect_from_module</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plugins</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">plugin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plugins</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pkg_resources</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">EntryPoint</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">plugin</span> <span class="o">=</span> <span class="n">plugin</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">require</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">,</span>
+                    <span class="n">pkg_resources</span><span class="o">.</span><span class="n">ResolutionError</span><span class="p">)</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t load plugin </span><span class="si">{plugin.name}</span><span class="s1"> (</span><span class="si">{msg}</span><span class="s1">), &#39;</span>
+                             <span class="n">f</span><span class="s1">&#39;maybe missing dependencies...&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plugins</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_plugins</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">plugin</span>
+        <span class="k">return</span> <span class="n">plugin</span>
+
+<div class="viewcode-block" id="Plugins.get"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Plugins.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">default</span></div>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plugins</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Plugins.set"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Plugins.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Plugins.keys"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Plugins.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plugins</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Plugins._collect_from_module"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Plugins._collect_from_module">[docs]</a>    <span class="k">def</span> <span class="nf">_collect_from_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">coherence.extern.simple_plugin</span> <span class="k">import</span> <span class="n">Reception</span>
+        <span class="n">reception</span> <span class="o">=</span> <span class="n">Reception</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;backends&#39;</span><span class="p">),</span>
+            <span class="n">log</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">reception</span><span class="o">.</span><span class="n">guestlist</span><span class="p">())</span>
+        <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">reception</span><span class="o">.</span><span class="n">guestlist</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plugins</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">cls</span></div></div>
+
+
+<div class="viewcode-block" id="Coherence"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence">[docs]</a><span class="k">class</span> <span class="nc">Coherence</span><span class="p">(</span><span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The Main class of the Cohen3 project. The Coherence class controls all the</span>
+<span class="sd">    servers initialization depending on the configuration passed.</span>
+<span class="sd">    It is also capable of initialize the plugins defined in config variable or</span>
+<span class="sd">    by configuration file.</span>
+<span class="sd">    It supports the creation of multiple servers at once.</span>
+
+<span class="sd">    **Example of a simple server via plugin AppleTrailersStore**::</span>
+
+<span class="sd">        from coherence.base import Coherence</span>
+<span class="sd">        from coherence.upnp.core.uuid import UUID</span>
+<span class="sd">        from twisted.internet import reactor</span>
+<span class="sd">        new_uuid = UUID()</span>
+
+<span class="sd">        coherence = Coherence(</span>
+<span class="sd">            {&#39;logmode&#39;: &#39;info&#39;,</span>
+<span class="sd">             &#39;controlpoint&#39;: &#39;yes&#39;,</span>
+<span class="sd">             &#39;plugin&#39;: [{&#39;backend&#39;: &#39;AppleTrailersStore&#39;,</span>
+<span class="sd">                        &#39;name&#39;: &#39;Cohen3 Example FSStore&#39;,</span>
+<span class="sd">                        &#39;uuid&#39;: new_uuid,</span>
+<span class="sd">                        }</span>
+<span class="sd">                        ]</span>
+<span class="sd">             }</span>
+<span class="sd">        )</span>
+<span class="sd">        reactor.run()</span>
+
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">        * Introduced inheritance from EventDispatcher</span>
+<span class="sd">        * The emitted events changed:</span>
+
+<span class="sd">            - Coherence.UPnP.Device.detection_completed =&gt;</span>
+<span class="sd">              coherence_device_detection_completed</span>
+<span class="sd">            - Coherence.UPnP.Device.removed =&gt; coherence_device_removed</span>
+<span class="sd">            - Coherence.UPnP.RootDevice.removed =&gt;</span>
+<span class="sd">              coherence_root_device_removed</span>
+
+<span class="sd">        * Changed some variables to benefit from the EventDispatcher&#39;s</span>
+<span class="sd">          properties:</span>
+
+<span class="sd">            - :attr:`devices`</span>
+<span class="sd">            - :attr:`children`</span>
+<span class="sd">            - :attr:`_callbacks`</span>
+<span class="sd">            - :attr:`active_backends`</span>
+<span class="sd">            - :attr:`ctrl`</span>
+<span class="sd">            - :attr:`dbus`</span>
+<span class="sd">            - :attr:`json`</span>
+<span class="sd">            - :attr:`msearch`</span>
+<span class="sd">            - :attr:`ssdp_server`</span>
+<span class="sd">            - :attr:`transcoder_manager`</span>
+<span class="sd">            - :attr:`web_server`</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">__instance</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Singleton</span>
+    <span class="n">__initialized</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">__incarnations</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">__cls</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;coherence&#39;</span>
+
+    <span class="n">devices</span> <span class="o">=</span> <span class="n">ListProperty</span><span class="p">([])</span>
+    <span class="sd">&#39;&#39;&#39;A list of the added devices.&#39;&#39;&#39;</span>
+    <span class="n">children</span> <span class="o">=</span> <span class="n">DictProperty</span><span class="p">({})</span>
+    <span class="sd">&#39;&#39;&#39;A dict containing the web resources.&#39;&#39;&#39;</span>
+    <span class="n">_callbacks</span> <span class="o">=</span> <span class="n">DictProperty</span><span class="p">({})</span>
+    <span class="sd">&#39;&#39;&#39;A dict containing the callbacks, used by the methods :meth:`subscribe`</span>
+<span class="sd">    and :meth:`unsubscribe`.&#39;&#39;&#39;</span>
+    <span class="n">active_backends</span> <span class="o">=</span> <span class="n">DictProperty</span><span class="p">({})</span>
+    <span class="sd">&#39;&#39;&#39;A dict containing the active backends.&#39;&#39;&#39;</span>
+
+    <span class="c1"># Services/Devices</span>
+    <span class="n">ctrl</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;A coherence&#39;s instance of class</span>
+<span class="sd">    :class:`~coherence.upnp.devices.control_point.ControlPoint`. This will be</span>
+<span class="sd">    enabled if we request it by config dict or configuration file via</span>
+<span class="sd">    keyword *controlpoint = yes*.&#39;&#39;&#39;</span>
+    <span class="n">dbus</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;A coherence&#39;s instance of class</span>
+<span class="sd">    :class:`~coherence.dbus_service.DBusPontoon`. This will be</span>
+<span class="sd">    enabled if we request it by config dict or configuration file via</span>
+<span class="sd">    keyword *use_dbus = yes*.&#39;&#39;&#39;</span>
+    <span class="n">json</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;A coherence&#39;s instance of class</span>
+<span class="sd">    :class:`~coherence.json_service.JsonInterface`. This will be</span>
+<span class="sd">    enabled if we request it by config dict or configuration file via</span>
+<span class="sd">    keyword *json = yes*.&#39;&#39;&#39;</span>
+    <span class="n">msearch</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;A coherence&#39;s instance of class</span>
+<span class="sd">    :class:`~coherence.upnp.core.msearch.MSearch`. This is automatically</span>
+<span class="sd">    enabled when :class:`Coherence` is initialized&#39;&#39;&#39;</span>
+    <span class="n">ssdp_server</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;A coherence&#39;s instance of class</span>
+<span class="sd">    :class:`~coherence.upnp.core.ssdp.SSDPServer`. This is automatically</span>
+<span class="sd">    enabled when :class:`Coherence` is initialized&#39;&#39;&#39;</span>
+    <span class="n">transcoder_manager</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;A coherence&#39;s instance of class</span>
+<span class="sd">    :class:`~coherence.transcoder.TranscoderManager`. This will be</span>
+<span class="sd">    enabled if we request itby config dict or configuration file via</span>
+<span class="sd">    keyword *transcoding = yes*.&#39;&#39;&#39;</span>
+    <span class="n">web_server</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;A coherence&#39;s instance of class</span>
+<span class="sd">    :class:`WebServer` or :class:`WebServerUi`. We can request our preference</span>
+<span class="sd">    by config dict or configuration file. If we use the keyword *web-ui = yes*,</span>
+<span class="sd">    then the class :class:`WebServerUi` will be used, otherwise, the enabled</span>
+<span class="sd">    web server will be of class :class:`WebServer`.&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Coherence</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span><span class="o">.</span><span class="n">__initialized</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span><span class="o">.</span><span class="n">__incarnations</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span><span class="o">.</span><span class="n">__cls</span> <span class="o">=</span> <span class="bp">cls</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span><span class="o">.</span><span class="n">__incarnations</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__instance</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># initialize only once</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initialized</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__initialized</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># supers</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">EventDispatcher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span>
+            <span class="s1">&#39;coherence_device_detection_completed&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;coherence_device_removed&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;coherence_root_device_removed&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">available_plugins</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_address</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_server_port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;serverport&#39;</span><span class="p">,</span> <span class="mi">8080</span><span class="p">))</span>
+
+        <span class="c1"># initializes log&#39;s system, a COHEN_DEBUG environment</span>
+        <span class="c1"># variable overwrites all level settings here.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logmode</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logging&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="n">logmode</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logmode&#39;</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">subsystems</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logging&#39;</span><span class="p">)[</span><span class="s1">&#39;subsystem&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subsystems</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">subsystems</span> <span class="o">=</span> <span class="p">[</span><span class="n">subsystems</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">subsystem</span> <span class="ow">in</span> <span class="n">subsystems</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">subsystem</span><span class="p">[</span><span class="s1">&#39;active&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+                    <span class="k">pass</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;setting log-level for subsystem &#39;</span>
+                          <span class="n">f</span><span class="s1">&#39;</span><span class="si">{subsystem[&quot;name&quot;]}</span><span class="s1"> to </span><span class="si">{subsystem[&quot;level&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">subsystem</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span>
+                    <span class="n">subsystem</span><span class="p">[</span><span class="s1">&#39;level&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="n">subsystem_log</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subsystem_log&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">for</span> <span class="n">subsystem</span><span class="p">,</span> <span class="n">level</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">subsystem_log</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">subsystem</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logfile</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logging&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logfile&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">logfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logfile</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">logfile</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="n">logfile</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logfile&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">logfile</span><span class="p">,</span> <span class="n">logmode</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Coherence UPnP framework version </span><span class="si">{__version__}</span><span class="s1"> &#39;</span>
+                     <span class="n">f</span><span class="s1">&#39;starting [log level: </span><span class="si">{logmode}</span><span class="s1">]...&#39;</span><span class="p">)</span>
+
+        <span class="n">network_if</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;interface&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">network_if</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">get_ip_address</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{network_if}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyname</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
+            <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">gaierror</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;hostname can</span><span class="se">\&#39;</span><span class="s1">t be resolved, &#39;</span>
+                             <span class="s1">&#39;maybe a system misconfiguration?&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="s1">&#39;127.0.0.1&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;127.&#39;</span><span class="p">):</span>
+            <span class="c1"># use interface detection via routing table as last resort</span>
+            <span class="k">def</span> <span class="nf">catch_result</span><span class="p">(</span><span class="n">hostname</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">hostname</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">setup_part2</span><span class="p">()</span>
+
+            <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">get_host_address</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">catch_result</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_part2</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Coherence.clear"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;We do need this to survive multiple calls to Coherence</span>
+<span class="sd">        during trial tests&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unbind_all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cls</span><span class="o">.</span><span class="n">__instance</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Coherence.setup_part2"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.setup_part2">[docs]</a>    <span class="k">def</span> <span class="nf">setup_part2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Initializes the basic and optional services/devices and the enabled</span>
+<span class="sd">        plugins (backends).&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;running on host: </span><span class="si">{self.hostname}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;127.&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;detection of own ip failed, using </span><span class="si">{self.hostname}</span><span class="s1"> &#39;</span>
+                         <span class="n">f</span><span class="s1">&#39;as own address, functionality will be limited&#39;</span><span class="p">)</span>
+
+        <span class="n">unittest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unittest&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span>
+        <span class="n">unittest</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">unittest</span> <span class="o">==</span> <span class="s1">&#39;no&#39;</span> <span class="k">else</span> <span class="kc">True</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># TODO: add ip/interface bind</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span> <span class="o">=</span> <span class="n">SSDPServer</span><span class="p">(</span><span class="n">test</span><span class="o">=</span><span class="n">unittest</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">CannotListenError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Error starting the SSDP-server: </span><span class="si">{err}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Error starting the SSDP-server&#39;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">reactor</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="c1"># maybe some devices are already notified, so we enforce</span>
+        <span class="c1"># to create the device, if it is not already added...and</span>
+        <span class="c1"># then we connect the signals for new detections.</span>
+        <span class="k">for</span> <span class="n">st</span><span class="p">,</span> <span class="n">usn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="o">.</span><span class="n">root_devices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_device</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">usn</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">new_device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">create_device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">removed_device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_device</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s1">&#39;new_device&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s1">&#39;removed_device&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_device</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">msearch</span> <span class="o">=</span> <span class="n">MSearch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="n">unittest</span><span class="p">)</span>
+
+        <span class="n">reactor</span><span class="o">.</span><span class="n">addSystemEventTrigger</span><span class="p">(</span><span class="s1">&#39;before&#39;</span><span class="p">,</span> <span class="s1">&#39;shutdown&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shutdown</span><span class="p">,</span>
+                                      <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Web Server Initialization</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># TODO: add ip/interface bind</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;web-ui&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span> <span class="o">=</span> <span class="n">WebServer</span><span class="p">(</span>
+                    <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_server_port</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span> <span class="o">=</span> <span class="n">WebServerUi</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">web_server_port</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unittests</span><span class="o">=</span><span class="n">unittest</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">CannotListenError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;port </span><span class="si">{self.web_server_port}</span><span class="s1"> already in use, aborting!&#39;</span><span class="p">)</span>
+            <span class="n">reactor</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;http://</span><span class="si">{self.hostname}</span><span class="s1">:</span><span class="si">{self.web_server_port:d}</span><span class="s1">/&#39;</span>
+        <span class="c1"># self.renew_service_subscription_loop = \</span>
+        <span class="c1">#     task.LoopingCall(self.check_devices)</span>
+        <span class="c1"># self.renew_service_subscription_loop.start(20.0, now=False)</span>
+
+        <span class="c1"># Plugins Initialization</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">plugins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;plugin&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plugins</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">plugins</span> <span class="o">=</span> <span class="p">[</span><span class="n">plugins</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">plugins</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">plugins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plugins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;plugins&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">plugins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;No plugin defined!&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plugins</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">plugin</span><span class="p">,</span> <span class="n">arguments</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">plugins</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                            <span class="n">arguments</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">add_plugin</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span> <span class="o">**</span><span class="n">arguments</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t enable plugin, </span><span class="si">{plugin}</span><span class="s1">: </span><span class="si">{msg}</span><span class="s1">!&#39;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="n">plugins</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">plugin</span><span class="p">[</span><span class="s1">&#39;active&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+                        <span class="k">pass</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">backend</span> <span class="o">=</span> <span class="n">plugin</span><span class="p">[</span><span class="s1">&#39;backend&#39;</span><span class="p">]</span>
+                        <span class="n">arguments</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">plugin</span><span class="p">)</span>
+                        <span class="k">del</span> <span class="n">arguments</span><span class="p">[</span><span class="s1">&#39;backend&#39;</span><span class="p">]</span>
+                        <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_plugin</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="o">**</span><span class="n">arguments</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">writeable_config</span><span class="p">():</span>
+                            <span class="k">if</span> <span class="s1">&#39;uuid&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plugin</span><span class="p">:</span>
+                                <span class="n">plugin</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">backend</span><span class="o">.</span><span class="n">uuid</span><span class="p">)[</span><span class="mi">5</span><span class="p">:]</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t enable plugin, </span><span class="si">{plugin}</span><span class="s1">: </span><span class="si">{msg}</span><span class="s1">!&#39;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_address</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">web_server_port</span><span class="p">)))</span>
+
+        <span class="c1"># Control Point Initialization</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;controlpoint&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span> <span class="o">=</span> <span class="n">ControlPoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Json Interface Initialization</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">coherence.json_service</span> <span class="k">import</span> <span class="n">JsonInterface</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">json</span> <span class="o">=</span> <span class="n">JsonInterface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">)</span>
+
+        <span class="c1"># Transcoder Initialization</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transcoding&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">coherence.transcoder</span> <span class="k">import</span> <span class="n">TranscoderManager</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transcoder_manager</span> <span class="o">=</span> <span class="n">TranscoderManager</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># DBus Initialization</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;use_dbus&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">dbus_service</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span> <span class="o">=</span> <span class="n">ControlPoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">auto_client_append</span><span class="p">(</span><span class="s1">&#39;InternetGatewayDevice&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dbus</span> <span class="o">=</span> <span class="n">dbus_service</span><span class="o">.</span><span class="n">DBusPontoon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to activate dbus sub-system: </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Coherence.add_plugin"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.add_plugin">[docs]</a>    <span class="k">def</span> <span class="nf">add_plugin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plugin</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;adding plugin </span><span class="si">{plugin}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">available_plugins</span> <span class="o">=</span> <span class="n">Plugins</span><span class="p">()</span>
+
+        <span class="c1"># TODO clean up this exception concept</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">plugin_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_plugins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">plugin_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span>
+            <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="n">plugin_class</span><span class="o">.</span><span class="n">implements</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">device_class</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">device_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">KeyError</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Activating </span><span class="si">{plugin}</span><span class="s1"> plugin as </span><span class="si">{device}</span><span class="s1">...&#39;</span><span class="p">)</span>
+                    <span class="n">new_backend</span> <span class="o">=</span> <span class="n">device_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plugin_class</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">active_backends</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">new_backend</span><span class="o">.</span><span class="n">uuid</span><span class="p">)]</span> <span class="o">=</span> <span class="n">new_backend</span>
+                    <span class="k">return</span> <span class="n">new_backend</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t enable </span><span class="si">{plugin}</span><span class="s1"> plugin, &#39;</span>
+                                 <span class="n">f</span><span class="s1">&#39;sub-system </span><span class="si">{device}</span><span class="s1"> not found!&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t enable </span><span class="si">{plugin}</span><span class="s1"> plugin for &#39;</span>
+                                   <span class="n">f</span><span class="s1">&#39;sub-system </span><span class="si">{device}</span><span class="s1"> [exception: </span><span class="si">{e1}</span><span class="s1">]&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t enable </span><span class="si">{plugin}</span><span class="s1"> plugin, not found!&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t enable </span><span class="si">{plugin}</span><span class="s1"> plugin, </span><span class="si">{e2}</span><span class="s1">!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Coherence.remove_plugin"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.remove_plugin">[docs]</a>    <span class="k">def</span> <span class="nf">remove_plugin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plugin</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Removes a backend from Coherence</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            plugin (object): is the object return by add_plugin or</span>
+<span class="sd">                an UUID string.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plugin</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">plugin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_backends</span><span class="p">[</span><span class="n">plugin</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;no backend with the uuid </span><span class="si">{plugin}</span><span class="s1"> found&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_backends</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">uuid</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;removing plugin </span><span class="si">{plugin}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">plugin</span><span class="o">.</span><span class="n">unregister</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">plugin</span><span class="o">.</span><span class="n">uuid</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;no backend with the uuid </span><span class="si">{plugin.uuid}</span><span class="s1"> found&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="Coherence.writeable_config"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.writeable_config">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">writeable_config</span><span class="p">():</span>
+        <span class="sd">&#39;&#39;&#39;Do we have a new-style config file&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Coherence.store_plugin_config"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.store_plugin_config">[docs]</a>    <span class="k">def</span> <span class="nf">store_plugin_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uuid</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Find the backend with uuid and store in its the config the key</span>
+<span class="sd">        and value pair(s).&#39;&#39;&#39;</span>
+        <span class="n">plugins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;plugin&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plugins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;storing a plugin config option is only possible&#39;</span>
+                         <span class="s1">&#39; with the new config file format&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plugins</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">plugins</span> <span class="o">=</span> <span class="p">[</span><span class="n">plugins</span><span class="p">]</span>
+        <span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">uuid</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;uuid:&#39;</span><span class="p">):</span>
+            <span class="n">uuid</span> <span class="o">=</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">plugin</span> <span class="ow">in</span> <span class="n">plugins</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">plugin</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">uuid</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">items</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                        <span class="n">plugin</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Coherence.store_plugin_config: </span><span class="si">{e}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;storing plugin config option &#39;</span>
+                      <span class="n">f</span><span class="s1">&#39;for </span><span class="si">{uuid}</span><span class="s1"> failed, plugin not found&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Coherence.receiver"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.receiver">[docs]</a>    <span class="k">def</span> <span class="nf">receiver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Coherence.shutdown"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.shutdown">[docs]</a>    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__incarnations</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__incarnations</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbus</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dbus</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dbus</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">backend</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_backends</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">backend</span><span class="o">.</span><span class="n">unregister</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_backends</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># send service unsubscribe messages</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="p">,</span> <span class="s1">&#39;endpoint_listen&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="o">.</span><span class="n">endpoint_listen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="o">.</span><span class="n">endpoint_listen</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="o">.</span><span class="n">endpoint_listen</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="o">.</span><span class="n">endpoint_port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="o">.</span><span class="n">endpoint_port</span><span class="o">.</span><span class="n">stopListening</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="p">,</span> <span class="s1">&#39;ws_endpoint_listen&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="o">.</span><span class="n">ws_endpoint_listen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="o">.</span><span class="n">ws_endpoint_listen</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="o">.</span><span class="n">ws_endpoint_listen</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="o">.</span><span class="n">ws_endpoint_port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">web_server</span><span class="o">.</span><span class="n">ws_endpoint_port</span><span class="o">.</span><span class="n">stopListening</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msearch</span><span class="p">,</span> <span class="s1">&#39;double_discover_loop&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">msearch</span><span class="o">.</span><span class="n">double_discover_loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msearch</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">msearch</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">stopListening</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="p">,</span> <span class="s1">&#39;resend_notify_loop&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="o">.</span><span class="n">resend_notify_loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="o">.</span><span class="n">port</span><span class="o">.</span><span class="n">stopListening</span><span class="p">()</span>
+            <span class="c1"># self.renew_service_subscription_loop.stop()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="n">dev_l</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">root_device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_devices</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">root_device</span><span class="p">,</span> <span class="s1">&#39;root_device_detection_completed&#39;</span><span class="p">):</span>
+                <span class="n">root_device</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span>
+                    <span class="n">root_device_detection_completed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_device</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="n">root_device</span><span class="o">.</span><span class="n">get_devices</span><span class="p">():</span>
+                <span class="n">dd</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">unsubscribe_service_subscriptions</span><span class="p">()</span>
+                <span class="n">dd</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">remove</span><span class="p">)</span>
+                <span class="n">dev_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dd</span><span class="p">)</span>
+            <span class="n">rd</span> <span class="o">=</span> <span class="n">root_device</span><span class="o">.</span><span class="n">unsubscribe_service_subscriptions</span><span class="p">()</span>
+            <span class="n">rd</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">root_device</span><span class="o">.</span><span class="n">remove</span><span class="p">)</span>
+            <span class="n">dev_l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rd</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">homecleanup</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="c1"># cleans up anything left over</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span><span class="n">new_device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">create_device</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span><span class="n">removed_device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_device</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ssdp_server</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ctrl</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Coherence UPnP framework shutdown&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="n">dl</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">DeferredList</span><span class="p">(</span><span class="n">dev_l</span><span class="p">)</span>
+        <span class="n">dl</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">homecleanup</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dl</span></div>
+
+<div class="viewcode-block" id="Coherence.check_devices"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.check_devices">[docs]</a>    <span class="k">def</span> <span class="nf">check_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Iterate over devices and their embedded ones and renew</span>
+<span class="sd">        subscriptions.&#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">root_device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_devices</span><span class="p">():</span>
+            <span class="n">root_device</span><span class="o">.</span><span class="n">renew_service_subscriptions</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="n">root_device</span><span class="o">.</span><span class="n">get_devices</span><span class="p">():</span>
+                <span class="n">device</span><span class="o">.</span><span class="n">renew_service_subscriptions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Coherence.subscribe"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.subscribe">[docs]</a>    <span class="k">def</span> <span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Coherence.unsubscribe"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.unsubscribe">[docs]</a>    <span class="k">def</span> <span class="nf">unsubscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="n">callbacks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">:</span>
+            <span class="n">callbacks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">callbacks</span></div>
+
+<div class="viewcode-block" id="Coherence.callback"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.callback">[docs]</a>    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">callback</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Coherence.get_device_by_host"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.get_device_by_host">[docs]</a>    <span class="k">def</span> <span class="nf">get_device_by_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">):</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">get_host</span><span class="p">()</span> <span class="o">==</span> <span class="n">host</span><span class="p">:</span>
+                <span class="n">found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">found</span></div>
+
+<div class="viewcode-block" id="Coherence.get_device_with_usn"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.get_device_with_usn">[docs]</a>    <span class="k">def</span> <span class="nf">get_device_with_usn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usn</span><span class="p">):</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">get_usn</span><span class="p">()</span> <span class="o">==</span> <span class="n">usn</span><span class="p">:</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="n">device</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">found</span></div>
+
+<div class="viewcode-block" id="Coherence.get_device_with_id"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.get_device_with_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_device_with_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">):</span>
+        <span class="c1"># print(f&#39;get_device_with_id [{type(device_id)}]: {device_id}&#39;)</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">device_id</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;uuid:&#39;</span><span class="p">:</span>
+                <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+            <span class="k">if</span> <span class="nb">id</span> <span class="o">==</span> <span class="n">device_id</span><span class="p">:</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="n">device</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">found</span></div>
+
+<div class="viewcode-block" id="Coherence.get_devices"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.get_devices">[docs]</a>    <span class="k">def</span> <span class="nf">get_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(f&#39;get_devices: {self.devices}&#39;)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span></div>
+
+<div class="viewcode-block" id="Coherence.get_local_devices"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.get_local_devices">[docs]</a>    <span class="k">def</span> <span class="nf">get_local_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(f&#39;get_local_devices: &#39;</span>
+        <span class="c1">#       f&#39;{[d for d in self.devices if d.manifestation == &quot;local&quot;]}&#39;)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">manifestation</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Coherence.get_nonlocal_devices"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.get_nonlocal_devices">[docs]</a>    <span class="k">def</span> <span class="nf">get_nonlocal_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(f&#39;get_nonlocal_devices: &#39;</span>
+        <span class="c1">#       f&#39;{[d for d in self.devices if d.manifestation == &quot;remote&quot;]}&#39;)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">manifestation</span> <span class="o">==</span> <span class="s1">&#39;remote&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Coherence.is_device_added"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.is_device_added">[docs]</a>    <span class="k">def</span> <span class="nf">is_device_added</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infos</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Check if the device exists in our list of created :attr:`devices`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            infos (dict): Information about the device</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if the device exists in our list of :attr:`devices`,</span>
+<span class="sd">            otherwise, returns False.</span>
+
+<span class="sd">        .. versionadded:: 0.9.0</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">st</span> <span class="o">==</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">d</span><span class="o">.</span><span class="n">usn</span> <span class="o">==</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;USN&#39;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Coherence.create_device"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.create_device">[docs]</a>    <span class="k">def</span> <span class="nf">create_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_type</span><span class="p">,</span> <span class="n">infos</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_device_added</span><span class="p">(</span><span class="n">infos</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;No need to create the device, we already added device: &#39;</span>
+                <span class="n">f</span><span class="s1">&#39;</span><span class="si">{infos[&quot;ST&quot;]}</span><span class="s1"> with usn </span><span class="si">{infos[&quot;USN&quot;]}</span><span class="s1">...!!&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;creating </span><span class="si">{infos[&quot;ST&quot;]}</span><span class="s1"> </span><span class="si">{infos[&quot;USN&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;upnp:rootdevice&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;creating upnp:rootdevice  </span><span class="si">{infos[&quot;USN&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">RootDevice</span><span class="p">(</span><span class="n">infos</span><span class="p">)</span>
+            <span class="n">root</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">root_detection_completed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_device</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;creating device/service  </span><span class="si">{infos[&quot;USN&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">root_id</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;USN&#39;</span><span class="p">][:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">infos</span><span class="p">[</span><span class="s1">&#39;ST&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">root_id</span><span class="p">)</span>
+            <span class="c1"># TODO: must check that this is working as expected</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">Device</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">udn</span><span class="o">=</span><span class="n">infos</span><span class="p">[</span><span class="s1">&#39;UDN&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Coherence.add_device"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.add_device">[docs]</a>    <span class="k">def</span> <span class="nf">add_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;adding device {device.get_id()} {device.get_usn()} &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;</span><span class="si">{device.friendly_device_type}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+            <span class="s1">&#39;coherence_device_detection_completed&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Coherence.remove_device"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.remove_device">[docs]</a>    <span class="k">def</span> <span class="nf">remove_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_type</span><span class="p">,</span> <span class="n">infos</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;removed device </span><span class="si">{infos[&quot;ST&quot;]}</span><span class="s1"> </span><span class="si">{infos[&quot;USN&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_device_with_usn</span><span class="p">(</span><span class="n">infos</span><span class="p">[</span><span class="s1">&#39;USN&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">device</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span><span class="s1">&#39;coherence_device_removed&#39;</span><span class="p">,</span>
+                                <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;USN&#39;</span><span class="p">],</span> <span class="n">device</span><span class="o">.</span><span class="n">client</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">device</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;ST&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;upnp:rootdevice&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+                    <span class="s1">&#39;coherence_root_device_removed&#39;</span><span class="p">,</span>
+                    <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;USN&#39;</span><span class="p">],</span> <span class="n">device</span><span class="o">.</span><span class="n">client</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="s1">&#39;removed_device&#39;</span><span class="p">,</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;ST&#39;</span><span class="p">],</span> <span class="n">infos</span><span class="p">[</span><span class="s1">&#39;USN&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Coherence.add_web_resource"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.add_web_resource">[docs]</a>    <span class="k">def</span> <span class="nf">add_web_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">sub</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub</span></div>
+
+<div class="viewcode-block" id="Coherence.remove_web_resource"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.remove_web_resource">[docs]</a>    <span class="k">def</span> <span class="nf">remove_web_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="sd">&#39;&#39;&#39; probably the backend init failed &#39;&#39;&#39;</span>
+            <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Coherence.check_louie"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.check_louie">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check_louie</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;connect&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Check if the connect or disconnect method&#39;s arguments are valid in</span>
+<span class="sd">        order to automatically convert to EventDispatcher&#39;s bind</span>
+<span class="sd">        The old valid signals are:</span>
+
+<span class="sd">            - Coherence.UPnP.Device.detection_completed</span>
+<span class="sd">            - Coherence.UPnP.RootDevice.detection_completed</span>
+<span class="sd">            - Coherence.UPnP.Device.removed</span>
+<span class="sd">            - Coherence.UPnP.RootDevice.removed</span>
+
+<span class="sd">        .. versionadded:: 0.9.0</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">receiver</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;The receiver should be callable in order to use&#39;</span>
+                            <span class="s1">&#39; the method </span><span class="si">{method}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">signal</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;We need a signal in order to use method </span><span class="si">{method}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Coherence.UPnP.Device.&#39;</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="n">signal</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Coherence.UPnP.RootDevice.&#39;</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s1">&#39;We need a signal an old signal starting with: &#39;</span>
+                <span class="s1">&#39;&quot;Coherence.UPnP.Device.&quot; or &quot;Coherence.UPnP.RootDevice.&quot;&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Coherence.connect"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weak</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Wrapper method around the deprecated method louie.connect. It will</span>
+<span class="sd">        check if the passed signal is supported by executing the method</span>
+<span class="sd">        :meth:`check_louie`.</span>
+
+<span class="sd">        .. warning:: This will probably be removed at some point, if you use</span>
+<span class="sd">                     the connect method you should migrate to the new event</span>
+<span class="sd">                     system EventDispatcher.</span>
+
+<span class="sd">        .. versionchanged:: 0.9.0</span>
+<span class="sd">            Added EventDispatcher&#39;s compatibility for some basic signals</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_louie</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="s1">&#39;connect&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">signal</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.detection_completed&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">coherence_device_detection_completed</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">signal</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.Device.removed&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">coherence_device_removed</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">signal</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.RootDevice.removed&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">coherence_root_device_removed</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;Unknown signal </span><span class="si">{signal}</span><span class="s1">, we cannot bind that signal.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Coherence.disconnect"><a class="viewcode-back" href="../../source/modules.html#coherence.base.Coherence.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weak</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Wrapper method around the deprecated method louie.disconnect. It will</span>
+<span class="sd">        check if the passed signal is supported by executing the method</span>
+<span class="sd">        :meth:`check_louie`.</span>
+
+<span class="sd">        .. warning:: This will probably be removed at some point, if you use</span>
+<span class="sd">                     the disconnect method you should migrate to the new event</span>
+<span class="sd">                     system EventDispatcher.</span>
+
+<span class="sd">        .. versionchanged:: 0.9.0</span>
+<span class="sd">            Added EventDispatcher&#39;s compatibility for some basic signals</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_louie</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="s1">&#39;disconnect&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">signal</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.detected&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span>
+                <span class="n">coherence_device_detection_completed</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">signal</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.removed&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span>
+                <span class="n">control_point_client_removed</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;Unknown signal </span><span class="si">{signal}</span><span class="s1">, we cannot unbind that signal.&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

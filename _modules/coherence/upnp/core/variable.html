@@ -1,0 +1,476 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.variable &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.variable</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.core.variable</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).</span>
+<span class="c1"># Copyright 2006, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">:class:`StateVariable`</span>
+<span class="sd">----------------------</span>
+
+<span class="sd">The :class:`StateVariable` implements an UPnP variable with the ability to</span>
+<span class="sd">emmit changes via EventDispatcher whenever some class variable changes.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">eventdispatcher</span> <span class="k">import</span> <span class="n">EventDispatcher</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">utils</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># FIXME:  there is some circular import,</span>
+    <span class="c1"># service imports variable, variable imports service</span>
+    <span class="c1"># how is this done properly?</span>
+    <span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">service</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">service</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+
+
+<div class="viewcode-block" id="StateVariable"><a class="viewcode-back" href="../../../../source/upnp/core/variable.html#coherence.upnp.core.variable.StateVariable">[docs]</a><span class="k">class</span> <span class="nc">StateVariable</span><span class="p">(</span><span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Represents a UPnP variable. It has the ability to dispatch changes whenever</span>
+<span class="sd">    some class variable changes.</span>
+
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">        * Migrated from louie/dispatcher to EventDispatcher</span>
+<span class="sd">        * Added two more class variables:</span>
+
+<span class="sd">            - :attr:`StateVariable.dispatch_targets`</span>
+<span class="sd">            - :attr:`StateVariable.dispatch_events`</span>
+
+<span class="sd">        * The emitted events changed:</span>
+
+<span class="sd">            - Coherence.UPnP.StateVariable.changed =&gt;</span>
+<span class="sd">              state_variable_changed</span>
+<span class="sd">            - Coherence.UPnP.StateVariable.{var name}.changed =&gt;</span>
+<span class="sd">              state_variable_{var name}_changed</span>
+
+<span class="sd">    .. warning: This class is special regarding EventDispatcher, because we</span>
+<span class="sd">                initialize the event into the service and in the class,</span>
+<span class="sd">                and we only do that if the target service has inherited from</span>
+<span class="sd">                EventDispatcher, otherwise we only implements EventDispatcher</span>
+<span class="sd">                into this class.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;variable&#39;</span>
+
+    <span class="n">dispatch_targets</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dispatch_events</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">upnp_service</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">implementation</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span>
+                 <span class="n">send_events</span><span class="p">,</span>
+                 <span class="n">data_type</span><span class="p">,</span> <span class="n">allowed_values</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">EventDispatcher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">upnp_service</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_events</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">f</span><span class="s1">&#39;state_variable_</span><span class="si">{name}</span><span class="s1">_changed&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;state_variable_changed&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_targets</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span> <span class="n">EventDispatcher</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_targets</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">evt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_events</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">evt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">target</span><span class="o">.</span><span class="n">event_dispatcher_event_callbacks</span><span class="p">:</span>
+                    <span class="n">target</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span> <span class="o">=</span> <span class="n">implementation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_events</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">means_true</span><span class="p">(</span><span class="n">send_events</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">never_evented</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">=</span> <span class="n">data_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span> <span class="o">=</span> <span class="n">allowed_values</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_vendor_values</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_value_range</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dependant_variable</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">old_value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_time_touched</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">ServiceServer</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">moderated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">is_variable_moderated</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="StateVariable.as_tuples"><a class="viewcode-back" href="../../../../source/upnp/core/variable.html#coherence.upnp.core.variable.StateVariable.as_tuples">[docs]</a>    <span class="k">def</span> <span class="nf">as_tuples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_events</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Evented&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Evented&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">))</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Data Type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="p">))</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Default Value&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span><span class="p">))</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Current Value&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
+                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Allowed Values&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">r</span></div>
+
+<div class="viewcode-block" id="StateVariable.set_default_value"><a class="viewcode-back" href="../../../../source/upnp/core/variable.html#coherence.upnp.core.variable.StateVariable.set_default_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_default_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span></div>
+
+<div class="viewcode-block" id="StateVariable.set_allowed_values"><a class="viewcode-back" href="../../../../source/upnp/core/variable.html#coherence.upnp.core.variable.StateVariable.set_allowed_values">[docs]</a>    <span class="k">def</span> <span class="nf">set_allowed_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">values</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span> <span class="o">=</span> <span class="n">values</span></div>
+
+<div class="viewcode-block" id="StateVariable.set_allowed_value_range"><a class="viewcode-back" href="../../../../source/upnp/core/variable.html#coherence.upnp.core.variable.StateVariable.set_allowed_value_range">[docs]</a>    <span class="k">def</span> <span class="nf">set_allowed_value_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowed_value_range</span> <span class="o">=</span> <span class="n">kwargs</span></div>
+
+<div class="viewcode-block" id="StateVariable.get_allowed_values"><a class="viewcode-back" href="../../../../source/upnp/core/variable.html#coherence.upnp.core.variable.StateVariable.get_allowed_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span></div>
+
+<div class="viewcode-block" id="StateVariable.set_never_evented"><a class="viewcode-back" href="../../../../source/upnp/core/variable.html#coherence.upnp.core.variable.StateVariable.set_never_evented">[docs]</a>    <span class="k">def</span> <span class="nf">set_never_evented</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">never_evented</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">means_true</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StateVariable.update"><a class="viewcode-back" href="../../../../source/upnp/core/variable.html#coherence.upnp.core.variable.StateVariable.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">Service</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;ContainerUpdateIDs&#39;</span><span class="p">:</span>
+                <span class="n">old_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">updated</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                        <span class="n">v</span> <span class="o">=</span> <span class="n">old_value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                                <span class="k">del</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
+                                <span class="n">old_value</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                                <span class="k">break</span>
+                            <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">old_value</span><span class="p">):</span>
+                            <span class="n">new_value</span> <span class="o">=</span> <span class="n">old_value</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                                <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">new_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">old_value</span><span class="p">):</span>
+                            <span class="n">new_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">old_value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">new_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                        <span class="n">new_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_value</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span>
+                            <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">set</span><span class="p">)):</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
+                    <span class="n">new_value</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                            <span class="n">v</span> <span class="o">=</span> <span class="n">v</span>  <span class="c1"># .encode(&#39;utf-8&#39;)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">v</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_vendor_values</span><span class="p">:</span>
+                                <span class="n">new_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">v</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span><span class="p">]:</span>
+                                <span class="n">new_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                                    <span class="n">f</span><span class="s1">&#39;Variable </span><span class="si">{self.name}</span><span class="s1"> update, &#39;</span>
+                                    <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.has_vendor_values}</span><span class="s1"> value </span><span class="si">{v}</span><span class="s1"> &#39;</span>
+                                    <span class="n">f</span><span class="s1">&#39;doesn</span><span class="se">\&#39;</span><span class="s1">t fit in </span><span class="si">{self.allowed_values}</span><span class="s1">&#39;</span><span class="p">)</span>
+                                <span class="n">new_value</span> <span class="o">=</span> <span class="s1">&#39;Coherence_Value_Error&#39;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">new_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="n">new_value</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s1">&#39;boolean&#39;</span><span class="p">:</span>
+                    <span class="n">new_value</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">generalise_boolean</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s1">&#39;bin.base64&#39;</span><span class="p">:</span>
+                    <span class="n">new_value</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_vendor_values</span><span class="p">:</span>
+                        <span class="n">new_value</span> <span class="o">=</span> <span class="n">value</span>
+                    <span class="k">elif</span> <span class="n">value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">allowed_values</span><span class="p">]:</span>
+                        <span class="n">new_value</span> <span class="o">=</span> <span class="n">value</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Variable </span><span class="si">{self.name}</span><span class="s1"> NOT updated, &#39;</span>
+                                     <span class="n">f</span><span class="s1">&#39;value </span><span class="si">{value}</span><span class="s1"> doesn</span><span class="se">\&#39;</span><span class="s1">t fit&#39;</span><span class="p">)</span>
+                        <span class="n">new_value</span> <span class="o">=</span> <span class="s1">&#39;Coherence_Value_Error&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_value</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s1">&#39;boolean&#39;</span><span class="p">:</span>
+                <span class="n">new_value</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">generalise_boolean</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="s1">&#39;bin.base64&#39;</span><span class="p">:</span>
+                <span class="n">new_value</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">new_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">new_value</span> <span class="o">=</span> <span class="s1">&#39;Coherence_Value_Error&#39;</span>
+
+        <span class="k">if</span> <span class="n">new_value</span> <span class="o">==</span> <span class="s1">&#39;Coherence_Value_Error&#39;</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">new_value</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;variable NOT updated, no value change&#39;</span>
+                      <span class="n">f</span><span class="s1">&#39; </span><span class="si">{self.name}</span><span class="s1"> </span><span class="si">{self.value}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">old_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">new_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_time_touched</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1"># print(f&#39;UPDATED {self.name} {self.service} &#39;</span>
+        <span class="c1">#       f&#39;{isinstance(self.service, service.Service)} &#39;</span>
+        <span class="c1">#       f&#39;{self.instance} {self.value} {self._callbacks}&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">Service</span><span class="p">):</span>
+            <span class="c1"># self.notify()</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">last_change</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">last_change</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="StateVariable.subscribe"><a class="viewcode-back" href="../../../../source/upnp/core/variable.html#coherence.upnp.core.variable.StateVariable.subscribe">[docs]</a>    <span class="k">def</span> <span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+        <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StateVariable.notify"><a class="viewcode-back" href="../../../../source/upnp/core/variable.html#coherence.upnp.core.variable.StateVariable.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;A_ARG_TYPE_&#39;</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;Variable </span><span class="si">{self.name}</span><span class="s1"> sends notify about new value &gt;</span><span class="si">{self.value}</span><span class="s1">&lt;&#39;</span>
+        <span class="p">)</span>
+        <span class="c1"># if self.old_value == &#39;&#39;:</span>
+        <span class="c1">#    return</span>
+
+        <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_targets</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">evt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_events</span><span class="p">:</span>
+                <span class="n">target</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># print(f&#39;CALLBACKS {self.name} {self.instance} {self._callbacks}&#39;)</span>
+        <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">:</span>
+            <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;Variable: </span><span class="si">{self.name}</span><span class="s1">, {str(self.service)}, </span><span class="si">{self.instance:d}</span><span class="s1">,&#39;</span> \
+            <span class="n">f</span><span class="s1">&#39; </span><span class="si">{self.implementation}</span><span class="s1">, </span><span class="si">{self.data_type}</span><span class="s1">,&#39;</span> \
+            <span class="n">f</span><span class="s1">&#39; {str(self.allowed_values)}, {str(self.default_value)},&#39;</span> \
+            <span class="n">f</span><span class="s1">&#39; {str(self.old_value)}, {str(self.value)},&#39;</span> \
+            <span class="n">f</span><span class="s1">&#39; {str(self.send_events)}&#39;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

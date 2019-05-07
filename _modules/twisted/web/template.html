@@ -1,0 +1,770 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>twisted.web.template &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>twisted.web.template</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for twisted.web.template</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- test-case-name: twisted.web.test.test_template -*-</span>
+<span class="c1"># Copyright (c) Twisted Matrix Laboratories.</span>
+<span class="c1"># See LICENSE for details.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">HTML rendering for twisted.web.</span>
+
+<span class="sd">@var VALID_HTML_TAG_NAMES: A list of recognized HTML tag names, used by the</span>
+<span class="sd">    L{tag} object.</span>
+
+<span class="sd">@var TEMPLATE_NAMESPACE: The XML namespace used to identify attributes and</span>
+<span class="sd">    elements used by the templating system, which should be removed from the</span>
+<span class="sd">    final output document.</span>
+
+<span class="sd">@var tags: A convenience object which can produce L{Tag} objects on demand via</span>
+<span class="sd">    attribute access.  For example: C{tags.div} is equivalent to C{Tag(&quot;div&quot;)}.</span>
+<span class="sd">    Tags not specified in L{VALID_HTML_TAG_NAMES} will result in an</span>
+<span class="sd">    L{AttributeError}.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">absolute_import</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;TEMPLATE_NAMESPACE&#39;</span><span class="p">,</span> <span class="s1">&#39;VALID_HTML_TAG_NAMES&#39;</span><span class="p">,</span> <span class="s1">&#39;Element&#39;</span><span class="p">,</span> <span class="s1">&#39;TagLoader&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;XMLString&#39;</span><span class="p">,</span> <span class="s1">&#39;XMLFile&#39;</span><span class="p">,</span> <span class="s1">&#39;renderer&#39;</span><span class="p">,</span> <span class="s1">&#39;flatten&#39;</span><span class="p">,</span> <span class="s1">&#39;flattenString&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Comment&#39;</span><span class="p">,</span> <span class="s1">&#39;CDATA&#39;</span><span class="p">,</span> <span class="s1">&#39;Tag&#39;</span><span class="p">,</span> <span class="s1">&#39;slot&#39;</span><span class="p">,</span> <span class="s1">&#39;CharRef&#39;</span><span class="p">,</span> <span class="s1">&#39;renderElement&#39;</span>
+    <span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">zope.interface</span> <span class="k">import</span> <span class="n">implementer</span>
+
+<span class="kn">from</span> <span class="nn">xml.sax</span> <span class="k">import</span> <span class="n">make_parser</span><span class="p">,</span> <span class="n">handler</span>
+
+<span class="kn">from</span> <span class="nn">twisted.python.compat</span> <span class="k">import</span> <span class="n">NativeStringIO</span><span class="p">,</span> <span class="n">items</span>
+<span class="kn">from</span> <span class="nn">twisted.python.filepath</span> <span class="k">import</span> <span class="n">FilePath</span>
+<span class="kn">from</span> <span class="nn">twisted.web._stan</span> <span class="k">import</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">Comment</span><span class="p">,</span> <span class="n">CDATA</span><span class="p">,</span> <span class="n">CharRef</span>
+<span class="kn">from</span> <span class="nn">twisted.web.iweb</span> <span class="k">import</span> <span class="n">ITemplateLoader</span>
+<span class="kn">from</span> <span class="nn">twisted.logger</span> <span class="k">import</span> <span class="n">Logger</span>
+
+<span class="n">TEMPLATE_NAMESPACE</span> <span class="o">=</span> <span class="s1">&#39;http://twistedmatrix.com/ns/twisted.web.template/0.1&#39;</span>
+
+<span class="c1"># Go read the definition of NOT_DONE_YET. For lulz. This is totally</span>
+<span class="c1"># equivalent. And this turns out to be necessary, because trying to import</span>
+<span class="c1"># NOT_DONE_YET in this module causes a circular import which we cannot escape</span>
+<span class="c1"># from. From which we cannot escape. Etc. glyph is okay with this solution for</span>
+<span class="c1"># now, and so am I, as long as this comment stays to explain to future</span>
+<span class="c1"># maintainers what it means. ~ C.</span>
+<span class="c1">#</span>
+<span class="c1"># See http://twistedmatrix.com/trac/ticket/5557 for progress on fixing this.</span>
+<span class="n">NOT_DONE_YET</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">_moduleLog</span> <span class="o">=</span> <span class="n">Logger</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">_NSContext</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A mapping from XML namespaces onto their prefixes in the document.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pull out the parent&#39;s namespaces, if there&#39;s no parent then default to</span>
+<span class="sd">        XML.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nss</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">nss</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nss</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;http://www.w3.org/XML/1998/namespace&#39;</span><span class="p">:</span><span class="s1">&#39;xml&#39;</span><span class="p">}</span>
+
+
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a prefix for a namespace.</span>
+
+<span class="sd">        @param d: The default prefix value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nss</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Proxy through to setting the prefix for the namespace.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nss</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Proxy through to getting the prefix for the namespace.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nss</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+
+
+<span class="k">class</span> <span class="nc">_ToStan</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">ContentHandler</span><span class="p">,</span> <span class="n">handler</span><span class="o">.</span><span class="n">EntityResolver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A SAX parser which converts an XML document to the Twisted STAN</span>
+<span class="sd">    Document Object Model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourceFilename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        @param sourceFilename: the filename to load the XML out of.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourceFilename</span> <span class="o">=</span> <span class="n">sourceFilename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefixMap</span> <span class="o">=</span> <span class="n">_NSContext</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inCDATA</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+    <span class="k">def</span> <span class="nf">setDocumentLocator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the document locator, which knows about line and character numbers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locator</span> <span class="o">=</span> <span class="n">locator</span>
+
+
+    <span class="k">def</span> <span class="nf">startDocument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialise the document.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">document</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xmlnsAttrs</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+    <span class="k">def</span> <span class="nf">endDocument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Document ended.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">processingInstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processing instructions are ignored.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">startPrefixMapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up the prefix mapping, which maps fully qualified namespace URIs</span>
+<span class="sd">        onto namespace prefixes.</span>
+
+<span class="sd">        This gets called before startElementNS whenever an C{xmlns} attribute</span>
+<span class="sd">        is seen.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefixMap</span> <span class="o">=</span> <span class="n">_NSContext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefixMap</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefixMap</span><span class="p">[</span><span class="n">uri</span><span class="p">]</span> <span class="o">=</span> <span class="n">prefix</span>
+
+        <span class="c1"># Ignore the template namespace; we&#39;ll replace those during parsing.</span>
+        <span class="k">if</span> <span class="n">uri</span> <span class="o">==</span> <span class="n">TEMPLATE_NAMESPACE</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Add to a list that will be applied once we have the element.</span>
+        <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xmlnsAttrs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;xmlns&#39;</span><span class="p">,</span><span class="n">uri</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xmlnsAttrs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;xmlns:</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">prefix</span><span class="p">,</span><span class="n">uri</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">endPrefixMapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;Pops the stack&quot; on the prefix mapping.</span>
+
+<span class="sd">        Gets called after endElementNS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefixMap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixMap</span><span class="o">.</span><span class="n">parent</span>
+
+
+    <span class="k">def</span> <span class="nf">startElementNS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespaceAndName</span><span class="p">,</span> <span class="n">qname</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets called when we encounter a new xmlns attribute.</span>
+
+<span class="sd">        @param namespaceAndName: a (namespace, name) tuple, where name</span>
+<span class="sd">            determines which type of action to take, if the namespace matches</span>
+<span class="sd">            L{TEMPLATE_NAMESPACE}.</span>
+<span class="sd">        @param qname: ignored.</span>
+<span class="sd">        @param attrs: attributes on the element being started.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourceFilename</span>
+        <span class="n">lineNumber</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locator</span><span class="o">.</span><span class="n">getLineNumber</span><span class="p">()</span>
+        <span class="n">columnNumber</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locator</span><span class="o">.</span><span class="n">getColumnNumber</span><span class="p">()</span>
+
+        <span class="n">ns</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">namespaceAndName</span>
+        <span class="k">if</span> <span class="n">ns</span> <span class="o">==</span> <span class="n">TEMPLATE_NAMESPACE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;transparent&#39;</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;slot&#39;</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Try to get the default value for the slot</span>
+                    <span class="n">default</span> <span class="o">=</span> <span class="n">attrs</span><span class="p">[(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">)]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="c1"># If there wasn&#39;t one, then use None to indicate no</span>
+                    <span class="c1"># default.</span>
+                    <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">el</span> <span class="o">=</span> <span class="n">slot</span><span class="p">(</span>
+                    <span class="n">attrs</span><span class="p">[(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)],</span> <span class="n">default</span><span class="o">=</span><span class="n">default</span><span class="p">,</span>
+                    <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">lineNumber</span><span class="o">=</span><span class="n">lineNumber</span><span class="p">,</span>
+                    <span class="n">columnNumber</span><span class="o">=</span><span class="n">columnNumber</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">children</span>
+                <span class="k">return</span>
+
+        <span class="n">render</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">attrs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">items</span><span class="p">(</span><span class="n">attrs</span><span class="p">):</span>
+            <span class="n">attrNS</span><span class="p">,</span> <span class="n">justTheName</span> <span class="o">=</span> <span class="n">k</span>
+            <span class="k">if</span> <span class="n">attrNS</span> <span class="o">!=</span> <span class="n">TEMPLATE_NAMESPACE</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">justTheName</span> <span class="o">==</span> <span class="s1">&#39;render&#39;</span><span class="p">:</span>
+                <span class="n">render</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="k">del</span> <span class="n">attrs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+        <span class="c1"># nonTemplateAttrs is a dictionary mapping attributes that are *not* in</span>
+        <span class="c1"># TEMPLATE_NAMESPACE to their values.  Those in TEMPLATE_NAMESPACE were</span>
+        <span class="c1"># just removed from &#39;attrs&#39; in the loop immediately above.  The key in</span>
+        <span class="c1"># nonTemplateAttrs is either simply the attribute name (if it was not</span>
+        <span class="c1"># specified as having a namespace in the template) or prefix:name,</span>
+        <span class="c1"># preserving the xml namespace prefix given in the document.</span>
+
+        <span class="n">nonTemplateAttrs</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">attrNs</span><span class="p">,</span> <span class="n">attrName</span><span class="p">),</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">items</span><span class="p">(</span><span class="n">attrs</span><span class="p">):</span>
+            <span class="n">nsPrefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixMap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrNs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nsPrefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">attrKey</span> <span class="o">=</span> <span class="n">attrName</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">attrKey</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nsPrefix</span><span class="p">,</span> <span class="n">attrName</span><span class="p">)</span>
+            <span class="n">nonTemplateAttrs</span><span class="p">[</span><span class="n">attrKey</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="k">if</span> <span class="n">ns</span> <span class="o">==</span> <span class="n">TEMPLATE_NAMESPACE</span> <span class="ow">and</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;attr&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="p">:</span>
+                <span class="c1"># TODO: define a better exception for this?</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                    <span class="s1">&#39;&lt;{</span><span class="si">%s</span><span class="s1">}attr&gt; as top-level element&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">TEMPLATE_NAMESPACE</span><span class="p">,))</span>
+            <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nonTemplateAttrs</span><span class="p">:</span>
+                <span class="c1"># TODO: same here</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                    <span class="s1">&#39;&lt;{</span><span class="si">%s</span><span class="s1">}attr&gt; requires a name attribute&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">TEMPLATE_NAMESPACE</span><span class="p">,))</span>
+            <span class="n">el</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
+                     <span class="n">lineNumber</span><span class="o">=</span><span class="n">lineNumber</span><span class="p">,</span> <span class="n">columnNumber</span><span class="o">=</span><span class="n">columnNumber</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">nonTemplateAttrs</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">el</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">children</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Apply any xmlns attributes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">xmlnsAttrs</span><span class="p">:</span>
+            <span class="n">nonTemplateAttrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">OrderedDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xmlnsAttrs</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xmlnsAttrs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Add the prefix that was used in the parsed template for non-template</span>
+        <span class="c1"># namespaces (which will not be consumed anyway).</span>
+        <span class="k">if</span> <span class="n">ns</span> <span class="o">!=</span> <span class="n">TEMPLATE_NAMESPACE</span> <span class="ow">and</span> <span class="n">ns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefixMap</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefixMap</span><span class="p">[</span><span class="n">ns</span><span class="p">],</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">el</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">nonTemplateAttrs</span><span class="p">),</span> <span class="n">render</span><span class="o">=</span><span class="n">render</span><span class="p">,</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">lineNumber</span><span class="o">=</span><span class="n">lineNumber</span><span class="p">,</span>
+            <span class="n">columnNumber</span><span class="o">=</span><span class="n">columnNumber</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">children</span>
+
+
+    <span class="k">def</span> <span class="nf">characters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called when we receive some characters.  CDATA characters get passed</span>
+<span class="sd">        through as is.</span>
+
+<span class="sd">        @type ch: C{string}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inCDATA</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">endElementNS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">qname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A namespace tag is closed.  Pop the stack, if there&#39;s anything left in</span>
+<span class="sd">        it, otherwise return to the document&#39;s namespace.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">children</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">document</span>
+
+
+    <span class="k">def</span> <span class="nf">startDTD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">publicId</span><span class="p">,</span> <span class="n">systemId</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        DTDs are ignored.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">endDTD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        DTDs are ignored.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">startCDATA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        We&#39;re starting to be in a CDATA element, make a note of this.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inCDATA</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+
+
+    <span class="k">def</span> <span class="nf">endCDATA</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        We&#39;re no longer in a CDATA element.  Collect up the characters we&#39;ve</span>
+<span class="sd">        parsed and put them in a new CDATA object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inCDATA</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">comment</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CDATA</span><span class="p">(</span><span class="n">comment</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an XML comment which we&#39;ve encountered.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Comment</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+
+
+
+<span class="k">def</span> <span class="nf">_flatsaxParse</span><span class="p">(</span><span class="n">fl</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform a SAX parse of an XML document with the _ToStan class.</span>
+
+<span class="sd">    @param fl: The XML document to be parsed.</span>
+<span class="sd">    @type fl: A file object or filename.</span>
+
+<span class="sd">    @return: a C{list} of Stan objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">make_parser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">setFeature</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">feature_validation</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">setFeature</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">feature_namespaces</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">setFeature</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">feature_external_ges</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">setFeature</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">feature_external_pes</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">_ToStan</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">fl</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">setContentHandler</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">setEntityResolver</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">setProperty</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">property_lexical_handler</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">fl</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">document</span>
+
+
+<span class="nd">@implementer</span><span class="p">(</span><span class="n">ITemplateLoader</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">TagLoader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An L{ITemplateLoader} that loads existing L{IRenderable} providers.</span>
+
+<span class="sd">    @ivar tag: The object which will be loaded.</span>
+<span class="sd">    @type tag: An L{IRenderable} provider.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        @param tag: The object which will be loaded.</span>
+<span class="sd">        @type tag: An L{IRenderable} provider.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">tag</span>
+
+
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span>
+
+
+
+<span class="nd">@implementer</span><span class="p">(</span><span class="n">ITemplateLoader</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">XMLString</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An L{ITemplateLoader} that loads and parses XML from a string.</span>
+
+<span class="sd">    @ivar _loadedTemplate: The loaded document.</span>
+<span class="sd">    @type _loadedTemplate: a C{list} of Stan objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the parser on a L{NativeStringIO} copy of the string.</span>
+
+<span class="sd">        @param s: The string from which to load the XML.</span>
+<span class="sd">        @type s: C{str}, or a UTF-8 encoded L{bytes}.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loadedTemplate</span> <span class="o">=</span> <span class="n">_flatsaxParse</span><span class="p">(</span><span class="n">NativeStringIO</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the document.</span>
+
+<span class="sd">        @return: the loaded document.</span>
+<span class="sd">        @rtype: a C{list} of Stan objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loadedTemplate</span>
+
+
+
+<span class="nd">@implementer</span><span class="p">(</span><span class="n">ITemplateLoader</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">XMLFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An L{ITemplateLoader} that loads and parses XML from a file.</span>
+
+<span class="sd">    @ivar _loadedTemplate: The loaded document, or L{None}, if not loaded.</span>
+<span class="sd">    @type _loadedTemplate: a C{list} of Stan objects, or L{None}.</span>
+
+<span class="sd">    @ivar _path: The L{FilePath}, file object, or filename that is being</span>
+<span class="sd">        loaded from.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the parser on a file.</span>
+
+<span class="sd">        @param path: The file from which to load the XML.</span>
+<span class="sd">        @type path: L{FilePath}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">FilePath</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Passing filenames or file objects to XMLFile is deprecated &quot;</span>
+                <span class="s2">&quot;since Twisted 12.1.  Pass a FilePath instead.&quot;</span><span class="p">,</span>
+                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loadedTemplate</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">path</span>
+
+
+    <span class="k">def</span> <span class="nf">_loadDoc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read and parse the XML.</span>
+
+<span class="sd">        @return: the loaded document.</span>
+<span class="sd">        @rtype: a C{list} of Stan objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">FilePath</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_flatsaxParse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_flatsaxParse</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;&lt;XMLFile of </span><span class="si">%r</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,)</span>
+
+
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the document, first loading it if necessary.</span>
+
+<span class="sd">        @return: the loaded document.</span>
+<span class="sd">        @rtype: a C{list} of Stan objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loadedTemplate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loadedTemplate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loadDoc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loadedTemplate</span>
+
+
+
+<span class="c1"># Last updated October 2011, using W3Schools as a reference. Link:</span>
+<span class="c1"># http://www.w3schools.com/html5/html5_reference.asp</span>
+<span class="c1"># Note that &lt;xmp&gt; is explicitly omitted; its semantics do not work with</span>
+<span class="c1"># t.w.template and it is officially deprecated.</span>
+<span class="n">VALID_HTML_TAG_NAMES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
+    <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;abbr&#39;</span><span class="p">,</span> <span class="s1">&#39;acronym&#39;</span><span class="p">,</span> <span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;applet&#39;</span><span class="p">,</span> <span class="s1">&#39;area&#39;</span><span class="p">,</span> <span class="s1">&#39;article&#39;</span><span class="p">,</span> <span class="s1">&#39;aside&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;audio&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="s1">&#39;basefont&#39;</span><span class="p">,</span> <span class="s1">&#39;bdi&#39;</span><span class="p">,</span> <span class="s1">&#39;bdo&#39;</span><span class="p">,</span> <span class="s1">&#39;big&#39;</span><span class="p">,</span> <span class="s1">&#39;blockquote&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="s1">&#39;br&#39;</span><span class="p">,</span> <span class="s1">&#39;button&#39;</span><span class="p">,</span> <span class="s1">&#39;canvas&#39;</span><span class="p">,</span> <span class="s1">&#39;caption&#39;</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="s1">&#39;cite&#39;</span><span class="p">,</span> <span class="s1">&#39;code&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;col&#39;</span><span class="p">,</span> <span class="s1">&#39;colgroup&#39;</span><span class="p">,</span> <span class="s1">&#39;command&#39;</span><span class="p">,</span> <span class="s1">&#39;datalist&#39;</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">,</span> <span class="s1">&#39;del&#39;</span><span class="p">,</span> <span class="s1">&#39;details&#39;</span><span class="p">,</span> <span class="s1">&#39;dfn&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dir&#39;</span><span class="p">,</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span> <span class="s1">&#39;dl&#39;</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">,</span> <span class="s1">&#39;em&#39;</span><span class="p">,</span> <span class="s1">&#39;embed&#39;</span><span class="p">,</span> <span class="s1">&#39;fieldset&#39;</span><span class="p">,</span> <span class="s1">&#39;figcaption&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;figure&#39;</span><span class="p">,</span> <span class="s1">&#39;font&#39;</span><span class="p">,</span> <span class="s1">&#39;footer&#39;</span><span class="p">,</span> <span class="s1">&#39;form&#39;</span><span class="p">,</span> <span class="s1">&#39;frame&#39;</span><span class="p">,</span> <span class="s1">&#39;frameset&#39;</span><span class="p">,</span> <span class="s1">&#39;h1&#39;</span><span class="p">,</span> <span class="s1">&#39;h2&#39;</span><span class="p">,</span> <span class="s1">&#39;h3&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;h4&#39;</span><span class="p">,</span> <span class="s1">&#39;h5&#39;</span><span class="p">,</span> <span class="s1">&#39;h6&#39;</span><span class="p">,</span> <span class="s1">&#39;head&#39;</span><span class="p">,</span> <span class="s1">&#39;header&#39;</span><span class="p">,</span> <span class="s1">&#39;hgroup&#39;</span><span class="p">,</span> <span class="s1">&#39;hr&#39;</span><span class="p">,</span> <span class="s1">&#39;html&#39;</span><span class="p">,</span> <span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;iframe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;img&#39;</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="s1">&#39;ins&#39;</span><span class="p">,</span> <span class="s1">&#39;isindex&#39;</span><span class="p">,</span> <span class="s1">&#39;keygen&#39;</span><span class="p">,</span> <span class="s1">&#39;kbd&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="s1">&#39;legend&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;li&#39;</span><span class="p">,</span> <span class="s1">&#39;link&#39;</span><span class="p">,</span> <span class="s1">&#39;map&#39;</span><span class="p">,</span> <span class="s1">&#39;mark&#39;</span><span class="p">,</span> <span class="s1">&#39;menu&#39;</span><span class="p">,</span> <span class="s1">&#39;meta&#39;</span><span class="p">,</span> <span class="s1">&#39;meter&#39;</span><span class="p">,</span> <span class="s1">&#39;nav&#39;</span><span class="p">,</span> <span class="s1">&#39;noframes&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;noscript&#39;</span><span class="p">,</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;ol&#39;</span><span class="p">,</span> <span class="s1">&#39;optgroup&#39;</span><span class="p">,</span> <span class="s1">&#39;option&#39;</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;param&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="s1">&#39;progress&#39;</span><span class="p">,</span> <span class="s1">&#39;q&#39;</span><span class="p">,</span> <span class="s1">&#39;rp&#39;</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">,</span> <span class="s1">&#39;ruby&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;samp&#39;</span><span class="p">,</span> <span class="s1">&#39;script&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;section&#39;</span><span class="p">,</span> <span class="s1">&#39;select&#39;</span><span class="p">,</span> <span class="s1">&#39;small&#39;</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;span&#39;</span><span class="p">,</span> <span class="s1">&#39;strike&#39;</span><span class="p">,</span> <span class="s1">&#39;strong&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;style&#39;</span><span class="p">,</span> <span class="s1">&#39;sub&#39;</span><span class="p">,</span> <span class="s1">&#39;summary&#39;</span><span class="p">,</span> <span class="s1">&#39;sup&#39;</span><span class="p">,</span> <span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="s1">&#39;tbody&#39;</span><span class="p">,</span> <span class="s1">&#39;td&#39;</span><span class="p">,</span> <span class="s1">&#39;textarea&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;tfoot&#39;</span><span class="p">,</span> <span class="s1">&#39;th&#39;</span><span class="p">,</span> <span class="s1">&#39;thead&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;tr&#39;</span><span class="p">,</span> <span class="s1">&#39;tt&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;ul&#39;</span><span class="p">,</span> <span class="s1">&#39;var&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;video&#39;</span><span class="p">,</span> <span class="s1">&#39;wbr&#39;</span><span class="p">,</span>
+<span class="p">])</span>
+
+
+
+<span class="k">class</span> <span class="nc">_TagFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A factory for L{Tag} objects; the implementation of the L{tags} object.</span>
+
+<span class="sd">    This allows for the syntactic convenience of C{from twisted.web.html import</span>
+<span class="sd">    tags; tags.a(href=&quot;linked-page.html&quot;)}, where &#39;a&#39; can be basically any HTML</span>
+<span class="sd">    tag.</span>
+
+<span class="sd">    The class is not exposed publicly because you only ever need one of these,</span>
+<span class="sd">    and we already made it for you.</span>
+
+<span class="sd">    @see: L{tags}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tagName</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tagName</span> <span class="o">==</span> <span class="s1">&#39;transparent&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Tag</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="c1"># allow for E.del as E.del_</span>
+        <span class="n">tagName</span> <span class="o">=</span> <span class="n">tagName</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tagName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">VALID_HTML_TAG_NAMES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;unknown tag </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tagName</span><span class="p">,))</span>
+        <span class="k">return</span> <span class="n">Tag</span><span class="p">(</span><span class="n">tagName</span><span class="p">)</span>
+
+
+
+<span class="n">tags</span> <span class="o">=</span> <span class="n">_TagFactory</span><span class="p">()</span>
+
+
+
+<span class="k">def</span> <span class="nf">renderElement</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span>
+                  <span class="n">doctype</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;&lt;!DOCTYPE html&gt;&#39;</span><span class="p">,</span> <span class="n">_failElement</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Render an element or other C{IRenderable}.</span>
+
+<span class="sd">    @param request: The C{Request} being rendered to.</span>
+<span class="sd">    @param element: An C{IRenderable} which will be rendered.</span>
+<span class="sd">    @param doctype: A C{bytes} which will be written as the first line of</span>
+<span class="sd">        the request, or L{None} to disable writing of a doctype.  The C{string}</span>
+<span class="sd">        should not include a trailing newline and will default to the HTML5</span>
+<span class="sd">        doctype C{&#39;&lt;!DOCTYPE html&gt;&#39;}.</span>
+
+<span class="sd">    @returns: NOT_DONE_YET</span>
+
+<span class="sd">    @since: 12.1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">doctype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">doctype</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_failElement</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_failElement</span> <span class="o">=</span> <span class="n">twisted</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">FailureElement</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="n">flatten</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">eb</span><span class="p">(</span><span class="n">failure</span><span class="p">):</span>
+        <span class="n">_moduleLog</span><span class="o">.</span><span class="n">failure</span><span class="p">(</span>
+            <span class="s2">&quot;An error occurred while rendering the response.&quot;</span><span class="p">,</span>
+            <span class="n">failure</span><span class="o">=</span><span class="n">failure</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">displayTracebacks</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">flatten</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">_failElement</span><span class="p">(</span><span class="n">failure</span><span class="p">),</span>
+                           <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&lt;div style=&quot;font-size:800%;&#39;</span>
+                 <span class="sa">b</span><span class="s1">&#39;background-color:#FFF;&#39;</span>
+                 <span class="sa">b</span><span class="s1">&#39;color:#F00&#39;</span>
+                 <span class="sa">b</span><span class="s1">&#39;&quot;&gt;An error occurred while rendering the response.&lt;/div&gt;&#39;</span><span class="p">))</span>
+
+    <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">eb</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">NOT_DONE_YET</span>
+
+
+
+<span class="kn">from</span> <span class="nn">twisted.web._element</span> <span class="k">import</span> <span class="n">Element</span><span class="p">,</span> <span class="n">renderer</span>
+<span class="kn">from</span> <span class="nn">twisted.web._flatten</span> <span class="k">import</span> <span class="n">flatten</span><span class="p">,</span> <span class="n">flattenString</span>
+<span class="kn">import</span> <span class="nn">twisted.web.util</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

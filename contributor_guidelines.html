@@ -1,0 +1,321 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>3. Contributor Guidelines &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributor Covenant Code of Conduct" href="contributor_code_of_conduct.html" />
+    <link rel="prev" title="2. Setting Up the Code for Local Development" href="contributor_setup.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="contributing.html">Contributing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="contributor_types.html">1. Types of Contributions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributor_setup.html">2. Setting Up the Code for Local Development</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">3. Contributor Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pull-request-guidelines">3.1. Pull Request Guidelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coding-standards">3.2. Coding Standards</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#docstrings">3.3. Docstrings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="contributing.html">Contributing</a> &raquo;</li>
+        
+      <li>3. Contributor Guidelines</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/contributor_guidelines.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="contributor-guidelines">
+<h1>3. Contributor Guidelines<a class="headerlink" href="#contributor-guidelines" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="pull-request-guidelines">
+<h2>3.1. Pull Request Guidelines<a class="headerlink" href="#pull-request-guidelines" title="Permalink to this headline">¶</a></h2>
+<p>Before you submit a pull request, check that it meets these guidelines:</p>
+<ol class="arabic simple">
+<li><p>The pull request should include tests.</p></li>
+<li><p>If the pull request adds functionality, the docs should be updated. Put
+your new functionality into a function with a docstring.</p></li>
+<li><p>The pull request should work for Python 3.6 and 3.7, and Travis CI.</p></li>
+<li><p>Check <a class="reference external" href="https://travis-ci.com/opacam/Cohen3/pull_requests">https://travis-ci.com/opacam/Cohen3/pull_requests</a> to ensure the tests
+pass for all supported Python versions and platforms.</p></li>
+</ol>
+</div>
+<div class="section" id="coding-standards">
+<h2>3.2. Coding Standards<a class="headerlink" href="#coding-standards" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>PEP8</p></li>
+<li><p>Write new code in Python 3.</p></li>
+</ul>
+</div>
+<div class="section" id="docstrings">
+<h2>3.3. Docstrings<a class="headerlink" href="#docstrings" title="Permalink to this headline">¶</a></h2>
+<p>Every module/class/method/function needs a docstring, so use the following
+keywords when relevant:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">versionadded::</span></code> to mark the version in which the feature was added.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">versionchanged::</span></code> to mark the version in which the behaviour of the
+feature was changed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">note::</span></code> to add additional info about how to use the feature or related
+feature.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">warning::</span></code> to indicate a potential issue the user might run into using
+the feature.</p></li>
+</ul>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_new_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    New feature is awesome</span>
+
+<span class="sd">    .. versionadded:: 0.8.3</span>
+
+<span class="sd">    .. note:: This new feature will likely blow your mind</span>
+
+<span class="sd">    .. warning:: Please take a seat before trying this feature</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>Will result in:</p>
+<blockquote>
+<div><dl>
+<dt>def my_new_feature(self, arg):</dt><dd><p>New feature is awesome</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.3.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This new feature will likely blow your mind</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Please take a seat before trying this feature</p>
+</div>
+</dd>
+</dl>
+</div></blockquote>
+<p>When referring to other parts of the api use:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">:mod:`~coherence.module`</span></code> to refer to a module</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:class:`~coherence.module.Class`</span></code> to refer to a class</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:attr:`~coherence.module.Class.attribute`</span></code> to refer to a attibute</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:meth:`~coherence.module.Class.method`</span></code> to refer to a method</p></li>
+</ul>
+<p>Obviously replacing <cite>module</cite>, <cite>Class</cite>, <cite>attribute</cite> and <cite>method</cite> with their
+real name, and using using ‘.’ to separate modules referring to imbricated
+modules, e.g:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>:mod:`~coherence.upnp.core.device`
+:class:`~coherence.upnp.core.device.Device`
+:attr:`~coherence.upnp.core.device.Device.services`
+:meth:`~coherence.upnp.core.device.Device.parse_device`
+</pre></div>
+</div>
+<p>Will result in:</p>
+<blockquote>
+<div><p><a class="reference internal" href="source/upnp/core/device.html#module-coherence.upnp.core.device" title="coherence.upnp.core.device"><code class="xref py py-mod docutils literal notranslate"><span class="pre">device</span></code></a>
+<a class="reference internal" href="source/upnp/core/device.html#coherence.upnp.core.device.Device" title="coherence.upnp.core.device.Device"><code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code></a>
+<a class="reference internal" href="source/upnp/core/device.html#coherence.upnp.core.device.Device.services" title="coherence.upnp.core.device.Device.services"><code class="xref py py-attr docutils literal notranslate"><span class="pre">services</span></code></a>
+<a class="reference internal" href="source/upnp/core/device.html#coherence.upnp.core.device.Device.parse_device" title="coherence.upnp.core.device.Device.parse_device"><code class="xref py py-meth docutils literal notranslate"><span class="pre">parse_device()</span></code></a></p>
+</div></blockquote>
+<p>To build your documentation, enter into docs folder and run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make html
+</pre></div>
+</div>
+<p>If you updated your Cohen3 install, and have some trouble compiling docs, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make clean
+$ make html
+</pre></div>
+</div>
+<p>The docs will be generated in <code class="docutils literal notranslate"><span class="pre">docs/_build/html</span></code>. For more information on
+docstring formatting, please refer to the official
+<a class="reference external" href="http://sphinx-doc.org/">Sphinx Documentation</a>.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contributor_code_of_conduct.html" class="btn btn-neutral float-right" title="Contributor Covenant Code of Conduct" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="contributor_setup.html" class="btn btn-neutral float-left" title="2. Setting Up the Code for Local Development" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

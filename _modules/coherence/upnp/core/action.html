@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.action &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.action</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.core.action</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright (C) 2006 Fluendo, S.A. (www.fluendo.com).</span>
+<span class="c1"># Copyright 2006,2007,2008,2009 Frank Scholz &lt;coherence@beebits.net&gt;</span>
+
+<span class="kn">from</span> <span class="nn">twisted.python.util</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+
+
+<div class="viewcode-block" id="Argument"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Argument">[docs]</a><span class="k">class</span> <span class="nc">Argument</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">state_variable</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_variable</span> <span class="o">=</span> <span class="n">state_variable</span>
+
+<div class="viewcode-block" id="Argument.get_name"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Argument.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+<div class="viewcode-block" id="Argument.get_direction"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Argument.get_direction">[docs]</a>    <span class="k">def</span> <span class="nf">get_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span></div>
+
+<div class="viewcode-block" id="Argument.get_state_variable"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Argument.get_state_variable">[docs]</a>    <span class="k">def</span> <span class="nf">get_state_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_variable</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;Argument: {self.get_name()}, {self.get_direction()}, &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;{self.get_state_variable()}&#39;</span>
+
+<div class="viewcode-block" id="Argument.as_tuples"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Argument.as_tuples">[docs]</a>    <span class="k">def</span> <span class="nf">as_tuples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Direction&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">))</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Related State Variable&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_variable</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">r</span></div>
+
+<div class="viewcode-block" id="Argument.as_dict"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Argument.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;direction&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span>
+                <span class="s1">&#39;related_state_variable&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_variable</span><span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="Action"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action">[docs]</a><span class="k">class</span> <span class="nc">Action</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;action&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">implementation</span><span class="p">,</span> <span class="n">arguments_list</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">service</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span> <span class="o">=</span> <span class="n">implementation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arguments_list</span> <span class="o">=</span> <span class="n">arguments_list</span>
+
+<div class="viewcode-block" id="Action._get_client"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action._get_client">[docs]</a>    <span class="k">def</span> <span class="nf">_get_client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">_get_client</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">client</span></div>
+
+<div class="viewcode-block" id="Action.get_name"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+<div class="viewcode-block" id="Action.get_implementation"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.get_implementation">[docs]</a>    <span class="k">def</span> <span class="nf">get_implementation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">implementation</span></div>
+
+<div class="viewcode-block" id="Action.get_arguments_list"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.get_arguments_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_arguments_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments_list</span></div>
+
+<div class="viewcode-block" id="Action.get_in_arguments"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.get_in_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">get_in_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments_list</span> <span class="k">if</span>
+                <span class="n">arg</span><span class="o">.</span><span class="n">get_direction</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;in&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Action.get_out_arguments"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.get_out_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">get_out_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments_list</span> <span class="k">if</span>
+                <span class="n">arg</span><span class="o">.</span><span class="n">get_direction</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;out&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Action.get_service"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.get_service">[docs]</a>    <span class="k">def</span> <span class="nf">get_service</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span></div>
+
+<div class="viewcode-block" id="Action.set_callback"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.set_callback">[docs]</a>    <span class="k">def</span> <span class="nf">set_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">callback</span></div>
+
+<div class="viewcode-block" id="Action.get_callback"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.get_callback">[docs]</a>    <span class="k">def</span> <span class="nf">get_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Action.call"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;calling </span><span class="si">{self.name}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">in_arguments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_in_arguments</span><span class="p">()</span>
+        <span class="n">args_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">in_arguments</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;in arguments </span><span class="si">{args_names}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">instance_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">al</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">in_arguments</span> <span class="k">if</span> <span class="n">arg_name</span> <span class="o">==</span> <span class="n">a</span><span class="o">.</span><span class="n">get_name</span><span class="p">()]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">al</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">in_arguments</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">al</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;argument </span><span class="si">{arg_name}</span><span class="s1"> not valid for action </span><span class="si">{self.name}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">arg_name</span> <span class="o">==</span> <span class="s1">&#39;InstanceID&#39;</span><span class="p">:</span>
+                <span class="n">instance_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_arguments</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">args_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">in_arguments</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;argument {[args_names]} &#39;</span>
+                       <span class="n">f</span><span class="s1">&#39;missing for action </span><span class="si">{self.name}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">action_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">client</span><span class="p">,</span> <span class="s1">&#39;overlay_actions&#39;</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">overlay_actions</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;we have an overlay method &#39;</span>
+                <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.service.device.client.overlay_actions[self.name]}</span><span class="s1"> &#39;</span>
+                <span class="n">f</span><span class="s1">&#39;for action </span><span class="si">{self.name}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">action_name</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">overlay_actions</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">](</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;changing action to </span><span class="si">{action_name}</span><span class="s1"> </span><span class="si">{kwargs}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">got_error</span><span class="p">(</span><span class="n">failure</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;error on </span><span class="si">{self.name}</span><span class="s1"> request with &#39;</span>
+                         <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.service.service_type}</span><span class="s1"> &#39;</span>
+                         <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.service.control_url}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">failure</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">failure</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">client</span><span class="p">,</span> <span class="s1">&#39;overlay_headers&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;action call has headers {&quot;headers&quot;}&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;headers&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">overlay_headers</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">overlay_headers</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;action call with new/updated headers &#39;</span>
+                      <span class="n">f</span><span class="s1">&#39;</span><span class="si">{kwargs[&quot;headers&quot;]}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client</span><span class="p">()</span>
+
+        <span class="n">ordered_arguments</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_in_arguments</span><span class="p">():</span>
+            <span class="n">ordered_arguments</span><span class="p">[</span><span class="n">argument</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">argument</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;headers&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">ordered_arguments</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">]</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">callRemote</span><span class="p">(</span><span class="n">action_name</span><span class="p">,</span> <span class="n">ordered_arguments</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">got_results</span><span class="p">,</span> <span class="n">instance_id</span><span class="o">=</span><span class="n">instance_id</span><span class="p">,</span>
+                      <span class="n">name</span><span class="o">=</span><span class="n">action_name</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">got_error</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="Action.got_results"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.got_results">[docs]</a>    <span class="k">def</span> <span class="nf">got_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">instance_id</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">instance_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">instance_id</span><span class="p">)</span>
+        <span class="n">out_arguments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_out_arguments</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;call </span><span class="si">{name}</span><span class="s1"> (instance </span><span class="si">{instance_id:d}</span><span class="s1">) &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;returns {len(out_arguments):d} arguments&#39;</span><span class="p">)</span>
+
+        <span class="c1"># XXX A_ARG_TYPE_ arguments probably don&#39;t need a variable update</span>
+        <span class="c1"># if len(out_arguments) == 1:</span>
+        <span class="c1">#    self.service.get_state_variable(</span>
+        <span class="c1">#       out_arguments[0].get_state_variable(),</span>
+        <span class="c1">#       instance_id).update(results)</span>
+        <span class="c1"># elif len(out_arguments) &gt; 1:</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_arguments</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="n">state_variable_name</span> <span class="o">=</span> \
+                    <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">get_state_variable</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">out_arguments</span> <span class="k">if</span>
+                     <span class="n">a</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">arg_name</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">get_state_variable</span><span class="p">(</span>
+                    <span class="n">state_variable_name</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">instance_id</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;Action: {self.get_name()} [{self.get_implementation()}], &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;({len(self.get_arguments_list())} args)&#39;</span>
+
+<div class="viewcode-block" id="Action.as_tuples"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.as_tuples">[docs]</a>    <span class="k">def</span> <span class="nf">as_tuples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">()),</span>
+                <span class="p">(</span><span class="s1">&#39;Number of </span><span class="se">\&#39;</span><span class="s1">in</span><span class="se">\&#39;</span><span class="s1"> arguments&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_in_arguments</span><span class="p">())),</span>
+                <span class="p">(</span><span class="s1">&#39;Number of </span><span class="se">\&#39;</span><span class="s1">out</span><span class="se">\&#39;</span><span class="s1"> arguments&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_out_arguments</span><span class="p">()))]</span></div>
+
+<div class="viewcode-block" id="Action.as_dict"><a class="viewcode-back" href="../../../../source/upnp/core/action.html#coherence.upnp.core.action.Action.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span>
+                <span class="s1">&#39;arguments&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments_list</span><span class="p">]}</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

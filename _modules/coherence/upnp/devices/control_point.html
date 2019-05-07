@@ -1,0 +1,709 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.devices.control_point &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.devices.control_point</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.devices.control_point</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2006-2010, Frank Scholz &lt;dev@coherence-project.org&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Control Point</span>
+<span class="sd">=============</span>
+
+<span class="sd">:class:`DeviceQuery`</span>
+<span class="sd">--------------------</span>
+
+<span class="sd">A convenient class that allow us to create request queries to control point.</span>
+
+<span class="sd">:class:`ControlPoint`</span>
+<span class="sd">---------------------</span>
+
+<span class="sd">Takes care of managing the different devices detected by our instance</span>
+<span class="sd">of class :class:`~coherence.base.Coherence`.</span>
+
+<span class="sd">:class:`XMLRPC`</span>
+<span class="sd">---------------</span>
+
+<span class="sd">A resource that implements XML-RPC.</span>
+
+<span class="sd">.. note::</span>
+<span class="sd">    XML-RPC is a remote procedure call (RPC) protocol which uses XML to encode</span>
+<span class="sd">    its calls and HTTP as a transport mechanism. &quot;XML-RPC&quot; also refers</span>
+<span class="sd">    generically to the use of XML for remote procedure call, independently</span>
+<span class="sd">    of the specific protocol.</span>
+
+<span class="sd">.. seealso::</span>
+<span class="sd">    XML-RPC information extracted from: https://en.wikipedia.org/wiki/XML-RPC</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">xmlrpc</span><span class="p">,</span> <span class="n">client</span>
+
+<span class="kn">from</span> <span class="nn">eventdispatcher</span> <span class="k">import</span> <span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">Property</span><span class="p">,</span> <span class="n">ListProperty</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">service</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.event</span> <span class="k">import</span> <span class="n">EventServer</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.devices.internet_gateway_device_client</span> <span class="k">import</span> \
+    <span class="n">InternetGatewayDeviceClient</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.devices.media_renderer_client</span> <span class="k">import</span> <span class="n">MediaRendererClient</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.devices.media_server_client</span> <span class="k">import</span> <span class="n">MediaServerClient</span>
+
+
+<div class="viewcode-block" id="DeviceQuery"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.DeviceQuery">[docs]</a><span class="k">class</span> <span class="nc">DeviceQuery</span><span class="p">(</span><span class="n">EventDispatcher</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">       * Introduced inheritance from EventDispatcher</span>
+<span class="sd">       * Changed class variable :attr:`fired` to benefit from the</span>
+<span class="sd">         EventDispatcher&#39;s properties</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">fired</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">oneshot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">EventDispatcher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="n">pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oneshot</span> <span class="o">=</span> <span class="n">oneshot</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;uuid&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;uuid:&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># print(f&#39;DeviceQuery: register event {self.callback}&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DeviceQuery.fire"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.DeviceQuery.fire">[docs]</a>    <span class="k">def</span> <span class="nf">fire</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fired</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="DeviceQuery.check"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.DeviceQuery.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fired</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">oneshot</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;host&#39;</span> <span class="ow">and</span>
+                <span class="n">device</span><span class="o">.</span><span class="n">host</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fire</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;friendly_name&#39;</span> <span class="ow">and</span>
+              <span class="n">device</span><span class="o">.</span><span class="n">friendly_name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fire</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;uuid&#39;</span> <span class="ow">and</span>
+              <span class="n">device</span><span class="o">.</span><span class="n">get_uuid</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fire</span><span class="p">(</span><span class="n">device</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ControlPoint"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint">[docs]</a><span class="k">class</span> <span class="nc">ControlPoint</span><span class="p">(</span><span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">        * Introduced inheritance from EventDispatcher, emitted events changed:</span>
+
+<span class="sd">            - Coherence.UPnP.ControlPoint.{client.device_type}.detected =&gt;</span>
+<span class="sd">              control_point_client_detected&#39;</span>
+<span class="sd">            - Coherence.UPnP.ControlPoint.{client.device_type}.removed =&gt;</span>
+<span class="sd">              control_point_client_removed</span>
+
+<span class="sd">        * Changed class variable :attr:`queries` to benefit from the</span>
+<span class="sd">          EventDispatcher&#39;s properties</span>
+<span class="sd">    .. warning::</span>
+<span class="sd">        Be aware that some events are removed, with the new dispatcher we</span>
+<span class="sd">        remove the detection for specific device type in flavour of a global</span>
+<span class="sd">        detection.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;controlpoint&#39;</span>
+
+    <span class="n">queries</span> <span class="o">=</span> <span class="n">ListProperty</span><span class="p">([])</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">,</span> <span class="n">auto_client</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">EventDispatcher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span>
+            <span class="s1">&#39;control_point_client_detected&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;control_point_client_removed&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">auto_client</span><span class="p">:</span>
+            <span class="n">auto_client</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">,</span> <span class="s1">&#39;MediaRenderer&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">coherence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auto_client</span> <span class="o">=</span> <span class="n">auto_client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+            <span class="n">coherence_device_detection_completed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">check_device</span><span class="p">,</span>
+            <span class="n">coherence_device_removed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_client</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Coherence UPnP ControlPoint starting...&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_server</span> <span class="o">=</span> <span class="n">EventServer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">add_web_resource</span><span class="p">(</span><span class="s1">&#39;RPC2&#39;</span><span class="p">,</span> <span class="n">XMLRPC</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_devices</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ControlPoint [check device]: </span><span class="si">{device}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ControlPoint.shutdown"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.shutdown">[docs]</a>    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_devices</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span>
+                <span class="n">coherence_device_detection_completed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">check_device</span><span class="p">,</span>
+                <span class="n">coherence_device_removed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_client</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">client</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">device</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span>
+                    <span class="n">detection_completed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.auto_client_append"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.auto_client_append">[docs]</a>    <span class="k">def</span> <span class="nf">auto_client_append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">device_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_client</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auto_client</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">device_type</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_devices</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.browse"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.browse">[docs]</a>    <span class="k">def</span> <span class="nf">browse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ControlPoint.browse: </span><span class="si">{device}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">get_device_with_usn</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">get_usn</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">device</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.process_queries"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.process_queries">[docs]</a>    <span class="k">def</span> <span class="nf">process_queries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="p">:</span>
+            <span class="n">query</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">device</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.add_query"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.add_query">[docs]</a>    <span class="k">def</span> <span class="nf">add_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_devices</span><span class="p">():</span>
+            <span class="n">query</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="o">.</span><span class="n">fired</span> <span class="ow">and</span> <span class="n">query</span><span class="o">.</span><span class="n">timeout</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">query</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">query</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.check_louie"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.check_louie">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check_louie</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;connect&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Check if the connect or disconnect method&#39;s arguments are valid in</span>
+<span class="sd">        order to automatically convert to EventDispatcher&#39;s bind method.</span>
+<span class="sd">        The old valid signals are:</span>
+
+<span class="sd">            - Coherence.UPnP.ControlPoint.MediaServer.detected</span>
+<span class="sd">            - Coherence.UPnP.ControlPoint.MediaServer.removed</span>
+<span class="sd">            - Coherence.UPnP.ControlPoint.MediaRenderer.detected</span>
+<span class="sd">            - Coherence.UPnP.ControlPoint.MediaRenderer.removed</span>
+<span class="sd">            - Coherence.UPnP.ControlPoint.InternetGatewayDevice.detected</span>
+<span class="sd">            - Coherence.UPnP.ControlPoint.InternetGatewayDevice.removed</span>
+
+<span class="sd">        .. versionadded:: 0.9.0</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">receiver</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;The receiver should be callable in order to use&#39;</span>
+                            <span class="s1">&#39; the method </span><span class="si">{method}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">signal</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;We need a signal in order to use method </span><span class="si">{method}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">signal</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Coherence.UPnP.ControlPoint.&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;We need a signal an old signal starting with: &#39;</span>
+                            <span class="s1">&#39;&quot;Coherence.UPnP.ControlPoint.&quot;&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.connect"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weak</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Wrapper method around the deprecated method louie.connect. It will</span>
+<span class="sd">        check if the passed signal is supported by executing the method</span>
+<span class="sd">        :meth:`check_louie`.</span>
+
+<span class="sd">        .. warning:: This will probably be removed at some point, if you use</span>
+<span class="sd">                     the connect method you should consider to migrate to the</span>
+<span class="sd">                     new event system EventDispatcher.</span>
+
+<span class="sd">        .. versionchanged:: 0.9.0</span>
+<span class="sd">            Added EventDispatcher&#39;s compatibility for some basic signals</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_louie</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="s1">&#39;connect&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">signal</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.detected&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+                <span class="n">coherence_device_detection_completed</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">signal</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.removed&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+                <span class="n">control_point_client_removed</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;Unknown signal </span><span class="si">{signal}</span><span class="s1">, we cannot bind that signal.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.disconnect"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weak</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Wrapper method around the deprecated method louie.disconnect. It will</span>
+<span class="sd">        check if the passed signal is supported by executing the method</span>
+<span class="sd">        :meth:`check_louie`.</span>
+
+<span class="sd">        .. warning:: This will probably be removed at some point, if you use</span>
+<span class="sd">                     the disconnect method you should migrate to the new event</span>
+<span class="sd">                     system EventDispatcher.</span>
+
+<span class="sd">        .. versionchanged:: 0.9.0</span>
+<span class="sd">            Added EventDispatcher&#39;s compatibility for some basic signals</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_louie</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="s1">&#39;disconnect&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">signal</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.detected&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span>
+                <span class="n">coherence_device_detection_completed</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">signal</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.removed&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span>
+                <span class="n">control_point_client_removed</span><span class="o">=</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;Unknown signal </span><span class="si">{signal}</span><span class="s1">, we cannot unbind that signal.&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.get_devices"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.get_devices">[docs]</a>    <span class="k">def</span> <span class="nf">get_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">get_devices</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ControlPoint.get_device_with_id"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.get_device_with_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_device_with_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.get_device_by_host"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.get_device_by_host">[docs]</a>    <span class="k">def</span> <span class="nf">get_device_by_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">get_device_by_host</span><span class="p">(</span><span class="n">host</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.check_device"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.check_device">[docs]</a>    <span class="k">def</span> <span class="nf">check_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;found device {device.get_friendly_name()} of type &#39;</span>
+                      <span class="n">f</span><span class="s1">&#39;{device.get_device_type()} - </span><span class="si">{device.client}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">short_type</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_friendly_device_type</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">short_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_client</span> <span class="ow">and</span> <span class="n">short_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;identified </span><span class="si">{short_type}</span><span class="s1"> {device.get_friendly_name()}&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">short_type</span> <span class="o">==</span> <span class="s1">&#39;MediaServer&#39;</span><span class="p">:</span>
+                    <span class="n">client</span> <span class="o">=</span> <span class="n">MediaServerClient</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">short_type</span> <span class="o">==</span> <span class="s1">&#39;MediaRenderer&#39;</span><span class="p">:</span>
+                    <span class="n">client</span> <span class="o">=</span> <span class="n">MediaRendererClient</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">short_type</span> <span class="o">==</span> <span class="s1">&#39;InternetGatewayDevice&#39;</span><span class="p">:</span>
+                    <span class="n">client</span> <span class="o">=</span> <span class="n">InternetGatewayDeviceClient</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">client</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">detection_completed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">)</span>
+                <span class="n">client</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span>
+
+                <span class="n">device</span><span class="o">.</span><span class="n">set_client</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">detection_completed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">completed</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">client</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_queries</span><span class="p">(</span><span class="n">device</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.completed"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.completed">[docs]</a>    <span class="k">def</span> <span class="nf">completed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;sending signal Coherence.UPnP.ControlPoint.&#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;</span><span class="si">{client.device_type}</span><span class="s1">.detected </span><span class="si">{client.device.udn}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+            <span class="s1">&#39;control_point_client_detected&#39;</span><span class="p">,</span>
+            <span class="n">client</span><span class="o">=</span><span class="n">client</span><span class="p">,</span> <span class="n">udn</span><span class="o">=</span><span class="n">client</span><span class="o">.</span><span class="n">device</span><span class="o">.</span><span class="n">udn</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ControlPoint.remove_client"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.remove_client">[docs]</a>    <span class="k">def</span> <span class="nf">remove_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">udn</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+            <span class="s1">&#39;control_point_client_removed&#39;</span><span class="p">,</span> <span class="n">udn</span><span class="o">=</span><span class="n">udn</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;removed </span><span class="si">{client.device_type}</span><span class="s1"> &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;{client.device.get_friendly_name()}&#39;</span><span class="p">)</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ControlPoint.propagate"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.propagate">[docs]</a>    <span class="k">def</span> <span class="nf">propagate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;propagate: </span><span class="si">{event}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">get_sid</span><span class="p">()</span> <span class="ow">in</span> <span class="n">service</span><span class="o">.</span><span class="n">subscribers</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">service</span><span class="o">.</span><span class="n">subscribers</span><span class="p">[</span><span class="n">event</span><span class="o">.</span><span class="n">get_sid</span><span class="p">()]</span><span class="o">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ControlPoint.put_resource"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint.put_resource">[docs]</a>    <span class="k">def</span> <span class="nf">put_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">got_result</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">got_error</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="sa">b</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;application/octet-stream&#39;</span><span class="p">,</span>
+                <span class="sa">b</span><span class="s1">&#39;Content-Length&#39;</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">postdata</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">got_result</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">got_error</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="XMLRPC"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC">[docs]</a><span class="k">class</span> <span class="nc">XMLRPC</span><span class="p">(</span><span class="n">xmlrpc</span><span class="o">.</span><span class="n">XMLRPC</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">control_point</span><span class="p">):</span>
+        <span class="n">xmlrpc</span><span class="o">.</span><span class="n">XMLRPC</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span> <span class="o">=</span> <span class="n">control_point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allowNone</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_list_devices"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_list_devices">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_list_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;list_devices&#39;</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_devices</span><span class="p">():</span>
+            <span class="c1"># print(device.get_friendly_name(), device.get_service_type(),</span>
+            <span class="c1">#       device.get_location(), device.get_id())</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;friendly_name&#39;</span><span class="p">:</span> <span class="n">device</span><span class="o">.</span><span class="n">get_friendly_name</span><span class="p">(),</span>
+                 <span class="s1">&#39;device_type&#39;</span><span class="p">:</span> <span class="n">device</span><span class="o">.</span><span class="n">get_device_type</span><span class="p">(),</span>
+                 <span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">get_location</span><span class="p">()),</span>
+                 <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">get_id</span><span class="p">())}</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_mute_device"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_mute_device">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_mute_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;mute&#39;</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">rendering_control</span><span class="o">.</span><span class="n">set_mute</span><span class="p">(</span><span class="n">desired_mute</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Error&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_unmute_device"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_unmute_device">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_unmute_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;unmute&#39;</span><span class="p">,</span> <span class="n">device_id</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">rendering_control</span><span class="o">.</span><span class="n">set_mute</span><span class="p">(</span><span class="n">desired_mute</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Error&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_set_volume"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_set_volume">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_set_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">volume</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;set volume&#39;</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">rendering_control</span><span class="o">.</span><span class="n">set_volume</span><span class="p">(</span><span class="n">desired_volume</span><span class="o">=</span><span class="n">volume</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Error&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_play"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_play">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_play</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;play&#39;</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">av_transport</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+            <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Error&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_pause"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_pause">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_pause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;pause&#39;</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">av_transport</span><span class="o">.</span><span class="n">pause</span><span class="p">()</span>
+            <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Error&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_stop"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_stop">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">av_transport</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Error&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_next"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_next">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;next&#39;</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+            <span class="nb">next</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">av_transport</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Error&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_previous"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_previous">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_previous</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;previous&#39;</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">av_transport</span><span class="o">.</span><span class="n">previous</span><span class="p">()</span>
+            <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Error&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_set_av_transport_uri"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_set_av_transport_uri">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_set_av_transport_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;set_av_transport_uri&#39;</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">av_transport</span><span class="o">.</span><span class="n">set_av_transport_uri</span><span class="p">(</span><span class="n">current_uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Error&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_create_object"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_create_object">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_create_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">container_id</span><span class="p">,</span> <span class="n">arguments</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;create_object&#39;</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">content_directory</span><span class="o">.</span><span class="n">create_object</span><span class="p">(</span><span class="n">container_id</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Error&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_import_resource"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_import_resource">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_import_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">source_uri</span><span class="p">,</span> <span class="n">destination_uri</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;import_resource&#39;</span><span class="p">,</span> <span class="n">source_uri</span><span class="p">,</span> <span class="n">destination_uri</span><span class="p">)</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">get_device_with_id</span><span class="p">(</span><span class="n">device_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">content_directory</span><span class="o">.</span><span class="n">import_resource</span><span class="p">(</span><span class="n">source_uri</span><span class="p">,</span>
+                                                     <span class="n">destination_uri</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Error&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_put_resource"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_put_resource">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_put_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;put_resource&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_point</span><span class="o">.</span><span class="n">put_resource</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span></div>
+
+<div class="viewcode-block" id="XMLRPC.xmlrpc_ping"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.XMLRPC.xmlrpc_ping">[docs]</a>    <span class="k">def</span> <span class="nf">xmlrpc_ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ping&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;Ok&#39;</span></div></div>
+
+
+<div class="viewcode-block" id="startXMLRPC"><a class="viewcode-back" href="../../../../source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.startXMLRPC">[docs]</a><span class="k">def</span> <span class="nf">startXMLRPC</span><span class="p">(</span><span class="n">control_point</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">server</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">XMLRPC</span><span class="p">(</span><span class="n">control_point</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;XMLRPC-API on port </span><span class="si">{port:d}</span><span class="s1"> ready&#39;</span><span class="p">)</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">listenTCP</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="n">server</span><span class="o">.</span><span class="n">Site</span><span class="p">(</span><span class="n">r</span><span class="p">))</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;logmode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;warning&#39;</span>
+    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;serverport&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30020</span>
+    <span class="kn">from</span> <span class="nn">coherence.base</span> <span class="k">import</span> <span class="n">Coherence</span>
+
+    <span class="n">ctrl</span> <span class="o">=</span> <span class="n">ControlPoint</span><span class="p">(</span><span class="n">Coherence</span><span class="p">(</span><span class="n">config</span><span class="p">),</span>
+                        <span class="n">auto_client</span><span class="o">=</span><span class="p">[])</span>
+
+    <span class="k">def</span> <span class="nf">show_devices</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;show_devices&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">ctrl</span><span class="o">.</span><span class="n">get_devices</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">get_id</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">the_result</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;result&#39;</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">get_id</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">query_devices</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;query_devices&#39;</span><span class="p">)</span>
+        <span class="n">ctrl</span><span class="o">.</span><span class="n">add_query</span><span class="p">(</span><span class="n">DeviceQuery</span><span class="p">(</span><span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;192.168.0.1&#39;</span><span class="p">,</span> <span class="n">the_result</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">query_devices2</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;query_devices with timeout&#39;</span><span class="p">)</span>
+        <span class="n">ctrl</span><span class="o">.</span><span class="n">add_query</span><span class="p">(</span>
+            <span class="n">DeviceQuery</span><span class="p">(</span><span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;192.168.0.1&#39;</span><span class="p">,</span> <span class="n">the_result</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                        <span class="n">oneshot</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">stop_reactor</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">reactor</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Stoped reactor successfully&#39;</span><span class="p">)</span>
+
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">show_devices</span><span class="p">)</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">query_devices</span><span class="p">)</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">query_devices2</span><span class="p">)</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">ctrl</span><span class="o">.</span><span class="n">add_query</span><span class="p">,</span> <span class="n">DeviceQuery</span><span class="p">(</span>
+        <span class="s1">&#39;friendly_name&#39;</span><span class="p">,</span> <span class="s1">&#39;Coherence Test Content&#39;</span><span class="p">,</span>
+        <span class="n">the_result</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">oneshot</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">stop_reactor</span><span class="p">)</span>
+
+    <span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.soap_lite &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.soap_lite</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.core.soap_lite</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2007 - Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">SOAP-lite</span>
+<span class="sd">=========</span>
+
+<span class="sd">Some simple functions to implement the SOAP messages needed by UPnP with</span>
+<span class="sd">ElementTree.</span>
+
+<span class="sd">.. note:: Inspired by ElementSOAP.py</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">twisted.python.util</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.xml_constants</span> <span class="k">import</span> <span class="n">ELEMENT_TYPE</span>
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+
+<span class="n">NS_SOAP_ENV</span> <span class="o">=</span> <span class="s1">&#39;http://schemas.xmlsoap.org/soap/envelope/&#39;</span>
+<span class="n">NS_SOAP_ENC</span> <span class="o">=</span> <span class="s1">&#39;http://schemas.xmlsoap.org/soap/encoding/&#39;</span>
+<span class="n">NS_XSD</span> <span class="o">=</span> <span class="s1">&#39;http://www.w3.org/1999/XMLSchema&#39;</span>
+<span class="n">NS_UPNP_ORG_CONTROL_1_0</span> <span class="o">=</span> <span class="s1">&#39;urn:schemas-upnp-org:control-1-0&#39;</span>
+
+<span class="n">TYPE_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nb">str</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+    <span class="nb">bytes</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">,</span>
+    <span class="nb">int</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+    <span class="nb">float</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+    <span class="nb">bool</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">}</span>
+
+<span class="n">UPNPERRORS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">401</span><span class="p">:</span> <span class="s1">&#39;Invalid Action&#39;</span><span class="p">,</span>
+    <span class="mi">402</span><span class="p">:</span> <span class="s1">&#39;Invalid Args&#39;</span><span class="p">,</span>
+    <span class="mi">501</span><span class="p">:</span> <span class="s1">&#39;Action Failed&#39;</span><span class="p">,</span>
+    <span class="mi">600</span><span class="p">:</span> <span class="s1">&#39;Argument Value Invalid&#39;</span><span class="p">,</span>
+    <span class="mi">601</span><span class="p">:</span> <span class="s1">&#39;Argument Value Out of Range&#39;</span><span class="p">,</span>
+    <span class="mi">602</span><span class="p">:</span> <span class="s1">&#39;Optional Action Not Implemented&#39;</span><span class="p">,</span>
+    <span class="mi">603</span><span class="p">:</span> <span class="s1">&#39;Out Of Memory&#39;</span><span class="p">,</span>
+    <span class="mi">604</span><span class="p">:</span> <span class="s1">&#39;Human Intervention Required&#39;</span><span class="p">,</span>
+    <span class="mi">605</span><span class="p">:</span> <span class="s1">&#39;String Argument Too Long&#39;</span><span class="p">,</span>
+    <span class="mi">606</span><span class="p">:</span> <span class="s1">&#39;Action Not Authorized&#39;</span><span class="p">,</span>
+    <span class="mi">607</span><span class="p">:</span> <span class="s1">&#39;Signature Failure&#39;</span><span class="p">,</span>
+    <span class="mi">608</span><span class="p">:</span> <span class="s1">&#39;Signature Missing&#39;</span><span class="p">,</span>
+    <span class="mi">609</span><span class="p">:</span> <span class="s1">&#39;Not Encrypted&#39;</span><span class="p">,</span>
+    <span class="mi">610</span><span class="p">:</span> <span class="s1">&#39;Invalid Sequence&#39;</span><span class="p">,</span>
+    <span class="mi">611</span><span class="p">:</span> <span class="s1">&#39;Invalid Control URL&#39;</span><span class="p">,</span>
+    <span class="mi">612</span><span class="p">:</span> <span class="s1">&#39;No Such Session&#39;</span><span class="p">,</span> <span class="p">}</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">get_logger</span><span class="p">(</span><span class="s1">&#39;soap_lite&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="build_soap_error"><a class="viewcode-back" href="../../../../source/upnp/core/soap_lite.html#coherence.upnp.core.soap_lite.build_soap_error">[docs]</a><span class="k">def</span> <span class="nf">build_soap_error</span><span class="p">(</span><span class="n">status</span><span class="p">,</span>
+                     <span class="n">description</span><span class="o">=</span><span class="s1">&#39;without words&#39;</span><span class="p">,</span>
+                     <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Builds an UPnP SOAP error message.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">QName</span><span class="p">(</span><span class="n">NS_SOAP_ENV</span><span class="p">,</span> <span class="s1">&#39;Fault&#39;</span><span class="p">))</span>
+    <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;faultcode&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;s:Client&#39;</span>
+    <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;faultstring&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;UPnPError&#39;</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;detail&#39;</span><span class="p">)</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">etree</span><span class="o">.</span><span class="n">QName</span><span class="p">(</span><span class="n">NS_UPNP_ORG_CONTROL_1_0</span><span class="p">,</span> <span class="s1">&#39;UPnPError&#39;</span><span class="p">),</span>
+                         <span class="n">nsmap</span><span class="o">=</span><span class="p">{</span><span class="kc">None</span><span class="p">:</span> <span class="n">NS_UPNP_ORG_CONTROL_1_0</span><span class="p">})</span>
+    <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s1">&#39;errorCode&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+    <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s1">&#39;errorDescription&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">UPNPERRORS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">status</span><span class="p">,</span>
+                                                                  <span class="n">description</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">build_soap_call</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="n">pretty_print</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="build_soap_call"><a class="viewcode-back" href="../../../../source/upnp/core/soap_lite.html#coherence.upnp.core.soap_lite.build_soap_call">[docs]</a><span class="k">def</span> <span class="nf">build_soap_call</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">ns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">is_response</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Create a shell for a SOAP request or response element:</span>
+
+<span class="sd">        - set method to none to omit the method element and</span>
+<span class="sd">          add the arguments directly to the body (for an error msg)</span>
+<span class="sd">        - arguments can be a dict or an etree.Element</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">envelope</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">QName</span><span class="p">(</span><span class="n">NS_SOAP_ENV</span><span class="p">,</span> <span class="s1">&#39;Envelope&#39;</span><span class="p">),</span>
+        <span class="n">attrib</span><span class="o">=</span><span class="p">{</span><span class="n">etree</span><span class="o">.</span><span class="n">QName</span><span class="p">(</span><span class="n">NS_SOAP_ENV</span><span class="p">,</span> <span class="s1">&#39;encodingStyle&#39;</span><span class="p">):</span> <span class="n">NS_SOAP_ENC</span><span class="p">},</span>
+        <span class="n">nsmap</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="n">NS_SOAP_ENV</span><span class="p">})</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span>
+        <span class="n">envelope</span><span class="p">,</span> <span class="n">etree</span><span class="o">.</span><span class="n">QName</span><span class="p">(</span><span class="n">NS_SOAP_ENV</span><span class="p">,</span> <span class="s1">&#39;Body&#39;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">method</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_response</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">method</span> <span class="o">+=</span> <span class="s1">&#39;Response&#39;</span>
+
+        <span class="k">if</span> <span class="n">ns</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">QName</span><span class="p">(</span><span class="n">ns</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+            <span class="n">nsmap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">ns</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">method</span>
+            <span class="n">nsmap</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">re</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">body</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">nsmap</span><span class="o">=</span><span class="n">nsmap</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">re</span> <span class="o">=</span> <span class="n">body</span>
+
+    <span class="c1"># append the arguments</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">arg_val</span> <span class="ow">in</span> <span class="n">arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg_val</span><span class="p">)</span> <span class="ow">in</span> <span class="n">TYPE_MAP</span><span class="p">:</span>
+                <span class="n">arg_type</span> <span class="o">=</span> <span class="n">TYPE_MAP</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">arg_val</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="n">arg_type</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span> <span class="ow">or</span> <span class="n">arg_type</span> <span class="o">==</span> <span class="s1">&#39;float&#39;</span><span class="p">:</span>
+                    <span class="n">arg_val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">arg_val</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">arg_type</span> <span class="o">==</span> <span class="s1">&#39;bytes&#39;</span><span class="p">:</span>
+                    <span class="n">arg_val</span> <span class="o">=</span> <span class="n">arg_val</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">arg_type</span> <span class="o">==</span> <span class="s1">&#39;boolean&#39;</span><span class="p">:</span>
+                    <span class="n">arg_val</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span> <span class="k">if</span> <span class="n">arg_val</span> <span class="k">else</span> <span class="s1">&#39;0&#39;</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">re</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">)</span>
+                <span class="n">e</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">arg_val</span>
+            <span class="c1"># elif isinstance(arg_val, ELEMENT_TYPE):</span>
+            <span class="c1">#   e.append(arg_val)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="n">ELEMENT_TYPE</span><span class="p">):</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arguments</span><span class="p">)</span>
+
+    <span class="n">xml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">envelope</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">pretty_print</span><span class="o">=</span><span class="n">pretty_print</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;xml dump:</span><span class="se">\n</span><span class="si">{xml}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xml</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

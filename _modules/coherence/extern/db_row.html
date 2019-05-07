@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.extern.db_row &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.extern.db_row</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.extern.db_row</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Wraps DB-API 2.0 query results to provide</span>
+<span class="c1"># a nice list and dictionary interface.</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (C) 2002  Dr. Conan C. Albrecht &lt;conan_albrecht@byu.edu&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># This library is free software; you can redistribute it and/or</span>
+<span class="c1"># modify it under the terms of the GNU Lesser General Public</span>
+<span class="c1"># License as published by the Free Software Foundation; either</span>
+<span class="c1"># version 2.1 of the License, or (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This library is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</span>
+<span class="c1"># Lesser General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU Lesser General Public</span>
+<span class="c1"># License along with this library; if not, write to the Free Software</span>
+<span class="c1"># Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</span>
+
+
+<span class="c1"># I created this class and related functions because I like accessing</span>
+<span class="c1"># database results by field name rather than field number.  Accessing</span>
+<span class="c1"># by field number has many problems: code is less readable, code gets</span>
+<span class="c1"># broken when field positions change or fields are added or deleted from</span>
+<span class="c1"># the query, etc.</span>
+<span class="c1">#</span>
+<span class="c1"># This class should have little overhead if you are already using fetchall().</span>
+<span class="c1"># It wraps each result row in a ResultRow class which allows you to</span>
+<span class="c1"># retrieve results via a dictionary interface (by column name).  The regular</span>
+<span class="c1"># list interface (by column number) is also provided.</span>
+<span class="c1">#</span>
+<span class="c1"># I can&#39;t believe the DB-API 2.0 api didn&#39;t include dictionary-style results.</span>
+<span class="c1"># I&#39;d love to see the reasoning behind not requiring them of database</span>
+<span class="c1"># connection classes.</span>
+
+<span class="c1"># This module comes from:</span>
+<span class="c1"># http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/163605</span>
+
+<div class="viewcode-block" id="get_rows"><a class="viewcode-back" href="../../../source/extern/db_row.html#coherence.extern.db_row.get_rows">[docs]</a><span class="k">def</span> <span class="nf">get_rows</span><span class="p">(</span><span class="n">cursor</span><span class="p">,</span> <span class="n">sql</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Return a list of ResultRow objects from an SQL query.&#39;&#39;&#39;</span>
+
+    <span class="c1"># run the query</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+
+    <span class="c1"># return the list</span>
+    <span class="k">return</span> <span class="n">getdict</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">(),</span> <span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="getdict"><a class="viewcode-back" href="../../../source/extern/db_row.html#coherence.extern.db_row.getdict">[docs]</a><span class="k">def</span> <span class="nf">getdict</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Return the list of DBRows in `results` with a given description.&#39;&#39;&#39;</span>
+
+    <span class="c1"># get the field names</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">description</span><span class="p">)):</span>
+        <span class="n">fields</span><span class="p">[</span><span class="n">description</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">i</span>
+
+    <span class="c1"># generate the list of DBRow objects</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DBRow</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">fields</span><span class="p">))</span>
+
+    <span class="c1"># return to the user</span>
+    <span class="k">return</span> <span class="n">rows</span></div>
+
+
+<div class="viewcode-block" id="DBRow"><a class="viewcode-back" href="../../../source/extern/db_row.html#coherence.extern.db_row.DBRow">[docs]</a><span class="k">class</span> <span class="nc">DBRow</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;A single row in a result set.</span>
+
+<span class="sd">    Each DBRow has a dictionary-style and list-style interface.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="DBRow.__init__"><a class="viewcode-back" href="../../../source/extern/db_row.html#coherence.extern.db_row.DBRow.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Called by ResultSet function.  Don&#39;t call directly&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="n">fields</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">=</span> <span class="n">row</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_fields</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;&lt;DBrow with {len(self)} fields&gt;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return a string representation&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">attr</span><span class="p">]]</span>
+
+<div class="viewcode-block" id="DBRow.set_extra_attr"><a class="viewcode-back" href="../../../source/extern/db_row.html#coherence.extern.db_row.DBRow.set_extra_attr">[docs]</a>    <span class="k">def</span> <span class="nf">set_extra_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extra_fields</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return the value of the named column&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="nb">int</span><span class="p">):</span>  <span class="c1"># if a number</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># a field name</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Not used in this implementation&#39;&#39;&#39;</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;can</span><span class="se">\&#39;</span><span class="s1">t set an item of a result set&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return the value of the numbered column&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">j</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setslice__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Not used in this implementation&#39;&#39;&#39;</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;can</span><span class="se">\&#39;</span><span class="s1">t set an item of a result set&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DBRow.keys"><a class="viewcode-back" href="../../../source/extern/db_row.html#coherence.extern.db_row.DBRow.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return the field names&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="DBRow.keymappings"><a class="viewcode-back" href="../../../source/extern/db_row.html#coherence.extern.db_row.DBRow.keymappings">[docs]</a>    <span class="k">def</span> <span class="nf">keymappings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return a dictionary of the keys and their indices in the row&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span></div>
+
+<div class="viewcode-block" id="DBRow.has_key"><a class="viewcode-back" href="../../../source/extern/db_row.html#coherence.extern.db_row.DBRow.has_key">[docs]</a>    <span class="k">def</span> <span class="nf">has_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return whether the given key is valid&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span></div>
+
+<div class="viewcode-block" id="DBRow.as_dict"><a class="viewcode-back" href="../../../source/extern/db_row.html#coherence.extern.db_row.DBRow.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">pos</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">d</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return how many columns are in this row&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="c1"># Error if other is not set</span>
+        <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">fields</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

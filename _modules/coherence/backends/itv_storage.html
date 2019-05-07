@@ -1,0 +1,533 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.itv_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.itv_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.itv_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Backend to retrieve the video streams from Shoutcast TV</span>
+
+<span class="c1"># Copyright 2007, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2008,2009 Jean-Michel Sizun &lt;jmDOTsizunATfreeDOTfr&gt;</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">cmp_to_key</span>
+
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">server</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendStore</span><span class="p">,</span> <span class="n">BackendItem</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">utils</span>
+
+<span class="n">ROOT_CONTAINER_ID</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">SHOUTCAST_WS_URL</span> <span class="o">=</span> <span class="s1">&#39;http://www.shoutcast.com/sbin/newtvlister.phtml?&#39;</span> \
+                   <span class="s1">&#39;service=winamp2&amp;no_compress=1&#39;</span>
+<span class="n">SHOUTCAST_TUNEIN_URL</span> <span class="o">=</span> \
+    <span class="s1">&#39;http://www.shoutcast.com/sbin/tunein-tvstation.pls?id=</span><span class="si">%s</span><span class="s1">&#39;</span>
+<span class="n">VIDEO_MIMETYPE</span> <span class="o">=</span> <span class="s1">&#39;video/x-nsv&#39;</span>
+
+
+<div class="viewcode-block" id="ProxyStream"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ProxyStream">[docs]</a><span class="k">class</span> <span class="nc">ProxyStream</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">ReverseProxyUriResource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;itv&#39;</span>
+
+    <span class="n">stream_url</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">ReverseProxyUriResource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProxyStream.requestFinished"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ProxyStream.requestFinished">[docs]</a>    <span class="k">def</span> <span class="nf">requestFinished</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; self.connection is set in utils.ReverseProxyResource.render &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;ProxyStream requestFinished&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">loseConnection</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ProxyStream.render"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ProxyStream.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">got_playlist</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s1">&#39;Error to retrieve playlist - nothing retrieved&#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;File1=&#39;</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">break</span>
+                <span class="c1"># print(&#39;stream URL:&#39;, self.stream_url)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s1">&#39;Error to retrieve playlist - &#39;</span>
+                        <span class="s1">&#39;inconsistent playlist file&#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="c1"># self.resetUri(self.stream_url)</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">got_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="n">playlist_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span>
+            <span class="c1"># print(&#39;playlist URL:&#39;, playlist_url)</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="n">playlist_url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">got_playlist</span><span class="p">,</span> <span class="n">got_error</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">clientproto</span> <span class="o">==</span> <span class="s1">&#39;HTTP/1.1&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">getHeader</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">:</span>
+                <span class="n">tokens</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)))</span>
+                <span class="k">if</span> <span class="s1">&#39;close&#39;</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+                    <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">ReverseProxyUriResource</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Container"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.Container">[docs]</a><span class="k">class</span> <span class="nc">Container</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span> <span class="o">=</span> <span class="n">parent_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;directory&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="Container.add_child"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.Container.add_child">[docs]</a>    <span class="k">def</span> <span class="nf">add_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">):</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="nb">id</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Container.get_children"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.Container.get_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">childs_sort</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">cmp_to_key</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">r</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">sort</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">childs_sort</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">start</span><span class="p">:]</span></div>
+
+<div class="viewcode-block" id="Container.get_child_count"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.Container.get_child_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_child_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Container.get_path"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.Container.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span></div>
+
+<div class="viewcode-block" id="Container.get_item"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.Container.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="Container.get_name"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.Container.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+<div class="viewcode-block" id="Container.get_id"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.Container.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div></div>
+
+
+<div class="viewcode-block" id="ITVItem"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVItem">[docs]</a><span class="k">class</span> <span class="nc">ITVItem</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;itv&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mimetype&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">ProxyStream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ITVItem.get_item"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVItem.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">VideoItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;http-get:*:</span><span class="si">%s</span><span class="s1">:*&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
+            <span class="c1"># res.size = 0 #None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="ITVItem.get_path"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVItem.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span></div></div>
+
+
+<div class="viewcode-block" id="ITVStore"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVStore">[docs]</a><span class="k">class</span> <span class="nc">ITVStore</span><span class="p">(</span><span class="n">BackendStore</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;itv&#39;</span>
+
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;Shoutcast TV&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;cexposes the list of video streams from Shoutcast TV.&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Server Name:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;my media&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the name under this MediaServer shall &#39;</span>
+                 <span class="s1">&#39;show up with on other UPnP clients&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UPnP Version:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the highest UPnP version this MediaServer shall support&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;uuid&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UUID Identifier:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the unique (UPnP) identifier for this MediaServer, &#39;</span>
+                 <span class="s1">&#39;usually automatically set&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;genrelist&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Server URL&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">SHOUTCAST_WS_URL</span><span class="p">}</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">BackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;iTV&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmc_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;4&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">shoutcast_ws_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;genrelist&#39;</span><span class="p">,</span> <span class="n">SHOUTCAST_WS_URL</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+<div class="viewcode-block" id="ITVStore.storeItem"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVStore.storeItem">[docs]</a>    <span class="k">def</span> <span class="nf">storeItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+        <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ITVStore.appendGenre"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVStore.appendGenre">[docs]</a>    <span class="k">def</span> <span class="nf">appendGenre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getnextID</span><span class="p">()</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">genre</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storeItem</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="ITVStore.appendFeed"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVStore.appendFeed">[docs]</a>    <span class="k">def</span> <span class="nf">appendFeed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getnextID</span><span class="p">()</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="n">ITVItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storeItem</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="ITVStore.len"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVStore.len">[docs]</a>    <span class="k">def</span> <span class="nf">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ITVStore.get_by_id"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVStore.get_by_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">)]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ITVStore.getnextID"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVStore.getnextID">[docs]</a>    <span class="k">def</span> <span class="nf">getnextID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="ITVStore.upnp_init"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVStore.upnp_init">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{VIDEO_MIMETYPE}</span><span class="s1">:*&#39;</span><span class="p">,</span> <span class="p">],</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">rootItem</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">rootItem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieveList_attemptCount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieveList</span><span class="p">(</span><span class="n">rootItem</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ITVStore.retrieveList"><a class="viewcode-back" href="../../../source/backends/itv.html#coherence.backends.itv_storage.ITVStore.retrieveList">[docs]</a>    <span class="k">def</span> <span class="nf">retrieveList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Retrieving Shoutcast TV listing...&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">got_page</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieveList_attemptCount</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Connection to ShoutCast service &#39;</span>
+                          <span class="s1">&#39;successful for TV listing&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Connection to ShoutCast service &#39;</span>
+                             <span class="n">f</span><span class="s1">&#39;successful for TV listing after &#39;</span>
+                             <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.retrieveList_attemptCount:d}</span><span class="s1"> attempts.&#39;</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">parse_xml</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+            <span class="n">genres</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">stations</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">stationResult</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;station&#39;</span><span class="p">):</span>
+                <span class="n">mimetype</span> <span class="o">=</span> <span class="n">VIDEO_MIMETYPE</span>
+                <span class="n">station_id</span> <span class="o">=</span> <span class="n">stationResult</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+                <span class="n">bitrate</span> <span class="o">=</span> <span class="n">stationResult</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;br&#39;</span><span class="p">)</span>
+                <span class="n">rating</span> <span class="o">=</span> <span class="n">stationResult</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">stationResult</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="n">genre</span> <span class="o">=</span> <span class="n">stationResult</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;genre&#39;</span><span class="p">)</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">SHOUTCAST_TUNEIN_URL</span> <span class="o">%</span> <span class="p">(</span><span class="n">station_id</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">genres</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">genre</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">genres</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">genre</span><span class="p">)</span>
+
+                <span class="n">sameStation</span> <span class="o">=</span> <span class="n">stations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">sameStation</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bitrate</span> <span class="o">&gt;</span> <span class="n">sameStation</span><span class="p">[</span><span class="s1">&#39;bitrate&#39;</span><span class="p">]:</span>
+                    <span class="n">station</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                               <span class="s1">&#39;station_id&#39;</span><span class="p">:</span> <span class="n">station_id</span><span class="p">,</span>
+                               <span class="s1">&#39;mimetype&#39;</span><span class="p">:</span> <span class="n">mimetype</span><span class="p">,</span>
+                               <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">station_id</span><span class="p">,</span>
+                               <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
+                               <span class="s1">&#39;bitrate&#39;</span><span class="p">:</span> <span class="n">bitrate</span><span class="p">,</span>
+                               <span class="s1">&#39;rating&#39;</span><span class="p">:</span> <span class="n">rating</span><span class="p">,</span>
+                               <span class="s1">&#39;genre&#39;</span><span class="p">:</span> <span class="n">genre</span><span class="p">}</span>
+                    <span class="n">stations</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">station</span>
+
+            <span class="n">genreItems</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">genre</span> <span class="ow">in</span> <span class="n">genres</span><span class="p">:</span>
+                <span class="n">genreItem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">appendGenre</span><span class="p">(</span><span class="n">genre</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+                <span class="n">genreItems</span><span class="p">[</span><span class="n">genre</span><span class="p">]</span> <span class="o">=</span> <span class="n">genreItem</span>
+
+            <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">stations</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                <span class="n">genre</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;genre&#39;</span><span class="p">)</span>
+                <span class="n">parentItem</span> <span class="o">=</span> <span class="n">genreItems</span><span class="p">[</span><span class="n">genre</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">appendFeed</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">station</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">),</span>
+                                 <span class="s1">&#39;mimetype&#39;</span><span class="p">:</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">],</span>
+                                 <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">station</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;station_id&#39;</span><span class="p">),</span>
+                                 <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">station</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">)},</span>
+                                <span class="n">parentItem</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">got_error</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">&#39;Connection to ShoutCast service failed. Will retry in 5s!&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{error.getTraceback()}&#39;</span><span class="p">)</span>
+            <span class="c1"># will retry later</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">retrieveList_attemptCount</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieveList</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shoutcast_ws_url</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">got_page</span><span class="p">,</span> <span class="n">got_error</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,392 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.ted_storage (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="coherence.backends.test_storage (module)" href="test.html" />
+    <link rel="prev" title="coherence.backends.swr3_storage (module)" href="swr3.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../coherence.backends.html">coherence.backends (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ampache.html">coherence.backends.ampache_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appletrailers.html">coherence.backends.appletrailers_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="audiocd.html">coherence.backends.audiocd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="axiscam.html">coherence.backends.axiscam_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="banshee.html">coherence.backends.banshee_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bbc.html">coherence.backends.bbc_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="buzztard.html">coherence.backends.buzztard_control (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dvbd.html">coherence.backends.dvbd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elisarenderer.html">coherence.backends.elisa_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elisastorage.html">coherence.backends.elisa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="feed.html">coherence.backends.feed_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="flickr.html">coherence.backends.flickr_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fs.html">coherence.backends.fs_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gallery2.html">coherence.backends.gallery2_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gstreamer_renderer.html">coherence.backends.gstreamer_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iradio.html">coherence.backends.iradio_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="itv.html">coherence.backends.itv_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lastfm.html">coherence.backends.lastfm_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lolcats.html">coherence.backends.lolcats_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mediadb.html">coherence.backends.mediadb_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="miroguide.html">coherence.backends.miroguide_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="picasa.html">coherence.backends.picasa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="playlist.html">coherence.backends.playlist_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="radiotime.html">coherence.backends.radiotime_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="swr3.html">coherence.backends.swr3_storage (module)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">coherence.backends.ted_storage (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tedstore">TEDStore</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="test.html">coherence.backends.test_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracker.html">coherence.backends.tracker_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="twitch.html">coherence.backends.twitch_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="yamj.html">coherence.backends.yamj_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="youtube.html">coherence.backends.youtube_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coherence.backends.html#coherence-backends-models-package">coherence.backends.models (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../coherence.backends.html">coherence.backends (package)</a> &raquo;</li>
+        
+      <li>coherence.backends.ted_storage (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/source/backends/ted.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.backends.ted_storage">
+<span id="coherence-backends-ted-storage-module"></span><span id="coherence-backends-ted"></span><h1>coherence.backends.ted_storage (module)<a class="headerlink" href="#module-coherence.backends.ted_storage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="tedstore">
+<h2>TEDStore<a class="headerlink" href="#tedstore" title="Permalink to this headline">¶</a></h2>
+<p>Another simple rss based Media Server, this time for TED.com content.</p>
+<p>Example to run from python script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">coherence.base</span> <span class="k">import</span> <span class="n">Coherence</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+
+<span class="n">coherence</span> <span class="o">=</span> <span class="n">Coherence</span><span class="p">(</span>
+    <span class="p">{</span><span class="s1">&#39;logmode&#39;</span><span class="p">:</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;plugin&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;backend&#39;</span><span class="p">:</span> <span class="s1">&#39;TEDStore&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Cohen3 TEDStore&#39;</span>
+                <span class="p">},</span>
+     <span class="p">}</span>
+<span class="p">)</span>
+<span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Example to run from console:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cohen3</span> <span class="o">--</span><span class="n">plugin</span><span class="o">=</span><span class="n">backend</span><span class="p">:</span><span class="n">TEDStore</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>you need the cohen 3 package installed to run the plugin from
+a console.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.8.3.</span></p>
+</div>
+<dl class="class">
+<dt id="coherence.backends.ted_storage.TedTalk">
+<em class="property">class </em><code class="descname">TedTalk</code><span class="sig-paren">(</span><em>parent_id</em>, <em>item_id</em>, <em>urlbase</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/ted_storage.html#TedTalk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.ted_storage.TedTalk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="models/items.html#coherence.backends.models.items.BackendVideoItem" title="coherence.backends.models.items.BackendVideoItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.items.BackendVideoItem</span></code></a></p>
+<p>The Backend Item.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.8.3: </span>Refactored using the class
+<a class="reference internal" href="models/items.html#coherence.backends.models.items.BackendVideoItem" title="coherence.backends.models.items.BackendVideoItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendVideoItem</span></code></a></p>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.ted_storage.TedTalk.mimetype">
+<code class="descname">mimetype</code><em class="property"> = 'video/mp4'</em><a class="headerlink" href="#coherence.backends.ted_storage.TedTalk.mimetype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.ted_storage.TEDStore">
+<em class="property">class </em><code class="descname">TEDStore</code><span class="sig-paren">(</span><em>server</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/ted_storage.html#TEDStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="models/stores.html#coherence.backends.models.stores.BackendVideoStore" title="coherence.backends.models.stores.BackendVideoStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.stores.BackendVideoStore</span></code></a></p>
+<p>The Backend Store.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.8.3: </span>Refactored using the class
+<a class="reference internal" href="models/stores.html#coherence.backends.models.stores.BackendVideoStore" title="coherence.backends.models.stores.BackendVideoStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendVideoStore</span></code></a></p>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.ted_storage.TEDStore.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'ted_store'</em><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.ted_storage.TEDStore.implements">
+<code class="descname">implements</code><em class="property"> = ['MediaServer']</em><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.implements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.ted_storage.TEDStore.name">
+<code class="descname">name</code><em class="property"> = 'TEDTalks'</em><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.ted_storage.TEDStore.upnp_protocols">
+<code class="descname">upnp_protocols</code><em class="property"> = ['http-get:*:video/quicktime:*', 'http-get:*:video/mp4:*']</em><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.upnp_protocols" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.ted_storage.TEDStore.root_url">
+<code class="descname">root_url</code><em class="property"> = b'http://feeds.feedburner.com/tedtalks_video?format=xml'</em><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.root_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.ted_storage.TEDStore.root_find_items">
+<code class="descname">root_find_items</code><em class="property"> = './channel/item'</em><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.root_find_items" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.ted_storage.TEDStore.root_id">
+<code class="descname">root_id</code><em class="property"> = 0</em><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.root_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.ted_storage.TEDStore.item_cls">
+<code class="descname">item_cls</code><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.item_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#coherence.backends.ted_storage.TedTalk" title="coherence.backends.ted_storage.TedTalk"><code class="xref py py-class docutils literal notranslate"><span class="pre">TedTalk</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.ted_storage.TEDStore.item_type">
+<code class="descname">item_type</code><em class="property"> = 'http-get:*:video/mp4:*'</em><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.item_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.ted_storage.TEDStore.last_updated">
+<code class="descname">last_updated</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.last_updated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.ted_storage.TEDStore.parse_data">
+<code class="descname">parse_data</code><span class="sig-paren">(</span><em>root</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/ted_storage.html#TEDStore.parse_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.parse_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over all items found inside the provided tree and parse each
+one of them.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.ted_storage.TEDStore.parse_item">
+<code class="descname">parse_item</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/ted_storage.html#TEDStore.parse_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.ted_storage.TEDStore.parse_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenient method to extract data from an item.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>this method must be sub classed and must return a
+dictionary which should hold the data that you want to be
+set for your items.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="test.html" class="btn btn-neutral float-right" title="coherence.backends.test_storage (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="swr3.html" class="btn btn-neutral float-left" title="coherence.backends.swr3_storage (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

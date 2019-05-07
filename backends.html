@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Backends &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Write a backend" href="write_a_backend.html" />
+    <link rel="prev" title="Command-Line Interface" href="cli.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Backends</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#working-backends">Working Backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#untested-backends">Untested Backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#not-working-backends">Not working backends</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Backends</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/backends.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="backends">
+<h1>Backends<a class="headerlink" href="#backends" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The backends are a special part of the Cohen3 project. They add extra capabilities
+to the main project, allowing to create a server which will serve some content
+depending on the enabled backend. The plugins were wrote a long time ago, and
+due to the nature of the backend himself it needs some kind of maintenance
+because, on some cases, we depend on external resources which may change…
+this could lead into some plugins may stop working. Another reason for backend
+failure maybe  a bug in source code, if you detect that some backend is not
+working anymore, please, create a new issue at
+<a class="reference external" href="https://github.com/opacam/Cohen3/issues">Cohen3 issue tracker</a>, this way
+there is a chance that the problem could be solved.</p>
+<p>If you plan to create your own backend you should check the section
+<a class="reference internal" href="write_a_backend.html#write-a-backend"><span class="std std-ref">Write a backend</span></a> which describes different methods
+for creating a backend.</p>
+</div>
+<div class="section" id="working-backends">
+<h2>Working Backends<a class="headerlink" href="#working-backends" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="source/backends/appletrailers.html#coherence-backends-appletrailers"><span class="std std-ref">Appletrailers storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/fs.html#coherence-backends-fs"><span class="std std-ref">FSStore storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/gstreamer_renderer.html#coherence-backends-gstreamer-renderer"><span class="std std-ref">Gstreamer renderer</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/lolcats.html#coherence-backends-lolcats"><span class="std std-ref">Lolcats storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/playlist.html#coherence-backends-playlist"><span class="std std-ref">Playlist storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/ted.html#coherence-backends-ted"><span class="std std-ref">Ted storage</span></a></p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="untested-backends">
+<h2>Untested Backends<a class="headerlink" href="#untested-backends" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="source/backends/ampache.html#coherence-backends-ampache"><span class="std std-ref">Ampache storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/audiocd.html#coherence-backends-audiocd"><span class="std std-ref">Audiocd storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/axiscam.html#coherence-backends-axiscam"><span class="std std-ref">Axiscam storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/banshee.html#coherence-backends-banshee"><span class="std std-ref">Banshee storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/buzztard.html#coherence-backends-buzztard"><span class="std std-ref">Buzztard storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/dvbd.html#coherence-backends-dvbd"><span class="std std-ref">DVBD storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/elisarenderer.html#coherence-backends-elisarenderer"><span class="std std-ref">Elisa renderer</span></a> (see note 1)</p></li>
+<li><p><a class="reference internal" href="source/backends/elisastorage.html#coherence-backends-elisastorage"><span class="std std-ref">Elisa storage</span></a> (see note 1)</p></li>
+<li><p><a class="reference internal" href="source/backends/feed.html#coherence-backends-feed"><span class="std std-ref">Feed storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/flickr.html#coherence-backends-flickr"><span class="std std-ref">Flickr storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/gallery2.html#coherence-backends-gallery2"><span class="std std-ref">Gallery2 storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/iradio.html#coherence-backends-iradio"><span class="std std-ref">Iradio storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/itv.html#coherence-backends-itv"><span class="std std-ref">Itv storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/mediadb.html#coherence-backends-mediadb"><span class="std std-ref">Mediadb storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/swr3.html#coherence-backends-swr3"><span class="std std-ref">SWR3 storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/test.html#coherence-backends-test"><span class="std std-ref">Test storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/tracker.html#coherence-backends-tracker"><span class="std std-ref">Tracker storage</span></a></p></li>
+<li><p><a class="reference internal" href="source/backends/yamj.html#coherence-backends-yamj"><span class="std std-ref">Yamj storage</span></a></p></li>
+</ul>
+</div></blockquote>
+<p><em>Note 1: Those backends depends on twisted.axiom and twisted.epsilon, which has
+been partially migrated to python 3…and may not work.</em></p>
+</div>
+<div class="section" id="not-working-backends">
+<h2>Not working backends<a class="headerlink" href="#not-working-backends" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="source/backends/miroguide.html#coherence-backends-miroguide"><span class="std std-ref">Miroguide storage</span></a>: miroguide’s api is not working anymore</p></li>
+<li><p><a class="reference internal" href="source/backends/bbc.html#coherence-backends-bbc"><span class="std std-ref">BBC storage</span></a>: bbc shutdown rss service</p></li>
+<li><p><a class="reference internal" href="source/backends/lastfm.html#coherence-backends-lastfm"><span class="std std-ref">LastFM storage</span></a>: service moved to new api…needs update</p></li>
+<li><p><a class="reference internal" href="source/backends/picasa.html#coherence-backends-picasa"><span class="std std-ref">Picasa storage</span></a>: google shutdown this service</p></li>
+<li><p><a class="reference internal" href="source/backends/twitch.html#coherence-backends-twitch"><span class="std std-ref">Twitch storage</span></a>: Partially working, video play is not working</p></li>
+<li><p><a class="reference internal" href="source/backends/youtube.html#coherence-backends-youtube"><span class="std std-ref">Youtube storage</span></a>: api must be updated to v3</p></li>
+</ul>
+</div></blockquote>
+<p>Note: Some of this non working backends, may be removed in a future releases
+(if we not find some way around the backend’s problem).</p>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="write_a_backend.html" class="btn btn-neutral float-right" title="Write a backend" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cli.html" class="btn btn-neutral float-left" title="Command-Line Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

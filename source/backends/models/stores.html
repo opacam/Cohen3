@@ -1,0 +1,589 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.models.stores (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.extern (package)" href="../../coherence.extern.html" />
+    <link rel="prev" title="coherence.backends.models.containers (module)" href="containers.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../ampache.html">coherence.backends.ampache_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../appletrailers.html">coherence.backends.appletrailers_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../audiocd.html">coherence.backends.audiocd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../axiscam.html">coherence.backends.axiscam_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../banshee.html">coherence.backends.banshee_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../bbc.html">coherence.backends.bbc_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../buzztard.html">coherence.backends.buzztard_control (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dvbd.html">coherence.backends.dvbd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elisarenderer.html">coherence.backends.elisa_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../elisastorage.html">coherence.backends.elisa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../feed.html">coherence.backends.feed_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../flickr.html">coherence.backends.flickr_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../fs.html">coherence.backends.fs_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gallery2.html">coherence.backends.gallery2_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../gstreamer_renderer.html">coherence.backends.gstreamer_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../iradio.html">coherence.backends.iradio_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../itv.html">coherence.backends.itv_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lastfm.html">coherence.backends.lastfm_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../lolcats.html">coherence.backends.lolcats_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mediadb.html">coherence.backends.mediadb_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../miroguide.html">coherence.backends.miroguide_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../picasa.html">coherence.backends.picasa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../playlist.html">coherence.backends.playlist_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../radiotime.html">coherence.backends.radiotime_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../swr3.html">coherence.backends.swr3_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ted.html">coherence.backends.ted_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../test.html">coherence.backends.test_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tracker.html">coherence.backends.tracker_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../twitch.html">coherence.backends.twitch_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../yamj.html">coherence.backends.yamj_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../youtube.html">coherence.backends.youtube_storage (module)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.backends.html#coherence-backends-models-package">coherence.backends.models (package)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="items.html">coherence.backends.models.items (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="containers.html">coherence.backends.models.containers (module)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.backends.models.stores (module)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.backends.html">coherence.backends (package)</a> &raquo;</li>
+        
+      <li>coherence.backends.models.stores (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/backends/models/stores.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.backends.models.stores">
+<span id="coherence-backends-models-stores-module"></span><span id="coherence-backends-models-stores"></span><h1>coherence.backends.models.stores (module)<a class="headerlink" href="#module-coherence.backends.models.stores" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="backend-models-for-backendstore">
+<h2>Backend models for BackendStore<a class="headerlink" href="#backend-models-for-backendstore" title="Permalink to this headline">¶</a></h2>
+<p>Backend stores to be subclassed. The base class <cite>BackendBaseStore</cite> inherits
+from <a class="reference internal" href="../../modules.html#coherence.backend.BackendStore" title="coherence.backend.BackendStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendStore</span></code></a>. The
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">store</span></code> classes represents some basic stores
+to create backend’s media servers. The available backend stores are:</p>
+<blockquote>
+<div><ul>
+<li><dl>
+<dt><a class="reference internal" href="#coherence.backends.models.stores.BackendBaseStore" title="coherence.backends.models.stores.BackendBaseStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendBaseStore</span></code></a>: the base class for all the backend stores.</dt><dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All the Backend items are stored into a class variable
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">BackendBaseStore.container</span></code> and it is a class of
+<a class="reference internal" href="containers.html#coherence.backends.models.containers.BackendContainer" title="coherence.backends.models.containers.BackendContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendContainer</span></code></a></p>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference internal" href="#coherence.backends.models.stores.BackendVideoStore" title="coherence.backends.models.stores.BackendVideoStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendVideoStore</span></code></a>: media server for video items. The default</dt><dd><p>backend items are instances of
+<a class="reference internal" href="items.html#coherence.backends.models.items.BackendVideoItem" title="coherence.backends.models.items.BackendVideoItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendVideoItem</span></code></a></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference internal" href="#coherence.backends.models.stores.BackendAudioStore" title="coherence.backends.models.stores.BackendAudioStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendAudioStore</span></code></a>: media server for audio items. The default</dt><dd><p>backend items are instances of
+<a class="reference internal" href="items.html#coherence.backends.models.items.BackendAudioItem" title="coherence.backends.models.items.BackendAudioItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendAudioItem</span></code></a></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><a class="reference internal" href="#coherence.backends.models.stores.BackendImageStore" title="coherence.backends.models.stores.BackendImageStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendImageStore</span></code></a>: media server for audio items. The default</dt><dd><p>backend items are instances of
+<a class="reference internal" href="items.html#coherence.backends.models.items.BackendImageItem" title="coherence.backends.models.items.BackendImageItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendImageItem</span></code></a></p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Be aware that we use super to initialize all the classes of this
+module in order to have a better MRO class resolution…so…take it
+into account if you inherit from one of this classes.</p>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.8.3.</span></p>
+</div>
+<dl class="class">
+<dt id="coherence.backends.models.stores.BackendBaseStore">
+<em class="property">class </em><code class="descname">BackendBaseStore</code><span class="sig-paren">(</span><em>server</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/stores.html#BackendBaseStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../modules.html#coherence.backend.BackendStore" title="coherence.backend.BackendStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.BackendStore</span></code></a></p>
+<p>The Base class to create a server which will hold some kind of items.
+This class will do most of the work:
+download page set in root_url, find items based on root_find_items and also
+will create the right item type to add into your container.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This class is intended to be used as a base class to create
+a custom BackendStore, so…some variables must be set into
+the corresponding inherited class. The mandatory variables
+are: item_cls, item_type, root_url, root_find_items.
+Also be sure to overwrite the method
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">parse_item()</span></code>
+in your inherited class.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.9.0: </span>Migrated from louie/dispatcher to EventDispatcher</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendBaseStore.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'BackendBaseStore'</em><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendBaseStore.implements">
+<code class="descname">implements</code><em class="property"> = ['MediaServer']</em><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.implements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendBaseStore.upnp_protocols">
+<code class="descname">upnp_protocols</code><em class="property"> = []</em><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.upnp_protocols" title="Permalink to this definition">¶</a></dt>
+<dd><p>The upnp protocols that the server should be capable to manage.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendBaseStore.container_cls">
+<code class="descname">container_cls</code><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.container_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="containers.html#coherence.backends.models.containers.BackendContainer" title="coherence.backends.models.containers.BackendContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.containers.BackendContainer</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendBaseStore.item_cls">
+<code class="descname">item_cls</code><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.item_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="items.html#coherence.backends.models.items.BackendBaseItem" title="coherence.backends.models.items.BackendBaseItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.items.BackendBaseItem</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendBaseStore.item_type">
+<code class="descname">item_type</code><em class="property"> = ''</em><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.item_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendBaseStore.root_id">
+<code class="descname">root_id</code><em class="property"> = 0</em><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.root_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The id of the store.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendBaseStore.root_url">
+<code class="descname">root_url</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.root_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>The root url to parse.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendBaseStore.root_find_items">
+<code class="descname">root_find_items</code><em class="property"> = ''</em><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.root_find_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>The xml’s findall command to parse your items. For example, if your xml
+data/file looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">root</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">item</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">Example</span> <span class="n">item</span> <span class="mi">1</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+    <span class="o">&lt;/</span><span class="n">item</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">item</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">Example</span> <span class="n">item</span> <span class="mi">2</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+    <span class="o">&lt;/</span><span class="n">item</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">root</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="#coherence.backends.models.stores.BackendBaseStore.root_find_items" title="coherence.backends.models.stores.BackendBaseStore.root_find_items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">root_find_items</span></code></a> should be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">root_find_items</span> <span class="o">=</span> <span class="s1">&#39;./root/item&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendBaseStore.name">
+<code class="descname">name</code><em class="property"> = 'Backend Base Store'</em><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the store.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.models.stores.BackendBaseStore.queue_update">
+<code class="descname">queue_update</code><span class="sig-paren">(</span><em>result</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/stores.html#BackendBaseStore.queue_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.queue_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Schedules a refresh of the media server data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.models.stores.BackendBaseStore.update_data">
+<code class="descname">update_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/stores.html#BackendBaseStore.update_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.update_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.models.stores.BackendBaseStore.parse_data">
+<code class="descname">parse_data</code><span class="sig-paren">(</span><em>root</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/stores.html#BackendBaseStore.parse_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.parse_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over all items found inside the provided tree and parse each
+one of them.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.models.stores.BackendBaseStore.parse_item">
+<code class="descname">parse_item</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/stores.html#BackendBaseStore.parse_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.parse_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenient method to extract data from an item.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>this method must be sub classed and must return a
+dictionary which should hold the data that you want to be
+set for your items.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.models.stores.BackendBaseStore.add_item">
+<code class="descname">add_item</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/stores.html#BackendBaseStore.add_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.add_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates and adds an instance of your defined item_cls into the
+<cite>:attr:container_cls</cite>. The item will be initialized with the provided
+data, collected from the method
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">parse_item()</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.models.stores.BackendBaseStore.get_by_id">
+<code class="descname">get_by_id</code><span class="sig-paren">(</span><em>item_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/stores.html#BackendBaseStore.get_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.get_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an item based on his id.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.models.stores.BackendBaseStore.upnp_init">
+<code class="descname">upnp_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/stores.html#BackendBaseStore.upnp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.stores.BackendBaseStore.upnp_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define what kind of media content we do provide</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.models.stores.BackendVideoStore">
+<em class="property">class </em><code class="descname">BackendVideoStore</code><span class="sig-paren">(</span><em>server</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/stores.html#BackendVideoStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.stores.BackendVideoStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.backends.models.stores.BackendBaseStore" title="coherence.backends.models.stores.BackendBaseStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.stores.BackendBaseStore</span></code></a></p>
+<p>The Base class to create a server for Video items. This class supports most
+typical upnp video protocols. If you need some video protocol not listed,
+you can subclass with your protocols according to your needs.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See the base class <a class="reference internal" href="#coherence.backends.models.stores.BackendBaseStore" title="coherence.backends.models.stores.BackendBaseStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendBaseStore</span></code></a> for more detailed
+information</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The default variable for item_type has been established to
+‘http-get:<em>:video/mp4:</em>’. Make sure to set the right video
+protocol for your needs</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendVideoStore.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'BackendVideoStore'</em><a class="headerlink" href="#coherence.backends.models.stores.BackendVideoStore.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendVideoStore.upnp_protocols">
+<code class="descname">upnp_protocols</code><em class="property"> = ['http-get:*:video/mp4:*', 'http-get:*:video/mp4v:*', 'http-get:*:video/mpeg:*', 'http-get:*:video/mpegts:*', 'http-get:*:video/matroska:*', 'http-get:*:video/h264:*', 'http-get:*:video/h265:*', 'http-get:*:video/avi:*', 'http-get:*:video/divx:*', 'http-get:*:video/quicktime:*', 'http-get:*:video/x-msvideo:*', 'http-get:*:video/x-ms-wmv:*', 'http-get:*:video/ogg:*']</em><a class="headerlink" href="#coherence.backends.models.stores.BackendVideoStore.upnp_protocols" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendVideoStore.item_cls">
+<code class="descname">item_cls</code><a class="headerlink" href="#coherence.backends.models.stores.BackendVideoStore.item_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="items.html#coherence.backends.models.items.BackendVideoItem" title="coherence.backends.models.items.BackendVideoItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.items.BackendVideoItem</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendVideoStore.item_type">
+<code class="descname">item_type</code><em class="property"> = 'http-get:*:video/mp4:*'</em><a class="headerlink" href="#coherence.backends.models.stores.BackendVideoStore.item_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendVideoStore.name">
+<code class="descname">name</code><em class="property"> = 'Backend Video Store'</em><a class="headerlink" href="#coherence.backends.models.stores.BackendVideoStore.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.models.stores.BackendAudioStore">
+<em class="property">class </em><code class="descname">BackendAudioStore</code><span class="sig-paren">(</span><em>server</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/stores.html#BackendAudioStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.stores.BackendAudioStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.backends.models.stores.BackendBaseStore" title="coherence.backends.models.stores.BackendBaseStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.stores.BackendBaseStore</span></code></a></p>
+<p>The Base class to create a server for Audio items. This class supports most
+typical upnp audio protocols. If you need some audio protocol not listed,
+you can subclass with your protocols according to your needs.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The default variable for item_type has been established to
+‘http-get:<em>:audio/mpeg:</em>’ (which should be fine for mp3).
+Make sure to set the right audio protocol for your needs.</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendAudioStore.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'BackendAudioStore'</em><a class="headerlink" href="#coherence.backends.models.stores.BackendAudioStore.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendAudioStore.upnp_protocols">
+<code class="descname">upnp_protocols</code><em class="property"> = ['http-get:*:audio/mp4:*', 'http-get:*:audio/mp4a:*', 'http-get:*:audio/mpeg:*', 'http-get:*:audio/x-wav:*', 'http-get:*:audio/x-scpls:*', 'http-get:*:audio/x-msaudio:*', 'http-get:*:audio/x-ms-wma:*', 'http-get:*:audio/flac:*', 'http-get:*:audio/ogg:*']</em><a class="headerlink" href="#coherence.backends.models.stores.BackendAudioStore.upnp_protocols" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendAudioStore.item_cls">
+<code class="descname">item_cls</code><a class="headerlink" href="#coherence.backends.models.stores.BackendAudioStore.item_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="items.html#coherence.backends.models.items.BackendVideoItem" title="coherence.backends.models.items.BackendVideoItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.items.BackendVideoItem</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendAudioStore.item_type">
+<code class="descname">item_type</code><em class="property"> = 'http-get:*:audio/mpeg:*'</em><a class="headerlink" href="#coherence.backends.models.stores.BackendAudioStore.item_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendAudioStore.name">
+<code class="descname">name</code><em class="property"> = 'Backend Audio Store'</em><a class="headerlink" href="#coherence.backends.models.stores.BackendAudioStore.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.models.stores.BackendImageStore">
+<em class="property">class </em><code class="descname">BackendImageStore</code><span class="sig-paren">(</span><em>server</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/backends/models/stores.html#BackendImageStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.models.stores.BackendImageStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.backends.models.stores.BackendBaseStore" title="coherence.backends.models.stores.BackendBaseStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.stores.BackendBaseStore</span></code></a></p>
+<p>The Base class to create a server for Image items. This class supports most
+typical upnp image protocols. If you need some image protocol not listed,
+you can subclass with your protocols according to your needs.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The default variable for item_type has been established to
+‘http-get:<em>:audio/jpeg:</em>’. Make sure to set the right image
+protocol for your needs.</p>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendImageStore.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'BackendImageStore'</em><a class="headerlink" href="#coherence.backends.models.stores.BackendImageStore.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendImageStore.upnp_protocols">
+<code class="descname">upnp_protocols</code><em class="property"> = ['http-get:*:image/jpeg:*', 'http-get:*:image/jpg:*', 'http-get:*:image/gif:*', 'http-get:*:image/png:*']</em><a class="headerlink" href="#coherence.backends.models.stores.BackendImageStore.upnp_protocols" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendImageStore.item_cls">
+<code class="descname">item_cls</code><a class="headerlink" href="#coherence.backends.models.stores.BackendImageStore.item_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="items.html#coherence.backends.models.items.BackendImageItem" title="coherence.backends.models.items.BackendImageItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backends.models.items.BackendImageItem</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendImageStore.item_type">
+<code class="descname">item_type</code><em class="property"> = 'http-get:*:image/jpeg:*'</em><a class="headerlink" href="#coherence.backends.models.stores.BackendImageStore.item_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.models.stores.BackendImageStore.name">
+<code class="descname">name</code><em class="property"> = 'Backend Image Store'</em><a class="headerlink" href="#coherence.backends.models.stores.BackendImageStore.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../coherence.extern.html" class="btn btn-neutral float-right" title="coherence.extern (package)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="containers.html" class="btn btn-neutral float-left" title="coherence.backends.models.containers (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

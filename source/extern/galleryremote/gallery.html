@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.extern.galleryremote.gallery (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.extern.youtubedl.youtubedl (module)" href="../youtubedl/youtubedl.html" />
+    <link rel="prev" title="coherence.extern.xdg (module)" href="../xdg.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../covers_by_amazon.html">coherence.extern.covers_by_amazon (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../db_row.html">coherence.extern.db_row (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../simple_plugin.html">coherence.extern.simple_plugin (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../xdg.html">coherence.extern.xdg (module)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.extern.html#coherence-extern-galleryremote-package">coherence.extern.galleryremote (package)</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.extern.galleryremote.gallery (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.extern.html#coherence-extern-youtubedl-package">coherence.extern.youtubedl (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.extern.html">coherence.extern (package)</a> &raquo;</li>
+        
+      <li>coherence.extern.galleryremote.gallery (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/extern/galleryremote/gallery.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.extern.galleryremote.gallery">
+<span id="coherence-extern-galleryremote-gallery-module"></span><span id="extern-gallery"></span><h1>coherence.extern.galleryremote.gallery (module)<a class="headerlink" href="#module-coherence.extern.galleryremote.gallery" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="coherence.extern.galleryremote.gallery.Gallery">
+<em class="property">class </em><code class="descname">Gallery</code><span class="sig-paren">(</span><em>url</em>, <em>version=2</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>The Gallery class implements the Gallery Remote protocol as documented
+here:
+<a class="reference external" href="http://codex.gallery2.org/Gallery_Remote:Protocol">http://codex.gallery2.org/Gallery_Remote:Protocol</a></p>
+<p>The Gallery project is an open source web based photo album organizer
+written in php. Gallery’s web site is:</p>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><a class="reference external" href="http://gallery.menalto.com/">http://gallery.menalto.com/</a></div>
+</div>
+</div></blockquote>
+<p>This class is a 3rd party product which is not maintained by the
+creators of the Gallery project.</p>
+<p>Example usage:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">coherence.extern.galleryremote</span> <span class="kn">import</span> <span class="n">Gallery</span>
+<span class="n">my_gallery</span> <span class="o">=</span> <span class="n">Gallery</span><span class="p">(</span><span class="s1">&#39;http://www.yoursite.com/gallery2&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">my_gallery</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span><span class="s1">&#39;password&#39;</span><span class="p">)</span>
+<span class="n">albums</span> <span class="o">=</span> <span class="n">my_gallery</span><span class="o">.</span><span class="n">fetch_albums</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Create a Gallery for remote access.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – base address of the gallery</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – version of the gallery being connected to
+(default 2), either 1 for Gallery1 or 2 for Gallery2.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>url</em>, <em>version=2</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Gallery for remote access.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – base address of the gallery</p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – version of the gallery being connected to
+(default 2), either 1 for Gallery1 or 2 for Gallery2.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery._do_request">
+<code class="descname">_do_request</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery._do_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery._do_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a request, encoded as described in the Gallery Remote protocol.
+request - a dictionary of protocol parameters and values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery._parse_response">
+<code class="descname">_parse_response</code><span class="sig-paren">(</span><em>response</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery._parse_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery._parse_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode the response from a request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>response</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – The response from a gallery request, encoded
+according to the gallery remote protocol.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A request dict.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery._get">
+<code class="descname">_get</code><span class="sig-paren">(</span><em>response</em>, <em>kwd</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery._get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery._get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery.login">
+<code class="descname">login</code><span class="sig-paren">(</span><em>username</em>, <em>password</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery.login"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery.login" title="Permalink to this definition">¶</a></dt>
+<dd><p>Establish an authenticated session to the remote gallery.
+username - A valid gallery user’s username
+password - That valid user’s password</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery.fetch_albums">
+<code class="descname">fetch_albums</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery.fetch_albums"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery.fetch_albums" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain a dict of albums contained in the gallery keyed by
+album name. In Gallery1, the name is alphanumeric. In Gallery2,
+the name is the unique identifying number for that album.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery.fetch_albums_prune">
+<code class="descname">fetch_albums_prune</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery.fetch_albums_prune"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery.fetch_albums_prune" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain a dict of albums contained in the gallery keyed by
+album name. In Gallery1, the name is alphanumeric. In Gallery2,
+the name is the unique identifying number for that album.</p>
+<p>From the protocol docs:
+“The fetch_albums_prune command asks the server to return a list
+of all albums that the user can either write to, or that are
+visible to the user and contain a sub-album that is writable
+(including sub-albums several times removed).”</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery.add_item">
+<code class="descname">add_item</code><span class="sig-paren">(</span><em>album</em>, <em>filename</em>, <em>caption</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery.add_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery.add_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a photo to the specified album.
+album - album name / identifier
+filename - image to upload
+caption - string caption to add to the image
+description - string description to add to the image</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery.album_properties">
+<code class="descname">album_properties</code><span class="sig-paren">(</span><em>album</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery.album_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery.album_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain album property information for the specified album.
+album - the album name / identifier to obtain information for</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery.new_album">
+<code class="descname">new_album</code><span class="sig-paren">(</span><em>parent</em>, <em>name=None</em>, <em>title=None</em>, <em>description=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery.new_album"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery.new_album" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an album to the specified parent album.
+parent - album name / identifier to contain the new album
+name - unique string name of the new album
+title - string title of the album
+description - string description to add to the image</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery.fetch_album_images">
+<code class="descname">fetch_album_images</code><span class="sig-paren">(</span><em>album</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery.fetch_album_images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery.fetch_album_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the image information for all images in the specified album.
+album - specifies the album from which to obtain image information</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.galleryremote.gallery.Gallery.get_URL_for_image">
+<code class="descname">get_URL_for_image</code><span class="sig-paren">(</span><em>gallery2_id</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/extern/galleryremote/gallery.html#Gallery.get_URL_for_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.galleryremote.gallery.Gallery.get_URL_for_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../youtubedl/youtubedl.html" class="btn btn-neutral float-right" title="coherence.extern.youtubedl.youtubedl (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../xdg.html" class="btn btn-neutral float-left" title="coherence.extern.xdg (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

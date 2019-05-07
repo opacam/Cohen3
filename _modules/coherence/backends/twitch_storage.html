@@ -1,0 +1,521 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.twitch_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.twitch_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.twitch_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2015, https://github.com/unintended</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">A backend to access twitch.tv streams.</span>
+
+<span class="sd">To enable personalized features (e.g. &#39;Following&#39; streams),</span>
+<span class="sd">add &#39;access_token&#39; key into your config file:</span>
+
+<span class="sd">  1. Click the link below to automatically request an access token for your</span>
+<span class="sd">     account:</span>
+
+<span class="sd">     `Go twitch&#39;s &#39;get access token&#39; page</span>
+<span class="sd">     &lt;https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&amp;</span>
+<span class="sd">     client_id=37684tuwyxmogmtduz6lz0jdtf0acob&amp;redirect_uri=</span>
+<span class="sd">     http://localhost&amp;scope=user_read&gt;`_</span>
+
+<span class="sd">  2. After authorization you will be redirected to http://localhost with</span>
+<span class="sd">     access token in fragment part, e.g:</span>
+
+<span class="sd">        **http://localhost/#access_token=</span>
+<span class="sd">        &lt;YOUR_ACCESS_TOKEN_IS_HERE&gt; &amp;scope=user_read**</span>
+
+<span class="sd">  3. Copy the token and paste in TwitchStore section of your config file:</span>
+
+<span class="sd">        access_token = &lt;YOUR_ACCESS_TOKEN (step 2)&gt;</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">urllib.error</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+
+<span class="kn">import</span> <span class="nn">livestreamer</span>
+<span class="kn">from</span> <span class="nn">dateutil</span> <span class="k">import</span> <span class="n">parser</span> <span class="k">as</span> <span class="n">dateutil_parser</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">threads</span>
+<span class="kn">from</span> <span class="nn">twisted.python.failure</span> <span class="k">import</span> <span class="n">Failure</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">server</span><span class="p">,</span> <span class="n">http</span>
+<span class="kn">from</span> <span class="nn">twisted.web.resource</span> <span class="k">import</span> <span class="n">Resource</span>
+<span class="kn">from</span> <span class="nn">twisted.web.static</span> <span class="k">import</span> <span class="n">NoRangeStaticProducer</span>
+
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">AbstractBackendStore</span><span class="p">,</span> <span class="n">Container</span><span class="p">,</span> <span class="n">BackendItem</span><span class="p">,</span> \
+    <span class="n">LazyContainer</span>
+<span class="kn">from</span> <span class="nn">coherence.log</span> <span class="k">import</span> <span class="n">LogAble</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">DIDLLite</span>
+
+<span class="n">MPEG_MIME</span> <span class="o">=</span> <span class="s1">&#39;video/mpeg&#39;</span>
+
+<span class="n">TWITCH_API_URL</span> <span class="o">=</span> <span class="s1">&#39;https://api.twitch.tv/kraken&#39;</span>
+
+
+<div class="viewcode-block" id="LiveStreamerProxyResource"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.LiveStreamerProxyResource">[docs]</a><span class="k">class</span> <span class="nc">LiveStreamerProxyResource</span><span class="p">(</span><span class="n">Resource</span><span class="p">,</span> <span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;twitch_store&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">stream_id</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="n">MPEG_MIME</span><span class="p">):</span>
+        <span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_id</span> <span class="o">=</span> <span class="n">stream_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span> <span class="o">=</span> <span class="n">content_type</span>
+
+<div class="viewcode-block" id="LiveStreamerProxyResource.render_GET"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.LiveStreamerProxyResource.render_GET">[docs]</a>    <span class="k">def</span> <span class="nf">render_GET</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;serving </span><span class="si">{request.method}</span><span class="s1"> request from &#39;</span>
+                   <span class="n">f</span><span class="s1">&#39;{request.getClientIP()} for </span><span class="si">{request.uri}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">stream_opened</span><span class="p">(</span><span class="n">fd</span><span class="p">):</span>
+            <span class="n">producer</span> <span class="o">=</span> <span class="n">NoRangeStaticProducer</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">fd</span><span class="p">)</span>
+            <span class="n">producer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">got_streams</span><span class="p">(</span><span class="n">streams</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">streams</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;stream not found for &#39;</span>
+                             <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.url}</span><span class="s1">@</span><span class="si">{self.stream_id}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="n">http</span><span class="o">.</span><span class="n">NOT_FOUND</span><span class="p">)</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">content_type</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="n">http</span><span class="o">.</span><span class="n">OK</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;HEAD&#39;</span><span class="p">:</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">d_open_stream</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span><span class="n">streams</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_id</span><span class="p">]</span><span class="o">.</span><span class="n">open</span><span class="p">)</span>
+            <span class="n">d_open_stream</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">stream_opened</span><span class="p">)</span>
+
+        <span class="n">d_get_streams</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span><span class="n">livestreamer</span><span class="o">.</span><span class="n">streams</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">d_get_streams</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">got_streams</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span></div></div>
+
+
+<div class="viewcode-block" id="TwitchLazyContainer"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchLazyContainer">[docs]</a><span class="k">class</span> <span class="nc">TwitchLazyContainer</span><span class="p">(</span><span class="n">LazyContainer</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;twitch_store&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TwitchLazyContainer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">childrenRetriever</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_children</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span> <span class="o">=</span> <span class="mi">60</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children_url</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit</span> <span class="o">=</span> <span class="n">limit</span>
+
+<div class="viewcode-block" id="TwitchLazyContainer.result_handler"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchLazyContainer.result_handler">[docs]</a>    <span class="k">def</span> <span class="nf">result_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="TwitchLazyContainer._retrieve_children"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchLazyContainer._retrieve_children">[docs]</a>    <span class="k">def</span> <span class="nf">_retrieve_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">children_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;limit&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit</span><span class="p">})</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">?</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children_url</span><span class="p">,</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span>
+            <span class="n">kwargs</span><span class="p">))</span> <span class="k">if</span> <span class="n">kwargs</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">children_url</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">getPage</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_got_page</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_got_error</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="TwitchLazyContainer._got_page"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchLazyContainer._got_page">[docs]</a>    <span class="k">def</span> <span class="nf">_got_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;connection to twitch service successful for game list&#39;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">json_loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_handler</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TwitchLazyContainer._got_error"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchLazyContainer._got_error">[docs]</a>    <span class="k">def</span> <span class="nf">_got_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;connection to twitch.tv service failed: </span><span class="si">{self.children_url}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{error.getTraceback()}&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">childrenRetrievingNeeded</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># we retry</span>
+        <span class="k">return</span> <span class="n">Failure</span><span class="p">(</span><span class="s1">&#39;Unable to retrieve game list&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GamesContainer"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.GamesContainer">[docs]</a><span class="k">class</span> <span class="nc">GamesContainer</span><span class="p">(</span><span class="n">TwitchLazyContainer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Games&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">children_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GamesContainer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
+                                             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">children_url</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{TWITCH_API_URL}</span><span class="s1">/games/top&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorting_method</span> <span class="o">=</span> <span class="s1">&#39;viewers&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children_limit</span> <span class="o">=</span> <span class="n">children_limit</span>
+
+<div class="viewcode-block" id="GamesContainer.result_handler"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.GamesContainer.result_handler">[docs]</a>    <span class="k">def</span> <span class="nf">result_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">game_info</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]:</span>
+            <span class="n">game_name</span> <span class="o">=</span> <span class="n">game_info</span><span class="p">[</span><span class="s1">&#39;game&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">StreamsContainer</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">game_name</span><span class="p">,</span>
+                <span class="n">viewers</span><span class="o">=</span><span class="n">game_info</span><span class="p">[</span><span class="s1">&#39;viewers&#39;</span><span class="p">],</span>
+                <span class="n">channels</span><span class="o">=</span><span class="n">game_info</span><span class="p">[</span><span class="s1">&#39;channels&#39;</span><span class="p">],</span>
+                <span class="n">cover_url</span><span class="o">=</span><span class="n">game_info</span><span class="p">[</span><span class="s1">&#39;game&#39;</span><span class="p">][</span><span class="s1">&#39;box&#39;</span><span class="p">][</span><span class="s1">&#39;large&#39;</span><span class="p">],</span>
+                <span class="n">game</span><span class="o">=</span><span class="n">game_name</span><span class="p">,</span>
+                <span class="n">limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">children_limit</span><span class="p">)</span>
+            <span class="c1"># item.description = f&#39;{game_info[&quot;viewers&quot;]:d} viewers&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">game_info</span><span class="p">[</span><span class="s1">&#39;game&#39;</span><span class="p">][</span><span class="s1">&#39;_id&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+<div class="viewcode-block" id="StreamsContainer"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.StreamsContainer">[docs]</a><span class="k">class</span> <span class="nc">StreamsContainer</span><span class="p">(</span><span class="n">TwitchLazyContainer</span><span class="p">):</span>
+    <span class="n">URL</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">/streams/&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">viewers</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">streams_url</span><span class="o">=</span><span class="n">URL</span><span class="p">,</span>
+                 <span class="n">cover_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StreamsContainer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewers</span> <span class="o">=</span> <span class="n">viewers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="n">channels</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">children_url</span> <span class="o">=</span> <span class="n">streams_url</span> <span class="o">%</span> <span class="n">TWITCH_API_URL</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cover_url</span> <span class="o">=</span> <span class="n">cover_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorting_method</span> <span class="o">=</span> <span class="s1">&#39;viewers&#39;</span>
+
+<div class="viewcode-block" id="StreamsContainer.result_handler"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.StreamsContainer.result_handler">[docs]</a>    <span class="k">def</span> <span class="nf">result_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">stream</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;streams&#39;</span><span class="p">]:</span>
+            <span class="n">created_at</span> <span class="o">=</span> <span class="n">dateutil_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">stream</span><span class="p">[</span><span class="s1">&#39;created_at&#39;</span><span class="p">])</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">TwitchStreamItem</span><span class="p">(</span>
+                <span class="n">stream</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">][</span><span class="s1">&#39;display_name&#39;</span><span class="p">],</span>
+                <span class="n">stream</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">],</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">stream</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">][</span><span class="s1">&#39;status&#39;</span><span class="p">],</span>
+                <span class="n">viewers</span><span class="o">=</span><span class="n">stream</span><span class="p">[</span><span class="s1">&#39;viewers&#39;</span><span class="p">],</span>
+                <span class="n">preview_url</span><span class="o">=</span><span class="n">stream</span><span class="p">[</span><span class="s1">&#39;preview&#39;</span><span class="p">][</span><span class="s1">&#39;medium&#39;</span><span class="p">],</span>
+                <span class="n">created_at</span><span class="o">=</span><span class="n">created_at</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">f</span><span class="s1">&#39;stream</span><span class="si">{stream[&quot;_id&quot;]:d}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+<div class="viewcode-block" id="TwitchStreamItem"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchStreamItem">[docs]</a><span class="k">class</span> <span class="nc">TwitchStreamItem</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;twitch_store&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">viewers</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">created_at</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">preview_url</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">MPEG_MIME</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">created_at</span> <span class="o">=</span> <span class="n">created_at</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewers</span> <span class="o">=</span> <span class="n">viewers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preview_url</span> <span class="o">=</span> <span class="n">preview_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">LiveStreamerProxyResource</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;best&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="TwitchStreamItem.get_item"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchStreamItem.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upnp_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="n">upnp_parent_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">VideoItem</span><span class="p">(</span><span class="n">upnp_id</span><span class="p">,</span> <span class="n">upnp_parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">longDescription</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">created_at</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preview_url</span>
+
+            <span class="n">res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{MPEG_MIME}</span><span class="s1">:#&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="TwitchStreamItem.get_id"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchStreamItem.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span></div>
+
+<div class="viewcode-block" id="TwitchStreamItem.get_url"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchStreamItem.get_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span></div>
+
+<div class="viewcode-block" id="TwitchStreamItem.replace_by"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchStreamItem.replace_by">[docs]</a>    <span class="k">def</span> <span class="nf">replace_by</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c1"># TODO update fields</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+
+
+<div class="viewcode-block" id="TwitchStore"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchStore">[docs]</a><span class="k">class</span> <span class="nc">TwitchStore</span><span class="p">(</span><span class="n">AbstractBackendStore</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;twitch_store&#39;</span>
+
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="n">wmc_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;16&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">}</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;twitch.tv&#39;</span><span class="p">,</span> <span class="s1">&#39;twitch.tv&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Server Name:&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;twitch.tv&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the name under this MediaServer shall &#39;</span>
+                 <span class="s1">&#39;show up with on other UPnP clients&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;access_token&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;OAuth Access Token:&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;access token to show personalized list of followed streams&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UPnP Version:&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+         <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the highest UPnP version this MediaServer shall support&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;uuid&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UUID Identifier:&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;twitch_tv&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the unique (UPnP) identifier for this MediaServer&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">}]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">AbstractBackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;twitch.tv&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;uuid&#39;</span><span class="p">,</span> <span class="s1">&#39;twitch_tv&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;access_token&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+<div class="viewcode-block" id="TwitchStore.upnp_init"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.TwitchStore.upnp_init">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{MPEG_MIME}</span><span class="s1">:*&#39;</span><span class="p">],</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># root item</span>
+        <span class="n">root_item</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_root_item</span><span class="p">(</span><span class="n">root_item</span><span class="p">)</span>
+
+        <span class="c1"># &#39;Following&#39; directory</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Following&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="ow">and</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;active&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+            <span class="n">games_dir</span> <span class="o">=</span> <span class="n">StreamsContainer</span><span class="p">(</span>
+                <span class="n">root_item</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;Following&#39;</span><span class="p">,</span>
+                <span class="n">streams_url</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">/streams/followed&#39;</span><span class="p">,</span>
+                <span class="n">limit</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;limit&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+                <span class="n">oauth_token</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">)</span>
+            <span class="n">root_item</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">games_dir</span><span class="p">)</span>
+
+        <span class="c1"># &#39;Games&#39; directory</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TopGames&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;active&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+            <span class="n">games_dir</span> <span class="o">=</span> <span class="n">GamesContainer</span><span class="p">(</span>
+                <span class="n">root_item</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;Top Games&#39;</span><span class="p">),</span>
+                <span class="n">limit</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;limit&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                <span class="n">children_limit</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;children_limit&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">))</span>
+            <span class="n">root_item</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">games_dir</span><span class="p">)</span>
+
+        <span class="c1"># &#39;Top Streams&#39; directory</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TopStreams&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;active&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span><span class="p">:</span>
+            <span class="n">games_dir</span> <span class="o">=</span> <span class="n">StreamsContainer</span><span class="p">(</span>
+                <span class="n">root_item</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;Top Streams&#39;</span><span class="p">),</span>
+                <span class="n">limit</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;limit&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">))</span>
+            <span class="n">root_item</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">games_dir</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="json_loads"><a class="viewcode-back" href="../../../source/backends/twitch.html#coherence.backends.twitch_storage.json_loads">[docs]</a><span class="k">def</span> <span class="nf">json_loads</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

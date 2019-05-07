@@ -1,0 +1,1057 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.devices.media_server &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.devices.media_server</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.devices.media_server</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2006,2007 Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">urllib.error</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+<span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">StringIO</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">defer</span>
+<span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">resource</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">static</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">__version__</span><span class="p">,</span> <span class="n">__url__</span><span class="p">,</span> <span class="n">__service_name__</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">xml_constants</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">ReverseProxyResource</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">StaticFile</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">to_string</span><span class="p">,</span> <span class="n">to_bytes</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.devices.basics</span> <span class="k">import</span> <span class="n">BasicDeviceMixin</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.services.servers.connection_manager_server</span> <span class="k">import</span> \
+    <span class="n">ConnectionManagerServer</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.services.servers.content_directory_server</span> <span class="k">import</span> \
+    <span class="n">ContentDirectoryServer</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.services.servers.media_receiver_registrar_server</span> <span class="k">import</span> \
+    <span class="n">FakeMediaReceiverRegistrarBackend</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.services.servers.media_receiver_registrar_server</span> <span class="k">import</span> \
+    <span class="n">MediaReceiverRegistrarServer</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.services.servers.scheduled_recording_server</span> <span class="k">import</span> \
+    <span class="n">ScheduledRecordingServer</span>
+
+<span class="n">COVER_REQUEST_INDICATOR</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;.*?cover\.[A-Z|a-z]{3,4}$&#39;</span><span class="p">)</span>
+<span class="n">ATTACHMENT_REQUEST_INDICATOR</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;.*?attachment=.*$&#39;</span><span class="p">)</span>
+<span class="n">TRANSCODED_REQUEST_INDICATOR</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;.*/transcoded/.*$&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MSRoot"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot">[docs]</a><span class="k">class</span> <span class="nc">MSRoot</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;mediaserver&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">store</span><span class="p">):</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">server</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+
+<div class="viewcode-block" id="MSRoot.getChildWithDefault"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot.getChildWithDefault">[docs]</a>    <span class="k">def</span> <span class="nf">getChildWithDefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.server.device_type}</span><span class="s1"> getChildWithDefault, &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;</span><span class="si">{request.method}</span><span class="s1">, </span><span class="si">{path}</span><span class="s1">, </span><span class="si">{request.uri}</span><span class="s1"> </span><span class="si">{request.client}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">getAllHeaders</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-&gt; headers are: </span><span class="si">{headers}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> modified wrong path from </span><span class="si">{path}</span><span class="s1"> to </span><span class="si">{path[:-1]}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-&gt; path is: </span><span class="si">{path}</span><span class="s1"> [{type(path)}]&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="sa">b</span><span class="s1">&#39;getcontentfeatures.dlna.org&#39;</span> <span class="ow">in</span> <span class="n">headers</span> <span class="ow">and</span> \
+                    <span class="n">headers</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;getcontentfeatures.dlna.org&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="sa">b</span><span class="s1">&#39;1&#39;</span><span class="p">:</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+                    <span class="sa">b</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;wrong value for &#39;</span>
+                    <span class="sa">b</span><span class="s1">&#39;getcontentFeatures.dlna.org&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;MSRoot.getChildWithDefault: </span><span class="si">{e1}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;HEAD&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="sa">b</span><span class="s1">&#39;getcaptioninfo.sec&#39;</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;requesting srt file for id </span><span class="si">{path}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">ch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">location</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">get_path</span><span class="p">()</span>
+                    <span class="n">caption</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">caption</span>
+                    <span class="k">if</span> <span class="n">caption</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">KeyError</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;CaptionInfo.sec&#39;</span><span class="p">,</span> <span class="n">caption</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e2</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="n">f</span><span class="s1">&#39;MSRoot.getChildWithDefault (method: HEAD): </span><span class="si">{e2}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+                        <span class="sa">b</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;the requested srt file &#39;</span>
+                        <span class="sa">b</span><span class="s1">&#39;was not found&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">_dlna_transfermode</span> <span class="o">=</span> <span class="n">headers</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;transfermode.dlna.org&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">_dlna_transfermode</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;Streaming&#39;</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;HEAD&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">COVER_REQUEST_INDICATOR</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;request cover for id </span><span class="si">{path}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                <span class="k">def</span> <span class="nf">got_item</span><span class="p">(</span><span class="n">ch</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">ch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+                        <span class="n">file</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">get_cover</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">file</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;got cover </span><span class="si">{file}</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="k">return</span> <span class="n">StaticFile</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+                        <span class="sa">b</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;cover requested not found&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+
+                <span class="n">dfr</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+                <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">got_item</span><span class="p">)</span>
+                <span class="n">dfr</span><span class="o">.</span><span class="n">isLeaf</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="n">dfr</span>
+
+            <span class="k">if</span> <span class="n">ATTACHMENT_REQUEST_INDICATOR</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;request attachment </span><span class="si">{request.args}</span><span class="s1"> for id </span><span class="si">{path}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                <span class="k">def</span> <span class="nf">got_attachment</span><span class="p">(</span><span class="n">ch</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="c1"># FIXME same as below</span>
+                        <span class="k">if</span> <span class="s1">&#39;transcoded&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                                    <span class="s1">&#39;transcoding&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+                                <span class="nb">format</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;transcoded&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                                <span class="nb">type</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                                    <span class="n">f</span><span class="s1">&#39;request transcoding </span><span class="si">{format}</span><span class="s1"> </span><span class="si">{type}</span><span class="s1">&#39;</span><span class="p">)</span>
+                                <span class="k">try</span><span class="p">:</span>
+                                    <span class="kn">from</span> <span class="nn">coherence.transcoder</span> <span class="k">import</span> \
+                                        <span class="n">TranscoderManager</span>
+                                    <span class="n">manager</span> <span class="o">=</span> <span class="n">TranscoderManager</span><span class="p">(</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="p">)</span>
+                                    <span class="k">return</span> \
+                                        <span class="n">manager</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
+                                            <span class="nb">format</span><span class="p">,</span>
+                                            <span class="n">ch</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span>
+                                                <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span>
+                                                    <span class="s1">&#39;attachment&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]])</span>
+                                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                                <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+                                <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+                                    <span class="sa">b</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;the requested transcoded file &#39;</span>
+                                    <span class="sa">b</span><span class="s1">&#39;was not found&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+                                <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+                                    <span class="sa">b</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;This MediaServer &#39;</span>
+                                    <span class="sa">b</span><span class="s1">&#39;doesn</span><span class="se">\&#39;</span><span class="s1">t support transcoding&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">ch</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span>
+                                <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;attachment&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+                            <span class="sa">b</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;the requested attachment &#39;</span>
+                            <span class="sa">b</span><span class="s1">&#39;was not found&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+
+                <span class="n">dfr</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+                <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">got_attachment</span><span class="p">)</span>
+                <span class="n">dfr</span><span class="o">.</span><span class="n">isLeaf</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="n">dfr</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;HEAD&#39;</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="n">TRANSCODED_REQUEST_INDICATOR</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;request transcoding to &#39;</span>
+                      <span class="n">f</span><span class="s1">&#39;{request.uri.split(b&quot;/&quot;)[-1]} for id </span><span class="si">{path}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transcoding&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+                <span class="k">def</span> <span class="nf">got_stuff_to_transcode</span><span class="p">(</span><span class="n">ch</span><span class="p">):</span>
+                    <span class="c1"># FIXME create a generic transcoder class</span>
+                    <span class="c1"># and sort the details there</span>
+                    <span class="nb">format</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span>
+                        <span class="o">-</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># request.args[&#39;transcoded&#39;][0]</span>
+                    <span class="n">uri</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">get_path</span><span class="p">()</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="kn">from</span> <span class="nn">coherence.transcoder</span> <span class="k">import</span> <span class="n">TranscoderManager</span>
+                        <span class="n">manager</span> <span class="o">=</span> <span class="n">TranscoderManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">manager</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                        <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+                            <span class="sa">b</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;the requested transcoded file &#39;</span>
+                            <span class="sa">b</span><span class="s1">&#39;was not found&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+
+                <span class="n">dfr</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+                <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">got_stuff_to_transcode</span><span class="p">)</span>
+                <span class="n">dfr</span><span class="o">.</span><span class="n">isLeaf</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="n">dfr</span>
+
+            <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+                <span class="sa">b</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;This MediaServer &#39;</span>
+                <span class="sa">b</span><span class="s1">&#39;doesn</span><span class="se">\&#39;</span><span class="s1">t support transcoding&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;POST&#39;</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;?import&#39;</span><span class="p">):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">defer</span><span class="o">.</span><span class="n">Deferred</span><span class="p">):</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_response</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">isLeaf</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="n">d</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_response</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;user-agent&#39;</span> <span class="ow">in</span> <span class="n">headers</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="n">headers</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;user-agent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Xbox/&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="ow">or</span>  <span class="c1"># XBox</span>
+                 <span class="n">headers</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;user-agent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span>  <span class="c1"># wmp11</span>
+                     <span class="sa">b</span><span class="sd">&#39;&#39;&#39;Mozilla/4.0 (compatible; UPnP/1.0; Windows&#39;&#39;&#39;</span><span class="p">))</span> <span class="ow">and</span>
+                <span class="n">path</span> <span class="ow">in</span> <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;description-1.xml&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;description-2.xml&#39;</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s1">&#39;XBox/WMP alert, we need to &#39;</span>
+                <span class="s1">&#39;simulate a Windows Media Connect server&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="sa">b</span><span class="s1">&#39;xbox-description-1.xml&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;returning xbox-description-1.xml&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;xbox-description-1.xml&#39;</span><span class="p">]</span>
+
+        <span class="c1"># resource http://XXXX/&lt;deviceID&gt;/config</span>
+        <span class="c1"># configuration for the given device</span>
+        <span class="c1"># accepted methods:</span>
+        <span class="c1"># GET, HEAD:</span>
+        <span class="c1">#       returns the configuration data (in XML format)</span>
+        <span class="c1"># POST: stop the current device and restart it</span>
+        <span class="c1">#       with the posted configuration data</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;config&#39;</span><span class="p">):</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">backend</span>
+            <span class="n">backend_type</span> <span class="o">=</span> <span class="n">backend</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+            <span class="k">def</span> <span class="nf">constructConfigData</span><span class="p">(</span><span class="n">backend</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&lt;plugin active=&quot;yes&quot;&gt;&#39;</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;&lt;backend&gt;&#39;</span> <span class="o">+</span> <span class="n">to_string</span><span class="p">(</span><span class="n">backend_type</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&lt;/backend&gt;&#39;</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">backend</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                    <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;&lt;&#39;</span> <span class="o">+</span> <span class="n">to_string</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&gt;&#39;</span> <span class="o">+</span> <span class="n">to_string</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> \
+                           <span class="s1">&#39;&lt;/&#39;</span> <span class="o">+</span> <span class="n">to_string</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&gt;&#39;</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/plugin&gt;&#39;</span>
+                <span class="k">return</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;HEAD&#39;</span><span class="p">):</span>
+                <span class="c1"># the client wants to retrieve the</span>
+                <span class="c1">#  configuration parameters for the backend</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">constructConfigData</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s1">&#39;text/xml&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;POST&#39;</span><span class="p">):</span>
+                <span class="c1"># the client wants to update the configuration parameters</span>
+                <span class="c1"># for the backend we relaunch the backend with the</span>
+                <span class="c1"># new configuration (after content validation)</span>
+
+                <span class="k">def</span> <span class="nf">convert_elementtree_to_dict</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+                    <span class="n">active</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;active&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;yes&#39;</span><span class="p">):</span>
+                                <span class="n">active</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+                    <span class="k">if</span> <span class="n">active</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">None</span>
+                    <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">getchildren</span><span class="p">():</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span>
+                        <span class="n">text</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;backend&#39;</span><span class="p">:</span>
+                            <span class="nb">dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span>
+                    <span class="k">return</span> <span class="nb">dict</span>
+
+                <span class="n">new_config</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">element_tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+                    <span class="n">new_config</span> <span class="o">=</span> <span class="n">convert_elementtree_to_dict</span><span class="p">(</span><span class="n">element_tree</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">remove_plugin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="n">f</span><span class="s1">&#39;</span><span class="si">{backend.name}</span><span class="s1"> </span><span class="si">{self.server.device_type}</span><span class="s1"> (</span><span class="si">{backend}</span><span class="s1">)&#39;</span>
+                        <span class="n">f</span><span class="s1">&#39; with id {str(self.server.uuid)[5:]} desactivated&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">new_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&lt;plugin active=&quot;no&quot;/&gt;&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_backend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">add_plugin</span><span class="p">(</span>
+                            <span class="n">backend_type</span><span class="p">,</span> <span class="o">**</span><span class="n">new_config</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">writeable_config</span><span class="p">():</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">store_plugin_config</span><span class="p">(</span>
+                                <span class="n">new_backend</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="n">new_config</span><span class="p">)</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&lt;html&gt;&lt;p&gt;Device restarted. Config file &#39;</span> \
+                                  <span class="s1">&#39;has been modified with posted data.&lt;/p&gt;&#39;</span> \
+                                  <span class="s1">&#39;&lt;/html&gt;&#39;</span>  <span class="c1"># constructConfigData(new_backend)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&lt;html&gt;&lt;p&gt;Device restarted. &#39;</span> \
+                                  <span class="s1">&#39;Config file not modified&lt;/p&gt;&#39;</span> \
+                                  <span class="s1">&#39;&lt;/html&gt;&#39;</span>  <span class="c1"># constructConfigData(new_backend)</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">202</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span> <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">SyntaxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+                        <span class="n">f</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;Invalid data posted:&lt;BR&gt;</span><span class="si">{e}</span><span class="s1">&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="o">.</span>
+                        <span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># invalid method requested</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">405</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span>
+                    <span class="sa">b</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;This resource does not allow &#39;</span>
+                    <span class="sa">b</span><span class="s1">&#39;the requested HTTP method&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">path</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">uri</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;/&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MSRoot.requestFinished"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot.requestFinished">[docs]</a>    <span class="k">def</span> <span class="nf">requestFinished</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;finished, remove </span><span class="si">{id:d}</span><span class="s1"> from connection table&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;finished, sentLength: </span><span class="si">{request.sentLength:d}</span><span class="s1"> &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;chunked: </span><span class="si">{request.chunked:d}</span><span class="s1"> code: </span><span class="si">{request.code:d}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;finished </span><span class="si">{request.responseHeaders}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">remove_connection</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MSRoot.import_file"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot.import_file">[docs]</a>    <span class="k">def</span> <span class="nf">import_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;import file, id </span><span class="si">{name}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">got_file</span><span class="p">(</span><span class="n">ch</span><span class="p">):</span>
+            <span class="c1"># self.debug(&#39;ch&#39;, ch)</span>
+            <span class="k">if</span> <span class="n">ch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">,</span> <span class="s1">&#39;backend_import&#39;</span><span class="p">):</span>
+                    <span class="n">response_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">backend_import</span><span class="p">(</span>
+                        <span class="n">ch</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response_code</span><span class="p">,</span> <span class="n">defer</span><span class="o">.</span><span class="n">Deferred</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="n">response_code</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="n">response_code</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+
+        <span class="n">dfr</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">dfr</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">got_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dfr</span></div>
+
+<div class="viewcode-block" id="MSRoot.prepare_connection"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot.prepare_connection">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">new_id</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span>
+            <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;Output&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;startup, add </span><span class="si">{new_id:d}</span><span class="s1"> to connection table&#39;</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">notifyFinish</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requestFinished</span><span class="p">,</span> <span class="n">new_id</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MSRoot.prepare_headers"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot.prepare_headers">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span>
+            <span class="sa">b</span><span class="s1">&#39;transferMode.dlna.org&#39;</span><span class="p">,</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">_dlna_transfermode</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="s1">&#39;item&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;res&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ch</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">protocolInfo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">additional_info</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_additional_info</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">additional_info</span> <span class="o">!=</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span>
+                        <span class="sa">b</span><span class="s1">&#39;contentFeatures.dlna.org&#39;</span><span class="p">,</span>
+                        <span class="n">additional_info</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="sa">b</span><span class="s1">&#39;getcontentfeatures.dlna.org&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">getAllHeaders</span><span class="p">():</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span>
+                        <span class="sa">b</span><span class="s1">&#39;contentFeatures.dlna.org&#39;</span><span class="p">,</span>
+                        <span class="sa">b</span><span class="s1">&#39;DLNA.ORG_OP=01;DLNA.ORG_CI=0;&#39;</span>
+                        <span class="sa">b</span><span class="s1">&#39;DLNA.ORG_FLAGS=01500000000000000000000000000000&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MSRoot.process_child"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot.process_child">[docs]</a>    <span class="k">def</span> <span class="nf">process_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;process_child: </span><span class="si">{name}</span><span class="s1"> [child: </span><span class="si">{ch}</span><span class="s1">, request: </span><span class="si">{request}</span><span class="s1">]&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Child found </span><span class="si">{ch}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;GET&#39;</span> <span class="ow">or</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;HEAD&#39;</span><span class="p">):</span>
+                <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">getAllHeaders</span><span class="p">()</span>
+                <span class="k">if</span> <span class="sa">b</span><span class="s1">&#39;content-length&#39;</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="n">f</span><span class="s1">&#39;</span><span class="si">{request.method}</span><span class="s1"> request with content-length &#39;</span>
+                        <span class="n">f</span><span class="s1">&#39;</span><span class="si">{headers[b&quot;content-length&quot;]}</span><span class="s1"> header - sanitizing&#39;</span><span class="p">)</span>
+                    <span class="k">del</span> <span class="n">request</span><span class="o">.</span><span class="n">received_headers</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;content-length&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># shall we remove that?</span>
+                    <span class="c1"># can we remove that?</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="n">f</span><span class="s1">&#39;</span><span class="si">{request.method}</span><span class="s1"> request with &#39;</span>
+                        <span class="n">f</span><span class="s1">&#39;{len(request.content.getvalue())} &#39;</span>
+                        <span class="n">f</span><span class="s1">&#39;bytes of message-body - sanitizing&#39;</span><span class="p">)</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="s1">&#39;location&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;we have a location &#39;</span>
+                           <span class="n">f</span><span class="s1">&#39;{isinstance(ch.location, resource.Resource)}&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">ReverseProxyResource</span><span class="p">)</span> <span class="ow">or</span>
+                        <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">)):</span>
+                    <span class="c1"># self.info(f&#39;getChild proxy {name} to {ch.location.uri}&#39;)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">prepare_headers</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">ch</span><span class="o">.</span><span class="n">location</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">ch</span><span class="o">.</span><span class="n">get_path</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_content</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;error accessing items path </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_content</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;accessing path </span><span class="si">{p}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prepare_connection</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prepare_headers</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+                <span class="n">ch</span> <span class="o">=</span> <span class="n">StaticFile</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;accessing path </span><span class="si">{p}</span><span class="s1"> failed&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_content</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ch</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">sibpath</span><span class="p">(</span><span class="vm">__file__</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;checking if msroot is file: </span><span class="si">{p}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="n">ch</span> <span class="o">=</span> <span class="n">StaticFile</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;MSRoot ch </span><span class="si">{ch}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ch</span></div>
+
+<div class="viewcode-block" id="MSRoot.getChild"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot.getChild">[docs]</a>    <span class="k">def</span> <span class="nf">getChild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;getChild </span><span class="si">{name}</span><span class="s1">, </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="n">ch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-child is: </span><span class="si">{ch}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">defer</span><span class="o">.</span><span class="n">Deferred</span><span class="p">):</span>
+            <span class="n">ch</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process_child</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+            <span class="c1"># ch.addCallback(self.delayed_response, request)</span>
+            <span class="k">return</span> <span class="n">ch</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_child</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MSRoot.list_content"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot.list_content">[docs]</a>    <span class="k">def</span> <span class="nf">list_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;list_content </span><span class="si">{name}</span><span class="s1"> </span><span class="si">{item}</span><span class="s1"> </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">        &lt;html&gt;</span>
+<span class="s1">            &lt;head&gt;&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot;</span>
+<span class="s1">            href=&quot;/styles/main.css&quot; /&gt;</span>
+<span class="s1">                &lt;title&gt;Cohen3 ({item.get_name()})&lt;/title&gt;</span>
+<span class="s1">            &lt;/head&gt;</span>
+<span class="s1">            &lt;body&gt;</span>
+<span class="s1">                &lt;h5&gt;</span>
+<span class="s1">                    &lt;img class=&quot;logo-icon&quot;</span>
+<span class="s1">                    src=&quot;/server-images/coherence-icon.svg&quot;&gt;</span>
+<span class="s1">                    &lt;/img&gt;{item.get_name()}</span>
+<span class="s1">                &lt;/h5&gt;</span>
+<span class="s1">                &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;mimetype&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">item</span><span class="o">.</span><span class="n">mimetype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">,</span>
+                                                            <span class="s1">&#39;root&#39;</span><span class="p">]):</span>
+            <span class="n">uri</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">uri</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+                <span class="n">uri</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+
+            <span class="k">def</span> <span class="nf">build_page</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">page</span><span class="p">):</span>
+                <span class="c1"># self.debug(&#39;build_page&#39;, r)</span>
+                <span class="n">page</span> <span class="o">+=</span> <span class="s1">&#39;&#39;&#39;&lt;div class=&quot;list&quot;&gt;&lt;ul&gt;&#39;&#39;&#39;</span>
+                <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s1">&#39;get_url&#39;</span><span class="p">):</span>
+                            <span class="n">path</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_url</span><span class="p">()</span>
+                        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s1">&#39;get_path&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">get_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="c1"># path = c.get_path().encode(</span>
+                            <span class="c1">#     &#39;utf-8&#39;).encode(&#39;string_escape&#39;)</span>
+                            <span class="n">path</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_path</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                                <span class="k">pass</span>
+                            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                                <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                                    <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s1">&#39;xmlcharrefreplace&#39;</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ReverseProxyResource</span><span class="p">):</span>
+                                <span class="n">path</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                            <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">get_id</span><span class="p">())</span>
+                            <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                        <span class="n">title</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                                <span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">title</span> <span class="o">=</span> <span class="n">title</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                                    <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s1">&#39;xmlcharrefreplace&#39;</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="p">(</span><span class="ne">UnicodeEncodeError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">):</span>
+                            <span class="n">title</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                                <span class="s1">&#39;string_escape&#39;</span><span class="p">)</span>
+                        <span class="n">it_cls</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                        <span class="n">has_mime</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s1">&#39;mimetype&#39;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">has_mime</span> <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">mimetype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;video&#39;</span><span class="p">):</span>
+                            <span class="n">it_cls</span> <span class="o">=</span> <span class="s1">&#39;class=&quot;item-video&quot;&#39;</span>
+                        <span class="k">elif</span> <span class="n">has_mime</span> <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">mimetype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;audio&#39;</span><span class="p">):</span>
+                            <span class="n">it_cls</span> <span class="o">=</span> <span class="s1">&#39;class=&quot;item-audio&quot;&#39;</span>
+                        <span class="k">elif</span> <span class="n">has_mime</span> <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">mimetype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">):</span>
+                            <span class="n">it_cls</span> <span class="o">=</span> <span class="s1">&#39;class=&quot;item-image&quot;&#39;</span>
+                        <span class="n">page</span> <span class="o">+=</span> \
+                            <span class="n">f</span><span class="s1">&#39;&lt;li&gt;&lt;a </span><span class="si">{it_cls}</span><span class="s1"> href=&quot;</span><span class="si">{path}</span><span class="s1">&quot;&gt;</span><span class="si">{title}</span><span class="s1">&lt;/a&gt;&lt;/li&gt;&#39;</span>
+                <span class="n">page</span> <span class="o">+=</span> <span class="s1">&#39;&#39;&#39;&lt;/ul&gt;&lt;/div&gt;&#39;&#39;&#39;</span>
+                <span class="n">page</span> <span class="o">+=</span> <span class="s1">&#39;&#39;&#39;&lt;/body&gt;&lt;/html&gt;&#39;&#39;&#39;</span>
+                <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">page</span><span class="p">),</span> <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+
+            <span class="n">children</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get_children</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="n">defer</span><span class="o">.</span><span class="n">Deferred</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;list_content, we have a Deferred&#39;</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span>
+                <span class="n">children</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">build_page</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span>
+                <span class="c1"># children.addErrback(....) #FIXME</span>
+                <span class="k">return</span> <span class="n">children</span>
+
+            <span class="k">return</span> <span class="n">build_page</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;mimetype&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">item</span><span class="o">.</span><span class="n">mimetype</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;image/&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># path = item.get_path().encode(&#39;utf-8&#39;).encode(&#39;string_escape&#39;)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">get_path</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s1">&#39;xmlcharrefreplace&#39;</span><span class="p">)</span>
+            <span class="n">page</span> <span class="o">+=</span> \
+                <span class="n">f</span><span class="s1">&#39;&lt;p&gt;&lt;img class=&quot;item-image&quot; src=&quot;</span><span class="si">{path}</span><span class="s1">&quot; alt=&quot;</span><span class="si">{title}</span><span class="s1">&quot;&gt;&lt;/p&gt;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">page</span> <span class="o">+=</span> <span class="s1">&#39;&#39;&#39;&lt;/body&gt;&lt;/html&gt;&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">page</span><span class="p">),</span> <span class="s1">&#39;text/html&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MSRoot.listchilds"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot.listchilds">[docs]</a>    <span class="k">def</span> <span class="nf">listchilds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;listchilds </span><span class="si">{uri}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">uri</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+            <span class="n">uri</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+        <span class="n">cl</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;&lt;li&gt;&lt;a href=</span><span class="si">{uri}</span><span class="s1">0&gt;Content&lt;/a&gt;&lt;/li&gt;&#39;</span>
+        <span class="n">cl</span> <span class="o">+=</span> <span class="n">f</span><span class="s1">&#39;&lt;li&gt;&lt;a href=</span><span class="si">{uri}</span><span class="s1">config&gt;Config&lt;/a&gt;&lt;/li&gt;&#39;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">cl</span> <span class="o">+=</span> <span class="n">f</span><span class="s1">&#39;&lt;li&gt;&lt;a href=</span><span class="si">{uri}{c}</span><span class="s1">&gt;</span><span class="si">{c}</span><span class="s1">&lt;/a&gt;&lt;/li&gt;&#39;</span>
+        <span class="k">return</span> <span class="n">cl</span></div>
+
+<div class="viewcode-block" id="MSRoot.import_response"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot.import_response">[docs]</a>    <span class="k">def</span> <span class="nf">import_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;&lt;html&gt;&lt;p&gt;import of </span><span class="si">{id}</span><span class="s1"> finished&lt;/p&gt;&lt;/html&gt;&#39;</span><span class="o">.</span>
+                        <span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;text/html&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MSRoot.render"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MSRoot.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">        &lt;html&gt;</span>
+<span class="s1">        &lt;head&gt;</span>
+<span class="s1">            &lt;title&gt;Cohen3 (MSRoot)&lt;/title&gt;</span>
+<span class="s1">            &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/styles/main.css&quot; /&gt;</span>
+<span class="s1">        &lt;/head&gt;</span>
+<span class="s1">        &lt;h5&gt;</span>
+<span class="s1">            &lt;img class=&quot;logo-icon&quot; src=&quot;/server-images/coherence-icon.svg&quot;&gt;</span>
+<span class="s1">            &lt;/img&gt;Root of the </span><span class="si">{self.server.backend}</span><span class="s1"> MediaServer&lt;/h5&gt;</span>
+<span class="s1">        &lt;div class=&quot;list&quot;&gt;</span>
+<span class="s1">            &lt;ul&gt;{self.listchilds(request.uri)}&lt;/ul&gt;</span>
+<span class="s1">        &lt;/div&gt;</span>
+<span class="s1">        &lt;/html&gt;&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">html</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RootDeviceXML"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.RootDeviceXML">[docs]</a><span class="k">class</span> <span class="nc">RootDeviceXML</span><span class="p">(</span><span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">uuid</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span>
+                 <span class="n">device_type</span><span class="o">=</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">,</span>
+                 <span class="n">version</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                 <span class="n">friendly_name</span><span class="o">=</span><span class="s1">&#39;Coherence UPnP A/V MediaServer&#39;</span><span class="p">,</span>
+                 <span class="n">xbox_hack</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">services</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">devices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">icons</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">presentation_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dlna_caps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span>
+            <span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="n">nsmap</span><span class="o">=</span><span class="p">{</span><span class="kc">None</span><span class="p">:</span> <span class="n">xml_constants</span><span class="o">.</span><span class="n">UPNP_DEVICE_NS</span><span class="p">})</span>
+        <span class="n">device_type</span> <span class="o">=</span> \
+            <span class="n">f</span><span class="s1">&#39;urn:schemas-upnp-org:device:</span><span class="si">{device_type}</span><span class="s1">:{int(version):d}&#39;</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;specVersion&#39;</span><span class="p">)</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s1">&#39;major&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s1">&#39;minor&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;device&#39;</span><span class="p">)</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;deviceType&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">device_type</span>
+
+        <span class="k">if</span> <span class="n">xbox_hack</span><span class="p">:</span>
+            <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;friendlyName&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> \
+                <span class="n">friendly_name</span> <span class="o">+</span> <span class="s1">&#39; : 1 : Windows Media Connect&#39;</span>
+            <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;modelName&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Windows Media Connect&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;friendlyName&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">friendly_name</span>
+            <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;modelName&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">__service_name__</span>
+
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;manufacturer&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;beebits.net&#39;</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;manufacturerURL&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">__url__</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;modelDescription&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">__service_name__</span>
+
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;modelNumber&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">__version__</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;modelURL&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">__url__</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;serialNumber&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;0000001&#39;</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;UDN&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">uuid</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;UPC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">icons</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;iconList&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">icon</span> <span class="ow">in</span> <span class="n">icons</span><span class="p">:</span>
+
+                <span class="n">icon_path</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">if</span> <span class="s1">&#39;url&#39;</span> <span class="ow">in</span> <span class="n">icon</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;file://&#39;</span><span class="p">):</span>
+                        <span class="n">icon_path</span> <span class="o">=</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">][</span><span class="mi">7</span><span class="p">:]</span>
+                    <span class="k">elif</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.face&#39;</span><span class="p">:</span>
+                        <span class="n">icon_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span>
+                                                 <span class="s1">&#39;.face&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">resource_filename</span>
+
+                        <span class="n">icon_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">resource_filename</span><span class="p">(</span>
+                            <span class="vm">__name__</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;misc&#39;</span><span class="p">,</span>
+                                                   <span class="s1">&#39;device-icons&#39;</span><span class="p">,</span>
+                                                   <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])))</span>
+
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">icon_path</span><span class="p">):</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s1">&#39;icon&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">icon</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;file://&#39;</span><span class="p">):</span>
+                                <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> \
+                                    <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                                <span class="k">continue</span>
+                            <span class="k">elif</span> <span class="n">v</span> <span class="o">==</span> <span class="s1">&#39;.face&#39;</span><span class="p">:</span>
+                                <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> \
+                                    <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="s1">&#39;face-icon.png&#39;</span>
+                                <span class="k">continue</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> \
+                                    <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                                <span class="k">continue</span>
+                        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">services</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;serviceList&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="n">services</span><span class="p">:</span>
+                <span class="nb">id</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">xbox_hack</span> <span class="ow">and</span> <span class="nb">id</span> <span class="o">==</span> <span class="s1">&#39;X_MS_MediaReceiverRegistrar&#39;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">s</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s1">&#39;service&#39;</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">namespace</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">namespace</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="n">namespace</span> <span class="o">=</span> <span class="s1">&#39;schemas-upnp-org&#39;</span>
+
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">service</span><span class="o">.</span><span class="n">version</span> <span class="o">&lt;</span> <span class="n">version</span><span class="p">:</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">version</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">version</span>
+
+                <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;serviceType&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> \
+                    <span class="n">f</span><span class="s1">&#39;urn:</span><span class="si">{namespace}</span><span class="s1">:service:</span><span class="si">{id}</span><span class="s1">:{int(v):d}&#39;</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">namespace</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">id_namespace</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="n">namespace</span> <span class="o">=</span> <span class="s1">&#39;upnp-org&#39;</span>
+
+                <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;serviceId&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> \
+                    <span class="n">f</span><span class="s1">&#39;urn:</span><span class="si">{namespace}</span><span class="s1">:serviceId:</span><span class="si">{id}</span><span class="s1">&#39;</span>
+                <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;SCPDURL&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> \
+                    <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">id</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> \
+                    <span class="n">service</span><span class="o">.</span><span class="n">scpd_url</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;controlURL&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> \
+                    <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">id</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> \
+                    <span class="n">service</span><span class="o">.</span><span class="n">control_url</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s1">&#39;eventSubURL&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> \
+                    <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">id</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> \
+                    <span class="n">service</span><span class="o">.</span><span class="n">subscription_url</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">devices</span><span class="p">:</span>
+            <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;deviceList&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">presentation_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">presentation_url</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+        <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;presentationURL&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">presentation_url</span>
+        <span class="k">if</span> <span class="n">dlna_caps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># TODO: Implement dlna caps for GstreamerPlayer</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;RootDeviceXML.__init__: dlna caps for GstreamerPlayer&#39;</span>
+                  <span class="s1">&#39; still not implemented&#39;</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;X_DLNADOC&#39;</span><span class="p">)</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;DMS-1.50&#39;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;X_DLNADOC&#39;</span><span class="p">)</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;M-DMS-1.50&#39;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;X_DLNACAP&#39;</span><span class="p">)</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;av-upload,image-upload,audio-upload&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">xml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">static</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xml</span><span class="p">,</span> <span class="s1">&#39;text/xml&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MediaServer"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MediaServer">[docs]</a><span class="k">class</span> <span class="nc">MediaServer</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">,</span> <span class="n">BasicDeviceMixin</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;mediaserver&#39;</span>
+
+    <span class="n">device_type</span> <span class="o">=</span> <span class="s1">&#39;MediaServer&#39;</span>
+
+    <span class="n">presentationURL</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">BasicDeviceMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MediaServer.fire"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MediaServer.fire">[docs]</a>    <span class="k">def</span> <span class="nf">fire</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;no_thread_needed&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="c1"># this could take some time, put it in a  thread to be sure</span>
+            <span class="c1"># it doesn&#39;t block as we can&#39;t tell for sure that</span>
+            <span class="c1"># every backend is implemented properly</span>
+
+            <span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">threads</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">backend_ready</span><span class="p">(</span><span class="n">backend</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
+
+            <span class="k">def</span> <span class="nf">backend_failure</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;backend </span><span class="si">{backend}</span><span class="s1"> not installed, MediaServer &#39;</span>
+                             <span class="n">f</span><span class="s1">&#39;activation aborted - {x.getErrorMessage()}&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">backend_ready</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">backend_failure</span><span class="p">)</span>
+
+            <span class="c1"># FIXME: we need a timeout here so if the signal</span>
+            <span class="c1"># we wait for not arrives we&#39;ll can close down this device</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MediaServer.init_complete"><a class="viewcode-back" href="../../../../source/upnp/devices/media_server.html#coherence.upnp.devices.media_server.MediaServer.init_complete">[docs]</a>    <span class="k">def</span> <span class="nf">init_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">!=</span> <span class="n">backend</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_services</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_devices</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager_server</span> <span class="o">=</span> <span class="n">ConnectionManagerServer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">LookupError</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ConnectionManagerServer </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">transcoding</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transcoding&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+                <span class="n">transcoding</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content_directory_server</span> <span class="o">=</span> \
+                <span class="n">ContentDirectoryServer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transcoding</span><span class="o">=</span><span class="n">transcoding</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content_directory_server</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">LookupError</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ContentDirectoryServer </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">media_receiver_registrar_server</span> <span class="o">=</span> \
+                <span class="n">MediaReceiverRegistrarServer</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="p">,</span>
+                    <span class="n">backend</span><span class="o">=</span><span class="n">FakeMediaReceiverRegistrarBackend</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">media_receiver_registrar_server</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">LookupError</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;MediaReceiverRegistrarServer (optional) </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scheduled_recording_server</span> <span class="o">=</span> <span class="n">ScheduledRecordingServer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scheduled_recording_server</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">LookupError</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ScheduledRecordingServer </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">upnp_init</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;upnp_init&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">upnp_init</span><span class="p">:</span>
+            <span class="n">upnp_init</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span> <span class="o">=</span> <span class="n">MSRoot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">add_web_resource</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)[</span><span class="mi">5</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="p">)</span>
+
+        <span class="n">version</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">version</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;description-</span><span class="si">{version}</span><span class="s1">.xml&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span>
+                <span class="n">RootDeviceXML</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">urlbase</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">device_type</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span>
+                    <span class="n">friendly_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">services</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="p">,</span>
+                    <span class="n">devices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_devices</span><span class="p">,</span>
+                    <span class="n">icons</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">icons</span><span class="p">,</span>
+                    <span class="n">presentation_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">presentationURL</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;xbox-description-</span><span class="si">{version}</span><span class="s1">.xml&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span>
+                <span class="n">RootDeviceXML</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">urlbase</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">device_type</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span>
+                    <span class="n">friendly_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">xbox_hack</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">services</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="p">,</span>
+                    <span class="n">devices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_devices</span><span class="p">,</span>
+                    <span class="n">icons</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">icons</span><span class="p">,</span>
+                    <span class="n">presentation_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">presentationURL</span><span class="p">))</span>
+            <span class="n">version</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;ConnectionManager&#39;</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;ContentDirectory&#39;</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">content_directory_server</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;scheduled_recording_server&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;ScheduledRecording&#39;</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">scheduled_recording_server</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;media_receiver_registrar_server&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;X_MS_MediaReceiverRegistrar&#39;</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">media_receiver_registrar_server</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">icon</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">icons</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;url&#39;</span> <span class="ow">in</span> <span class="n">icon</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;file://&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">][</span><span class="mi">7</span><span class="p">:]):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span>
+                            <span class="n">StaticFile</span><span class="p">(</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">][</span><span class="mi">7</span><span class="p">:],</span>
+                                       <span class="n">defaultType</span><span class="o">=</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">]))</span>
+                <span class="k">elif</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.face&#39;</span><span class="p">:</span>
+                    <span class="n">face_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.face&#39;</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">face_path</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span>
+                            <span class="sa">b</span><span class="s1">&#39;face-icon.png&#39;</span><span class="p">,</span>
+                            <span class="n">StaticFile</span><span class="p">(</span>
+                                <span class="n">face_path</span><span class="p">,</span> <span class="n">defaultType</span><span class="o">=</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">resource_filename</span>
+                    <span class="n">icon_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
+                        <span class="n">resource_filename</span><span class="p">(</span>
+                            <span class="vm">__name__</span><span class="p">,</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;misc&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;device-icons&#39;</span><span class="p">,</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])))</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">icon_path</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span>
+                            <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span>
+                            <span class="n">StaticFile</span><span class="p">(</span><span class="n">icon_path</span><span class="p">,</span>
+                                       <span class="n">defaultType</span><span class="o">=</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.device_type}</span><span class="s1"> </span><span class="si">{self.backend.name}</span><span class="s1"> (</span><span class="si">{self.backend}</span><span class="s1">)&#39;</span>
+                     <span class="n">f</span><span class="s1">&#39; activated with id {str(self.uuid)[5:]}&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

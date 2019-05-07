@@ -1,0 +1,342 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.models.containers &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.models.containers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.models.containers</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Backend models for Container</span>
+<span class="sd">----------------------------</span>
+
+<span class="sd">Backend container to be used as a container for backend items, used by backend</span>
+<span class="sd">store :class:`~coherence.backends.models.stores.BackendBaseStore`.</span>
+
+<span class="sd">The `BackendContainer` inherits from :class:`~coherence.backend.Container` and</span>
+<span class="sd">will initialize a :class:`~coherence.upnp.core.DIDLLite.Container` stored into</span>
+<span class="sd">variable :attr:`BackendContainer.item`. This is the base class for our</span>
+<span class="sd">containers.</span>
+
+<span class="sd">We also provide some more containers:</span>
+
+<span class="sd">    - :class:`BackendMusicAlbum`: Container which will contain audio items</span>
+<span class="sd">      from an album</span>
+<span class="sd">    - :class:`BackendBasePlaylist`: Container which will contain items to be</span>
+<span class="sd">      played</span>
+
+<span class="sd">.. note:: To write this module, some of the the old backends has been taken</span>
+<span class="sd">          as a reference:</span>
+
+<span class="sd">              - :mod:`~coherence.backends.appletrailers_storage`</span>
+<span class="sd">              - :mod:`~coherence.backends.lolcats_storage`</span>
+<span class="sd">              - :mod:`~coherence.backends.banshee_storage`</span>
+<span class="sd">              - :mod:`~coherence.backends.fs_storage`</span>
+
+<span class="sd">.. warning:: Be aware that we use super to initialize all the classes of this</span>
+<span class="sd">             module in order to have a better MRO class resolution...so...take</span>
+<span class="sd">             it into account if you inherit from one of this classes.</span>
+
+<span class="sd">.. versionadded:: 0.8.3</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">Container</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+
+
+<div class="viewcode-block" id="BackendContainer"><a class="viewcode-back" href="../../../../source/backends/models/containers.html#coherence.backends.models.containers.BackendContainer">[docs]</a><span class="k">class</span> <span class="nc">BackendContainer</span><span class="p">(</span><span class="n">Container</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The BackendContainer will hold the reference to all your instances of</span>
+<span class="sd">    BackendItem/s. This class could be used as a container for a simple</span>
+<span class="sd">    backend. It is almost the same as a :class:`~coherence.backend.Container`</span>
+<span class="sd">    but with some slight differences that will make easier to create an</span>
+<span class="sd">    inherited class form BackendContainer:</span>
+
+<span class="sd">        - The arguments to initialize the BackendContainer are</span>
+<span class="sd">        - When we initialize the BackendContainer we also create an attribute</span>
+<span class="sd">          item whim will be of :class:`~coherence.upnp.core.DIDLLite.Container`</span>
+<span class="sd">          which will allow us to perform most of the operations we need to</span>
+<span class="sd">          operate with your BackendItem/s</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;BackendContainer&#39;</span>
+
+    <span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&#39;&#39;&#39;Define the initialized :attr:`item_cls`. It will be set when the class</span>
+<span class="sd">    :class:`BackendContainer` is initialized based on the attribute</span>
+<span class="sd">    :attr:`item_cls`&#39;&#39;&#39;</span>
+
+    <span class="n">item_cls</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Container</span>
+    <span class="sd">&#39;&#39;&#39;Define an atomic object from :mod:`~coherence.upnp.core.DIDLLite`</span>
+<span class="sd">    to be used to initialize the :attr:`item`&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BackendContainer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">item_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span> <span class="o">=</span> <span class="n">parent_id</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;storage_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">item_cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;&lt;BackendContainer </span><span class="si">{self.id}</span><span class="s1"> {self.get_name()} &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;[parent id: </span><span class="si">{self.parent_id}</span><span class="s1">]&gt;&#39;</span></div>
+
+
+<div class="viewcode-block" id="BackendMusicAlbum"><a class="viewcode-back" href="../../../../source/backends/models/containers.html#coherence.backends.models.containers.BackendMusicAlbum">[docs]</a><span class="k">class</span> <span class="nc">BackendMusicAlbum</span><span class="p">(</span><span class="n">BackendContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Definition for a music album. This is an inherited class from</span>
+<span class="sd">    :class:`BackendContainer` but we use a different item class</span>
+<span class="sd">    :class:`~coherence.upnp.core.DIDLLite.MusicAlbum` to create our item</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;BackendMusicAlbum&#39;</span>
+
+    <span class="n">item_cls</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">MusicAlbum</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BackendMusicAlbum</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">item_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">artist</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genre</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;genre&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cover</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cover&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">item_cls</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">attachments</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">artist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">artist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">genre</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">genre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cover</span>
+
+<div class="viewcode-block" id="BackendMusicAlbum.get_name"><a class="viewcode-back" href="../../../../source/backends/models/containers.html#coherence.backends.models.containers.BackendMusicAlbum.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span></div>
+
+<div class="viewcode-block" id="BackendMusicAlbum.get_cover"><a class="viewcode-back" href="../../../../source/backends/models/containers.html#coherence.backends.models.containers.BackendMusicAlbum.get_cover">[docs]</a>    <span class="k">def</span> <span class="nf">get_cover</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cover</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;&lt;BackendMusicAlbum </span><span class="si">{self.id}</span><span class="s1"> title=&quot;</span><span class="si">{self.title}</span><span class="s1">&quot; &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;genre=&quot;</span><span class="si">{self.genre}</span><span class="s1">&quot; artist=&quot;</span><span class="si">{self.artist}</span><span class="s1">&quot; &#39;</span> \
+            <span class="n">f</span><span class="s1">&#39;cover=&quot;</span><span class="si">{self.cover}</span><span class="s1">&quot;&gt;&#39;</span></div>
+
+
+<div class="viewcode-block" id="BackendBasePlaylist"><a class="viewcode-back" href="../../../../source/backends/models/containers.html#coherence.backends.models.containers.BackendBasePlaylist">[docs]</a><span class="k">class</span> <span class="nc">BackendBasePlaylist</span><span class="p">(</span><span class="n">BackendContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Definition for a playlist. This is an inherited class from</span>
+<span class="sd">    :class:`BackendContainer` but we use a different item class</span>
+<span class="sd">    :class:`~coherence.upnp.core.DIDLLite.PlaylistContainer` to create our item</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;BackendBasePlaylist&#39;</span>
+
+    <span class="n">item_cls</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">PlaylistContainer</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BackendBasePlaylist</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">item_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">name</span>
+
+<div class="viewcode-block" id="BackendBasePlaylist.get_name"><a class="viewcode-back" href="../../../../source/backends/models/containers.html#coherence.backends.models.containers.BackendBasePlaylist.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> \
+            <span class="n">f</span><span class="s1">&#39;&lt;BackendBasePlaylist </span><span class="si">{self.id}</span><span class="s1"> title=&quot;</span><span class="si">{self.title}</span><span class="s1">&gt;&#39;</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

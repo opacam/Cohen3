@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.extern.db_row (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="coherence.extern.simple_plugin (module)" href="simple_plugin.html" />
+    <link rel="prev" title="coherence.extern.covers_by_amazon (module)" href="covers_by_amazon.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../coherence.extern.html">coherence.extern (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="covers_by_amazon.html">coherence.extern.covers_by_amazon (module)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">coherence.extern.db_row (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple_plugin.html">coherence.extern.simple_plugin (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="xdg.html">coherence.extern.xdg (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coherence.extern.html#coherence-extern-galleryremote-package">coherence.extern.galleryremote (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coherence.extern.html#coherence-extern-youtubedl-package">coherence.extern.youtubedl (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../coherence.extern.html">coherence.extern (package)</a> &raquo;</li>
+        
+      <li>coherence.extern.db_row (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/source/extern/db_row.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.extern.db_row">
+<span id="coherence-extern-db-row-module"></span><span id="extern-db-row"></span><h1>coherence.extern.db_row (module)<a class="headerlink" href="#module-coherence.extern.db_row" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="coherence.extern.db_row.get_rows">
+<code class="descname">get_rows</code><span class="sig-paren">(</span><em>cursor</em>, <em>sql</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/db_row.html#get_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.db_row.get_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of ResultRow objects from an SQL query.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.extern.db_row.getdict">
+<code class="descname">getdict</code><span class="sig-paren">(</span><em>results</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/db_row.html#getdict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.db_row.getdict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of DBRows in <cite>results</cite> with a given description.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.extern.db_row.DBRow">
+<em class="property">class </em><code class="descname">DBRow</code><span class="sig-paren">(</span><em>row</em>, <em>fields</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/db_row.html#DBRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.db_row.DBRow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A single row in a result set.</p>
+<p>Each DBRow has a dictionary-style and list-style interface.</p>
+<p>Called by ResultSet function.  Don’t call directly</p>
+<dl class="method">
+<dt id="coherence.extern.db_row.DBRow.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>row</em>, <em>fields</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/db_row.html#DBRow.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.db_row.DBRow.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by ResultSet function.  Don’t call directly</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.db_row.DBRow.set_extra_attr">
+<code class="descname">set_extra_attr</code><span class="sig-paren">(</span><em>attr</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/db_row.html#DBRow.set_extra_attr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.db_row.DBRow.set_extra_attr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.db_row.DBRow.keys">
+<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/db_row.html#DBRow.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.db_row.DBRow.keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the field names</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.db_row.DBRow.keymappings">
+<code class="descname">keymappings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/db_row.html#DBRow.keymappings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.db_row.DBRow.keymappings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary of the keys and their indices in the row</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.db_row.DBRow.has_key">
+<code class="descname">has_key</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/db_row.html#DBRow.has_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.db_row.DBRow.has_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether the given key is valid</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.extern.db_row.DBRow.as_dict">
+<code class="descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/extern/db_row.html#DBRow.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.extern.db_row.DBRow.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="simple_plugin.html" class="btn btn-neutral float-right" title="coherence.extern.simple_plugin (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="covers_by_amazon.html" class="btn btn-neutral float-left" title="coherence.extern.covers_by_amazon (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

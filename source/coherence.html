@@ -1,0 +1,553 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Cohen3 source tree &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="coherence.backend (module)" href="modules.html" />
+    <link rel="prev" title="The events system" href="../events.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Cohen3 source tree</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Cohen3 source tree</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/coherence.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="cohen3-source-tree">
+<span id="coherence"></span><h1>Cohen3 source tree<a class="headerlink" href="#cohen3-source-tree" title="Permalink to this headline">¶</a></h1>
+<p>This is the source tree for Cohen3’s package. The main module name is named
+coherence, so…all the submodules and subpackages will contain <cite>coherence</cite>.
+This allow us to maintain compatibility to projects who wants to migrate from
+python 2 to python 3 and has the original project <cite>Coherence</cite> as one of his
+dependencies, allowing to the developers to maintain his source code with
+minimal changes.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">coherence.backend (module)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#backend">Backend</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#id1"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#backendstore"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendStore</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#abstractbackendstore"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractBackendStore</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#backenditem"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendItem</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#container"><code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#lazycontainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LazyContainer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#backendrssmixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BackendRssMixin</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html#module-coherence.base">coherence.base (module)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#base">Base</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#simpleroot"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleRoot</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#webserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#webserverui"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebServerUi</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#plugins"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plugins</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules.html#coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">Coherence</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coherence.backends.html">coherence.backends (package)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="backends/ampache.html">coherence.backends.ampache_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/appletrailers.html">coherence.backends.appletrailers_storage (module)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backends/appletrailers.html#appletrailersstore">AppleTrailersStore</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="backends/audiocd.html">coherence.backends.audiocd_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/axiscam.html">coherence.backends.axiscam_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/banshee.html">coherence.backends.banshee_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/bbc.html">coherence.backends.bbc_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/buzztard.html">coherence.backends.buzztard_control (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/dvbd.html">coherence.backends.dvbd_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/elisarenderer.html">coherence.backends.elisa_renderer (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/elisastorage.html">coherence.backends.elisa_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/feed.html">coherence.backends.feed_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/flickr.html">coherence.backends.flickr_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/fs.html">coherence.backends.fs_storage (module)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backends/fs.html#fsstore-filesystem-media-server">FSStore - filesystem media server</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="backends/gallery2.html">coherence.backends.gallery2_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/gstreamer_renderer.html">coherence.backends.gstreamer_renderer (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/iradio.html">coherence.backends.iradio_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/itv.html">coherence.backends.itv_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/lastfm.html">coherence.backends.lastfm_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/lolcats.html">coherence.backends.lolcats_storage (module)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backends/lolcats.html#lolcatsstore">LolcatsStore</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="backends/mediadb.html">coherence.backends.mediadb_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/miroguide.html">coherence.backends.miroguide_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/picasa.html">coherence.backends.picasa_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/playlist.html">coherence.backends.playlist_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/radiotime.html">coherence.backends.radiotime_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/swr3.html">coherence.backends.swr3_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/ted.html">coherence.backends.ted_storage (module)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backends/ted.html#tedstore">TEDStore</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="backends/test.html">coherence.backends.test_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/tracker.html">coherence.backends.tracker_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/twitch.html">coherence.backends.twitch_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/yamj.html">coherence.backends.yamj_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backends/youtube.html">coherence.backends.youtube_storage (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.backends.html#coherence-backends-models-package">coherence.backends.models (package)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backends/models/items.html">coherence.backends.models.items (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="backends/models/items.html#backend-models-for-backenditem">Backend models for BackendItem</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="backends/models/containers.html">coherence.backends.models.containers (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="backends/models/containers.html#backend-models-for-container">Backend models for Container</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="backends/models/stores.html">coherence.backends.models.stores (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="backends/models/stores.html#backend-models-for-backendstore">Backend models for BackendStore</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="coherence.extern.html">coherence.extern (package)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="extern/covers_by_amazon.html">coherence.extern.covers_by_amazon (module)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="extern/covers_by_amazon.html#covers-by-amazon">Covers by Amazon</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="extern/db_row.html">coherence.extern.db_row (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extern/simple_plugin.html">coherence.extern.simple_plugin (module)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="extern/simple_plugin.html#simple-plugin">Simple Plugin</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="extern/xdg.html">coherence.extern.xdg (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.extern.html#coherence-extern-galleryremote-package">coherence.extern.galleryremote (package)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="extern/galleryremote/gallery.html">coherence.extern.galleryremote.gallery (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.extern.html#coherence-extern-youtubedl-package">coherence.extern.youtubedl (package)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="extern/youtubedl/youtubedl.html">coherence.extern.youtubedl.youtubedl (module)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="coherence.upnp.html">coherence.upnp (package)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="coherence.upnp.html#coherence-upnp-core-package">coherence.upnp.core (package)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/action.html">coherence.upnp.core.action (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/device.html">coherence.upnp.core.device (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/core/device.html#devices">Devices</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/device.html#device"><code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/device.html#rootdevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">RootDevice</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/didllite.html">coherence.upnp.core.DIDLLite (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/core/didllite.html#didllite">DIDLLite</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#resources"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resources</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#playcontainerresource"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlayContainerResource</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#object"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#item"><code class="xref py py-class docutils literal notranslate"><span class="pre">Item</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#imageitem"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageItem</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#photo"><code class="xref py py-class docutils literal notranslate"><span class="pre">Photo</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#audioitem"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioItem</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#musictrack"><code class="xref py py-class docutils literal notranslate"><span class="pre">MusicTrack</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#audiobroadcast"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioBroadcast</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#audiobook"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioBook</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#videoitem"><code class="xref py py-class docutils literal notranslate"><span class="pre">VideoItem</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#movie"><code class="xref py py-class docutils literal notranslate"><span class="pre">Movie</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#videobroadcast"><code class="xref py py-class docutils literal notranslate"><span class="pre">VideoBroadcast</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#musicvideoclip"><code class="xref py py-class docutils literal notranslate"><span class="pre">MusicVideoClip</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#playlistitem"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlayListItem</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#textitem"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextItem</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#container"><code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#person"><code class="xref py py-class docutils literal notranslate"><span class="pre">Person</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#musicartist"><code class="xref py py-class docutils literal notranslate"><span class="pre">MusicArtist</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#playlistcontainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlaylistContainer</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#album"><code class="xref py py-class docutils literal notranslate"><span class="pre">Album</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#musicalbum"><code class="xref py py-class docutils literal notranslate"><span class="pre">MusicAlbum</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#photoalbum"><code class="xref py py-class docutils literal notranslate"><span class="pre">PhotoAlbum</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#genre"><code class="xref py py-class docutils literal notranslate"><span class="pre">Genre</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#musicgenre"><code class="xref py py-class docutils literal notranslate"><span class="pre">MusicGenre</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#moviegenre"><code class="xref py py-class docutils literal notranslate"><span class="pre">MovieGenre</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#storagesystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">StorageSystem</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#storagevolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">StorageVolume</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#storagefolder"><code class="xref py py-class docutils literal notranslate"><span class="pre">StorageFolder</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/didllite.html#didlelement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIDLElement</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/dlna.html">coherence.upnp.core.dlna (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/event.html">coherence.upnp.core.event (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/core/event.html#events">Events</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/event.html#eventserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventServer</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/event.html#eventsubscriptionserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventSubscriptionServer</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/event.html#event"><code class="xref py py-class docutils literal notranslate"><span class="pre">Event</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/event.html#eventprotocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventProtocol</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/event.html#notificationprotocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">NotificationProtocol</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/msearch.html">coherence.upnp.core.msearch (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/core/msearch.html#msearch"><code class="xref py py-class docutils literal notranslate"><span class="pre">MSearch</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/service.html">coherence.upnp.core.service (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/core/service.html#services">Services</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/service.html#service"><code class="xref py py-class docutils literal notranslate"><span class="pre">Service</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/service.html#serviceserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceServer</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/service.html#scpdxml"><code class="xref py py-class docutils literal notranslate"><span class="pre">scpdXML</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/service.html#servicecontrol"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceControl</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/soap_lite.html">coherence.upnp.core.soap_lite (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/core/soap_lite.html#soap-lite">SOAP-lite</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/soap_proxy.html">coherence.upnp.core.soap_proxy (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/core/soap_proxy.html#soapproxy"><code class="xref py py-class docutils literal notranslate"><span class="pre">SOAPProxy</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/soap_service.html">coherence.upnp.core.soap_service (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/core/soap_service.html#soap-service">Soap Service</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/soap_service.html#errorcode"><code class="xref py py-class docutils literal notranslate"><span class="pre">errorCode</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/core/soap_service.html#upnppublisher"><code class="xref py py-class docutils literal notranslate"><span class="pre">UPnPPublisher</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/ssdp.html">coherence.upnp.core.ssdp (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/core/ssdp.html#ssdpserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">SSDPServer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/utils.html">coherence.upnp.core.utils (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/core/utils.html#utils">Utils</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/uuid.html">coherence.upnp.core.uuid (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/variable.html">coherence.upnp.core.variable (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/core/variable.html#statevariable"><code class="xref py py-class docutils literal notranslate"><span class="pre">StateVariable</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/core/xml_constants.html">coherence.upnp.core.xml_constants (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.upnp.html#coherence-upnp-devices-package">coherence.upnp.devices (package)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upnp/devices/basics.html">coherence.upnp.devices.basics (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/devices/basics.html#basics">Basics</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="upnp/devices/basics.html#devicehttproot"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceHttpRoot</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/devices/basics.html#basicdevicemixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasicDeviceMixin</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/devices/control_point.html">coherence.upnp.devices.control_point (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/devices/control_point.html#control-point">Control Point</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="upnp/devices/control_point.html#devicequery"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceQuery</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/devices/control_point.html#controlpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ControlPoint</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="upnp/devices/control_point.html#xmlrpc"><code class="xref py py-class docutils literal notranslate"><span class="pre">XMLRPC</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/devices/internet_gateway_device_client.html">coherence.upnp.devices.internet_gateway_device_client (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/devices/internet_gateway_device_client.html#internetgatewaydeviceclient"><code class="xref py py-class docutils literal notranslate"><span class="pre">InternetGatewayDeviceClient</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/devices/media_renderer.html">coherence.upnp.devices.media_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/devices/media_renderer_client.html">coherence.upnp.devices.media_renderer_client (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/devices/media_renderer_client.html#mediarendererclient"><code class="xref py py-class docutils literal notranslate"><span class="pre">MediaRendererClient</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/devices/media_server.html">coherence.upnp.devices.media_server (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/devices/media_server_client.html">coherence.upnp.devices.media_server_client (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/devices/media_server_client.html#mediaserverclient"><code class="xref py py-class docutils literal notranslate"><span class="pre">MediaServerClient</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/devices/wan_connection_device_client.html">coherence.upnp.devices.wan_connection_device_client (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/devices/wan_connection_device_client.html#wanconnectiondeviceclient"><code class="xref py py-class docutils literal notranslate"><span class="pre">WANConnectionDeviceClient</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/devices/wan_device_client.html">coherence.upnp.devices.wan_device_client (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/devices/wan_device_client.html#wandeviceclient"><code class="xref py py-class docutils literal notranslate"><span class="pre">WANDeviceClient</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.upnp.html#coherence-upnp-services-package">coherence.upnp.services (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.upnp.html#coherence-upnp-services-clients-subpackage">coherence.upnp.services.clients (subpackage)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/clients/av_transport_client.html">coherence.upnp.services.clients.av_transport_client (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/clients/connection_manager_client.html">coherence.upnp.services.clients.connection_manager_client (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/clients/content_directory_client.html">coherence.upnp.services.clients.content_directory_client (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/clients/dimming_client.html">coherence.upnp.services.clients.dimming_client (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/clients/rendering_control_client.html">coherence.upnp.services.clients.rendering_control_client (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/clients/switch_power_client.html">coherence.upnp.services.clients.switch_power_client (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/clients/wan_common_interface_config_client.html">coherence.upnp.services.clients.wan_common_interface_config_client (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/clients/wan_ip_connection_client.html">coherence.upnp.services.clients.wan_ip_connection_client (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/clients/wan_ppp_connection_client.html">coherence.upnp.services.clients.wan_ppp_connection_client (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.upnp.html#coherence-upnp-services-servers-subpackage">coherence.upnp.services.servers (subpackage)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/servers/av_transport_server.html">coherence.upnp.services.servers.av_transport_server (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/services/servers/av_transport_server.html#avtransport-service">AVTransport service</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/servers/connection_manager_server.html">coherence.upnp.services.servers.connection_manager_server (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/services/servers/connection_manager_server.html#connection-manager-service">Connection Manager service</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/servers/content_directory_server.html">coherence.upnp.services.servers.content_directory_server (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/services/servers/content_directory_server.html#content-directory-service">Content Directory service</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/servers/dimming_server.html">coherence.upnp.services.servers.dimming_server (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/services/servers/dimming_server.html#dimming-service">Dimming service</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/servers/media_receiver_registrar_server.html">coherence.upnp.services.servers.media_receiver_registrar_server (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/servers/rendering_control_server.html">coherence.upnp.services.servers.rendering_control_server (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/services/servers/rendering_control_server.html#renderingcontrol-service">RenderingControl service</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/servers/scheduled_recording_server.html">coherence.upnp.services.servers.scheduled_recording_server (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/services/servers/scheduled_recording_server.html#scheduledrecording-service">ScheduledRecording service</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="upnp/services/servers/switch_power_server.html">coherence.upnp.services.servers.switch_power_server (module)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="upnp/services/servers/switch_power_server.html#switch-power-service">Switch Power service</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="coherence.web.html">coherence.web (package)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="coherence.web.html#module-coherence.web.ui">coherence.web.ui (module)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="coherence.web.html#webui">WebUI</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="coherence.web.html#webui-example">WebUi Example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="modules.html" class="btn btn-neutral float-right" title="coherence.backend (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../events.html" class="btn btn-neutral float-left" title="The events system" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

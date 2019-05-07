@@ -1,0 +1,419 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.picasa_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.picasa_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.picasa_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2009, Jean-Michel Sizun</span>
+<span class="c1"># Copyright 2009 Frank Scholz &lt;coherence@beebits.net&gt;</span>
+
+<span class="kn">import</span> <span class="nn">gdata.geo</span>
+<span class="kn">import</span> <span class="nn">gdata.media</span>
+<span class="kn">import</span> <span class="nn">gdata.photos.service</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">threads</span>
+
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendItem</span><span class="p">,</span> <span class="n">Container</span><span class="p">,</span> \
+    <span class="n">LazyContainer</span><span class="p">,</span> \
+    <span class="n">AbstractBackendStore</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">ReverseProxyUriResource</span>
+
+
+<div class="viewcode-block" id="PicasaProxy"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaProxy">[docs]</a><span class="k">class</span> <span class="nc">PicasaProxy</span><span class="p">(</span><span class="n">ReverseProxyUriResource</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="n">ReverseProxyUriResource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PicasaProxy.render"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaProxy.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;referer&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">received_headers</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">request</span><span class="o">.</span><span class="n">received_headers</span><span class="p">[</span><span class="s1">&#39;referer&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ReverseProxyUriResource</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PicasaPhotoItem"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaPhotoItem">[docs]</a><span class="k">class</span> <span class="nc">PicasaPhotoItem</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">photo</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># print photo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo</span> <span class="o">=</span> <span class="n">photo</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">photo</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">photo</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">photo</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">photo</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_url</span> <span class="o">=</span> <span class="n">photo</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">src</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thumbnail_url</span> <span class="o">=</span> <span class="n">photo</span><span class="o">.</span><span class="n">media</span><span class="o">.</span><span class="n">thumbnail</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">url</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">PicasaProxy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo_url</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PicasaPhotoItem.replace_by"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaPhotoItem.replace_by">[docs]</a>    <span class="k">def</span> <span class="nf">replace_by</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c1"># print photo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">photo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">photo_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">src</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thumbnail_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo</span><span class="o">.</span><span class="n">media</span><span class="o">.</span><span class="n">thumbnail</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">PicasaProxy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photo_url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="PicasaPhotoItem.get_item"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaPhotoItem.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">upnp_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="n">upnp_parent_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Photo</span><span class="p">(</span>
+                <span class="n">upnp_id</span><span class="p">,</span> <span class="n">upnp_parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{self.mimetype}</span><span class="s1">:*&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="PicasaPhotoItem.get_path"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaPhotoItem.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span></div>
+
+<div class="viewcode-block" id="PicasaPhotoItem.get_id"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaPhotoItem.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage_id</span></div></div>
+
+
+<div class="viewcode-block" id="PicasaStore"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaStore">[docs]</a><span class="k">class</span> <span class="nc">PicasaStore</span><span class="p">(</span><span class="n">AbstractBackendStore</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;picasa_store&#39;</span>
+
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;Picasa Web Albums&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;connects to the Picasa Web Albums service and exposes the &#39;</span>
+        <span class="s1">&#39;featured photos and albums for a given user.&#39;</span><span class="p">,</span>
+        <span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Server Name:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;my media&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the name under this MediaServer shall &#39;</span>
+                 <span class="s1">&#39;show up with on other UPnP clients&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UPnP Version:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the highest UPnP version this MediaServer shall support&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;uuid&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;UUID Identifier:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the unique (UPnP) identifier for this MediaServer, &#39;</span>
+                 <span class="s1">&#39;usually automatically set&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;refresh&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Refresh period&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;login&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;User ID:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="s1">&#39;User Account&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Password:&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="s1">&#39;User Account&#39;</span><span class="p">},</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">AbstractBackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;Picasa Web Albums&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;refresh&#39;</span><span class="p">,</span> <span class="mi">60</span><span class="p">))</span> <span class="o">*</span> <span class="mi">60</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">login</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;userid&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;login&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="n">rootContainer</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_root_item</span><span class="p">(</span><span class="n">rootContainer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">AlbumsContainer</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span>
+            <span class="n">rootContainer</span><span class="p">,</span> <span class="s1">&#39;My Albums&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieveAlbums</span><span class="p">)</span>
+        <span class="n">rootContainer</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AlbumsContainer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">FeaturedContainer</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span>
+            <span class="n">rootContainer</span><span class="p">,</span> <span class="s1">&#39;Featured photos&#39;</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">retrieveFeaturedPhotos</span><span class="p">)</span>
+        <span class="n">rootContainer</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FeaturedContainer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+<div class="viewcode-block" id="PicasaStore.upnp_init"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaStore.upnp_init">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;&#39;</span>
+                <span class="s1">&#39;DLNA.ORG_FLAGS=00f00000000000000000000000000000,&#39;</span>
+                <span class="s1">&#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;DLNA.ORG_OP=01;&#39;</span>
+                <span class="s1">&#39;DLNA.ORG_FLAGS=00f00000000000000000000000000000,&#39;</span>
+                <span class="s1">&#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;DLNA.ORG_OP=01;&#39;</span>
+                <span class="s1">&#39;DLNA.ORG_FLAGS=00f00000000000000000000000000000,&#39;</span>
+                <span class="s1">&#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;DLNA.ORG_OP=01;&#39;</span>
+                <span class="s1">&#39;DLNA.ORG_FLAGS=00f00000000000000000000000000000,&#39;</span>
+                <span class="s1">&#39;http-get:*:image/jpeg:*,&#39;</span>
+                <span class="s1">&#39;http-get:*:image/gif:*,&#39;</span>
+                <span class="s1">&#39;http-get:*:image/png:*&#39;</span><span class="p">,</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmc_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;16&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_root_id</span><span class="p">()}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gd_client</span> <span class="o">=</span> <span class="n">gdata</span><span class="o">.</span><span class="n">photos</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">PhotosService</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gd_client</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">login</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gd_client</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gd_client</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;Coherence UPnP backend&#39;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">login</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gd_client</span><span class="o">.</span><span class="n">ProgrammaticLogin</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PicasaStore.retrieveAlbums"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaStore.retrieveAlbums">[docs]</a>    <span class="k">def</span> <span class="nf">retrieveAlbums</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">albums</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gd_client</span><span class="o">.</span><span class="n">GetUserFeed</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotAlbums</span><span class="p">(</span><span class="n">albums</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">albums</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Unable to retrieve albums&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">for</span> <span class="n">album</span> <span class="ow">in</span> <span class="n">albums</span><span class="o">.</span><span class="n">entry</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">album</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">album_id</span> <span class="o">=</span> <span class="n">album</span><span class="o">.</span><span class="n">gphoto_id</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">LazyContainer</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">album_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">retrieveAlbumPhotos</span><span class="p">,</span>
+                                     <span class="n">album_id</span><span class="o">=</span><span class="n">album_id</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">album_id</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ERROR: </span><span class="si">{error}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">albums</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">gotAlbums</span><span class="p">,</span> <span class="n">gotError</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">albums</span></div>
+
+<div class="viewcode-block" id="PicasaStore.retrieveFeedPhotos"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaStore.retrieveFeedPhotos">[docs]</a>    <span class="k">def</span> <span class="nf">retrieveFeedPhotos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feed_uri</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="c1"># print feed_uri</span>
+        <span class="n">photos</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gd_client</span><span class="o">.</span><span class="n">GetFeed</span><span class="p">,</span> <span class="n">feed_uri</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotPhotos</span><span class="p">(</span><span class="n">photos</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">photos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to retrieve photos for feed </span><span class="si">{feed_uri}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">for</span> <span class="n">photo</span> <span class="ow">in</span> <span class="n">photos</span><span class="o">.</span><span class="n">entry</span><span class="p">:</span>
+                <span class="n">photo_id</span> <span class="o">=</span> <span class="n">photo</span><span class="o">.</span><span class="n">gphoto_id</span><span class="o">.</span><span class="n">text</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">PicasaPhotoItem</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">external_id</span><span class="o">=</span><span class="n">photo_id</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">error</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ERROR: </span><span class="si">{error}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">photos</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span><span class="n">gotPhotos</span><span class="p">,</span> <span class="n">gotError</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">photos</span></div>
+
+<div class="viewcode-block" id="PicasaStore.retrieveAlbumPhotos"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaStore.retrieveAlbumPhotos">[docs]</a>    <span class="k">def</span> <span class="nf">retrieveAlbumPhotos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">album_id</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">album_feed_uri</span> <span class="o">=</span> \
+            <span class="n">f</span><span class="s1">&#39;/data/feed/api/user/</span><span class="si">{self.login}</span><span class="s1">/albumid/</span><span class="si">{album_id}</span><span class="s1">?kind=photo&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieveFeedPhotos</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">album_feed_uri</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PicasaStore.retrieveFeaturedPhotos"><a class="viewcode-back" href="../../../source/backends/picasa.html#coherence.backends.picasa_storage.PicasaStore.retrieveFeaturedPhotos">[docs]</a>    <span class="k">def</span> <span class="nf">retrieveFeaturedPhotos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">feed_uri</span> <span class="o">=</span> <span class="s1">&#39;http://picasaweb.google.com/data/feed/api/featured&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieveFeedPhotos</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">feed_uri</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

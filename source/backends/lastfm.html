@@ -1,0 +1,477 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.lastfm_storage (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="coherence.backends.lolcats_storage (module)" href="lolcats.html" />
+    <link rel="prev" title="coherence.backends.itv_storage (module)" href="itv.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../coherence.backends.html">coherence.backends (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ampache.html">coherence.backends.ampache_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appletrailers.html">coherence.backends.appletrailers_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="audiocd.html">coherence.backends.audiocd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="axiscam.html">coherence.backends.axiscam_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="banshee.html">coherence.backends.banshee_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bbc.html">coherence.backends.bbc_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="buzztard.html">coherence.backends.buzztard_control (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dvbd.html">coherence.backends.dvbd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elisarenderer.html">coherence.backends.elisa_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elisastorage.html">coherence.backends.elisa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="feed.html">coherence.backends.feed_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="flickr.html">coherence.backends.flickr_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fs.html">coherence.backends.fs_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gallery2.html">coherence.backends.gallery2_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gstreamer_renderer.html">coherence.backends.gstreamer_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iradio.html">coherence.backends.iradio_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="itv.html">coherence.backends.itv_storage (module)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">coherence.backends.lastfm_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lolcats.html">coherence.backends.lolcats_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mediadb.html">coherence.backends.mediadb_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="miroguide.html">coherence.backends.miroguide_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="picasa.html">coherence.backends.picasa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="playlist.html">coherence.backends.playlist_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="radiotime.html">coherence.backends.radiotime_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="swr3.html">coherence.backends.swr3_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ted.html">coherence.backends.ted_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="test.html">coherence.backends.test_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracker.html">coherence.backends.tracker_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="twitch.html">coherence.backends.twitch_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="yamj.html">coherence.backends.yamj_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="youtube.html">coherence.backends.youtube_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coherence.backends.html#coherence-backends-models-package">coherence.backends.models (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../coherence.backends.html">coherence.backends (package)</a> &raquo;</li>
+        
+      <li>coherence.backends.lastfm_storage (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/source/backends/lastfm.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.backends.lastfm_storage">
+<span id="coherence-backends-lastfm-storage-module"></span><span id="coherence-backends-lastfm"></span><h1>coherence.backends.lastfm_storage (module)<a class="headerlink" href="#module-coherence.backends.lastfm_storage" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="coherence.backends.lastfm_storage.LastFMUser">
+<em class="property">class </em><code class="descname">LastFMUser</code><span class="sig-paren">(</span><em>user</em>, <em>passwd</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMUser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'lastFM_user'</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.host">
+<code class="descname">host</code><em class="property"> = 'ws.audioscrobbler.com'</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.host" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.basepath">
+<code class="descname">basepath</code><em class="property"> = '/radio'</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.basepath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.sessionid">
+<code class="descname">sessionid</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.sessionid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.parent">
+<code class="descname">parent</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.getting_tracks">
+<code class="descname">getting_tracks</code><em class="property"> = False</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.getting_tracks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.tracks">
+<code class="descname">tracks</code><em class="property"> = []</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.tracks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.user">
+<code class="descname">user</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.user" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.passwd">
+<code class="descname">passwd</code><em class="property"> = None</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.passwd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.login">
+<code class="descname">login</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMUser.login"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.login" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.get_tracks">
+<code class="descname">get_tracks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMUser.get_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.get_tracks" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMUser.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMUser.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMUser.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.lastfm_storage.LFMProxyStream">
+<em class="property">class </em><code class="descname">LFMProxyStream</code><span class="sig-paren">(</span><em>uri</em>, <em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LFMProxyStream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LFMProxyStream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../upnp/core/utils.html#coherence.upnp.core.utils.ReverseProxyResource" title="coherence.upnp.core.utils.ReverseProxyResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.utils.ReverseProxyResource</span></code></a>, <a class="reference internal" href="../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LFMProxyStream.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'lastFM_stream'</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LFMProxyStream.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LFMProxyStream.render">
+<code class="descname">render</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LFMProxyStream.render"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LFMProxyStream.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Render a request by forwarding it to the proxied server.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.lastfm_storage.LastFMItem">
+<em class="property">class </em><code class="descname">LastFMItem</code><span class="sig-paren">(</span><em>id</em>, <em>obj</em>, <em>parent</em>, <em>mimetype</em>, <em>urlbase</em>, <em>UPnPClass</em>, <em>update=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'LastFM_item'</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.add_child">
+<code class="descname">add_child</code><span class="sig-paren">(</span><em>child</em>, <em>update=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.add_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.add_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.remove_child">
+<code class="descname">remove_child</code><span class="sig-paren">(</span><em>child</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.remove_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.remove_child" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.get_children">
+<code class="descname">get_children</code><span class="sig-paren">(</span><em>start=0</em>, <em>request_count=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.get_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.get_children" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.get_child_count">
+<code class="descname">get_child_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.get_child_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.get_child_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.get_id">
+<code class="descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.get_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.get_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.get_update_id">
+<code class="descname">get_update_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.get_update_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.get_update_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.get_path">
+<code class="descname">get_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.get_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.get_parent">
+<code class="descname">get_parent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.get_parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.get_parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.get_item">
+<code class="descname">get_item</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.get_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.get_item" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMItem.get_xml">
+<code class="descname">get_xml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMItem.get_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMItem.get_xml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.backends.lastfm_storage.LastFMStore">
+<em class="property">class </em><code class="descname">LastFMStore</code><span class="sig-paren">(</span><em>server</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.Backend</span></code></a></p>
+<p>This is a backend to the LastFM.</p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Migrated from louie/dispatcher to EventDispatcher</p></li>
+<li><p>Introduced <a class="reference internal" href="../modules.html#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>’s inheritance</p></li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMStore.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'lastFM_store'</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMStore.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.lastfm_storage.LastFMStore.implements">
+<code class="descname">implements</code><em class="property"> = ['MediaServer']</em><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMStore.implements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMStore.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>obj</em>, <em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMStore.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMStore.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMStore.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMStore.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMStore.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMStore.len">
+<code class="descname">len</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMStore.len"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMStore.len" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMStore.get_by_id">
+<code class="descname">get_by_id</code><span class="sig-paren">(</span><em>id</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMStore.get_by_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMStore.get_by_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMStore.getnextID">
+<code class="descname">getnextID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMStore.getnextID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMStore.getnextID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.lastfm_storage.LastFMStore.upnp_init">
+<code class="descname">upnp_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#LastFMStore.upnp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.LastFMStore.upnp_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method gets called after the device is fired, here all
+initializations of service related state variables should happen, as
+the services aren’t available before that point.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.backends.lastfm_storage.main">
+<code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/lastfm_storage.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.lastfm_storage.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="lolcats.html" class="btn btn-neutral float-right" title="coherence.backends.lolcats_storage (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="itv.html" class="btn btn-neutral float-left" title="coherence.backends.itv_storage (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

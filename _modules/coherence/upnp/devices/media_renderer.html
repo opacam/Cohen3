@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.devices.media_renderer &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.devices.media_renderer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.devices.media_renderer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2006,2007 Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">StaticFile</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.devices.media_server</span> <span class="k">import</span> <span class="n">RootDeviceXML</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.devices.basics</span> <span class="k">import</span> <span class="n">DeviceHttpRoot</span><span class="p">,</span> <span class="n">BasicDeviceMixin</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.services.servers.av_transport_server</span> <span class="k">import</span> \
+    <span class="n">AVTransportServer</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.services.servers.connection_manager_server</span> <span class="k">import</span> \
+    <span class="n">ConnectionManagerServer</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.services.servers.rendering_control_server</span> <span class="k">import</span> \
+    <span class="n">RenderingControlServer</span>
+
+
+<div class="viewcode-block" id="HttpRoot"><a class="viewcode-back" href="../../../../source/upnp/devices/media_renderer.html#coherence.upnp.devices.media_renderer.HttpRoot">[docs]</a><span class="k">class</span> <span class="nc">HttpRoot</span><span class="p">(</span><span class="n">DeviceHttpRoot</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;mediarenderer&#39;</span></div>
+
+
+<div class="viewcode-block" id="MediaRenderer"><a class="viewcode-back" href="../../../../source/upnp/devices/media_renderer.html#coherence.upnp.devices.media_renderer.MediaRenderer">[docs]</a><span class="k">class</span> <span class="nc">MediaRenderer</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">,</span> <span class="n">BasicDeviceMixin</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;mediarenderer&#39;</span>
+    <span class="n">device_type</span> <span class="o">=</span> <span class="s1">&#39;MediaRenderer&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">BasicDeviceMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MediaRenderer.fire"><a class="viewcode-back" href="../../../../source/upnp/devices/media_renderer.html#coherence.upnp.devices.media_renderer.MediaRenderer.fire">[docs]</a>    <span class="k">def</span> <span class="nf">fire</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;no_thread_needed&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; this could take some time, put it in a  thread to be sure</span>
+<span class="sd">                it doesn&#39;t block as we can&#39;t tell for sure that every</span>
+<span class="sd">                backend is implemented properly &#39;&#39;&#39;</span>
+
+            <span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">threads</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">threads</span><span class="o">.</span><span class="n">deferToThread</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">backend_ready</span><span class="p">(</span><span class="n">backend</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
+
+            <span class="k">def</span> <span class="nf">backend_failure</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;backend </span><span class="si">{backend}</span><span class="s1"> not installed, </span><span class="si">{self.device_type}</span><span class="s1">&#39;</span>
+                    <span class="n">f</span><span class="s1">&#39; activation aborted - {x.getErrorMessage()}&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="n">backend_ready</span><span class="p">)</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="n">backend_failure</span><span class="p">)</span>
+
+            <span class="c1"># FIXME: we need a timeout here so if the signal we wait for</span>
+            <span class="c1"># not arrives we&#39;ll can close down this device</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MediaRenderer.init_complete"><a class="viewcode-back" href="../../../../source/upnp/devices/media_renderer.html#coherence.upnp.devices.media_renderer.MediaRenderer.init_complete">[docs]</a>    <span class="k">def</span> <span class="nf">init_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">!=</span> <span class="n">backend</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_services</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_devices</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager_server</span> <span class="o">=</span> <span class="n">ConnectionManagerServer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">LookupError</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;ConnectionManagerServer </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rendering_control_server</span> <span class="o">=</span> <span class="n">RenderingControlServer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rendering_control_server</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">LookupError</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;RenderingControlServer </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">av_transport_server</span> <span class="o">=</span> <span class="n">AVTransportServer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">av_transport_server</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">LookupError</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;AVTransportServer </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">upnp_init</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;upnp_init&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">upnp_init</span><span class="p">:</span>
+            <span class="n">upnp_init</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span> <span class="o">=</span> <span class="n">HttpRoot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">add_web_resource</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)[</span><span class="mi">5</span><span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dlna_caps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">dlna_caps</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">dlna_caps</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span>
+        <span class="k">while</span> <span class="n">version</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;description-</span><span class="si">{version}</span><span class="s1">.xml&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span>
+                <span class="n">RootDeviceXML</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">hostname</span><span class="p">,</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">urlbase</span><span class="p">,</span>
+                    <span class="n">device_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device_type</span><span class="p">,</span>
+                    <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">,</span>
+                    <span class="c1"># presentation_url=&#39;/&#39;+str(self.uuid)[5:],</span>
+                    <span class="n">friendly_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="c1"># model_description=f&#39;Coherence UPnP A/V {self.device_type}&#39;,  # noqa</span>
+                    <span class="c1"># model_name=f&#39;Coherence UPnP A/V {self.device_type}&#39;,</span>
+                    <span class="n">services</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="p">,</span>
+                    <span class="n">devices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_devices</span><span class="p">,</span>
+                    <span class="n">icons</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">icons</span><span class="p">,</span>
+                    <span class="n">dlna_caps</span><span class="o">=</span><span class="n">dlna_caps</span><span class="p">))</span>
+            <span class="n">version</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;ConnectionManager&#39;</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;RenderingControl&#39;</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">rendering_control_server</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;AVTransport&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">av_transport_server</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">icon</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">icons</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;url&#39;</span> <span class="ow">in</span> <span class="n">icon</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;file://&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">][</span><span class="mi">7</span><span class="p">:]):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span>
+                            <span class="n">StaticFile</span><span class="p">(</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">][</span><span class="mi">7</span><span class="p">:],</span>
+                                       <span class="n">defaultType</span><span class="o">=</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">]))</span>
+                <span class="k">elif</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.face&#39;</span><span class="p">:</span>
+                    <span class="n">face_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.face&#39;</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">face_path</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span>
+                            <span class="sa">b</span><span class="s1">&#39;face-icon.png&#39;</span><span class="p">,</span>
+                            <span class="n">StaticFile</span><span class="p">(</span>
+                                <span class="n">face_path</span><span class="p">,</span> <span class="n">defaultType</span><span class="o">=</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">resource_filename</span>
+                    <span class="n">icon_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
+                        <span class="n">resource_filename</span><span class="p">(</span>
+                            <span class="vm">__name__</span><span class="p">,</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;misc&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;device-icons&#39;</span><span class="p">,</span> <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])))</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">icon_path</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">web_resource</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span>
+                            <span class="n">icon</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span>
+                            <span class="n">StaticFile</span><span class="p">(</span><span class="n">icon_path</span><span class="p">,</span>
+                                       <span class="n">defaultType</span><span class="o">=</span><span class="n">icon</span><span class="p">[</span><span class="s1">&#39;mimetype&#39;</span><span class="p">]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.backend.name}</span><span class="s1"> </span><span class="si">{self.device_type}</span><span class="s1"> &#39;</span>
+                     <span class="n">f</span><span class="s1">&#39;(</span><span class="si">{self.backend}</span><span class="s1">) activated with {str(self.uuid)[5:]}&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,653 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.devices.basics &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.devices.basics</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.devices.basics</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2008, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Basics</span>
+<span class="sd">======</span>
+
+<span class="sd">This module contains two classes which will be used as a base classes which</span>
+<span class="sd">will be useful to create our device classes: MediaRenderer and MediaServer.</span>
+
+<span class="sd">:class:`DeviceHttpRoot`</span>
+<span class="sd">-----------------------</span>
+
+<span class="sd">Inherits from :class:`twisted.web.resource.Resource` and is used as a a base</span>
+<span class="sd">class by class the :class:`~coherence.upnp.devices.media_renderer.HttpRoot`.</span>
+
+<span class="sd">:class:`BasicDeviceMixin`</span>
+<span class="sd">-------------------------</span>
+
+<span class="sd">This is an EventDispatcher object used as a base class by the classes</span>
+<span class="sd">:class:`~coherence.upnp.devices.media_renderer.MediaRenderer` and</span>
+<span class="sd">:class:`~coherence.upnp.devices.media_server.MediaServer`. It contains some</span>
+<span class="sd">methods that will help us to initialize the backend as well as the methods</span>
+<span class="sd">:meth:`BasicDeviceMixin.register` and :meth:`BasicDeviceMixin.unregister` which</span>
+<span class="sd">will take care to register/unregister our device.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">resource</span><span class="p">,</span> <span class="n">static</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+
+<span class="kn">from</span> <span class="nn">eventdispatcher</span> <span class="k">import</span> <span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">Property</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">to_string</span>
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+
+
+<div class="viewcode-block" id="DeviceHttpRoot"><a class="viewcode-back" href="../../../../source/upnp/devices/basics.html#coherence.upnp.devices.basics.DeviceHttpRoot">[docs]</a><span class="k">class</span> <span class="nc">DeviceHttpRoot</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;basicdevice&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">):</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">server</span>
+
+<div class="viewcode-block" id="DeviceHttpRoot.getChildWithDefault"><a class="viewcode-back" href="../../../../source/upnp/devices/basics.html#coherence.upnp.devices.basics.DeviceHttpRoot.getChildWithDefault">[docs]</a>    <span class="k">def</span> <span class="nf">getChildWithDefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="n">f</span><span class="s1">&#39;DeviceHttpRoot </span><span class="si">{self.server.device_type}</span><span class="s1"> getChildWithDefault &#39;</span>
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{path}</span><span class="s1"> </span><span class="si">{request.uri}</span><span class="s1"> </span><span class="si">{request.client}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">getAllHeaders</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">path</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">uri</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;/&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DeviceHttpRoot.getChild"><a class="viewcode-back" href="../../../../source/upnp/devices/basics.html#coherence.upnp.devices.basics.DeviceHttpRoot.getChild">[docs]</a>    <span class="k">def</span> <span class="nf">getChild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;DeviceHttpRoot </span><span class="si">{name}</span><span class="s1"> getChild </span><span class="si">{request}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="n">ch</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">ch</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">sibpath</span><span class="p">(</span><span class="vm">__file__</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="n">ch</span> <span class="o">=</span> <span class="n">static</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;DeviceHttpRoot ch </span><span class="si">{ch}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ch</span></div>
+
+<div class="viewcode-block" id="DeviceHttpRoot.listchilds"><a class="viewcode-back" href="../../../../source/upnp/devices/basics.html#coherence.upnp.devices.basics.DeviceHttpRoot.listchilds">[docs]</a>    <span class="k">def</span> <span class="nf">listchilds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="n">cl</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">to_string</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">cl</span> <span class="o">+=</span> <span class="n">f</span><span class="s1">&#39;&lt;li&gt;&lt;a href=</span><span class="si">{uri}</span><span class="s1">/</span><span class="si">{c}</span><span class="s1">&gt;</span><span class="si">{c}</span><span class="s1">&lt;/a&gt;&lt;/li&gt;&#39;</span>
+        <span class="k">return</span> <span class="n">cl</span></div>
+
+<div class="viewcode-block" id="DeviceHttpRoot.render"><a class="viewcode-back" href="../../../../source/upnp/devices/basics.html#coherence.upnp.devices.basics.DeviceHttpRoot.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">        &lt;html&gt;</span>
+<span class="s1">        &lt;head&gt;</span>
+<span class="s1">            &lt;title&gt;Cohen3 (DeviceHttpRoot)&lt;/title&gt;</span>
+<span class="s1">            &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/styles/main.css&quot; /&gt;</span>
+<span class="s1">        &lt;/head&gt;</span>
+<span class="s1">        &lt;h5&gt;</span>
+<span class="s1">            &lt;img class=&quot;logo-icon&quot; src=&quot;/server-images/coherence-icon.svg&quot;&gt;</span>
+<span class="s1">            &lt;/img&gt;</span>
+<span class="s1">            Root of the </span><span class="si">{self.server.backend.name}</span><span class="s1"> </span><span class="si">{self.server.device_type}</span><span class="s1"></span>
+<span class="s1">        &lt;/h5&gt;</span>
+<span class="s1">        &lt;div class=&quot;list&quot;&gt;&lt;ul&gt;{self.listchilds(request.uri)}&lt;/ul&gt;&lt;/div&gt;</span>
+<span class="s1">        &lt;/html&gt;&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">html</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span></div></div>
+
+
+<span class="c1"># class RootDeviceXML(static.Data):</span>
+<span class="c1">#   def __init__(self, hostname, uuid, urlbase,</span>
+<span class="c1">#                xmlns=&#39;urn:schemas-upnp-org:device-1-0&#39;,</span>
+<span class="c1">#                device_uri_base=&#39;urn:schemas-upnp-org:device&#39;,</span>
+<span class="c1">#                device_type=&#39;BasicDevice&#39;,</span>
+<span class="c1">#                version=2,</span>
+<span class="c1">#                friendly_name=&#39;Coherence UPnP BasicDevice&#39;,</span>
+<span class="c1">#                manufacturer=&#39;beebits.net&#39;,</span>
+<span class="c1">#                manufacturer_url=&#39;http://coherence.beebits.net&#39;,</span>
+<span class="c1">#                model_description=&#39;Coherence UPnP BasicDevice&#39;,</span>
+<span class="c1">#                model_name=&#39;Coherence UPnP BasicDevice&#39;,</span>
+<span class="c1">#                model_number=__version__,</span>
+<span class="c1">#                model_url=&#39;http://coherence.beebits.net&#39;,</span>
+<span class="c1">#                serial_number=&#39;0000001&#39;,</span>
+<span class="c1">#                presentation_url=&#39;&#39;,</span>
+<span class="c1">#                services=None,</span>
+<span class="c1">#                devices=None,</span>
+<span class="c1">#                icons=None,</span>
+<span class="c1">#                dlna_caps=None):</span>
+<span class="c1">#         uuid = str(uuid)</span>
+<span class="c1">#         root = ET.Element(&#39;root&#39;)</span>
+<span class="c1">#         root.attrib[&#39;xmlns&#39;] = xmlns</span>
+<span class="c1">#         device_type_uri = &#39;:&#39;.join(</span>
+<span class="c1">#             (device_uri_base, device_type, str(version)))</span>
+<span class="c1">#         e = ET.SubElement(root, &#39;specVersion&#39;)</span>
+<span class="c1">#         ET.SubElement(e, &#39;major&#39;).text = &#39;1&#39;</span>
+<span class="c1">#         ET.SubElement(e, &#39;minor&#39;).text = &#39;0&#39;</span>
+<span class="c1">#         #ET.SubElement(root, &#39;URLBase&#39;).text = urlbase + uuid[5:] + &#39;/&#39;</span>
+<span class="c1">#</span>
+<span class="c1">#         d = ET.SubElement(root, &#39;device&#39;)</span>
+<span class="c1">#</span>
+<span class="c1">#         if device_type == &#39;MediaServer&#39;:</span>
+<span class="c1">#             x = ET.SubElement(d, &#39;dev:X_DLNADOC&#39;)</span>
+<span class="c1">#             x.text = &#39;DMS-1.50&#39;</span>
+<span class="c1">#             x = ET.SubElement(d, &#39;dev:X_DLNADOC&#39;)</span>
+<span class="c1">#             x.text = &#39;M-DMS-1.50&#39;</span>
+<span class="c1">#         elif device_type == &#39;MediaRenderer&#39;:</span>
+<span class="c1">#             x = ET.SubElement(d, &#39;dev:X_DLNADOC&#39;)</span>
+<span class="c1">#             x.text = &#39;DMR-1.50&#39;</span>
+<span class="c1">#             x = ET.SubElement(d, &#39;dev:X_DLNADOC&#39;)</span>
+<span class="c1">#             x.text = &#39;M-DMR-1.50&#39;</span>
+<span class="c1">#</span>
+<span class="c1">#         if len(dlna_caps) &gt; 0:</span>
+<span class="c1">#             if isinstance(dlna_caps, basestring):</span>
+<span class="c1">#                 dlna_caps = [dlna_caps]</span>
+<span class="c1">#             for cap in dlna_caps:</span>
+<span class="c1">#                 x = ET.SubElement(d, &#39;dev:X_DLNACAP&#39;)</span>
+<span class="c1">#                 x.text = cap</span>
+<span class="c1">#</span>
+<span class="c1">#         ET.SubElement(d, &#39;deviceType&#39;).text = device_type_uri</span>
+<span class="c1">#         ET.SubElement(d, &#39;friendlyName&#39;).text = friendly_name</span>
+<span class="c1">#         ET.SubElement(d, &#39;manufacturer&#39;).text = manufacturer</span>
+<span class="c1">#         ET.SubElement(d, &#39;manufacturerURL&#39;).text = manufacturer_url</span>
+<span class="c1">#         ET.SubElement(d, &#39;modelDescription&#39;).text = model_description</span>
+<span class="c1">#         ET.SubElement(d, &#39;modelName&#39;).text = model_name</span>
+<span class="c1">#         ET.SubElement(d, &#39;modelNumber&#39;).text = model_number</span>
+<span class="c1">#         ET.SubElement(d, &#39;modelURL&#39;).text = model_url</span>
+<span class="c1">#         ET.SubElement(d, &#39;serialNumber&#39;).text = serial_number</span>
+<span class="c1">#         ET.SubElement(d, &#39;UDN&#39;).text = uuid</span>
+<span class="c1">#         ET.SubElement(d, &#39;UPC&#39;).text = &#39;&#39;</span>
+<span class="c1">#         ET.SubElement(d, &#39;presentationURL&#39;).text = presentation_url</span>
+<span class="c1">#</span>
+<span class="c1">#         if len(services):</span>
+<span class="c1">#             e = ET.SubElement(d, &#39;serviceList&#39;)</span>
+<span class="c1">#             for service in services:</span>
+<span class="c1">#                 id = service.get_id()</span>
+<span class="c1">#                 s = ET.SubElement(e, &#39;service&#39;)</span>
+<span class="c1">#                 try:</span>
+<span class="c1">#                     namespace = service.namespace</span>
+<span class="c1">#                 except:</span>
+<span class="c1">#                     namespace = &#39;schemas-upnp-org&#39;</span>
+<span class="c1">#                 if(hasattr(service, &#39;version&#39;) and</span>
+<span class="c1">#                     service.version &lt; version):</span>
+<span class="c1">#                     v = service.version</span>
+<span class="c1">#                 else:</span>
+<span class="c1">#                     v = version</span>
+<span class="c1">#                 ET.SubElement(s, &#39;serviceType&#39;).text = \</span>
+<span class="c1">#                     f&#39;urn:{namespace}:service:{id}:{int(v):d}&#39;</span>
+<span class="c1">#                 try:</span>
+<span class="c1">#                     namespace = service.id_namespace</span>
+<span class="c1">#                 except:</span>
+<span class="c1">#                     namespace = &#39;upnp-org&#39;</span>
+<span class="c1">#                 ET.SubElement(s, &#39;serviceId&#39;).text = \</span>
+<span class="c1">#                     f&#39;urn:{namespace}:serviceId:{id}&#39;</span>
+<span class="c1">#                 ET.SubElement(s, &#39;SCPDURL&#39;).text = \</span>
+<span class="c1">#                     &#39;/&#39; + uuid[5:] + &#39;/&#39; + id + &#39;/&#39; + service.scpd_url</span>
+<span class="c1">#                 ET.SubElement(s, &#39;controlURL&#39;).text = \</span>
+<span class="c1">#                     &#39;/&#39; + uuid[5:] + &#39;/&#39; + id + &#39;/&#39; + service.control_url</span>
+<span class="c1">#                 ET.SubElement(s, &#39;eventSubURL&#39;).text = \</span>
+<span class="c1">#                     &#39;/&#39; + uuid[5:] + &#39;/&#39; + id + &#39;/&#39; + \</span>
+<span class="c1">#                     service.subscription_url</span>
+<span class="c1">#</span>
+<span class="c1">#         if len(devices):</span>
+<span class="c1">#             e = ET.SubElement(d, &#39;deviceList&#39;)</span>
+<span class="c1">#</span>
+<span class="c1">#         if len(icons):</span>
+<span class="c1">#             e = ET.SubElement(d, &#39;iconList&#39;)</span>
+<span class="c1">#             for icon in icons:</span>
+<span class="c1">#</span>
+<span class="c1">#                 icon_path = &#39;&#39;</span>
+<span class="c1">#                 if icon.has_key(&#39;url&#39;):</span>
+<span class="c1">#                     if icon[&#39;url&#39;].startswith(&#39;file://&#39;):</span>
+<span class="c1">#                         icon_path = icon[&#39;url&#39;][7:]</span>
+<span class="c1">#                     elif icon[&#39;url&#39;] == &#39;.face&#39;:</span>
+<span class="c1">#                         icon_path = os.path.join(</span>
+<span class="c1">#                             os.path.expanduser(&#39;~&#39;), &#39;.face&#39;)</span>
+<span class="c1">#                     else:</span>
+<span class="c1">#                         from pkg_resources import resource_filename</span>
+<span class="c1">#                         icon_path = os.path.abspath(</span>
+<span class="c1">#                             resource_filename(</span>
+<span class="c1">#                                 __name__,</span>
+<span class="c1">#                                 os.path.join(</span>
+<span class="c1">#                                     &#39;..&#39;, &#39;..&#39;, &#39;..&#39;, &#39;misc&#39;,</span>
+<span class="c1">#                                     &#39;device-icons&#39;, icon[&#39;url&#39;])))</span>
+<span class="c1">#</span>
+<span class="c1">#                 if os.path.exists(icon_path):</span>
+<span class="c1">#                     i = ET.SubElement(e, &#39;icon&#39;)</span>
+<span class="c1">#                     for k, v in icon.items():</span>
+<span class="c1">#                         if k == &#39;url&#39;:</span>
+<span class="c1">#                             if v.startswith(&#39;file://&#39;):</span>
+<span class="c1">#                                 ET.SubElement(i, k).text = \</span>
+<span class="c1">#                                     &#39;/&#39; + uuid[5:] + &#39;/&#39; + \</span>
+<span class="c1">#                                     os.path.basename(v)</span>
+<span class="c1">#                                 continue</span>
+<span class="c1">#                             elif v == &#39;.face&#39;:</span>
+<span class="c1">#                                 ET.SubElement(i, k).text = \</span>
+<span class="c1">#                                     &#39;/&#39; + uuid[5:] + &#39;/&#39; + &#39;face-icon.png&#39;</span>
+<span class="c1">#                                 continue</span>
+<span class="c1">#                             else:</span>
+<span class="c1">#                                 ET.SubElement(i, k).text = \</span>
+<span class="c1">#                                     &#39;/&#39; + uuid[5:] + &#39;/&#39; + \</span>
+<span class="c1">#                                     os.path.basename(v)</span>
+<span class="c1">#                                 continue</span>
+<span class="c1">#                         ET.SubElement(i, k).text = str(v)</span>
+<span class="c1">#         #if self.has_level(LOG_DEBUG):</span>
+<span class="c1">#         #    indent( root)</span>
+<span class="c1">#</span>
+        <span class="c1"># self.xml = &#39;&#39;&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&#39;&#39;&#39; + \</span>
+        <span class="c1">#            ET.tostring(root, encoding=&#39;utf-8&#39;)</span>
+<span class="c1">#         static.Data.__init__(self, self.xml, &#39;text/xml&#39;)</span>
+
+
+<div class="viewcode-block" id="BasicDeviceMixin"><a class="viewcode-back" href="../../../../source/upnp/devices/basics.html#coherence.upnp.devices.basics.BasicDeviceMixin">[docs]</a><span class="k">class</span> <span class="nc">BasicDeviceMixin</span><span class="p">(</span><span class="n">EventDispatcher</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is used as a base class for the following classes:</span>
+
+<span class="sd">        - :class:`~coherence.upnp.devices.media_renderer.MediaRenderer`</span>
+<span class="sd">        - :class:`~coherence.upnp.devices.media_server.MediaServer`</span>
+
+<span class="sd">    It contains some methods that will help us to initialize the backend</span>
+<span class="sd">    (:meth:`on_backend`, :meth:`init_complete` and :meth:`init_failed`). There</span>
+<span class="sd">    is no need to call those methods, because it will be automatically</span>
+<span class="sd">    triggered based on the backend status.</span>
+
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">       * Introduced inheritance from EventDispatcher</span>
+<span class="sd">       * Changed class variable :attr:`backend` to benefit from the</span>
+<span class="sd">         EventDispatcher&#39;s properties</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">backend</span> <span class="o">=</span> <span class="n">Property</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="sd">&#39;&#39;&#39;The device&#39;s backend. When this variable is filled it will automatically</span>
+<span class="sd">    trigger the method :meth:`on_backend`.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">EventDispatcher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">coherence</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;uuid:&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="s1">&#39;uuid:&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">coherence.upnp.core.uuid</span> <span class="k">import</span> <span class="n">UUID</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">()</span>
+
+        <span class="n">urlbase</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">urlbase</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">urlbase</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+            <span class="n">urlbase</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">=</span> <span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)[</span><span class="mi">5</span><span class="p">:]</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;urlbase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icons</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;iconlist&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;icons&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icons</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;icon&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;icon&#39;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">icons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;icon&#39;</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">icons</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;icon&#39;</span><span class="p">]</span>
+
+        <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fire</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BasicDeviceMixin.on_backend"><a class="viewcode-back" href="../../../../source/upnp/devices/basics.html#coherence.upnp.devices.basics.BasicDeviceMixin.on_backend">[docs]</a>    <span class="k">def</span> <span class="nf">on_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">arsg</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This function is automatically triggered whenever the :attr:`backend`</span>
+<span class="sd">        class variable changes. Here we connect the backend initialization</span>
+<span class="sd">        with the device.</span>
+
+<span class="sd">        .. versionadded:: 0.9.0</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">init_completed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_complete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+            <span class="n">backend_init_completed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">init_complete</span><span class="p">,</span>
+            <span class="n">backend_init_failed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">init_failed</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="BasicDeviceMixin.init_complete"><a class="viewcode-back" href="../../../../source/upnp/devices/basics.html#coherence.upnp.devices.basics.BasicDeviceMixin.init_complete">[docs]</a>    <span class="k">def</span> <span class="nf">init_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">):</span>
+        <span class="c1"># This must be overwritten in subclass</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="BasicDeviceMixin.init_failed"><a class="viewcode-back" href="../../../../source/upnp/devices/basics.html#coherence.upnp.devices.basics.BasicDeviceMixin.init_failed">[docs]</a>    <span class="k">def</span> <span class="nf">init_failed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">!=</span> <span class="n">backend</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;backend not installed, </span><span class="si">{self.device_type}</span><span class="s1"> &#39;</span>
+                     <span class="n">f</span><span class="s1">&#39;activation aborted - {msg.getErrorMessage()}&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">active_backends</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="BasicDeviceMixin.register"><a class="viewcode-back" href="../../../../source/upnp/devices/basics.html#coherence.upnp.devices.basics.BasicDeviceMixin.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">ssdp_server</span>
+        <span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+        <span class="n">host</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">hostname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.device_type}</span><span class="s1"> register&#39;</span><span class="p">)</span>
+        <span class="c1"># we need to do this after the children are there,</span>
+        <span class="c1"># since we send notifies</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+            <span class="s1">&#39;local&#39;</span><span class="p">,</span>
+            <span class="n">f</span><span class="s1">&#39;</span><span class="si">{uuid}</span><span class="s1">::upnp:rootdevice&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;upnp:rootdevice&#39;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span>
+            <span class="n">f</span><span class="s1">&#39;description-</span><span class="si">{self.version:d}</span><span class="s1">.xml&#39;</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+
+        <span class="n">s</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+            <span class="s1">&#39;local&#39;</span><span class="p">,</span>
+            <span class="n">uuid</span><span class="p">,</span>
+            <span class="n">uuid</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span>
+            <span class="n">f</span><span class="s1">&#39;description-</span><span class="si">{self.version:d}</span><span class="s1">.xml&#39;</span><span class="p">,</span>
+            <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span>
+        <span class="k">while</span> <span class="n">version</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">:</span>
+                <span class="n">silent</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">silent</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+                <span class="s1">&#39;local&#39;</span><span class="p">,</span>
+                <span class="n">f</span><span class="s1">&#39;</span><span class="si">{uuid}</span><span class="s1">::urn:schemas-upnp-org:device:</span><span class="si">{self.device_type}</span><span class="s1">:</span><span class="si">{version:d}</span><span class="s1">&#39;</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                <span class="n">f</span><span class="s1">&#39;urn:schemas-upnp-org:device:</span><span class="si">{self.device_type}</span><span class="s1">:</span><span class="si">{version:d}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span>
+                <span class="n">f</span><span class="s1">&#39;description-</span><span class="si">{version:d}</span><span class="s1">.xml&#39;</span><span class="p">,</span>
+                <span class="n">silent</span><span class="o">=</span><span class="n">silent</span><span class="p">,</span>
+                <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+            <span class="n">version</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="p">:</span>
+            <span class="n">device_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span>
+            <span class="n">service_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">):</span>
+                <span class="n">service_version</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">version</span>
+            <span class="n">silent</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">while</span> <span class="n">service_version</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">namespace</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">namespace</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="n">namespace</span> <span class="o">=</span> <span class="s1">&#39;schemas-upnp-org&#39;</span>
+
+                <span class="n">device_description_tmpl</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;description-</span><span class="si">{device_version:d}</span><span class="s1">.xml&#39;</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="s1">&#39;device_description_tmpl&#39;</span><span class="p">):</span>
+                    <span class="n">device_description_tmpl</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">device_description_tmpl</span>
+
+                <span class="n">s</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+                    <span class="s1">&#39;local&#39;</span><span class="p">,</span>
+                    <span class="n">f</span><span class="s1">&#39;</span><span class="si">{uuid}</span><span class="s1">::urn:</span><span class="si">{namespace}</span><span class="s1">:service:</span><span class="si">{service.id}</span><span class="s1">:</span><span class="si">{service_version:d}</span><span class="s1">&#39;</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                    <span class="n">f</span><span class="s1">&#39;urn:</span><span class="si">{namespace}</span><span class="s1">:service:</span><span class="si">{service.id}</span><span class="s1">:</span><span class="si">{service_version:d}</span><span class="s1">&#39;</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span> <span class="o">+</span>
+                    <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">device_description_tmpl</span><span class="p">,</span>
+                    <span class="n">silent</span><span class="o">=</span><span class="n">silent</span><span class="p">,</span>
+                    <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+
+                <span class="n">silent</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">service_version</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">device_version</span> <span class="o">-=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="BasicDeviceMixin.unregister"><a class="viewcode-back" href="../../../../source/upnp/devices/basics.html#coherence.upnp.devices.basics.BasicDeviceMixin.unregister">[docs]</a>    <span class="k">def</span> <span class="nf">unregister</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span> <span class="s1">&#39;release&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_services&#39;</span><span class="p">):</span>
+            <span class="sd">&#39;&#39;&#39; seems we never made it to actually</span>
+<span class="sd">                completing that device</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">service</span><span class="o">.</span><span class="n">check_subscribers_loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e1</span><span class="p">:</span>
+                <span class="n">ms</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;BasicDeviceMixin.unregister: </span><span class="si">{e1}</span><span class="s1">&#39;</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">ms</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: &#39;</span><span class="p">,</span> <span class="n">ms</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="s1">&#39;check_moderated_loop&#39;</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="n">service</span><span class="o">.</span><span class="n">check_moderated_loop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">service</span><span class="o">.</span><span class="n">check_moderated_loop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e2</span><span class="p">:</span>
+                    <span class="n">ms</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;BasicDeviceMixin.unregister: </span><span class="si">{e2}</span><span class="s1">&#39;</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">ms</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: &#39;</span><span class="p">,</span> <span class="n">ms</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="s1">&#39;release&#39;</span><span class="p">):</span>
+                <span class="n">service</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="s1">&#39;_release&#39;</span><span class="p">):</span>
+                <span class="n">service</span><span class="o">.</span><span class="n">_release</span><span class="p">()</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">ssdp_server</span>
+        <span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">remove_web_resource</span><span class="p">(</span><span class="n">uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">:])</span>
+
+        <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span>
+        <span class="k">while</span> <span class="n">version</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">doByebye</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;</span><span class="si">{uuid}</span><span class="s1">::urn:schemas-upnp-org:device:</span><span class="si">{self.device_type}</span><span class="s1">:</span><span class="si">{version:d}</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># noqa</span>
+            <span class="k">for</span> <span class="n">service</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_services</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">service</span><span class="o">.</span><span class="n">version</span> <span class="o">&lt;</span> <span class="n">version</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">namespace</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">namespace</span>
+                <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                    <span class="n">namespace</span> <span class="o">=</span> <span class="s1">&#39;schemas-upnp-org&#39;</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">doByebye</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;</span><span class="si">{uuid}</span><span class="s1">::urn:</span><span class="si">{namespace}</span><span class="s1">:service:</span><span class="si">{service.id}</span><span class="s1">:</span><span class="si">{version:d}</span><span class="s1">&#39;</span>
+                <span class="p">)</span>
+
+            <span class="n">version</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="n">s</span><span class="o">.</span><span class="n">doByebye</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">doByebye</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{uuid}</span><span class="s1">::upnp:rootdevice&#39;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

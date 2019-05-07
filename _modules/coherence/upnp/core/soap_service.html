@@ -1,0 +1,423 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.soap_service &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.soap_service</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.upnp.core.soap_service</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2007 - Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Soap Service</span>
+<span class="sd">============</span>
+
+<span class="sd">SOAP is a simple Object Access Protocol, for actually calling actions. This</span>
+<span class="sd">module contains  a class :class:`UPnPPublisher` which will manage SOAP&#39;s</span>
+<span class="sd">services.</span>
+
+<span class="sd">:class:`errorCode`</span>
+<span class="sd">------------------</span>
+
+<span class="sd">Custom exception for class :class:`UPnPPublisher`</span>
+
+<span class="sd">:class:`UPnPPublisher`</span>
+<span class="sd">----------------------</span>
+
+<span class="sd">A custom implementation of :class:`twisted.web.soap.SOAPPublisher`, but</span>
+<span class="sd">removing the SOAPpy dependency.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">defer</span>
+<span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">failure</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">server</span><span class="p">,</span> <span class="n">resource</span>
+
+<span class="kn">from</span> <span class="nn">eventdispatcher</span> <span class="k">import</span> <span class="n">EventDispatcher</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">SERVER_ID</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">soap_lite</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">parse_with_lxml</span><span class="p">,</span> <span class="n">to_bytes</span>
+
+
+<div class="viewcode-block" id="errorCode"><a class="viewcode-back" href="../../../../source/upnp/core/soap_service.html#coherence.upnp.core.soap_service.errorCode">[docs]</a><span class="k">class</span> <span class="nc">errorCode</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
+        <span class="ne">Exception</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span></div>
+
+
+<div class="viewcode-block" id="UPnPPublisher"><a class="viewcode-back" href="../../../../source/upnp/core/soap_service.html#coherence.upnp.core.soap_service.UPnPPublisher">[docs]</a><span class="k">class</span> <span class="nc">UPnPPublisher</span><span class="p">(</span><span class="n">EventDispatcher</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Based upon twisted.web.soap.SOAPPublisher and extracted to remove the</span>
+<span class="sd">    SOAPpy dependency UPnP requires headers and OUT parameters to be returned</span>
+<span class="sd">    in a slightly different way than the SOAPPublisher class does.</span>
+
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+
+<span class="sd">        * Migrated from louie/dispatcher to EventDispatcher</span>
+<span class="sd">        * The emitted events changed:</span>
+
+<span class="sd">            - UPnPTest.Control.Client.CommandReceived =&gt;</span>
+<span class="sd">              control_client_command_received</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;soap&#39;</span>
+    <span class="n">isLeaf</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">encoding</span> <span class="o">=</span> <span class="s1">&#39;UTF-8&#39;</span>
+    <span class="n">envelope_attrib</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">EventDispatcher</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_event</span><span class="p">(</span>
+            <span class="s1">&#39;control_client_command_received&#39;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="UPnPPublisher._sendResponse"><a class="viewcode-back" href="../../../../source/upnp/core/soap_service.html#coherence.upnp.core.soap_service.UPnPPublisher._sendResponse">[docs]</a>    <span class="k">def</span> <span class="nf">_sendResponse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;_sendResponse </span><span class="si">{status}</span><span class="s1"> </span><span class="si">{response}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setResponseCode</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mimeType</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;text/xml; charset=&quot;</span><span class="si">{self.encoding}</span><span class="s1">&quot;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mimeType</span> <span class="o">=</span> <span class="s1">&#39;text/xml&#39;</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Content-type&#39;</span><span class="p">,</span> <span class="n">mimeType</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Content-length&#39;</span><span class="p">,</span> <span class="n">to_bytes</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)))</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;EXT&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;SERVER&#39;</span><span class="p">,</span> <span class="n">SERVER_ID</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">response</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> \
+            <span class="n">response</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="UPnPPublisher._methodNotFound"><a class="viewcode-back" href="../../../../source/upnp/core/soap_service.html#coherence.upnp.core.soap_service.UPnPPublisher._methodNotFound">[docs]</a>    <span class="k">def</span> <span class="nf">_methodNotFound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">methodName</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">soap_lite</span><span class="o">.</span><span class="n">build_soap_error</span><span class="p">(</span><span class="mi">401</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sendResponse</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">401</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UPnPPublisher._gotResult"><a class="viewcode-back" href="../../../../source/upnp/core/soap_service.html#coherence.upnp.core.soap_service.UPnPPublisher._gotResult">[docs]</a>    <span class="k">def</span> <span class="nf">_gotResult</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">methodName</span><span class="p">,</span> <span class="n">ns</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;_gotResult </span><span class="si">{result}</span><span class="s1"> </span><span class="si">{request}</span><span class="s1"> </span><span class="si">{methodName}</span><span class="s1"> </span><span class="si">{ns}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">soap_lite</span><span class="o">.</span><span class="n">build_soap_call</span><span class="p">(</span><span class="n">methodName</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">ns</span><span class="o">=</span><span class="n">ns</span><span class="p">,</span>
+                                             <span class="n">is_response</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sendResponse</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UPnPPublisher._gotError"><a class="viewcode-back" href="../../../../source/upnp/core/soap_service.html#coherence.upnp.core.soap_service.UPnPPublisher._gotError">[docs]</a>    <span class="k">def</span> <span class="nf">_gotError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">failure</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">methodName</span><span class="p">,</span> <span class="n">ns</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;_gotError </span><span class="si">{failure}</span><span class="s1"> </span><span class="si">{failure.value}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">failure</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="mi">500</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">errorCode</span><span class="p">):</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">status</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">failure</span><span class="o">.</span><span class="n">printTraceback</span><span class="p">()</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">soap_lite</span><span class="o">.</span><span class="n">build_soap_error</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sendResponse</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UPnPPublisher.lookupFunction"><a class="viewcode-back" href="../../../../source/upnp/core/soap_service.html#coherence.upnp.core.soap_service.UPnPPublisher.lookupFunction">[docs]</a>    <span class="k">def</span> <span class="nf">lookupFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functionName</span><span class="p">):</span>
+        <span class="n">function</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;soap_</span><span class="si">{functionName}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">function</span><span class="p">:</span>
+            <span class="n">function</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;soap__generic&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">function</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">function</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="s1">&#39;useKeywords&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="UPnPPublisher.render"><a class="viewcode-back" href="../../../../source/upnp/core/soap_service.html#coherence.upnp.core.soap_service.UPnPPublisher.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Handle a SOAP command.&#39;&#39;&#39;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">getAllHeaders</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;soap_request: </span><span class="si">{headers}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># allow external check of data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span>
+            <span class="s1">&#39;control_client_command_received&#39;</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">print_c</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">getchildren</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+                <span class="n">print_c</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;&lt;p&gt;No content to show&lt;/p&gt;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">&#39;UPnPPublisher.render: error on parsing soap result, probably&#39;</span>
+                <span class="s1">&#39; has encoding declaration, trying with another method...&#39;</span><span class="p">)</span>
+            <span class="n">tree</span> <span class="o">=</span> <span class="n">parse_with_lxml</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+        <span class="n">body</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;{http://schemas.xmlsoap.org/soap/envelope/}Body&#39;</span><span class="p">)</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">getchildren</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">methodName</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">tag</span>
+        <span class="n">ns</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">methodName</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;{&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">methodName</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">ns</span><span class="p">,</span> <span class="n">methodName</span> <span class="o">=</span> <span class="n">methodName</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">method</span><span class="o">.</span><span class="n">getchildren</span><span class="p">():</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode_result</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">])</span>
+
+        <span class="c1"># p, header, body, attrs = SOAPpy.parseSOAPRPC(data, 1, 1, 1)</span>
+        <span class="c1"># methodName, args, kwargs, ns = p._name, p._aslist, p._asdict, p._ns</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">headers</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;content-type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;text/xml&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gotError</span><span class="p">(</span>
+                <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">415</span><span class="p">)),</span>
+                <span class="n">request</span><span class="p">,</span> <span class="n">methodName</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;headers: </span><span class="si">{headers}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">l_function</span><span class="p">,</span> <span class="n">use_keywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookupFunction</span><span class="p">(</span><span class="n">methodName</span><span class="p">)</span>
+        <span class="c1"># print(&#39;function&#39;, function, &#39;keywords&#39;, useKeywords,</span>
+        <span class="c1">#       &#39;args&#39;, args, &#39;kwargs&#39;, kwargs)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">l_function</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_methodNotFound</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">methodName</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">keywords</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;soap_methodName&#39;</span><span class="p">:</span> <span class="n">methodName</span><span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;user-agent&#39;</span> <span class="ow">in</span> <span class="n">headers</span> <span class="ow">and</span>
+                    <span class="n">headers</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;user-agent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Xbox/&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;X_UPnPClient&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;XBox&#39;</span>
+            <span class="c1"># if headers.has_key(b&#39;user-agent&#39;) and \</span>
+            <span class="c1">#         headers[b&#39;user-agent&#39;].startswith(</span>
+            <span class="c1">#             b&#39;&#39;&#39;Mozilla/4.0 (compatible; UPnP/1.0; Windows&#39;&#39;&#39;):</span>
+            <span class="c1">#     keywords[&#39;X_UPnPClient&#39;] = &#39;XBox&#39;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;x-av-client-info&#39;</span> <span class="ow">in</span> <span class="n">headers</span> <span class="ow">and</span>
+                    <span class="n">headers</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;x-av-client-info&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&quot;PLAYSTATION3&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;X_UPnPClient&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PLAYSTATION3&#39;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;user-agent&#39;</span> <span class="ow">in</span> <span class="n">headers</span> <span class="ow">and</span>
+                    <span class="n">headers</span><span class="p">[</span><span class="sa">b</span><span class="s1">&#39;user-agent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+                        <span class="sa">b</span><span class="s1">&#39;Philips-Software-WebClient/4.32&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;X_UPnPClient&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Philips-TV&#39;</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="n">keywords</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;call </span><span class="si">{methodName}</span><span class="s1"> </span><span class="si">{keywords}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">l_function</span><span class="p">,</span> <span class="s1">&#39;useKeywords&#39;</span><span class="p">):</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">l_function</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">defer</span><span class="o">.</span><span class="n">maybeDeferred</span><span class="p">(</span><span class="n">l_function</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">)</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gotResult</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">methodName</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">addErrback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gotError</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">methodName</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span></div>
+
+<div class="viewcode-block" id="UPnPPublisher.decode_result"><a class="viewcode-back" href="../../../../source/upnp/core/soap_service.html#coherence.upnp.core.soap_service.UPnPPublisher.decode_result">[docs]</a>    <span class="k">def</span> <span class="nf">decode_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;{http://www.w3.org/1999/XMLSchema-instance}type&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">prefix</span><span class="p">,</span> <span class="n">local</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">prefix</span> <span class="o">==</span> <span class="s1">&#39;xsd&#39;</span><span class="p">:</span>
+                    <span class="nb">type</span> <span class="o">=</span> <span class="n">local</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;integer&#39;</span> <span class="ow">or</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;float&#39;</span> <span class="ow">or</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;double&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;boolean&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span>
+
+        <span class="k">return</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

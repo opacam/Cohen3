@@ -1,0 +1,752 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.web.ui &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.web.ui</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.web.ui</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">WebUI</span>
+<span class="sd">=====</span>
+
+<span class="sd">The :class:`WebUI` is used to enable an html interface where the user can</span>
+<span class="sd">browse the devices content via web browser. By default, the WebUI interface</span>
+<span class="sd">is disabled and could be enabled from config file or by config dictionary when</span>
+<span class="sd">initializing :class:`~coherence.base.Coherence`</span>
+
+<span class="sd">.. versionchanged:: 0.8.2</span>
+
+<span class="sd">.. note:: Be aware that the browser should support Web Sockets and js enabled.</span>
+<span class="sd">          All modern browsers should have this features integrated (tested with</span>
+<span class="sd">          firefox and google chrome).</span>
+
+<span class="sd">.. warning:: Don&#39;t create your web server into port 9000. This is reserved for</span>
+<span class="sd">             the js WebSocket.</span>
+
+<span class="sd">WebUi Example</span>
+<span class="sd">-------------</span>
+
+<span class="sd">A simple server with *web-ui* enabled::</span>
+
+<span class="sd">    from coherence.base import Coherence</span>
+<span class="sd">    from coherence.upnp.core.uuid import UUID</span>
+<span class="sd">    from twisted.internet import reactor</span>
+<span class="sd">    new_uuid = UUID()</span>
+<span class="sd">    coherence = Coherence(</span>
+<span class="sd">            {&#39;web-ui&#39;: &#39;yes&#39;,</span>
+<span class="sd">             &#39;serverport&#39;: &#39;9001&#39;,</span>
+<span class="sd">             &#39;logmode&#39;: &#39;info&#39;,</span>
+<span class="sd">             &#39;controlpoint&#39;: &#39;yes&#39;,</span>
+<span class="sd">             &#39;plugin&#39;: {&#39;backend&#39;: &#39;FSStore&#39;,</span>
+<span class="sd">                        &#39;name&#39;: &#39;WEB UI FSStore&#39;,</span>
+<span class="sd">                        &#39;content&#39;: &#39;path-to-a-directory-with-media-content&#39;,</span>
+<span class="sd">                        &#39;uuid&#39;: new_uuid</span>
+<span class="sd">                        }</span>
+<span class="sd">             }</span>
+<span class="sd">    )</span>
+<span class="sd">    reactor.run()</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">exists</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">twisted.web.template</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">Element</span><span class="p">,</span> <span class="n">renderer</span><span class="p">,</span> <span class="n">flatten</span><span class="p">,</span>
+    <span class="n">XMLFile</span><span class="p">,</span> <span class="n">XMLString</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">TagLoader</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">server</span><span class="p">,</span> <span class="n">resource</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">static</span>
+<span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">twisted.python.filepath</span> <span class="k">import</span> <span class="n">FilePath</span>
+
+<span class="kn">from</span> <span class="nn">zope.interface</span> <span class="k">import</span> <span class="n">interface</span>
+
+<span class="kn">from</span> <span class="nn">autobahn.twisted.websocket</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">WebSocketServerFactory</span><span class="p">,</span> <span class="n">WebSocketServerProtocol</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">__version__</span>
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+
+<span class="n">TEMPLATES_DIR</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;templates&#39;</span><span class="p">)</span>
+<span class="n">TEMPLATE_INDEX</span> <span class="o">=</span> <span class="n">FilePath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">TEMPLATES_DIR</span><span class="p">,</span> <span class="s1">&#39;template_index.xml&#39;</span><span class="p">))</span>
+
+<span class="n">template_menu_item</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span><span class="se">\</span>
+<span class="s1">&lt;ul class=&quot;text-center&quot;&gt;</span>
+<span class="s1">    &lt;li class=&quot;nav-logo&quot;&gt;&lt;/li&gt;</span>
+<span class="s1">    &lt;li  xmlns:t=&quot;http://twistedmatrix.com/ns/twisted.web.template/0.1&quot;</span>
+<span class="s1">     t:render=&quot;menu_elements&quot;&gt;</span>
+<span class="s1">        &lt;t:attr name=&quot;class&quot;&gt;&lt;t:slot name=&quot;menu_class&quot; /&gt;&lt;/t:attr&gt;</span>
+<span class="s1">        &lt;a class=&quot;tablink&quot; href=&quot;#&quot; t:render=&quot;name&quot;&gt;</span>
+<span class="s1">        &lt;t:attr name=&quot;id&quot;&gt;&lt;t:slot name=&quot;menu_id&quot; /&gt;&lt;/t:attr&gt;</span>
+<span class="s1">        &lt;t:attr name=&quot;onclick&quot;&gt;&lt;t:slot name=&quot;menu_click&quot; /&gt;&lt;/t:attr&gt;</span>
+<span class="s1">        &lt;/a&gt;</span>
+<span class="s1">    &lt;/li&gt;</span>
+<span class="s1">&lt;/ul&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="WSBroadcastServerProtocol"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WSBroadcastServerProtocol">[docs]</a><span class="k">class</span> <span class="nc">WSBroadcastServerProtocol</span><span class="p">(</span><span class="n">WebSocketServerProtocol</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    WSBroadcastServerProtocol deals with the async WebSocket client connection.</span>
+
+<span class="sd">    .. versionadded:: 0.8.2</span>
+
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+<span class="sd">        Migrated from louie/dispatcher to EventDispatcher</span>
+
+<span class="sd">    .. note:: We can attach a callback into the variable message_callback, this</span>
+<span class="sd">              callback will be triggered whenever onMessage is called.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">factory</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">message_callback</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="WSBroadcastServerProtocol.onMessage"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WSBroadcastServerProtocol.onMessage">[docs]</a>    <span class="k">def</span> <span class="nf">onMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">isBinary</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_callback</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">isBinary</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WSBroadcastServerProtocol.onOpen"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WSBroadcastServerProtocol.onOpen">[docs]</a>    <span class="k">def</span> <span class="nf">onOpen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WSBroadcastServerProtocol.connectionLost"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WSBroadcastServerProtocol.connectionLost">[docs]</a>    <span class="k">def</span> <span class="nf">connectionLost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="p">):</span>
+        <span class="n">WebSocketServerProtocol</span><span class="o">.</span><span class="n">connectionLost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WSBroadcastServerFactory"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WSBroadcastServerFactory">[docs]</a><span class="k">class</span> <span class="nc">WSBroadcastServerFactory</span><span class="p">(</span><span class="n">WebSocketServerFactory</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    WSBroadcastServerFactory is the central WebSocket server side component</span>
+<span class="sd">    shared between connections.</span>
+
+<span class="sd">    .. versionadded:: 0.8.2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_tracker</span><span class="p">):</span>
+        <span class="n">WebSocketServerFactory</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_tracker</span> <span class="o">=</span> <span class="n">client_tracker</span>
+
+<div class="viewcode-block" id="WSBroadcastServerFactory.register"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WSBroadcastServerFactory.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_tracker</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">client</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WSBroadcastServerFactory.unregister"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WSBroadcastServerFactory.unregister">[docs]</a>    <span class="k">def</span> <span class="nf">unregister</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_tracker</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="n">client</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WSBroadcastServerFactory.broadcast"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WSBroadcastServerFactory.broadcast">[docs]</a>    <span class="k">def</span> <span class="nf">broadcast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="c1"># print(f&#39;WSBroadcastServerFactory: {msg}&#39;)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_tracker</span><span class="o">.</span><span class="n">clients</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">sendMessage</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">),</span> <span class="n">isBinary</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="WSClientTracker"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WSClientTracker">[docs]</a><span class="k">class</span> <span class="nc">WSClientTracker</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Helper to keep track of connections,</span>
+<span class="sd">    accessed by the sync and async methods.</span>
+
+<span class="sd">    .. versionadded:: 0.8.2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clients</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="WSClientTracker.register"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WSClientTracker.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">client</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">client</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WSClientTracker.unregister"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WSClientTracker.unregister">[docs]</a>    <span class="k">def</span> <span class="nf">unregister</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">client</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">client</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MenuItemElement"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.MenuItemElement">[docs]</a><span class="k">class</span> <span class="nc">MenuItemElement</span><span class="p">(</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Helper class to render a menu entry for the main navigation bar, created</span>
+<span class="sd">    with :class:`~coherence.we.ui.MenuNavigationBar`.</span>
+
+<span class="sd">    .. versionadded:: 0.8.2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">Element</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">title</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MenuItemElement.name"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.MenuItemElement.name">[docs]</a>    <span class="nd">@renderer</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MenuNavigationBar"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.MenuNavigationBar">[docs]</a><span class="k">class</span> <span class="nc">MenuNavigationBar</span><span class="p">(</span><span class="n">Element</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Convenient class to create a dynamic navigation bar</span>
+
+<span class="sd">    .. versionadded:: 0.8.2</span>
+
+<span class="sd">    .. note:: This is strongly related with the file:</span>
+<span class="sd">              templates/template_index.html. The content of the each element</span>
+<span class="sd">              should be implemented dynamically (here or in any subclass) or</span>
+<span class="sd">              statically (into the mentioned file).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">XMLString</span><span class="p">(</span><span class="n">template_menu_item</span><span class="p">)</span>
+    <span class="n">menuData</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cohen3&#39;</span><span class="p">,</span> <span class="s1">&#39;devices&#39;</span><span class="p">,</span> <span class="s1">&#39;logging&#39;</span><span class="p">,</span> <span class="s1">&#39;about&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MenuNavigationBar</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">page</span> <span class="o">=</span> <span class="n">page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">coherence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="MenuNavigationBar.menu_elements"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.MenuNavigationBar.menu_elements">[docs]</a>    <span class="nd">@renderer</span>
+    <span class="k">def</span> <span class="nf">menu_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">menuData</span><span class="p">:</span>
+            <span class="n">link</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">cls_active</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">if</span> <span class="n">el</span> <span class="o">==</span> <span class="s1">&#39;cohen3&#39;</span><span class="p">:</span>
+                <span class="n">link</span> <span class="o">=</span> <span class="s1">&#39;home&#39;</span>
+                <span class="n">cls_active</span> <span class="o">+=</span> <span class="s1">&#39;active&#39;</span>
+            <span class="n">tag</span><span class="o">.</span><span class="n">fillSlots</span><span class="p">(</span><span class="n">menu_id</span><span class="o">=</span><span class="n">f</span><span class="s1">&#39;but-</span><span class="si">{link}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">tag</span><span class="o">.</span><span class="n">fillSlots</span><span class="p">(</span><span class="n">menu_class</span><span class="o">=</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{cls_active}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">tag</span><span class="o">.</span><span class="n">fillSlots</span><span class="p">(</span><span class="n">menu_click</span><span class="o">=</span><span class="n">f</span><span class="s1">&#39;openTab(</span><span class="se">\&#39;</span><span class="si">{link}</span><span class="se">\&#39;</span><span class="s1">, this)&#39;</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">MenuItemElement</span><span class="p">(</span><span class="n">TagLoader</span><span class="p">(</span><span class="n">tag</span><span class="p">),</span> <span class="n">el</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="DevicesWatcher"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.DevicesWatcher">[docs]</a><span class="k">class</span> <span class="nc">DevicesWatcher</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    To manage the connected devices. Broadcast messages informing about the</span>
+<span class="sd">    connected/disconnected devices via the web socket interface. This messages</span>
+<span class="sd">    can be received by the html/js side, which will be responsible to add or</span>
+<span class="sd">    to remove the devices.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        page (object): An instance of :class:`~coherence.web.ui.WebUI`.</span>
+
+<span class="sd">    .. versionadded:: 0.8.2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">addSlash</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">isLeaf</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">detected</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">coherence</span>
+
+<div class="viewcode-block" id="DevicesWatcher.add_device"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.DevicesWatcher.add_device">[docs]</a>    <span class="k">def</span> <span class="nf">add_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;DevicesWatcher found device {device.get_usn()} &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;{device.get_friendly_name()} of type &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;{device.get_device_type()}&#39;</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span>
+        <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">location</span><span class="p">:</span>
+            <span class="n">link</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span>
+                <span class="n">dirname</span><span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">get_location</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)),</span>
+                <span class="s1">&#39;0&#39;</span><span class="p">)</span>  <span class="c1"># here we force to navigate into the Content folder</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">link</span> <span class="o">=</span> \
+                <span class="n">f</span><span class="s1">&#39;http://</span><span class="si">{device.host}</span><span class="s1">:</span><span class="si">{c.web_server_port}</span><span class="s1">/&#39;</span> \
+                <span class="n">f</span><span class="s1">&#39;{device.udn.replace(&quot;uuid:&quot;, &quot;&quot;)}&#39;</span><span class="p">,</span>
+        <span class="n">dev</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;add-device&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">device</span><span class="o">.</span><span class="n">get_markup_name</span><span class="p">(),</span>
+               <span class="s1">&#39;usn&#39;</span><span class="p">:</span> <span class="n">device</span><span class="o">.</span><span class="n">get_usn</span><span class="p">(),</span>
+               <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="n">link</span><span class="p">,</span>
+               <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">get_friendly_name</span><span class="p">(),</span> <span class="n">device</span><span class="o">.</span><span class="n">get_usn</span><span class="p">())</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">detected</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">get_friendly_name</span><span class="p">(),</span> <span class="n">device</span><span class="o">.</span><span class="n">get_usn</span><span class="p">()))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">dev</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DevicesWatcher.remove_device"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.DevicesWatcher.remove_device">[docs]</a>    <span class="k">def</span> <span class="nf">remove_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usn</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;DevicesWatcher remove device </span><span class="si">{usn}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">dev</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;remove-device&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;usn&#39;</span><span class="p">:</span> <span class="n">usn</span><span class="p">,</span>
+               <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">dev</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">u</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">detected</span><span class="p">[:]:</span>
+            <span class="k">if</span> <span class="n">u</span> <span class="o">==</span> <span class="n">usn</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">detected</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="n">d</span><span class="p">,</span> <span class="n">u</span><span class="p">))</span>
+                <span class="k">break</span></div>
+
+<div class="viewcode-block" id="DevicesWatcher.going_live"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.DevicesWatcher.going_live">[docs]</a>    <span class="k">def</span> <span class="nf">going_live</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># TODO: Properly implement disconnection calls</span>
+        <span class="c1"># d = self.page.notifyOnDisconnect()</span>
+        <span class="c1"># d.addCallback(self.remove_me)</span>
+        <span class="c1"># d.addErrback(self.remove_me)</span>
+        <span class="n">devices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">get_devices</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># print(device.__dict__)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+            <span class="n">coherence_device_detection_completed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">add_device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+            <span class="n">coherence_device_removed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remove_device</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="format_log"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.format_log">[docs]</a><span class="k">def</span> <span class="nf">format_log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Simple method to format the captured logs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        message (str): Message from the captured log.</span>
+<span class="sd">        *args (list): The args from the captured log.</span>
+<span class="sd">        **kwargs (dict): The kwargs from the captured log.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A formatted string including the args and the kwargs.</span>
+
+<span class="sd">    .. versionadded:: 0.8.2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">message</span> <span class="o">%</span> <span class="n">args</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">message</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">msg</span></div>
+
+
+<div class="viewcode-block" id="LogsWatcher"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.LogsWatcher">[docs]</a><span class="k">class</span> <span class="nc">LogsWatcher</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Object that takes control of all known loggers (at init time) and redirects</span>
+<span class="sd">    them into the web-ui interface.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        page (object): An instance of :class:`~coherence.web.ui.WebUI`.</span>
+<span class="sd">        active (bool): Choice to enable disable the web-ui logging system</span>
+
+<span class="sd">    .. versionadded:: 0.8.2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;webui-logger&#39;</span>
+    <span class="n">addSlash</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">isLeaf</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_messages</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_ws_ready</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">active</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LogsWatcher</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">factory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">coherence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="o">=</span> <span class="n">active</span>
+
+        <span class="c1"># TODO: Maybe this should be implemented differently:</span>
+        <span class="c1"># we could read from the logfile and extract the last lines</span>
+        <span class="c1"># from the logfile, this way we will make the logging process</span>
+        <span class="c1"># lighter and we will make sure to get all the created loggers</span>
+        <span class="c1"># at anytime, even before this function is initialized.</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">log</span><span class="o">.</span><span class="n">loggers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">webui_logger</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="n">webui_logger</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span>
+            <span class="n">webui_logger</span><span class="o">.</span><span class="n">warning</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">warning</span>
+            <span class="n">webui_logger</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span>
+            <span class="n">webui_logger</span><span class="o">.</span><span class="n">critical</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">critical</span>
+            <span class="n">webui_logger</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
+            <span class="n">webui_logger</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span>
+            <span class="n">webui_logger</span><span class="o">.</span><span class="n">exception</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exception</span>
+
+<div class="viewcode-block" id="LogsWatcher.going_live"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.LogsWatcher.going_live">[docs]</a>    <span class="k">def</span> <span class="nf">going_live</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;add a view to the LogsWatcher </span><span class="si">{self.coherence}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_messages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ws_ready</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="LogsWatcher.send_log"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.LogsWatcher.send_log">[docs]</a>    <span class="k">def</span> <span class="nf">send_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">format_log</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;webui-</span><span class="si">{type}</span><span class="s1">: </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+            <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">f</span><span class="s1">&#39;log-</span><span class="si">{type}</span><span class="s1">&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">f</span><span class="s1">&#39;[</span><span class="si">{type}</span><span class="s1">] </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">})</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ws_ready</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogsWatcher.log"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.LogsWatcher.log">[docs]</a>    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_log</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogsWatcher.warning"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.LogsWatcher.warning">[docs]</a>    <span class="k">def</span> <span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_log</span><span class="p">(</span><span class="s1">&#39;warning&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogsWatcher.info"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.LogsWatcher.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_log</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogsWatcher.critical"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.LogsWatcher.critical">[docs]</a>    <span class="k">def</span> <span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_log</span><span class="p">(</span><span class="s1">&#39;critical&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogsWatcher.debug"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.LogsWatcher.debug">[docs]</a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_log</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogsWatcher.error"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.LogsWatcher.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_log</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogsWatcher.exception"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.LogsWatcher.exception">[docs]</a>    <span class="k">def</span> <span class="nf">exception</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># self._logger.exception(message, *args, **kwargs)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_log</span><span class="p">(</span><span class="s1">&#39;exception&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="IndexResource"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.IndexResource">[docs]</a><span class="k">class</span> <span class="nc">IndexResource</span><span class="p">(</span><span class="n">Element</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A sub class of :class:`twisted.web.template.Element` which represents the</span>
+<span class="sd">    main page for the web-ui interface. This takes care of rendering the main</span>
+<span class="sd">    page as an element template, so we could add some dynamic elements when</span>
+<span class="sd">    initializing it, like the navigation bar or the current version of the</span>
+<span class="sd">    program.</span>
+
+<span class="sd">    .. versionadded:: 0.8.2</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">XMLFile</span><span class="p">(</span><span class="n">TEMPLATE_INDEX</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">web_resource</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">IndexResource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">web_resource</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">web_resource</span><span class="o">.</span><span class="n">coherence</span>
+
+<div class="viewcode-block" id="IndexResource.version"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.IndexResource.version">[docs]</a>    <span class="nd">@renderer</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">__version__</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IndexResource.menu"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.IndexResource.menu">[docs]</a>    <span class="nd">@renderer</span>
+    <span class="k">def</span> <span class="nf">menu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MenuNavigationBar</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">IWeb</span><span class="p">(</span><span class="n">interface</span><span class="o">.</span><span class="n">InterfaceClass</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Interface class that allow us to register :class:`~coherence.web.ui.WebUI&#39;</span>
+<span class="sd">     as a new adapter using the `twisted.python.components.registerAdapter`.</span>
+
+<span class="sd">     .. note:: See :class:`~coherence.base.WebServerUi&#39; for usage.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="vm">__module__</span> <span class="o">=</span> <span class="s1">&#39;zope.interface&#39;</span>
+
+    <span class="k">def</span> <span class="nf">goingLive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="Web"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.Web">[docs]</a><span class="k">class</span> <span class="nc">Web</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Convenient class describing an adapterFactory that allow us to register</span>
+<span class="sd">    :class:`~coherence.web.ui.WebUI&#39; as a new adapter, using the</span>
+<span class="sd">    `twisted.python.components.registerAdapter`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        coherence (object): An instance of `~coherence.base.Coherence`</span>
+
+<span class="sd">     .. note:: See :class:`~coherence.base.WebServerUi` for usage.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Web</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">coherence</span></div>
+
+
+<div class="viewcode-block" id="WebUI"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WebUI">[docs]</a><span class="k">class</span> <span class="nc">WebUI</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A convenient html interface to browse the connected devices via preferred</span>
+<span class="sd">    web browser. This interface could be enabled when initializing</span>
+<span class="sd">    :class:`~coherence.base.Coherence` by setting &quot;&#39;web-ui&#39;: &#39;yes&#39;&quot; into your</span>
+<span class="sd">    config command or via config file using the same key and value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        coherence (object): An instance of `~coherence.base.Coherence`</span>
+
+<span class="sd">    .. versionchanged:: 0.8.2</span>
+
+<span class="sd">    .. warning:: Be aware that the browser should support Web Sockets and to</span>
+<span class="sd">                 have js enabled. All modern browsers should have this features</span>
+<span class="sd">                 integrated (tested with firefox and google chrome).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;webui&#39;</span>
+
+    <span class="n">addSlash</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">isLeaf</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">ws_recived</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coherence</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span> <span class="o">=</span> <span class="n">coherence</span>
+
+        <span class="c1"># WebSocket init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_tracker</span> <span class="o">=</span> <span class="n">WSClientTracker</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="n">WSBroadcastServerFactory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client_tracker</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">protocol</span> <span class="o">=</span> <span class="n">WSBroadcastServerProtocol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">protocol</span><span class="o">.</span><span class="n">message_callback</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_ws_message</span>
+
+        <span class="c1"># Enable resources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;styles&#39;</span><span class="p">,</span>
+                      <span class="n">static</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">sibpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="s1">&#39;static/styles&#39;</span><span class="p">),</span>
+                                  <span class="n">defaultType</span><span class="o">=</span><span class="s1">&#39;text/css&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;server-images&#39;</span><span class="p">,</span>
+                      <span class="n">static</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">sibpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="s1">&#39;static/images&#39;</span><span class="p">),</span>
+                                  <span class="n">defaultType</span><span class="o">=</span><span class="s1">&#39;text/css&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">putChild</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;js&#39;</span><span class="p">,</span>
+                      <span class="n">static</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">util</span><span class="o">.</span><span class="n">sibpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="s1">&#39;static/js&#39;</span><span class="p">),</span>
+                                  <span class="n">defaultType</span><span class="o">=</span><span class="s1">&#39;text/javascript&#39;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">devices</span> <span class="o">=</span> <span class="n">DevicesWatcher</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logging</span> <span class="o">=</span> <span class="n">LogsWatcher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">IndexResource</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WebUI.on_ws_message"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WebUI.on_ws_message">[docs]</a>    <span class="k">def</span> <span class="nf">on_ws_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">isBinary</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;on_ws_message: </span><span class="si">{payload}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ws_recived</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">payload</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;WebSocket Ready&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">devices</span><span class="o">.</span><span class="n">going_live</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">going_live</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="WebUI.render"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WebUI.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;content-type&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">WebUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="WebUI.render_GET"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WebUI.render_GET">[docs]</a>    <span class="k">def</span> <span class="nf">render_GET</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">flatten</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">done_index</span><span class="p">(</span><span class="n">ignored</span><span class="p">):</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">addBoth</span><span class="p">(</span><span class="n">done_index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span></div>
+
+<div class="viewcode-block" id="WebUI.getChild"><a class="viewcode-back" href="../../../source/coherence.web.html#coherence.web.ui.WebUI.getChild">[docs]</a>    <span class="k">def</span> <span class="nf">getChild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;WebUI getChild: </span><span class="si">{name}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="k">def</span> <span class="nf">exist_child</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">children</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+                <span class="c1"># print(&#39;\t- found child: &#39;, name)</span>
+                <span class="k">return</span> <span class="n">children</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">na</span> <span class="ow">in</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">children</span><span class="p">):</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">exist_child</span><span class="p">(</span><span class="n">na</span><span class="p">,</span> <span class="n">ch</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">c</span>
+        <span class="n">ch</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">WebUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">getChild</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">NoResource</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;not found child, checking  static file: &#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">sibpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="n">name</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;looking for file </span><span class="si">{p}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">exists</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="n">ch</span> <span class="o">=</span> <span class="n">static</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ch</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">coherence.base</span> <span class="k">import</span> <span class="n">Coherence</span>
+    <span class="kn">from</span> <span class="nn">coherence.upnp.core.uuid</span> <span class="k">import</span> <span class="n">UUID</span>
+    <span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+    <span class="n">new_uuid</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">()</span>
+    <span class="n">icon_url</span> <span class="o">=</span> <span class="s1">&#39;file://</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;static&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="s1">&#39;coherence-icon.png&#39;</span><span class="p">))</span>
+
+    <span class="n">coherence</span> <span class="o">=</span> <span class="n">Coherence</span><span class="p">(</span>
+        <span class="p">{</span><span class="s1">&#39;unittest&#39;</span><span class="p">:</span> <span class="s1">&#39;no&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;web-ui&#39;</span><span class="p">:</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;serverport&#39;</span><span class="p">:</span> <span class="s1">&#39;9001&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;logmode&#39;</span><span class="p">:</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;controlpoint&#39;</span><span class="p">:</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;plugin&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;backend&#39;</span><span class="p">:</span> <span class="s1">&#39;FSStore&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;WEB UI FSStore&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="s1">&#39;/media/MEDIA/TVSHOWS&#39;</span><span class="p">,</span>  <span class="c1"># change path</span>
+                    <span class="s1">&#39;uuid&#39;</span><span class="p">:</span> <span class="n">new_uuid</span><span class="p">,</span>
+                    <span class="s1">&#39;icon&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;mimetype&#39;</span><span class="p">:</span> <span class="s1">&#39;image/png&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;256&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="s1">&#39;256&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="s1">&#39;24&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">icon_url</span><span class="p">}</span>
+                    <span class="p">}</span>
+         <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

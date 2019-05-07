@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.appletrailers_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.appletrailers_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.appletrailers_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2008, Benjamin Kampmann &lt;ben.kampmann@googlemail.com&gt;</span>
+<span class="c1"># Copyright 2018, Pol Canelles &lt;canellestudi@gmail.com&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">AppleTrailersStore</span>
+<span class="sd">------------------</span>
+
+<span class="sd">This is a Media Backend that allows you to access the Trailers from Apple.com.</span>
+
+<span class="sd">Example to run from python script::</span>
+
+<span class="sd">    from coherence.base import Coherence</span>
+<span class="sd">    from twisted.internet import reactor</span>
+
+<span class="sd">    coherence = Coherence(</span>
+<span class="sd">        {&#39;logmode&#39;: &#39;info&#39;,</span>
+<span class="sd">         &#39;plugin&#39;: {&#39;backend&#39;: &#39;AppleTrailersStore&#39;,</span>
+<span class="sd">                    &#39;name&#39;: &#39;Cohen3 AppleTrailersStore&#39;,</span>
+<span class="sd">                    &#39;proxy&#39;: &#39;no&#39;,</span>
+<span class="sd">                    },</span>
+<span class="sd">         }</span>
+<span class="sd">    )</span>
+<span class="sd">    reactor.run()</span>
+
+<span class="sd">Example to run from console::</span>
+
+<span class="sd">    cohen3 --plugin=backend:AppleTrailersStore,proxy:no</span>
+
+<span class="sd">.. note:: you need the cohen 3 package installed to run the plugin from</span>
+<span class="sd">          a console.</span>
+
+<span class="sd">.. versionchanged:: 0.8.3</span>
+<span class="sd">   The Container class has been removed</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.utils</span> <span class="k">import</span> <span class="n">ReverseProxyUriResource</span>
+<span class="kn">from</span> <span class="nn">coherence.backends.models.items</span> <span class="k">import</span> <span class="n">BackendVideoItem</span>
+<span class="kn">from</span> <span class="nn">coherence.backends.models.stores</span> <span class="k">import</span> <span class="n">BackendVideoStore</span>
+
+
+<div class="viewcode-block" id="AppleTrailerProxy"><a class="viewcode-back" href="../../../source/backends/appletrailers.html#coherence.backends.appletrailers_storage.AppleTrailerProxy">[docs]</a><span class="k">class</span> <span class="nc">AppleTrailerProxy</span><span class="p">(</span><span class="n">ReverseProxyUriResource</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Tha AppleTrailerProxy  ia a Resource that takes</span>
+<span class="sd">    care to render the result gotten from our server</span>
+<span class="sd">    :class:`~coherence.backends.appletrailers_storage.AppleTrailersStore`</span>
+
+<span class="sd">    .. warning:: The ReverseProxyUriResource is not able to handle https</span>
+<span class="sd">                 requests, so... better stick to non proxy until properly</span>
+<span class="sd">                 handled.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AppleTrailerProxy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AppleTrailerProxy.render"><a class="viewcode-back" href="../../../source/backends/appletrailers.html#coherence.backends.appletrailers_storage.AppleTrailerProxy.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">requestHeaders</span><span class="o">.</span><span class="n">setRawHeaders</span><span class="p">(</span>
+            <span class="sa">b</span><span class="s1">&#39;user-agent&#39;</span><span class="p">,</span>
+            <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AppleTrailerProxy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Trailer"><a class="viewcode-back" href="../../../source/backends/appletrailers.html#coherence.backends.appletrailers_storage.Trailer">[docs]</a><span class="k">class</span> <span class="nc">Trailer</span><span class="p">(</span><span class="n">BackendVideoItem</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A backend item object which represents an Apple Trailer.</span>
+<span class="sd">    This class will hold all information regarding the trailer.</span>
+
+<span class="sd">    .. versionchanged:: 0.8.3</span>
+<span class="sd">       Refactored using the class</span>
+<span class="sd">       :class:`~coherence.backends.models.items.BackendVideoItem`</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">is_proxy</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">proxy_cls</span> <span class="o">=</span> <span class="n">AppleTrailerProxy</span>
+    <span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;video/quicktime&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Trailer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">parent_id</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">runtime</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;runtime&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rating</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rating&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">post_date</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;post_date&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">release_date</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;release_date&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">studio</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;studio&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;</span><span class="si">{self.name}</span><span class="s1"> [</span><span class="si">{self.release_date}</span><span class="s1">]&#39;</span></div>
+
+
+<div class="viewcode-block" id="AppleTrailersStore"><a class="viewcode-back" href="../../../source/backends/appletrailers.html#coherence.backends.appletrailers_storage.AppleTrailersStore">[docs]</a><span class="k">class</span> <span class="nc">AppleTrailersStore</span><span class="p">(</span><span class="n">BackendVideoStore</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The media server for Apple Trailers.</span>
+
+<span class="sd">    .. versionchanged:: 0.8.3</span>
+<span class="sd">       Refactored using the class</span>
+<span class="sd">       :class:`~coherence.backends.models.stores.BackendVideoStore`</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;apple_trailers&#39;</span>
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="n">upnp_protocols</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;http-get:*:video/quicktime:*&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http-get:*:video/mp4:*&#39;</span><span class="p">]</span>
+
+    <span class="n">root_url</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;http://www.apple.com/trailers/home/xml/current.xml&#39;</span>
+    <span class="n">root_find_items</span> <span class="o">=</span> <span class="s1">&#39;./movieinfo&#39;</span>
+    <span class="n">root_id</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">item_cls</span> <span class="o">=</span> <span class="n">Trailer</span>
+    <span class="n">item_type</span> <span class="o">=</span> <span class="s1">&#39;http-get:*:video/quicktime:*&#39;</span>
+
+<div class="viewcode-block" id="AppleTrailersStore.parse_item"><a class="viewcode-back" href="../../../source/backends/appletrailers.html#coherence.backends.appletrailers_storage.AppleTrailersStore.parse_item">[docs]</a>    <span class="k">def</span> <span class="nf">parse_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="n">info_keys</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;info/title&#39;</span><span class="p">:</span> <span class="s1">&#39;title&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;info/director&#39;</span><span class="p">:</span> <span class="s1">&#39;director&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;info/runtime&#39;</span><span class="p">:</span> <span class="s1">&#39;runtime&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;info/rating&#39;</span><span class="p">:</span> <span class="s1">&#39;rating&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;info/postdate&#39;</span><span class="p">:</span> <span class="s1">&#39;post_date&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;info/releasedate&#39;</span><span class="p">:</span> <span class="s1">&#39;release_date&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;info/studio&#39;</span><span class="p">:</span> <span class="s1">&#39;studio&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;info/description&#39;</span><span class="p">:</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;poster/location&#39;</span><span class="p">:</span> <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;preview/large&#39;</span><span class="p">:</span> <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;cast/name&#39;</span><span class="p">:</span> <span class="s1">&#39;actors&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;genre/name&#39;</span><span class="p">:</span> <span class="s1">&#39;genres&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">has_multiple_values</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cast/name&#39;</span><span class="p">,</span> <span class="s1">&#39;genre/name&#39;</span><span class="p">]</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)}</span>
+        <span class="k">for</span> <span class="n">search_key</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">info_keys</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">search_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">has_multiple_values</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./</span><span class="si">{search_key}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lv</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;./</span><span class="si">{search_key}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lv</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">lv</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="n">duration</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s1">&#39;runtime&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">hours</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">minutes</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">seconds</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;runtime&#39;</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">hours</span><span class="p">,</span> <span class="n">minutes</span><span class="p">,</span> <span class="n">seconds</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">minutes</span><span class="p">,</span> <span class="n">seconds</span> <span class="o">=</span> <span class="n">duration</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">seconds</span> <span class="o">=</span> <span class="n">duration</span>
+            <span class="n">duration</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{int(hours):d}:{int(minutes):02d}:{int(seconds):02d}&#39;</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">duration</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;video_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
+                <span class="s1">&#39;./preview/large&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filesize&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;video_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="AppleTrailersStore.add_item"><a class="viewcode-back" href="../../../source/backends/appletrailers.html#coherence.backends.appletrailers_storage.AppleTrailersStore.add_item">[docs]</a>    <span class="k">def</span> <span class="nf">add_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="c1"># print(&#39;add_item: {}&#39;.format(data))</span>
+        <span class="n">trailer</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AppleTrailersStore</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">trailer</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Todo: maybe this should be refactored into BackendVideoStore?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transcoding&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+            <span class="n">dlna_pn</span> <span class="o">=</span> <span class="s1">&#39;DLNA.ORG_PN=AVC_TS_BL_CIF15_AAC&#39;</span>
+            <span class="n">dlna_tags</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">simple_dlna_tags</span><span class="p">[:]</span>
+            <span class="n">dlna_tags</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DLNA.ORG_CI=1&#39;</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">trailer</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;?transcoded=mp4&#39;</span>
+            <span class="n">new_res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span>
+                <span class="n">f</span><span class="s1">&#39;http-get:*:{&quot;video/mp4&quot;}:{&quot;;&quot;.join([dlna_pn] + dlna_tags)}&#39;</span><span class="p">)</span>
+            <span class="n">new_res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">new_res</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span>
+            <span class="n">trailer</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_res</span><span class="p">)</span>
+
+            <span class="n">dlna_pn</span> <span class="o">=</span> <span class="s1">&#39;DLNA.ORG_PN=JPEG_TN&#39;</span>
+            <span class="n">dlna_tags</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">simple_dlna_tags</span><span class="p">[:]</span>
+            <span class="n">dlna_tags</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DLNA.ORG_CI=1&#39;</span>
+            <span class="n">dlna_tags</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DLNA.ORG_FLAGS=00f00000000000000000000000000000&#39;</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="n">trailer</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;?attachment=poster&amp;transcoded=thumb&amp;type=jpeg&#39;</span>
+            <span class="n">new_res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span>
+                <span class="n">f</span><span class="s1">&#39;http-get:*:{&quot;image/jpeg&quot;}:{&quot;;&quot;.join([dlna_pn] + dlna_tags)}&#39;</span><span class="p">)</span>
+            <span class="n">new_res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1"># new_res.resolution = &#39;160x160&#39;</span>
+            <span class="n">trailer</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_res</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">trailer</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;attachments&#39;</span><span class="p">):</span>
+                <span class="n">trailer</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">attachments</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">trailer</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="s1">&#39;poster&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">])</span>  <span class="c1"># noqa pylint: disable=E1101</span>
+
+        <span class="k">return</span> <span class="n">trailer</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

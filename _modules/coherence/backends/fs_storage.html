@@ -1,0 +1,1329 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.fs_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.fs_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.fs_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2006, Frank Scholz &lt;coherence@beebits.net&gt;</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">FSStore - filesystem media server</span>
+<span class="sd">---------------------------------</span>
+
+<span class="sd">FSStore exposes media files found in the directory trees defined by</span>
+<span class="sd">the &#39;content&#39; configuration entry.</span>
+
+<span class="sd">The first &quot;.jpg&quot; or &quot;.png&quot; file found inside a media directory is</span>
+<span class="sd">served as a cover image.</span>
+
+<span class="sd">The plugin is configured with::</span>
+
+<span class="sd">    &lt;plugin active=&quot;yes&quot;&gt;</span>
+<span class="sd">      &lt;!-- The plugin identifier, mandatory --&gt;</span>
+<span class="sd">      &lt;backend&gt;FSStore&lt;/backend&gt;</span>
+<span class="sd">      &lt;!-- A comma-separated list of path containing the medias to serve --&gt;</span>
+<span class="sd">      &lt;content&gt;/media/path1,/media/path2&lt;/content&gt;</span>
+<span class="sd">      &lt;!-- The avertized media server name, default: &quot;my media&quot; --&gt;</span>
+<span class="sd">      &lt;name&gt;my media&lt;/name&gt;</span>
+<span class="sd">      &lt;!-- The highest UPnP version this</span>
+<span class="sd">      media server should support, default: 2 --&gt;</span>
+<span class="sd">      &lt;version&gt;2&lt;/version&gt;</span>
+<span class="sd">      &lt;!-- A unique identifier used to reference the media server,</span>
+<span class="sd">      autogenerated if not set explicitly. In this case, some control points</span>
+<span class="sd">      might memorize it between runs and display the same media server more</span>
+<span class="sd">      than once. --&gt;</span>
+<span class="sd">      &lt;uuid&gt;2f7f4096-cba3-4390-be7d-d1d07106a6f4&lt;/uuid&gt;</span>
+<span class="sd">    &lt;/plugin&gt;</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">mimetypes</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">stat</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">quote</span>
+
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;audio/x-m4a&#39;</span><span class="p">,</span> <span class="s1">&#39;.m4a&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;audio/x-musepack&#39;</span><span class="p">,</span> <span class="s1">&#39;.mpc&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;audio/x-wavpack&#39;</span><span class="p">,</span> <span class="s1">&#39;.wv&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;video/mp4&#39;</span><span class="p">,</span> <span class="s1">&#39;.mp4&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;video/mpegts&#39;</span><span class="p">,</span> <span class="s1">&#39;.ts&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;video/divx&#39;</span><span class="p">,</span> <span class="s1">&#39;.divx&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;video/divx&#39;</span><span class="p">,</span> <span class="s1">&#39;.avi&#39;</span><span class="p">)</span>
+<span class="n">mimetypes</span><span class="o">.</span><span class="n">add_type</span><span class="p">(</span><span class="s1">&#39;video/x-matroska&#39;</span><span class="p">,</span> <span class="s1">&#39;.mkv&#39;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlsplit</span>
+
+<span class="kn">from</span> <span class="nn">twisted.python.filepath</span> <span class="k">import</span> <span class="n">FilePath</span>
+<span class="kn">from</span> <span class="nn">twisted.python</span> <span class="k">import</span> <span class="n">failure</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.DIDLLite</span> <span class="k">import</span> <span class="n">classChooser</span><span class="p">,</span> <span class="n">Container</span><span class="p">,</span> <span class="n">Resource</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.DIDLLite</span> <span class="k">import</span> <span class="n">DIDLElement</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.DIDLLite</span> <span class="k">import</span> <span class="n">simple_dlna_tags</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.soap_service</span> <span class="k">import</span> <span class="n">errorCode</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">utils</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">twisted.internet.inotify</span> <span class="k">import</span> <span class="p">(</span>
+        <span class="n">INotify</span><span class="p">,</span> <span class="n">IN_CREATE</span><span class="p">,</span> <span class="n">IN_DELETE</span><span class="p">,</span> <span class="n">IN_MOVED_FROM</span><span class="p">,</span> <span class="n">IN_MOVED_TO</span><span class="p">,</span>
+        <span class="n">IN_ISDIR</span><span class="p">,</span> <span class="n">IN_CHANGED</span><span class="p">,</span> <span class="n">_FLAG_TO_HUMAN</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+    <span class="n">INotify</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">no_inotify_reason</span> <span class="o">=</span> <span class="n">msg</span>
+
+<span class="kn">from</span> <span class="nn">coherence.extern.xdg</span> <span class="k">import</span> <span class="n">xdg_content</span>
+
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendItem</span><span class="p">,</span> <span class="n">BackendStore</span>
+
+<span class="c1"># Sorting helpers</span>
+<span class="n">NUMS</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;([0-9]+)&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="_natural_key"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage._natural_key">[docs]</a><span class="k">def</span> <span class="nf">_natural_key</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="c1"># strip the spaces</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">part</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">part</span><span class="p">)</span> <span class="ow">or</span> <span class="n">part</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span>
+            <span class="n">NUMS</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">s</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="NoThumbnailFound"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.NoThumbnailFound">[docs]</a><span class="k">class</span> <span class="nc">NoThumbnailFound</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;no thumbnail found&#39;&#39;&#39;</span></div>
+
+
+<div class="viewcode-block" id="_find_thumbnail"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage._find_thumbnail">[docs]</a><span class="k">def</span> <span class="nf">_find_thumbnail</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">thumbnail_folder</span><span class="o">=</span><span class="s1">&#39;.thumbs&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; looks for a thumbnail file of the same basename</span>
+<span class="sd">        in a folder named &#39;.thumbs&#39; relative to the file</span>
+
+<span class="sd">        returns the filename of the thumb, its mimetype and</span>
+<span class="sd">        the correspondig DLNA PN string or throws an Exception otherwise</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">thumbnail_folder</span><span class="p">,</span>
+                           <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.*&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">pattern</span><span class="p">):</span>
+        <span class="n">mimetype</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_type</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;image/png&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mimetype</span> <span class="o">==</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">:</span>
+                <span class="n">dlna_pn</span> <span class="o">=</span> <span class="s1">&#39;DLNA.ORG_PN=JPEG_TN&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dlna_pn</span> <span class="o">=</span> <span class="s1">&#39;DLNA.ORG_PN=PNG_TN&#39;</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">mimetype</span><span class="p">,</span> <span class="n">dlna_pn</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NoThumbnailFound</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="FSItem"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem">[docs]</a><span class="k">class</span> <span class="nc">FSItem</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;fs_item&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_id</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">,</span> <span class="n">UPnPClass</span><span class="p">,</span>
+                 <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">object_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="n">parent</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="n">update</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mimetype</span> <span class="o">==</span> <span class="s1">&#39;root&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mimetype</span> <span class="o">==</span> <span class="s1">&#39;item&#39;</span> <span class="ow">and</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">get_realpath</span><span class="p">(),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+            <span class="c1"># self.location = FilePath(unicode(path))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">FilePath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">mimetype</span>
+        <span class="k">if</span> <span class="n">urlbase</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+            <span class="n">urlbase</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">store</span>
+
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parent_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parent_id</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">UPnPClass</span><span class="p">(</span><span class="n">object_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">Container</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">child_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caption</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">,</span> <span class="s1">&#39;root&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_url</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
+            <span class="c1"># self.item.searchable = True</span>
+            <span class="c1"># self.item.searchClass = &#39;object&#39;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">FilePath</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">isdir</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check_for_cover_art</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;cover&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cover</span><span class="p">)</span>
+                    <span class="sd">&#39;&#39;&#39; add the cover image extension to help clients</span>
+<span class="sd">                        not reacting on the mimetype &#39;&#39;&#39;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span> <span class="o">=</span> \
+                        <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">urlbase</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="s1">&#39;?cover&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ext</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_url</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;audio/&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s1">&#39;cover&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">cover</span><span class="p">)</span>
+                    <span class="sd">&#39;&#39;&#39; add the cover image extension to help clients</span>
+<span class="sd">                        not reacting on the mimetype &#39;&#39;&#39;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span> <span class="o">=</span> \
+                        <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">urlbase</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="s1">&#39;?cover&#39;</span><span class="p">,</span> <span class="n">ext</span><span class="p">))</span>
+
+            <span class="n">_</span><span class="p">,</span> <span class="n">host_port</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">urlbase</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">host_port</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">host</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">host_port</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">host</span> <span class="o">=</span> <span class="n">host_port</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">getsize</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">server</span> <span class="ow">and</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;transcoding&#39;</span><span class="p">,</span>
+                                                           <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;application/ogg&#39;</span><span class="p">,</span> <span class="s1">&#39;audio/ogg&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;audio/x-wav&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;audio/x-m4a&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;application/x-flac&#39;</span><span class="p">):</span>
+                    <span class="n">new_res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;/transcoded.mp3&#39;</span><span class="p">,</span>
+                                       <span class="n">f</span><span class="s1">&#39;http-get:*:{&quot;audio/mpeg&quot;}:*&#39;</span><span class="p">)</span>
+                    <span class="n">new_res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="c1"># self.item.res.append(new_res)</span>
+
+            <span class="k">if</span> <span class="n">mimetype</span> <span class="o">!=</span> <span class="s1">&#39;item&#39;</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span>
+                    <span class="s1">&#39;file://&#39;</span> <span class="o">+</span> <span class="n">quote</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">(),</span>
+                        <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+                    <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{host}</span><span class="s1">:</span><span class="si">{self.mimetype}</span><span class="s1">:*&#39;</span><span class="p">)</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">mimetype</span> <span class="o">!=</span> <span class="s1">&#39;item&#39;</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{self.mimetype}</span><span class="s1">:*&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;http-get:*:*:*&#39;</span><span class="p">)</span>
+
+            <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+            <span class="sd">&#39;&#39;&#39; if this item is of type audio and we want to add a transcoding</span>
+<span class="sd">                rule for it, this is the way to do it:</span>
+
+<span class="sd">                create a new Resource object, at least a &#39;http-get&#39;</span>
+<span class="sd">                and maybe an &#39;internal&#39; one too</span>
+
+<span class="sd">                for transcoding to wav this looks like that</span>
+
+<span class="sd">                res = Resource(</span>
+<span class="sd">                    url_for_transcoded audio,</span>
+<span class="sd">                    &#39;http-get:*:audio/x-wav:%s&#39;% &#39;;&#39;.join(</span>
+<span class="sd">                        [&#39;DLNA.ORG_PN=JPEG_TN&#39;]+simple_dlna_tags))</span>
+<span class="sd">                res.size = None</span>
+<span class="sd">                self.item.res.append(res)</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">server</span> <span class="ow">and</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">coherence</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="s1">&#39;transcoding&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;audio/mpeg&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;application/ogg&#39;</span><span class="p">,</span> <span class="s1">&#39;audio/ogg&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;audio/x-wav&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;audio/x-m4a&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;audio/flac&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;application/x-flac&#39;</span><span class="p">):</span>
+                    <span class="n">dlna_pn</span> <span class="o">=</span> <span class="s1">&#39;DLNA.ORG_PN=LPCM&#39;</span>
+                    <span class="n">dlna_tags</span> <span class="o">=</span> <span class="n">simple_dlna_tags</span><span class="p">[:]</span>
+                    <span class="c1"># dlna_tags[1] = &#39;DLNA.ORG_OP=00&#39;</span>
+                    <span class="n">dlna_tags</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DLNA.ORG_CI=1&#39;</span>
+                    <span class="n">new_res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;?transcoded=lpcm&#39;</span><span class="p">,</span>
+                        <span class="n">f</span><span class="s1">&#39;http-get:*:{&quot;audio/L16;rate=44100;channels=2&quot;}:&#39;</span>
+                        <span class="n">f</span><span class="s1">&#39;{&quot;;&quot;.join([dlna_pn] + dlna_tags)}&#39;</span><span class="p">)</span>
+                    <span class="n">new_res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="c1"># self.item.res.append(new_res)</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">!=</span> <span class="s1">&#39;audio/mpeg&#39;</span><span class="p">:</span>
+                        <span class="n">new_res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;?transcoded=mp3&#39;</span><span class="p">,</span>
+                                           <span class="n">f</span><span class="s1">&#39;http-get:*:{&quot;audio/mpeg&quot;}:*&#39;</span><span class="p">)</span>
+                        <span class="n">new_res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="c1"># self.item.res.append(new_res)</span>
+
+            <span class="sd">&#39;&#39;&#39; if this item is an image and we want to add a thumbnail for it</span>
+<span class="sd">                we have to follow these rules:</span>
+
+<span class="sd">                create a new Resource object, at least a &#39;http-get&#39;</span>
+<span class="sd">                and maybe an &#39;internal&#39; one too</span>
+
+<span class="sd">                for an JPG this looks like that</span>
+
+<span class="sd">                res = Resource(url_for_thumbnail,</span>
+<span class="sd">                        &#39;http-get:*:image/jpg:%s&#39;% &#39;;&#39;.join(</span>
+<span class="sd">                        [&#39;DLNA.ORG_PN=JPEG_TN&#39;]+simple_dlna_tags))</span>
+<span class="sd">                res.size = size_of_thumbnail</span>
+<span class="sd">                self.item.res.append(res)</span>
+
+<span class="sd">                and for a PNG the Resource creation is like that</span>
+
+<span class="sd">                res = Resource(url_for_thumbnail,</span>
+<span class="sd">                        &#39;http-get:*:image/png:%s&#39;% &#39;;&#39;.join(</span>
+<span class="sd">                        simple_dlna_tags+[&#39;DLNA.ORG_PN=PNG_TN&#39;]))</span>
+
+<span class="sd">                if not hasattr(self.item, &#39;attachments&#39;):</span>
+<span class="sd">                    self.item.attachments = {}</span>
+<span class="sd">                self.item.attachments[key] = utils.StaticFile(</span>
+<span class="sd">                filename_of_thumbnail)</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;image/png&#39;</span><span class="p">)</span> <span class="ow">or</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;video/&#39;</span><span class="p">)):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">filename</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">,</span> <span class="n">dlna_pn</span> <span class="o">=</span> <span class="n">_find_thumbnail</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">())</span>
+                <span class="k">except</span> <span class="n">NoThumbnailFound</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dlna_tags</span> <span class="o">=</span> <span class="n">simple_dlna_tags</span><span class="p">[:]</span>
+                    <span class="n">dlna_tags</span><span class="p">[</span>
+                        <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DLNA.ORG_FLAGS=00f00000000000000000000000000000&#39;</span>
+
+                    <span class="n">hash_from_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+                    <span class="n">new_res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;?attachment=&#39;</span> <span class="o">+</span> <span class="n">hash_from_path</span><span class="p">,</span>
+                        <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{mimetype}</span><span class="s1">:&#39;</span>
+                        <span class="n">f</span><span class="s1">&#39;{&quot;;&quot;.join([dlna_pn] + dlna_tags)}&#39;</span><span class="p">)</span>
+                    <span class="n">new_res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_res</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;attachments&#39;</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">attachments</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">hash_from_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">StaticFile</span><span class="p">(</span>
+                        <span class="n">filename</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;video/&#39;</span><span class="p">):</span>
+                <span class="c1"># check for a subtitles file</span>
+                <span class="n">caption</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">())</span>
+                <span class="n">caption</span> <span class="o">=</span> <span class="n">caption</span> <span class="o">+</span> <span class="s1">&#39;.srt&#39;</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">caption</span><span class="p">):</span>
+                    <span class="n">hash_from_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">caption</span><span class="p">))</span>
+                    <span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;smi/caption&#39;</span>
+                    <span class="n">new_res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;?attachment=&#39;</span> <span class="o">+</span> <span class="n">hash_from_path</span><span class="p">,</span>
+                        <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{mimetype}</span><span class="s1">:{&quot;*&quot;}&#39;</span><span class="p">)</span>
+                    <span class="n">new_res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">caption</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">caption</span> <span class="o">=</span> <span class="n">new_res</span><span class="o">.</span><span class="n">data</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_res</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="s1">&#39;attachments&#39;</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">attachments</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">attachments</span><span class="p">[</span><span class="n">hash_from_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">StaticFile</span><span class="p">(</span>
+                        <span class="n">caption</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># FIXME: getmtime is deprecated in Twisted 2.6</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">getmtime</span><span class="p">())</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="FSItem.rebuild"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.rebuild">[docs]</a>    <span class="k">def</span> <span class="nf">rebuild</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urlbase</span><span class="p">):</span>
+        <span class="c1"># print(&#39;rebuild&#39;, self.mimetype)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">!=</span> <span class="s1">&#39;item&#39;</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># print(&#39;rebuild for&#39;, self.get_path())</span>
+        <span class="n">mimetype</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">(),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">mimetype</span>
+        <span class="c1"># print(&#39;rebuild&#39;, self.mimetype)</span>
+        <span class="n">UPnPClass</span> <span class="o">=</span> <span class="n">classChooser</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">UPnPClass</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s1">&#39;cover&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">cover</span><span class="p">)</span>
+            <span class="sd">&#39;&#39;&#39; add the cover image extension to help clients not reacting on</span>
+<span class="sd">                the mimetype &#39;&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">albumArtURI</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">urlbase</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="s1">&#39;?cover&#39;</span><span class="p">,</span> <span class="n">ext</span><span class="p">))</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">host_port</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">urlbase</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">host_port</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">host</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">host_port</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="n">host_port</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span>
+            <span class="s1">&#39;file://&#39;</span> <span class="o">+</span> <span class="n">quote</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">()),</span>
+            <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{host}</span><span class="s1">:</span><span class="si">{self.mimetype}</span><span class="s1">:*&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">getsize</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">Resource</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{self.mimetype}</span><span class="s1">:*&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">getsize</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># FIXME: getmtime is deprecated in Twisted 2.6</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">getmtime</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="FSItem.check_for_cover_art"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.check_for_cover_art">[docs]</a>    <span class="k">def</span> <span class="nf">check_for_cover_art</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; let&#39;s try to find in the current directory some jpg file,</span>
+<span class="sd">            or png if the jpg search fails, and take the first one</span>
+<span class="sd">            that comes around</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">jpgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">path</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">children</span><span class="p">()</span> <span class="k">if</span>
+                    <span class="n">i</span><span class="o">.</span><span class="n">splitext</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;.JPG&#39;</span><span class="p">)]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cover</span> <span class="o">=</span> <span class="n">jpgs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">pngs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">path</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">children</span><span class="p">()</span> <span class="k">if</span>
+                        <span class="n">i</span><span class="o">.</span><span class="n">splitext</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="s1">&#39;.PNG&#39;</span><span class="p">)]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cover</span> <span class="o">=</span> <span class="n">pngs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">f</span><span class="s1">&#39;UnicodeDecodeError - there is something wrong with a &#39;</span>
+                <span class="n">f</span><span class="s1">&#39;file located in </span><span class="si">{self.location.path}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FSItem.remove"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(&#39;FSItem remove&#39;, self.id, self.get_name(), self.parent)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">remove_child</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="FSItem.add_child"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.add_child">[docs]</a>    <span class="k">def</span> <span class="nf">add_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">child_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">Container</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="FSItem.remove_child"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.remove_child">[docs]</a>    <span class="k">def</span> <span class="nf">remove_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">):</span>
+        <span class="c1"># print(f&#39;remove_from {self.id:d} ({self.get_name()}) &#39;</span>
+        <span class="c1">#       f&#39;child {child.id:d} ({child.get_name()})&#39;)</span>
+        <span class="k">if</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">child_count</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">,</span> <span class="n">Container</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="FSItem.get_children"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.get_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">request_count</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">_natural_key</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">request_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">start</span><span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">request_count</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="FSItem.get_child_count"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.get_child_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_child_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_count</span></div>
+
+<div class="viewcode-block" id="FSItem.get_id"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
+
+<div class="viewcode-block" id="FSItem.get_update_id"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.get_update_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_update_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="FSItem.get_path"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;directory&#39;</span><span class="p">,</span> <span class="s1">&#39;root&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">FilePath</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span></div>
+
+<div class="viewcode-block" id="FSItem.get_realpath"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.get_realpath">[docs]</a>    <span class="k">def</span> <span class="nf">get_realpath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">FilePath</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span></div>
+
+<div class="viewcode-block" id="FSItem.set_path"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.set_path">[docs]</a>    <span class="k">def</span> <span class="nf">set_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span><span class="p">,</span> <span class="n">old_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="n">path</span><span class="p">,</span> <span class="n">extension</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">FilePath</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">FilePath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">path</span></div>
+
+<div class="viewcode-block" id="FSItem.get_name"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">FilePath</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">basename</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span>
+        <span class="k">return</span> <span class="n">name</span></div>
+
+<div class="viewcode-block" id="FSItem.get_cover"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.get_cover">[docs]</a>    <span class="k">def</span> <span class="nf">get_cover</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cover</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cover</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">cover</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="FSItem.get_parent"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.get_parent">[docs]</a>    <span class="k">def</span> <span class="nf">get_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span></div>
+
+<div class="viewcode-block" id="FSItem.get_item"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="FSItem.get_xml"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSItem.get_xml">[docs]</a>    <span class="k">def</span> <span class="nf">get_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">toString</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;id: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; @ &#39;</span> <span class="o">+</span> \
+               <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;xmlcharrefreplace&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="FSStore"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore">[docs]</a><span class="k">class</span> <span class="nc">FSStore</span><span class="p">(</span><span class="n">BackendStore</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    .. versionchanged:: 0.9.0</span>
+<span class="sd">        Migrated from louie/dispatcher to EventDispatcher</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;fs_store&#39;</span>
+
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;MediaServer exporting files from the file-system&#39;&#39;&#39;</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;my media&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the name under this MediaServer &#39;</span>
+                 <span class="s1">&#39;shall show up with on other UPnP clients&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the highest UPnP version this MediaServer shall support&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;uuid&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the unique (UPnP) identifier for this MediaServer,&#39;</span>
+                 <span class="s1">&#39; usually automatically set&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="s1">&#39;advance&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;content&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">xdg_content</span><span class="p">(),</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;the path(s) this MediaServer shall export&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;ignore_patterns&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;list of regex patterns, matching filenames will be ignored&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;enable_inotify&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;enable real-time monitoring of the content folders&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;enable_destroy&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;no&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;enable deleting a file via an UPnP method&#39;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s1">&#39;option&#39;</span><span class="p">:</span> <span class="s1">&#39;import_folder&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="s1">&#39;The path to store files imported via an UPnP method, &#39;</span>
+                 <span class="s1">&#39;if empty the Import method is disabled&#39;</span><span class="p">}</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">BackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;my media&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;content&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">]</span>
+            <span class="n">cl</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
+                <span class="n">cl</span> <span class="o">+=</span> <span class="n">a</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">cl</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">xdg_content</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="s1">&#39;tests/content&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">])</span>
+        <span class="n">ignore_patterns</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ignore_patterns&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inotify</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;enable_inotify&#39;</span><span class="p">,</span> <span class="s1">&#39;yes&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">INotify</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inotify</span> <span class="o">=</span> <span class="n">INotify</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inotify</span><span class="o">.</span><span class="n">startReading</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;inotify disabled: </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inotify</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{no_inotify_reason}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;FSStore content auto-update disabled upon user request&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;enable_destroy&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">upnp_DestroyObject</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_upnp_DestroyObject</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">import_folder</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;import_folder&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_folder</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_folder</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">import_folder</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_file_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">r</span><span class="s1">&#39;^\..*&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">ignore_patterns</span><span class="p">)))</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span>
+                <span class="n">utils</span><span class="o">.</span><span class="n">means_true</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;create_root&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span> <span class="ow">or</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">import_folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">UPnPClass</span> <span class="o">=</span> <span class="n">classChooser</span><span class="p">(</span><span class="s1">&#39;root&#39;</span><span class="p">)</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getnextID</span><span class="p">())</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">FSItem</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="s1">&#39;media&#39;</span><span class="p">,</span> <span class="s1">&#39;root&#39;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span><span class="p">,</span> <span class="n">UPnPClass</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;Error on setting self.store[id], Error on FSItem: </span><span class="si">{e}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getnextID</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">FSItem</span><span class="p">(</span>
+                <span class="nb">id</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_folder</span><span class="p">,</span> <span class="s1">&#39;directory&#39;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span><span class="p">,</span> <span class="n">UPnPClass</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">import_folder_id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="k">for</span> <span class="n">bytesPath</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bytesPath</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">bytesPath</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_file_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_file_pattern</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;on walk of </span><span class="si">{path!r}</span><span class="s1">: </span><span class="si">{msg!r}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="kn">import</span> <span class="nn">traceback</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmc_mapping</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;14&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;15&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;16&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;17&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span>
+                                 <span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+
+<div class="viewcode-block" id="FSStore.release"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.release">[docs]</a>    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inotify</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inotify</span><span class="o">.</span><span class="n">stopReading</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FSStore.len"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.len">[docs]</a>    <span class="k">def</span> <span class="nf">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FSStore.get_by_id"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.get_by_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="c1"># print(&#39;get_by_id&#39;, id, type(id))</span>
+        <span class="c1"># we have referenced ids here when we are in WMC mapping mode</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="c1"># try:</span>
+        <span class="c1">#    id = int(id)</span>
+        <span class="c1"># except ValueError:</span>
+        <span class="c1">#    id = 1000</span>
+
+        <span class="k">if</span> <span class="nb">id</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="s1">&#39;1000&#39;</span>
+        <span class="c1"># print(&#39;get_by_id 2&#39;, id)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># print(&#39;get_by_id 3&#39;, r)</span>
+        <span class="k">return</span> <span class="n">r</span></div>
+
+<div class="viewcode-block" id="FSStore.get_id_by_name"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.get_id_by_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_id_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;get_id_by_name </span><span class="si">{parent}</span><span class="s1"> ({type(parent)}) </span><span class="si">{name}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{parent}</span><span class="s1"> {len(parent.children):d}&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">parent</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="c1"># if not isinstance(name, unicode):</span>
+                <span class="c1">#    name = name.decode(&#39;utf8&#39;)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{child.get_name()} {child.get_realpath()} &#39;</span>
+                           <span class="n">f</span><span class="s1">&#39;{name == child.get_realpath()}&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">child</span><span class="o">.</span><span class="n">get_realpath</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">child</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;get_id_by_name: </span><span class="si">{e!r}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="kn">import</span> <span class="nn">traceback</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;get_id_by_name not found&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="FSStore.get_url_by_name"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.get_url_by_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_url_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;get_url_by_name </span><span class="si">{parent!r}</span><span class="s1"> </span><span class="si">{name!r}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id_by_name</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="c1"># print &#39;get_url_by_name&#39;, id</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span><span class="o">.</span><span class="n">url</span></div>
+
+<div class="viewcode-block" id="FSStore.update_config"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.update_config">[docs]</a>    <span class="k">def</span> <span class="nf">update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;update_config: </span><span class="si">{kwargs}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;content&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">new_content</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
+            <span class="n">new_content</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">new_content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)])</span>
+            <span class="n">new_folders</span> <span class="o">=</span> <span class="n">new_content</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+            <span class="n">obsolete_folders</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">new_content</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;new folders: </span><span class="si">{new_folders}</span><span class="se">\n</span><span class="s1">&#39;</span>
+                       <span class="n">f</span><span class="s1">&#39;obsolete folders: </span><span class="si">{obsolete_folders}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">obsolete_folders</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">remove_content_folder</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">new_folders</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_content_folder</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">new_content</span></div>
+
+<div class="viewcode-block" id="FSStore.add_content_folder"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.add_content_folder">[docs]</a>    <span class="k">def</span> <span class="nf">add_content_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="s1">&#39;1000&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_file_pattern</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FSStore.remove_content_folder"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.remove_content_folder">[docs]</a>    <span class="k">def</span> <span class="nf">remove_content_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">:</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id_by_name</span><span class="p">(</span><span class="s1">&#39;1000&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FSStore.walk"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.walk">[docs]</a>    <span class="k">def</span> <span class="nf">walk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ignore_file_pattern</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;walk </span><span class="si">{path}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">containers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">containers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">containers</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">container</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;adding </span><span class="si">{container.location!r}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;walk.adding: </span><span class="si">{container.location}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">ignore_file_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">basename</span><span class="p">())</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">new_container</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">new_container</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">containers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_container</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s1">&#39;UnicodeDecodeError - there is something wrong with a &#39;</span>
+                    <span class="n">f</span><span class="s1">&#39;file located in {container.get_path()!r}&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FSStore.create"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;create  </span><span class="si">{mimetype}</span><span class="s1"> </span><span class="si">{path}</span><span class="s1"> {type(path)} </span><span class="si">{parent}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">UPnPClass</span> <span class="o">=</span> <span class="n">classChooser</span><span class="p">(</span><span class="n">mimetype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">UPnPClass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getnextID</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="s1">&#39;directory&#39;</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">+</span> <span class="n">ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">update</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+            <span class="n">update</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">FSItem</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span><span class="p">,</span>
+                                <span class="n">UPnPClass</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># print(self.update_id)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="s1">&#39;content_directory_server&#39;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SystemUpdateID&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_update_id</span><span class="p">())</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="s1">&#39;content_directory_server&#39;</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                            <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ContainerUpdateIDs&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">id</span></div>
+
+<div class="viewcode-block" id="FSStore.append"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bytes_path</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">bytes_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;append  </span><span class="si">{path}</span><span class="s1"> {type(path)} </span><span class="si">{parent}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;path </span><span class="si">{path!r}</span><span class="s1"> not available - ignored&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_ISFIFO</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">st_mode</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;path </span><span class="si">{path!r}</span><span class="s1"> is a FIFO - ignored&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mimetype</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_type</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;directory&#39;</span>
+            <span class="k">if</span> <span class="n">mimetype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">mimetype</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">mimetype</span> <span class="o">==</span> <span class="s1">&#39;directory&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inotify</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">mask</span> <span class="o">=</span> \
+                        <span class="n">IN_CREATE</span> <span class="o">|</span> <span class="n">IN_DELETE</span> <span class="o">|</span> <span class="n">IN_MOVED_FROM</span> <span class="o">|</span> \
+                        <span class="n">IN_MOVED_TO</span> <span class="o">|</span> <span class="n">IN_CHANGED</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inotify</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span>
+                        <span class="n">FilePath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)),</span>
+                        <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">autoAdd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="nb">id</span><span class="p">)])</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">os_msg</span><span class="p">:</span>
+            <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">            seems we have some permissions issues along the content path</span>
+<span class="sd">            &#39;&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;path </span><span class="si">{path}</span><span class="s1"> isn</span><span class="se">\&#39;</span><span class="s1">t accessible, error </span><span class="si">{os_msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="FSStore.remove"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;FSSTore remove id: </span><span class="si">{id}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get_parent</span><span class="p">()</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SystemUpdateID&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span><span class="p">)</span>
+                <span class="c1"># value = f&#39;{parent.get_id():d},{parent_get_update_id():d}&#39;</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">parent</span><span class="o">.</span><span class="n">get_update_id</span><span class="p">())</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                        <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ContainerUpdateIDs&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="FSStore.notify"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.notify">[docs]</a>    <span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ignore</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Event </span><span class="si">%s</span><span class="s1"> on </span><span class="si">%s</span><span class="s1"> - parameter </span><span class="si">%r</span><span class="s1">&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">fl</span> <span class="k">for</span> <span class="n">fl</span> <span class="ow">in</span> <span class="n">_FLAG_TO_HUMAN</span> <span class="k">if</span> <span class="n">fl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">mask</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span>
+                  <span class="n">path</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">parameter</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">IN_CHANGED</span><span class="p">:</span>
+            <span class="c1"># FIXME react maybe on access right changes, loss of read rights?</span>
+            <span class="c1"># print(f&#39;{path} was changed, parent {parameter:d} ({iwp.path})&#39;)</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">IN_DELETE</span> <span class="ow">or</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">IN_MOVED_FROM</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="si">{path.path}</span><span class="s1"> was deleted, &#39;</span>
+                      <span class="n">f</span><span class="s1">&#39;parent </span><span class="si">{parameter!r}</span><span class="s1"> (</span><span class="si">{path.parent.path}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id_by_name</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">IN_CREATE</span> <span class="ow">or</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">IN_MOVED_TO</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">IN_ISDIR</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;directory </span><span class="si">{path.path}</span><span class="s1"> was created, &#39;</span>
+                          <span class="n">f</span><span class="s1">&#39;parent </span><span class="si">{parameter!r}</span><span class="s1"> (</span><span class="si">{path.parent.path}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;file </span><span class="si">{path.path}</span><span class="s1"> was created, &#39;</span>
+                          <span class="n">f</span><span class="s1">&#39;parent </span><span class="si">{parameter!r}</span><span class="s1"> (</span><span class="si">{path.parent.path}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_id_by_name</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">parameter</span><span class="p">),</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">ignore_file_pattern</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_file_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">path</span><span class="p">),</span>
+                            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">parameter</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="FSStore.getnextID"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.getnextID">[docs]</a>    <span class="k">def</span> <span class="nf">getnextID</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+<div class="viewcode-block" id="FSStore.backend_import"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.backend_import">[docs]</a>    <span class="k">def</span> <span class="nf">backend_import</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">get_path</span><span class="p">(),</span> <span class="s1">&#39;w+b&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;read&#39;</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">rebuild</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">200</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;import of file {item.get_path()} failed&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">traceback</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="k">return</span> <span class="mi">500</span></div>
+
+<div class="viewcode-block" id="FSStore.upnp_init"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.upnp_init">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_connection_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connection_manager_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;SourceProtocolInfo&#39;</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:audio/mpeg:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:audio/mpeg:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/mp4:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:video/mp4:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:application/ogg:*&#39;</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                 <span class="s1">&#39;http-get:*:application/ogg:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/x-msvideo:*&#39;</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                 <span class="s1">&#39;http-get:*:video/x-msvideo:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/mpeg:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:video/mpeg:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/avi:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:video/avi:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/divx:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:video/divx:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:video/quicktime:*&#39;</span><span class="p">,</span>  <span class="c1"># noqa</span>
+                 <span class="s1">&#39;http-get:*:video/quicktime:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:image/gif:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:image/gif:*&#39;</span><span class="p">,</span>
+                 <span class="n">f</span><span class="s1">&#39;internal:</span><span class="si">{self.server.coherence.hostname}</span><span class="s1">:image/jpeg:*&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;http-get:*:image/jpeg:*&#39;</span>
+                 <span class="c1"># &#39;http-get:*:audio/mpeg:DLNA.ORG_PN=MP3;DLNA.ORG_OP=11;&#39;</span>
+                 <span class="c1"># &#39;DLNA.ORG_FLAGS=01700000000000000000000000000000&#39;,</span>
+                 <span class="c1"># &#39;http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMABASE;&#39;</span>
+                 <span class="c1"># &#39;DLNA.ORG_OP=11;DLNA.ORG_FLAGS&#39;</span>
+                 <span class="c1"># &#39;=01700000000000000000000000000000&#39;,</span>
+                 <span class="c1"># &#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;&#39;</span>
+                 <span class="c1"># &#39;DLNA.ORG_OP=01;DLNA.ORG_FLAGS&#39;</span>
+                 <span class="c1"># &#39;=00f00000000000000000000000000000&#39;,</span>
+                 <span class="c1"># &#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;&#39;</span>
+                 <span class="c1"># &#39;DLNA.ORG_OP=01;DLNA.ORG_FLAGS&#39;</span>
+                 <span class="c1"># &#39;=00f00000000000000000000000000000&#39;,</span>
+                 <span class="c1"># &#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;&#39;</span>
+                 <span class="c1"># &#39;DLNA.ORG_OP=01;DLNA.ORG_FLAGS&#39;</span>
+                 <span class="c1"># &#39;=00f00000000000000000000000000000&#39;,</span>
+                 <span class="c1"># &#39;http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;&#39;</span>
+                 <span class="c1"># &#39;DLNA.ORG_OP=01;DLNA.ORG_FLAGS&#39;</span>
+                 <span class="c1"># &#39;=00f00000000000000000000000000000&#39;,</span>
+                 <span class="c1"># &#39;http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL;&#39;</span>
+                 <span class="c1"># &#39;DLNA.ORG_OP=01;DLNA.ORG_FLAGS&#39;</span>
+                 <span class="c1"># &#39;=01700000000000000000000000000000&#39;,</span>
+                 <span class="c1"># &#39;http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_BASE;&#39;</span>
+                 <span class="c1"># &#39;DLNA.ORG_OP=01;DLNA.ORG_FLAGS&#39;</span>
+                 <span class="c1"># &#39;=01700000000000000000000000000000&#39;,</span>
+                 <span class="p">],</span>
+                <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SystemUpdateID&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span><span class="p">)</span></div>
+            <span class="c1"># self.server.content_directory_server.set_variable(</span>
+            <span class="c1">#     0, &#39;SortCapabilities&#39;, &#39;*&#39;)</span>
+
+<div class="viewcode-block" id="FSStore.upnp_ImportResource"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.upnp_ImportResource">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_ImportResource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">SourceURI</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;SourceURI&#39;</span><span class="p">]</span>
+        <span class="n">DestinationURI</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;DestinationURI&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">DestinationURI</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;?import&#39;</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">DestinationURI</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>  <span class="c1"># remove the ?import</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">718</span><span class="p">))</span>
+
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">718</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="nf">gotPage</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
+            <span class="c1"># print(&#39;gotPage&#39;, headers)</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;content-type&#39;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">content_type</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_type</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">extension</span> <span class="o">=</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_extension</span><span class="p">(</span><span class="n">content_type</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                      <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">set_path</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="n">item</span><span class="o">.</span><span class="n">get_path</span><span class="p">())</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">rebuild</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;update_id&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="s1">&#39;content_directory_server&#39;</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                            <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;SystemUpdateID&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">item</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_update_id</span><span class="p">())</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="s1">&#39;content_directory_server&#39;</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">content_directory_server</span><span class="o">.</span><span class="n">set_variable</span><span class="p">(</span>
+                                <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ContainerUpdateIDs&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gotError</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;error requesting </span><span class="si">{url}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">718</span><span class="p">))</span>
+
+        <span class="n">tmp_fp</span><span class="p">,</span> <span class="n">tmp_path</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkstemp</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">tmp_fp</span><span class="p">)</span>
+
+        <span class="n">utils</span><span class="o">.</span><span class="n">downloadPage</span><span class="p">(</span>
+            <span class="n">SourceURI</span><span class="p">,</span> <span class="n">tmp_path</span><span class="p">)</span><span class="o">.</span><span class="n">addCallbacks</span><span class="p">(</span>
+                <span class="n">gotPage</span><span class="p">,</span> <span class="n">gotError</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="n">SourceURI</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">transfer_id</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># FIXME</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;TransferID&#39;</span><span class="p">:</span> <span class="n">transfer_id</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="FSStore.upnp_CreateObject"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.upnp_CreateObject">[docs]</a>    <span class="k">def</span> <span class="nf">upnp_CreateObject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># print(f&#39;CreateObject {kwargs}&#39;)</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ContainerID&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;DLNA.ORG_AnyContainer&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ContainerID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_folder_id</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">712</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ContainerID</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ContainerID&#39;</span><span class="p">]</span>
+        <span class="n">Elements</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;Elements&#39;</span><span class="p">]</span>
+
+        <span class="n">parent_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">ContainerID</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">parent_item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">710</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">parent_item</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">restricted</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">713</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Elements</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">712</span><span class="p">))</span>
+
+        <span class="n">elt</span> <span class="o">=</span> <span class="n">DIDLElement</span><span class="o">.</span><span class="n">fromString</span><span class="p">(</span><span class="n">Elements</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">elt</span><span class="o">.</span><span class="n">numItems</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">712</span><span class="p">))</span>
+
+        <span class="n">item</span> <span class="o">=</span> <span class="n">elt</span><span class="o">.</span><span class="n">getItems</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">parentID</span> <span class="o">==</span> <span class="s1">&#39;DLNA.ORG_AnyContainer&#39;</span><span class="p">:</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">parentID</span> <span class="o">=</span> <span class="n">ContainerID</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">parentID</span> <span class="o">!=</span> <span class="n">ContainerID</span> <span class="ow">or</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">restricted</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">or</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">title</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">712</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;..&#39;</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">title</span> <span class="ow">or</span>
+                <span class="s1">&#39;~&#39;</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">title</span> <span class="ow">or</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">title</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">712</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">upnp_class</span> <span class="o">==</span> <span class="s1">&#39;object.container.storageFolder&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">712</span><span class="p">))</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent_item</span><span class="o">.</span><span class="n">get_path</span><span class="p">(),</span> <span class="n">item</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s1">&#39;directory&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">parent_item</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">712</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inotify</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mask</span> <span class="o">=</span> \
+                    <span class="n">IN_CREATE</span> <span class="o">|</span> <span class="n">IN_DELETE</span> <span class="o">|</span> <span class="n">IN_MOVED_FROM</span> <span class="o">|</span> \
+                    <span class="n">IN_MOVED_TO</span> <span class="o">|</span> <span class="n">IN_CHANGED</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inotify</span><span class="o">.</span><span class="n">watch</span><span class="p">(</span>
+                    <span class="n">path</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">autoAdd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="nb">id</span><span class="p">)])</span>
+
+            <span class="n">new_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+            <span class="n">didl</span> <span class="o">=</span> <span class="n">DIDLElement</span><span class="p">()</span>
+            <span class="n">didl</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">new_item</span><span class="o">.</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;ObjectID&#39;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span> <span class="s1">&#39;Result&#39;</span><span class="p">:</span> <span class="n">didl</span><span class="o">.</span><span class="n">toString</span><span class="p">()}</span>
+
+        <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">upnp_class</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;object.item&#39;</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">content_format</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">protocolInfo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+            <span class="n">extension</span> <span class="o">=</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_extension</span><span class="p">(</span><span class="n">content_format</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent_item</span><span class="o">.</span><span class="n">get_realpath</span><span class="p">(),</span>
+                                <span class="n">item</span><span class="o">.</span><span class="n">title</span> <span class="o">+</span> <span class="n">extension</span><span class="p">)</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s1">&#39;item&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">parent_item</span><span class="p">)</span>
+
+            <span class="n">new_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">new_item</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">importUri</span> <span class="o">=</span> <span class="n">new_item</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;?import&#39;</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">didl</span> <span class="o">=</span> <span class="n">DIDLElement</span><span class="p">()</span>
+            <span class="n">didl</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">new_item</span><span class="o">.</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;ObjectID&#39;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span> <span class="s1">&#39;Result&#39;</span><span class="p">:</span> <span class="n">didl</span><span class="o">.</span><span class="n">toString</span><span class="p">()}</span>
+
+        <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">712</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="FSStore.hidden_upnp_DestroyObject"><a class="viewcode-back" href="../../../source/backends/fs.html#coherence.backends.fs_storage.FSStore.hidden_upnp_DestroyObject">[docs]</a>    <span class="k">def</span> <span class="nf">hidden_upnp_DestroyObject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ObjectID</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ObjectID&#39;</span><span class="p">]</span>
+
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">ObjectID</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">701</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;upnp_DestroyObject: </span><span class="si">{item.location}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;upnp_DestroyObject [</span><span class="si">{Exception}</span><span class="s1">]: </span><span class="si">{msg}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">failure</span><span class="o">.</span><span class="n">Failure</span><span class="p">(</span><span class="n">errorCode</span><span class="p">(</span><span class="mi">715</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="p">{}</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">reactor</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="s1">&#39;tests/content&#39;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">FSStore</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;my media&#39;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+                <span class="n">urlbase</span><span class="o">=</span><span class="s1">&#39;http://localhost/xyz&#39;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">len</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">child_count</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">get_xml</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1001</span><span class="p">)</span><span class="o">.</span><span class="n">child_count</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1001</span><span class="p">)</span><span class="o">.</span><span class="n">get_xml</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1002</span><span class="p">)</span><span class="o">.</span><span class="n">child_count</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1002</span><span class="p">)</span><span class="o">.</span><span class="n">get_xml</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1003</span><span class="p">)</span><span class="o">.</span><span class="n">child_count</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1003</span><span class="p">)</span><span class="o">.</span><span class="n">get_xml</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1004</span><span class="p">)</span><span class="o">.</span><span class="n">child_count</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1004</span><span class="p">)</span><span class="o">.</span><span class="n">get_xml</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1005</span><span class="p">)</span><span class="o">.</span><span class="n">child_count</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="mi">1005</span><span class="p">)</span><span class="o">.</span><span class="n">get_xml</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="mi">1000</span><span class="p">]</span><span class="o">.</span><span class="n">get_children</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="c1"># print(f.upnp_Search(</span>
+    <span class="c1">#     ContainerID=&#39;4&#39;,</span>
+    <span class="c1">#     Filter=&#39;dc:title,upnp:artist&#39;,</span>
+    <span class="c1">#     RequestedCount=&#39;1000&#39;,</span>
+    <span class="c1">#     StartingIndex=&#39;0&#39;,</span>
+    <span class="c1">#     SearchCriteria=&#39;(upnp:class = &#39;object.container.album.musicAlbum&#39;)&#39;,</span>
+    <span class="c1">#     SortCriteria=&#39;+dc:title&#39;))</span>
+
+    <span class="n">f</span><span class="o">.</span><span class="n">upnp_ImportResource</span><span class="p">(</span><span class="n">SourceURI</span><span class="o">=</span><span class="s1">&#39;http://spiegel.de&#39;</span><span class="p">,</span> <span class="n">DestinationURI</span><span class="o">=</span><span class="s1">&#39;ttt&#39;</span><span class="p">)</span>
+
+    <span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

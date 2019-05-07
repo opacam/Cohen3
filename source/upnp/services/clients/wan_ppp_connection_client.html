@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.services.clients.wan_ppp_connection_client (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="coherence.upnp.services.servers.av_transport_server (module)" href="../servers/av_transport_server.html" />
+    <link rel="prev" title="coherence.upnp.services.clients.wan_ip_connection_client (module)" href="wan_ip_connection_client.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../coherence.upnp.html">coherence.upnp (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../coherence.upnp.html#coherence-upnp-core-package">coherence.upnp.core (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../coherence.upnp.html#coherence-upnp-devices-package">coherence.upnp.devices (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../coherence.upnp.html#coherence-upnp-services-package">coherence.upnp.services (package)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../coherence.upnp.html#coherence-upnp-services-clients-subpackage">coherence.upnp.services.clients (subpackage)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="av_transport_client.html">coherence.upnp.services.clients.av_transport_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="connection_manager_client.html">coherence.upnp.services.clients.connection_manager_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="content_directory_client.html">coherence.upnp.services.clients.content_directory_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dimming_client.html">coherence.upnp.services.clients.dimming_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rendering_control_client.html">coherence.upnp.services.clients.rendering_control_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="switch_power_client.html">coherence.upnp.services.clients.switch_power_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="wan_common_interface_config_client.html">coherence.upnp.services.clients.wan_common_interface_config_client (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="wan_ip_connection_client.html">coherence.upnp.services.clients.wan_ip_connection_client (module)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.upnp.services.clients.wan_ppp_connection_client (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../coherence.upnp.html#coherence-upnp-services-servers-subpackage">coherence.upnp.services.servers (subpackage)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../../coherence.upnp.html">coherence.upnp (package)</a> &raquo;</li>
+        
+      <li>coherence.upnp.services.clients.wan_ppp_connection_client (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../../_sources/source/upnp/services/clients/wan_ppp_connection_client.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="module-coherence.upnp.services.clients.wan_ppp_connection_client">
+<span id="coherence-upnp-services-clients-wan-ppp-connection-client-module"></span><span id="upnp-services-clients-wan-ppp-connection-client"></span><h1>coherence.upnp.services.clients.wan_ppp_connection_client (module)<a class="headerlink" href="#module-coherence.upnp.services.clients.wan_ppp_connection_client" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient">
+<em class="property">class </em><code class="descname">WANPPPConnectionClient</code><span class="sig-paren">(</span><em>service</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/clients/wan_ppp_connection_client.html#WANPPPConnectionClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/clients/wan_ppp_connection_client.html#WANPPPConnectionClient.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.subscribe_for_variable">
+<code class="descname">subscribe_for_variable</code><span class="sig-paren">(</span><em>var_name</em>, <em>callback</em>, <em>signal=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/clients/wan_ppp_connection_client.html#WANPPPConnectionClient.subscribe_for_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.subscribe_for_variable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.get_external_ip_address">
+<code class="descname">get_external_ip_address</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/clients/wan_ppp_connection_client.html#WANPPPConnectionClient.get_external_ip_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.get_external_ip_address" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.get_all_port_mapping_entries">
+<code class="descname">get_all_port_mapping_entries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/clients/wan_ppp_connection_client.html#WANPPPConnectionClient.get_all_port_mapping_entries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.get_all_port_mapping_entries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.get_generic_port_mapping_entry">
+<code class="descname">get_generic_port_mapping_entry</code><span class="sig-paren">(</span><em>port_mapping_index</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/clients/wan_ppp_connection_client.html#WANPPPConnectionClient.get_generic_port_mapping_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.get_generic_port_mapping_entry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.get_specific_port_mapping_entry">
+<code class="descname">get_specific_port_mapping_entry</code><span class="sig-paren">(</span><em>remote_host=''</em>, <em>external_port=0</em>, <em>protocol='TCP'</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/clients/wan_ppp_connection_client.html#WANPPPConnectionClient.get_specific_port_mapping_entry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.get_specific_port_mapping_entry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.add_port_mapping">
+<code class="descname">add_port_mapping</code><span class="sig-paren">(</span><em>remote_host=''</em>, <em>external_port=0</em>, <em>protocol='TCP'</em>, <em>internal_port=None</em>, <em>internal_client=None</em>, <em>enabled=False</em>, <em>port_mapping_description=''</em>, <em>lease_duration=60</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/clients/wan_ppp_connection_client.html#WANPPPConnectionClient.add_port_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.add_port_mapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.delete_port_mapping">
+<code class="descname">delete_port_mapping</code><span class="sig-paren">(</span><em>remote_host=''</em>, <em>external_port=0</em>, <em>protocol='TCP'</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/coherence/upnp/services/clients/wan_ppp_connection_client.html#WANPPPConnectionClient.delete_port_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.services.clients.wan_ppp_connection_client.WANPPPConnectionClient.delete_port_mapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../servers/av_transport_server.html" class="btn btn-neutral float-right" title="coherence.upnp.services.servers.av_transport_server (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="wan_ip_connection_client.html" class="btn btn-neutral float-left" title="coherence.upnp.services.clients.wan_ip_connection_client (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

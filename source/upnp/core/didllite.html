@@ -1,0 +1,1120 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.upnp.core.DIDLLite (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="coherence.upnp.core.dlna (module)" href="dlna.html" />
+    <link rel="prev" title="coherence.upnp.core.device (module)" href="device.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.backends.html">coherence.backends (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../coherence.upnp.html">coherence.upnp (package)</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-core-package">coherence.upnp.core (package)</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="action.html">coherence.upnp.core.action (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="device.html">coherence.upnp.core.device (module)</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">coherence.upnp.core.DIDLLite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dlna.html">coherence.upnp.core.dlna (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="event.html">coherence.upnp.core.event (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="msearch.html">coherence.upnp.core.msearch (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="service.html">coherence.upnp.core.service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_lite.html">coherence.upnp.core.soap_lite (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_proxy.html">coherence.upnp.core.soap_proxy (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="soap_service.html">coherence.upnp.core.soap_service (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ssdp.html">coherence.upnp.core.ssdp (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html">coherence.upnp.core.utils (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="uuid.html">coherence.upnp.core.uuid (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="variable.html">coherence.upnp.core.variable (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="xml_constants.html">coherence.upnp.core.xml_constants (module)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-devices-package">coherence.upnp.devices (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-package">coherence.upnp.services (package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-clients-subpackage">coherence.upnp.services.clients (subpackage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../coherence.upnp.html#coherence-upnp-services-servers-subpackage">coherence.upnp.services.servers (subpackage)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../../coherence.upnp.html">coherence.upnp (package)</a> &raquo;</li>
+        
+      <li>coherence.upnp.core.DIDLLite (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../_sources/source/upnp/core/didllite.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="module-coherence.upnp.core.DIDLLite">
+<span id="coherence-upnp-core-didllite-module"></span><span id="upnp-core-didllite"></span><h1>coherence.upnp.core.DIDLLite (module)<a class="headerlink" href="#module-coherence.upnp.core.DIDLLite" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="didllite">
+<h2>DIDLLite<a class="headerlink" href="#didllite" title="Permalink to this headline">¶</a></h2>
+<p>Different classes and methods used to represent atomic content objects for
+DIDL (Digital Item Declaration Language)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more information about DIDL you can check the
+<a class="reference external" href="https://en.wikipedia.org/wiki/Digital_Item">wikipedia entry</a>.</p>
+</div>
+<div class="section" id="resources">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.Resources" title="coherence.upnp.core.DIDLLite.Resources"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resources</span></code></a><a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h3>
+<p>A list of resources, always sorted after an append</p>
+</div>
+<div class="section" id="resource">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.Resource" title="coherence.upnp.core.DIDLLite.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">Resource</span></code></a><a class="headerlink" href="#resource" title="Permalink to this headline">¶</a></h3>
+<p>An object representing a resource.</p>
+</div>
+<div class="section" id="playcontainerresource">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.PlayContainerResource" title="coherence.upnp.core.DIDLLite.PlayContainerResource"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlayContainerResource</span></code></a><a class="headerlink" href="#playcontainerresource" title="Permalink to this headline">¶</a></h3>
+<p>An object representing a DLNA play container resource.</p>
+</div>
+<div class="section" id="object">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.Object" title="coherence.upnp.core.DIDLLite.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a><a class="headerlink" href="#object" title="Permalink to this headline">¶</a></h3>
+<p>The root class of the entire content directory class hierarchy.</p>
+</div>
+<div class="section" id="item">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.Item" title="coherence.upnp.core.DIDLLite.Item"><code class="xref py py-class docutils literal notranslate"><span class="pre">Item</span></code></a><a class="headerlink" href="#item" title="Permalink to this headline">¶</a></h3>
+<p>A class used to represent atomic (non-container) content objects.</p>
+</div>
+<div class="section" id="imageitem">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.ImageItem" title="coherence.upnp.core.DIDLLite.ImageItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageItem</span></code></a><a class="headerlink" href="#imageitem" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a image.</p>
+</div>
+<div class="section" id="photo">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.Photo" title="coherence.upnp.core.DIDLLite.Photo"><code class="xref py py-class docutils literal notranslate"><span class="pre">Photo</span></code></a><a class="headerlink" href="#photo" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a photo.</p>
+</div>
+<div class="section" id="audioitem">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.AudioItem" title="coherence.upnp.core.DIDLLite.AudioItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioItem</span></code></a><a class="headerlink" href="#audioitem" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a audio.</p>
+</div>
+<div class="section" id="musictrack">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.MusicTrack" title="coherence.upnp.core.DIDLLite.MusicTrack"><code class="xref py py-class docutils literal notranslate"><span class="pre">MusicTrack</span></code></a><a class="headerlink" href="#musictrack" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a music track.</p>
+</div>
+<div class="section" id="audiobroadcast">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.AudioBroadcast" title="coherence.upnp.core.DIDLLite.AudioBroadcast"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioBroadcast</span></code></a><a class="headerlink" href="#audiobroadcast" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a audio broadcast.</p>
+</div>
+<div class="section" id="audiobook">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.AudioBook" title="coherence.upnp.core.DIDLLite.AudioBook"><code class="xref py py-class docutils literal notranslate"><span class="pre">AudioBook</span></code></a><a class="headerlink" href="#audiobook" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a audio book.</p>
+</div>
+<div class="section" id="videoitem">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.VideoItem" title="coherence.upnp.core.DIDLLite.VideoItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">VideoItem</span></code></a><a class="headerlink" href="#videoitem" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a video.</p>
+</div>
+<div class="section" id="movie">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.Movie" title="coherence.upnp.core.DIDLLite.Movie"><code class="xref py py-class docutils literal notranslate"><span class="pre">Movie</span></code></a><a class="headerlink" href="#movie" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a movie.</p>
+</div>
+<div class="section" id="videobroadcast">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.VideoBroadcast" title="coherence.upnp.core.DIDLLite.VideoBroadcast"><code class="xref py py-class docutils literal notranslate"><span class="pre">VideoBroadcast</span></code></a><a class="headerlink" href="#videobroadcast" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a video broadcast.</p>
+</div>
+<div class="section" id="musicvideoclip">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.MusicVideoClip" title="coherence.upnp.core.DIDLLite.MusicVideoClip"><code class="xref py py-class docutils literal notranslate"><span class="pre">MusicVideoClip</span></code></a><a class="headerlink" href="#musicvideoclip" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a music video clip.</p>
+</div>
+<div class="section" id="playlistitem">
+<h3><code class="xref py py-class docutils literal notranslate"><span class="pre">PlayListItem</span></code><a class="headerlink" href="#playlistitem" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a play list.</p>
+</div>
+<div class="section" id="textitem">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.TextItem" title="coherence.upnp.core.DIDLLite.TextItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextItem</span></code></a><a class="headerlink" href="#textitem" title="Permalink to this headline">¶</a></h3>
+<p>An item class which represents a text.</p>
+</div>
+<div class="section" id="container">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.Container" title="coherence.upnp.core.DIDLLite.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">Container</span></code></a><a class="headerlink" href="#container" title="Permalink to this headline">¶</a></h3>
+<p>An object that can contain other objects.</p>
+</div>
+<div class="section" id="person">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.Person" title="coherence.upnp.core.DIDLLite.Person"><code class="xref py py-class docutils literal notranslate"><span class="pre">Person</span></code></a><a class="headerlink" href="#person" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a Person.</p>
+</div>
+<div class="section" id="musicartist">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.MusicArtist" title="coherence.upnp.core.DIDLLite.MusicArtist"><code class="xref py py-class docutils literal notranslate"><span class="pre">MusicArtist</span></code></a><a class="headerlink" href="#musicartist" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a Music Artist.</p>
+</div>
+<div class="section" id="playlistcontainer">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.PlaylistContainer" title="coherence.upnp.core.DIDLLite.PlaylistContainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlaylistContainer</span></code></a><a class="headerlink" href="#playlistcontainer" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a Play List.</p>
+</div>
+<div class="section" id="album">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.Album" title="coherence.upnp.core.DIDLLite.Album"><code class="xref py py-class docutils literal notranslate"><span class="pre">Album</span></code></a><a class="headerlink" href="#album" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a generic Album.</p>
+</div>
+<div class="section" id="musicalbum">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.MusicAlbum" title="coherence.upnp.core.DIDLLite.MusicAlbum"><code class="xref py py-class docutils literal notranslate"><span class="pre">MusicAlbum</span></code></a><a class="headerlink" href="#musicalbum" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a Music Album.</p>
+</div>
+<div class="section" id="photoalbum">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.PhotoAlbum" title="coherence.upnp.core.DIDLLite.PhotoAlbum"><code class="xref py py-class docutils literal notranslate"><span class="pre">PhotoAlbum</span></code></a><a class="headerlink" href="#photoalbum" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a Photo Album.</p>
+</div>
+<div class="section" id="genre">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.Genre" title="coherence.upnp.core.DIDLLite.Genre"><code class="xref py py-class docutils literal notranslate"><span class="pre">Genre</span></code></a><a class="headerlink" href="#genre" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a generic genre.</p>
+</div>
+<div class="section" id="musicgenre">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.MusicGenre" title="coherence.upnp.core.DIDLLite.MusicGenre"><code class="xref py py-class docutils literal notranslate"><span class="pre">MusicGenre</span></code></a><a class="headerlink" href="#musicgenre" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a Music genre.</p>
+</div>
+<div class="section" id="moviegenre">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.MovieGenre" title="coherence.upnp.core.DIDLLite.MovieGenre"><code class="xref py py-class docutils literal notranslate"><span class="pre">MovieGenre</span></code></a><a class="headerlink" href="#moviegenre" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a Movie genre.</p>
+</div>
+<div class="section" id="storagesystem">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.StorageSystem" title="coherence.upnp.core.DIDLLite.StorageSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">StorageSystem</span></code></a><a class="headerlink" href="#storagesystem" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a Storage System.</p>
+</div>
+<div class="section" id="storagevolume">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.StorageVolume" title="coherence.upnp.core.DIDLLite.StorageVolume"><code class="xref py py-class docutils literal notranslate"><span class="pre">StorageVolume</span></code></a><a class="headerlink" href="#storagevolume" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a Storage Volume.</p>
+</div>
+<div class="section" id="storagefolder">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.StorageFolder" title="coherence.upnp.core.DIDLLite.StorageFolder"><code class="xref py py-class docutils literal notranslate"><span class="pre">StorageFolder</span></code></a><a class="headerlink" href="#storagefolder" title="Permalink to this headline">¶</a></h3>
+<p>An container class which represents a Storage Folder.</p>
+</div>
+<div class="section" id="didlelement">
+<h3><a class="reference internal" href="#coherence.upnp.core.DIDLLite.DIDLElement" title="coherence.upnp.core.DIDLLite.DIDLElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIDLElement</span></code></a><a class="headerlink" href="#didlelement" title="Permalink to this headline">¶</a></h3>
+<p>Our element for DIDL (Digital Item Declaration Language).</p>
+<dl class="function">
+<dt id="coherence.upnp.core.DIDLLite.qname">
+<code class="descname">qname</code><span class="sig-paren">(</span><em>tag</em>, <em>ns=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#qname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.qname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.DIDLLite.is_audio">
+<code class="descname">is_audio</code><span class="sig-paren">(</span><em>mimetype</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#is_audio"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.is_audio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks for type audio, expects a
+mimetype or an UPnP protocolInfo.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.DIDLLite.is_video">
+<code class="descname">is_video</code><span class="sig-paren">(</span><em>mimetype</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#is_video"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.is_video" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks for type video, expects a
+mimetype or an UPnP protocolInfo.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.Resources">
+<em class="property">class </em><code class="descname">Resources</code><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Resources"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Resources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></p>
+<p>A list of resources, always sorted after an append.</p>
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Resources.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>object</em><span class="sig-paren">)</span> &#x2192; None -- append object to end<a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Resources.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Resources.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Resources.p_sort">
+<code class="descname">p_sort</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Resources.p_sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Resources.p_sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>We want the following order: http-get is always
+at the beginning, rtsp-rtp-udp the second and
+anything else after that.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Resources.get_matching">
+<code class="descname">get_matching</code><span class="sig-paren">(</span><em>local_protocol_infos</em>, <em>protocol_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Resources.get_matching"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Resources.get_matching" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.DIDLLite.classChooser">
+<code class="descname">classChooser</code><span class="sig-paren">(</span><em>mimetype</em>, <em>sub=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#classChooser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.classChooser" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="coherence.upnp.core.DIDLLite.build_dlna_additional_info">
+<code class="descname">build_dlna_additional_info</code><span class="sig-paren">(</span><em>content_format</em>, <em>does_playcontainer=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#build_dlna_additional_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.build_dlna_additional_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.Resource">
+<em class="property">class </em><code class="descname">Resource</code><span class="sig-paren">(</span><em>data=None</em>, <em>protocol_info=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>An object representing a resource.</p>
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Resource.get_additional_info">
+<code class="descname">get_additional_info</code><span class="sig-paren">(</span><em>upnp_client=''</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Resource.get_additional_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Resource.get_additional_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Resource.toElement">
+<code class="descname">toElement</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Resource.toElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Resource.toElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Resource.fromElement">
+<code class="descname">fromElement</code><span class="sig-paren">(</span><em>elt</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Resource.fromElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Resource.fromElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Resource.toString">
+<code class="descname">toString</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Resource.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Resource.toString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="coherence.upnp.core.DIDLLite.Resource.fromString">
+<em class="property">classmethod </em><code class="descname">fromString</code><span class="sig-paren">(</span><em>_string</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Resource.fromString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Resource.fromString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Resource.transcoded">
+<code class="descname">transcoded</code><span class="sig-paren">(</span><em>format</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Resource.transcoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Resource.transcoded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.PlayContainerResource">
+<em class="property">class </em><code class="descname">PlayContainerResource</code><span class="sig-paren">(</span><em>udn</em>, <em>sid='urn:upnp-org:serviceId:ContentDirectory'</em>, <em>cid=None</em>, <em>fid=None</em>, <em>fii=0</em>, <em>sc=''</em>, <em>md=0</em>, <em>protocol_info=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#PlayContainerResource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.PlayContainerResource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Resource" title="coherence.upnp.core.DIDLLite.Resource"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Resource</span></code></a></p>
+<p>An object representing a DLNA play container resource.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.Object">
+<em class="property">class </em><code class="descname">Object</code><span class="sig-paren">(</span><em>id=None</em>, <em>parentID=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<p>The root class of the entire content directory class hierarchy.</p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'didllite'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.elementName">
+<code class="descname">elementName</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.elementName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.writeStatus">
+<code class="descname">writeStatus</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.writeStatus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.date">
+<code class="descname">date</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.albumArtURI">
+<code class="descname">albumArtURI</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.albumArtURI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.artist">
+<code class="descname">artist</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.artist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.genre">
+<code class="descname">genre</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.genre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.genres">
+<code class="descname">genres</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.genres" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.album">
+<code class="descname">album</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.album" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.originalTrackNumber">
+<code class="descname">originalTrackNumber</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.originalTrackNumber" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.description">
+<code class="descname">description</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.longDescription">
+<code class="descname">longDescription</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.longDescription" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.refID">
+<code class="descname">refID</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.refID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.server_uuid">
+<code class="descname">server_uuid</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.server_uuid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.creator">
+<code class="descname">creator</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.creator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Object.res">
+<code class="descname">res</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.res" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Object.checkUpdate">
+<code class="descname">checkUpdate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Object.checkUpdate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.checkUpdate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Object.toElement">
+<code class="descname">toElement</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Object.toElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.toElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Object.toString">
+<code class="descname">toString</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Object.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.toString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Object.fromElement">
+<code class="descname">fromElement</code><span class="sig-paren">(</span><em>elt</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Object.fromElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.fromElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="coherence.upnp.core.DIDLLite.Object.fromString">
+<em class="property">classmethod </em><code class="descname">fromString</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Object.fromString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Object.fromString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.Item">
+<em class="property">class </em><code class="descname">Item</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Object" title="coherence.upnp.core.DIDLLite.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Object</span></code></a></p>
+<p>A class used to represent atomic (non-container) content
+objects.</p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Item.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Item.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Item.elementName">
+<code class="descname">elementName</code><em class="property"> = 'item'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Item.elementName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Item.refID">
+<code class="descname">refID</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Item.refID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Item.director">
+<code class="descname">director</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Item.director" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Item.actors">
+<code class="descname">actors</code><em class="property"> = []</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Item.actors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Item.language">
+<code class="descname">language</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Item.language" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Item.toElement">
+<code class="descname">toElement</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Item.toElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Item.toElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Item.fromElement">
+<code class="descname">fromElement</code><span class="sig-paren">(</span><em>elt</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Item.fromElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Item.fromElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.ImageItem">
+<em class="property">class </em><code class="descname">ImageItem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#ImageItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.ImageItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Item" title="coherence.upnp.core.DIDLLite.Item"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Item</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.ImageItem.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.imageItem'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.ImageItem.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.ImageItem.rating">
+<code class="descname">rating</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.ImageItem.rating" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.ImageItem.storageMedium">
+<code class="descname">storageMedium</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.ImageItem.storageMedium" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.ImageItem.publisher">
+<code class="descname">publisher</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.ImageItem.publisher" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.ImageItem.rights">
+<code class="descname">rights</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.ImageItem.rights" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.ImageItem.toElement">
+<code class="descname">toElement</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#ImageItem.toElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.ImageItem.toElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.Photo">
+<em class="property">class </em><code class="descname">Photo</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Photo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Photo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.ImageItem" title="coherence.upnp.core.DIDLLite.ImageItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.ImageItem</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Photo.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.imageItem.photo'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Photo.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Photo.album">
+<code class="descname">album</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Photo.album" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Photo.toElement">
+<code class="descname">toElement</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Photo.toElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Photo.toElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.AudioItem">
+<em class="property">class </em><code class="descname">AudioItem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#AudioItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Item" title="coherence.upnp.core.DIDLLite.Item"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Item</span></code></a></p>
+<p>A piece of content that when rendered generates some audio.</p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.AudioItem.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.audioItem'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioItem.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.AudioItem.publisher">
+<code class="descname">publisher</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioItem.publisher" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.AudioItem.language">
+<code class="descname">language</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioItem.language" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.AudioItem.relation">
+<code class="descname">relation</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioItem.relation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.AudioItem.rights">
+<code class="descname">rights</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioItem.rights" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.AudioItem.valid_keys">
+<code class="descname">valid_keys</code><em class="property"> = ['genre', 'description', 'longDescription', 'publisher', 'language', 'relation', 'rights', 'albumArtURI']</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioItem.valid_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.AudioItem.toElement">
+<code class="descname">toElement</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#AudioItem.toElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioItem.toElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.AudioItem.fromElement">
+<code class="descname">fromElement</code><span class="sig-paren">(</span><em>elt</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#AudioItem.fromElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioItem.fromElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.MusicTrack">
+<em class="property">class </em><code class="descname">MusicTrack</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#MusicTrack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicTrack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.AudioItem" title="coherence.upnp.core.DIDLLite.AudioItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.AudioItem</span></code></a></p>
+<p>A discrete piece of audio that should be interpreted as music.</p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.MusicTrack.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.audioItem.musicTrack'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicTrack.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.MusicTrack.album">
+<code class="descname">album</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicTrack.album" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.MusicTrack.playlist">
+<code class="descname">playlist</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicTrack.playlist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.MusicTrack.storageMedium">
+<code class="descname">storageMedium</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicTrack.storageMedium" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.MusicTrack.contributor">
+<code class="descname">contributor</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicTrack.contributor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.MusicTrack.toElement">
+<code class="descname">toElement</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#MusicTrack.toElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicTrack.toElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.AudioBroadcast">
+<em class="property">class </em><code class="descname">AudioBroadcast</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#AudioBroadcast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioBroadcast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.AudioItem" title="coherence.upnp.core.DIDLLite.AudioItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.AudioItem</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.AudioBroadcast.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.audioItem.audioBroadcast'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioBroadcast.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.AudioBook">
+<em class="property">class </em><code class="descname">AudioBook</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#AudioBook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioBook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.AudioItem" title="coherence.upnp.core.DIDLLite.AudioItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.AudioItem</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.AudioBook.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.audioItem.audioBook'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.AudioBook.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.VideoItem">
+<em class="property">class </em><code class="descname">VideoItem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#VideoItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.VideoItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Item" title="coherence.upnp.core.DIDLLite.Item"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Item</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.VideoItem.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.videoItem'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.VideoItem.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.VideoItem.valid_attrs">
+<code class="descname">valid_attrs</code><em class="property"> = {'producer': 'urn:schemas-upnp-org:metadata-1-0/upnp/', 'publisher': 'http://purl.org/dc/elements/1.1/', 'rating': 'urn:schemas-upnp-org:metadata-1-0/upnp/', 'relation': 'http://purl.org/dc/elements/1.1/'}</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.VideoItem.valid_attrs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.VideoItem.toElement">
+<code class="descname">toElement</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#VideoItem.toElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.VideoItem.toElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.VideoItem.fromElement">
+<code class="descname">fromElement</code><span class="sig-paren">(</span><em>elt</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#VideoItem.fromElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.VideoItem.fromElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.Movie">
+<em class="property">class </em><code class="descname">Movie</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Movie"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Movie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.VideoItem" title="coherence.upnp.core.DIDLLite.VideoItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.VideoItem</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Movie.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.videoItem.movie'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Movie.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.VideoBroadcast">
+<em class="property">class </em><code class="descname">VideoBroadcast</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#VideoBroadcast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.VideoBroadcast" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.VideoItem" title="coherence.upnp.core.DIDLLite.VideoItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.VideoItem</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.VideoBroadcast.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.videoItem.videoBroadcast'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.VideoBroadcast.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.MusicVideoClip">
+<em class="property">class </em><code class="descname">MusicVideoClip</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#MusicVideoClip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicVideoClip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.VideoItem" title="coherence.upnp.core.DIDLLite.VideoItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.VideoItem</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.MusicVideoClip.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.videoItem.musicVideoClip'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicVideoClip.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.PlaylistItem">
+<em class="property">class </em><code class="descname">PlaylistItem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#PlaylistItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.PlaylistItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Item" title="coherence.upnp.core.DIDLLite.Item"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Item</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.PlaylistItem.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.playlistItem'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.PlaylistItem.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.TextItem">
+<em class="property">class </em><code class="descname">TextItem</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#TextItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.TextItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Item" title="coherence.upnp.core.DIDLLite.Item"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Item</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.TextItem.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.item.textItem'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.TextItem.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.Container">
+<em class="property">class </em><code class="descname">Container</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Container"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Container" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Object" title="coherence.upnp.core.DIDLLite.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Object</span></code></a></p>
+<p>An object that can contain other objects.</p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Container.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Container.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Container.elementName">
+<code class="descname">elementName</code><em class="property"> = 'container'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Container.elementName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Container.childCount">
+<code class="descname">childCount</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Container.childCount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Container.createClass">
+<code class="descname">createClass</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Container.createClass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Container.searchable">
+<code class="descname">searchable</code><em class="property"> = None</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Container.searchable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Container.toElement">
+<code class="descname">toElement</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Container.toElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Container.toElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.Container.fromElement">
+<code class="descname">fromElement</code><span class="sig-paren">(</span><em>elt</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Container.fromElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Container.fromElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.Person">
+<em class="property">class </em><code class="descname">Person</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Person"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Person" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Container" title="coherence.upnp.core.DIDLLite.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Container</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Person.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.person'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Person.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.MusicArtist">
+<em class="property">class </em><code class="descname">MusicArtist</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#MusicArtist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicArtist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Person" title="coherence.upnp.core.DIDLLite.Person"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Person</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.MusicArtist.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.person.musicArtist'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicArtist.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.PlaylistContainer">
+<em class="property">class </em><code class="descname">PlaylistContainer</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#PlaylistContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.PlaylistContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Container" title="coherence.upnp.core.DIDLLite.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Container</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.PlaylistContainer.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.playlistContainer'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.PlaylistContainer.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.Album">
+<em class="property">class </em><code class="descname">Album</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Album"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Album" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Container" title="coherence.upnp.core.DIDLLite.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Container</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Album.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.album'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Album.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.MusicAlbum">
+<em class="property">class </em><code class="descname">MusicAlbum</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#MusicAlbum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicAlbum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Album" title="coherence.upnp.core.DIDLLite.Album"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Album</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.MusicAlbum.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.album.musicAlbum'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicAlbum.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.PhotoAlbum">
+<em class="property">class </em><code class="descname">PhotoAlbum</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#PhotoAlbum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.PhotoAlbum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Album" title="coherence.upnp.core.DIDLLite.Album"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Album</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.PhotoAlbum.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.album.photoAlbum'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.PhotoAlbum.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.Genre">
+<em class="property">class </em><code class="descname">Genre</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#Genre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Genre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Container" title="coherence.upnp.core.DIDLLite.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Container</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.Genre.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.genre'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.Genre.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.MusicGenre">
+<em class="property">class </em><code class="descname">MusicGenre</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#MusicGenre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicGenre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Genre" title="coherence.upnp.core.DIDLLite.Genre"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Genre</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.MusicGenre.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.genre.musicGenre'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MusicGenre.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.MovieGenre">
+<em class="property">class </em><code class="descname">MovieGenre</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#MovieGenre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MovieGenre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Genre" title="coherence.upnp.core.DIDLLite.Genre"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Genre</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.MovieGenre.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.genre.movieGenre'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.MovieGenre.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.StorageSystem">
+<em class="property">class </em><code class="descname">StorageSystem</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#StorageSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.StorageSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Container" title="coherence.upnp.core.DIDLLite.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Container</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.StorageSystem.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.storageSystem'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.StorageSystem.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.StorageVolume">
+<em class="property">class </em><code class="descname">StorageVolume</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#StorageVolume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.StorageVolume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Container" title="coherence.upnp.core.DIDLLite.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Container</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.StorageVolume.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.storageVolume'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.StorageVolume.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.StorageFolder">
+<em class="property">class </em><code class="descname">StorageFolder</code><span class="sig-paren">(</span><em>id=None</em>, <em>parent_id=None</em>, <em>title=None</em>, <em>restricted=False</em>, <em>creator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#StorageFolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.StorageFolder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#coherence.upnp.core.DIDLLite.Container" title="coherence.upnp.core.DIDLLite.Container"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.upnp.core.DIDLLite.Container</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.StorageFolder.upnp_class">
+<code class="descname">upnp_class</code><em class="property"> = 'object.container.storageFolder'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.StorageFolder.upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="coherence.upnp.core.DIDLLite.DIDLElement">
+<em class="property">class </em><code class="descname">DIDLElement</code><span class="sig-paren">(</span><em>upnp_client=''</em>, <em>parent_container=None</em>, <em>requested_id=None</em>, <em>transcoding=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#DIDLElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.DIDLElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../modules.html#coherence.log.LogAble" title="coherence.log.LogAble"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.log.LogAble</span></code></a></p>
+<dl class="attribute">
+<dt id="coherence.upnp.core.DIDLLite.DIDLElement.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'didllite'</em><a class="headerlink" href="#coherence.upnp.core.DIDLLite.DIDLElement.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.DIDLElement.addContainer">
+<code class="descname">addContainer</code><span class="sig-paren">(</span><em>id</em>, <em>parent_id</em>, <em>title</em>, <em>restricted=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#DIDLElement.addContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.DIDLElement.addContainer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.DIDLElement.addItem">
+<code class="descname">addItem</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#DIDLElement.addItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.DIDLElement.addItem" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.DIDLElement.rebuild">
+<code class="descname">rebuild</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#DIDLElement.rebuild"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.DIDLElement.rebuild" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.DIDLElement.numItems">
+<code class="descname">numItems</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#DIDLElement.numItems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.DIDLElement.numItems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.DIDLElement.getItems">
+<code class="descname">getItems</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#DIDLElement.getItems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.DIDLElement.getItems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.DIDLElement.toString">
+<code class="descname">toString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#DIDLElement.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.DIDLElement.toString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.upnp.core.DIDLLite.DIDLElement.get_upnp_class">
+<code class="descname">get_upnp_class</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#DIDLElement.get_upnp_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.DIDLElement.get_upnp_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="coherence.upnp.core.DIDLLite.DIDLElement.fromString">
+<em class="property">classmethod </em><code class="descname">fromString</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/coherence/upnp/core/DIDLLite.html#DIDLElement.fromString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.upnp.core.DIDLLite.DIDLElement.fromString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dlna.html" class="btn btn-neutral float-right" title="coherence.upnp.core.dlna (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="device.html" class="btn btn-neutral float-left" title="coherence.upnp.core.device (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

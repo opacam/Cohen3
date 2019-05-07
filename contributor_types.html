@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>1. Types of Contributions &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="2. Setting Up the Code for Local Development" href="contributor_setup.html" />
+    <link rel="prev" title="Contributing" href="contributing.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="contributing.html">Contributing</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">1. Types of Contributions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fix-cohen3-backends-plugin">1.1. Fix Cohen3 backends (plugin)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-more-tests">1.2. Add more tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#report-bugs">1.3. Report Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fix-bugs">1.4. Fix Bugs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#implement-features">1.5. Implement Features</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#write-documentation">1.6. Write Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submit-feedback">1.7. Submit Feedback</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="contributor_setup.html">2. Setting Up the Code for Local Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributor_guidelines.html">3. Contributor Guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="contributing.html">Contributing</a> &raquo;</li>
+        
+      <li>1. Types of Contributions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/contributor_types.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="types-of-contributions">
+<h1>1. Types of Contributions<a class="headerlink" href="#types-of-contributions" title="Permalink to this headline">¶</a></h1>
+<p>You can contribute in many ways:</p>
+<div class="section" id="fix-cohen3-backends-plugin">
+<h2>1.1. Fix Cohen3 backends (plugin)<a class="headerlink" href="#fix-cohen3-backends-plugin" title="Permalink to this headline">¶</a></h2>
+<p>Right now some of the plugins are outdated and should be reviewed/updated.</p>
+</div>
+<div class="section" id="add-more-tests">
+<h2>1.2. Add more tests<a class="headerlink" href="#add-more-tests" title="Permalink to this headline">¶</a></h2>
+<p>There will be great if we can increase the coverage of our source code. Most of
+the backends hasn’t the corresponding tests.</p>
+</div>
+<div class="section" id="report-bugs">
+<h2>1.3. Report Bugs<a class="headerlink" href="#report-bugs" title="Permalink to this headline">¶</a></h2>
+<p>Report bugs at <a class="reference external" href="https://github.com/opacam/Cohen3/issues">https://github.com/opacam/Cohen3/issues</a>.</p>
+<p>If you are reporting a bug, please include:</p>
+<ul class="simple">
+<li><p>Your operating system name and version.</p></li>
+<li><p>Any details about your local setup that might be helpful in troubleshooting.</p></li>
+<li><p>If you can, provide detailed steps to reproduce the bug.</p></li>
+<li><p>If you don’t have steps to reproduce the bug, just note your observations in
+as much detail as you can. Questions to start a discussion about the issue
+are welcome.</p></li>
+</ul>
+</div>
+<div class="section" id="fix-bugs">
+<h2>1.4. Fix Bugs<a class="headerlink" href="#fix-bugs" title="Permalink to this headline">¶</a></h2>
+<p>Look through the GitHub issues for bugs. Anything tagged with “bug”
+is open to whoever wants to implement it.</p>
+</div>
+<div class="section" id="implement-features">
+<h2>1.5. Implement Features<a class="headerlink" href="#implement-features" title="Permalink to this headline">¶</a></h2>
+<p>Look through the GitHub issues for features. Anything tagged with “enhancement”
+and “please-help” is open to whoever wants to implement it.</p>
+<p>Please do not combine multiple feature enhancements into a single pull request.</p>
+</div>
+<div class="section" id="write-documentation">
+<h2>1.6. Write Documentation<a class="headerlink" href="#write-documentation" title="Permalink to this headline">¶</a></h2>
+<p>Cohen3 could always use more documentation, whether as part of the
+official Cohen3 docs, in docstrings, or even on the web in blog posts,
+articles, and such.</p>
+<p>If you want to review your changes on the documentation locally, you can do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="n">doc</span><span class="p">]</span>
+<span class="n">cd</span> <span class="n">docs</span>
+<span class="n">make</span> <span class="n">html</span>
+</pre></div>
+</div>
+<p>This will compile the documentation, open it in your browser and start
+watching the files for changes, if the pull request is accepted by the Cohen3
+team, it will be compiled and posted automatically at the branch gh-pages
+whenever the pull request is merged into the master branch.</p>
+</div>
+<div class="section" id="submit-feedback">
+<h2>1.7. Submit Feedback<a class="headerlink" href="#submit-feedback" title="Permalink to this headline">¶</a></h2>
+<p>The best way to send feedback is to file an issue at
+<a class="reference external" href="https://github.com/opacam/Cohen3/issues">https://github.com/opacam/Cohen3/issues</a>.</p>
+<p>If you are proposing a feature:</p>
+<ul class="simple">
+<li><p>Explain in detail how it would work.</p></li>
+<li><p>Keep the scope as narrow as possible, to make it easier to implement.</p></li>
+<li><p>Remember that this is a volunteer-driven project, and that contributions
+are welcome :)</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contributor_setup.html" class="btn btn-neutral float-right" title="2. Setting Up the Code for Local Development" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="contributing.html" class="btn btn-neutral float-left" title="Contributing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

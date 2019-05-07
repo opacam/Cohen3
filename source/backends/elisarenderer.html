@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.elisa_renderer (module) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="coherence.backends.elisa_storage (module)" href="elisastorage.html" />
+    <link rel="prev" title="coherence.backends.dvbd_storage (module)" href="dvbd.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../coherence.backends.html">coherence.backends (package)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ampache.html">coherence.backends.ampache_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="appletrailers.html">coherence.backends.appletrailers_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="audiocd.html">coherence.backends.audiocd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="axiscam.html">coherence.backends.axiscam_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="banshee.html">coherence.backends.banshee_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bbc.html">coherence.backends.bbc_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="buzztard.html">coherence.backends.buzztard_control (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dvbd.html">coherence.backends.dvbd_storage (module)</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">coherence.backends.elisa_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="elisastorage.html">coherence.backends.elisa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="feed.html">coherence.backends.feed_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="flickr.html">coherence.backends.flickr_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fs.html">coherence.backends.fs_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gallery2.html">coherence.backends.gallery2_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gstreamer_renderer.html">coherence.backends.gstreamer_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iradio.html">coherence.backends.iradio_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="itv.html">coherence.backends.itv_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lastfm.html">coherence.backends.lastfm_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="lolcats.html">coherence.backends.lolcats_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mediadb.html">coherence.backends.mediadb_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="miroguide.html">coherence.backends.miroguide_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="picasa.html">coherence.backends.picasa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="playlist.html">coherence.backends.playlist_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="radiotime.html">coherence.backends.radiotime_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="swr3.html">coherence.backends.swr3_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ted.html">coherence.backends.ted_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="test.html">coherence.backends.test_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tracker.html">coherence.backends.tracker_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="twitch.html">coherence.backends.twitch_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="yamj.html">coherence.backends.yamj_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="youtube.html">coherence.backends.youtube_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../coherence.backends.html#coherence-backends-models-package">coherence.backends.models (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+          <li><a href="../coherence.backends.html">coherence.backends (package)</a> &raquo;</li>
+        
+      <li>coherence.backends.elisa_renderer (module)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/source/backends/elisarenderer.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-coherence.backends.elisa_renderer">
+<span id="coherence-backends-elisa-renderer-module"></span><span id="coherence-backends-elisarenderer"></span><h1>coherence.backends.elisa_renderer (module)<a class="headerlink" href="#module-coherence.backends.elisa_renderer" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer">
+<em class="property">class </em><code class="descname">ElisaPlayer</code><span class="sig-paren">(</span><em>server</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../modules.html#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">coherence.backend.Backend</span></code></a></p>
+<p>a backend to the Elisa player</p>
+<div class="versionchanged">
+<ul>
+<span class="versionmodified changed">Changed in version 0.9.0: </span><li><p>Migrated from louie/dispatcher to EventDispatcher</p></li>
+<li><p>Introduced <a class="reference internal" href="../modules.html#coherence.backend.Backend" title="coherence.backend.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">Backend</span></code></a>’s inheritance</p></li>
+</ul>
+</div>
+<dl class="attribute">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.logCategory">
+<code class="descname">logCategory</code><em class="property"> = 'elisa_player'</em><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.logCategory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.implements">
+<code class="descname">implements</code><em class="property"> = ['MediaRenderer']</em><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.implements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.vendor_value_defaults">
+<code class="descname">vendor_value_defaults</code><em class="property"> = {'RenderingControl': {'A_ARG_TYPE_Channel': 'Master'}}</em><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.vendor_value_defaults" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.vendor_range_defaults">
+<code class="descname">vendor_range_defaults</code><em class="property"> = {'RenderingControl': {'Volume': {'maximum': 100}}}</em><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.vendor_range_defaults" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.call_player">
+<code class="descname">call_player</code><span class="sig-paren">(</span><em>method</em>, <em>callback</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.call_player"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.call_player" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.poll_player">
+<code class="descname">poll_player</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.poll_player"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.poll_player" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.query_position">
+<code class="descname">query_position</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.query_position"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.query_position" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.load">
+<code class="descname">load</code><span class="sig-paren">(</span><em>uri</em>, <em>metadata</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.load" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>uri</em>, <em>metadata=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.play">
+<code class="descname">play</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.play"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.play" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.pause">
+<code class="descname">pause</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.pause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.pause" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.seek">
+<code class="descname">seek</code><span class="sig-paren">(</span><em>location</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.seek"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.seek" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>&#64;param location:    simple number = time to seek to, in seconds</dt><dd><p>+nL = relative seek forward n seconds
+-nL = relative seek backwards n seconds</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.mute">
+<code class="descname">mute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.mute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.mute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.unmute">
+<code class="descname">unmute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.unmute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.unmute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.get_mute">
+<code class="descname">get_mute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.get_mute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.get_mute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.get_volume">
+<code class="descname">get_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.get_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.get_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>playbin volume is a double from 0.0 - 10.0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.set_volume">
+<code class="descname">set_volume</code><span class="sig-paren">(</span><em>volume</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.set_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.set_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.upnp_init">
+<code class="descname">upnp_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.upnp_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.upnp_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method gets called after the device is fired, here all
+initializations of service related state variables should happen, as
+the services aren’t available before that point.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.upnp_Play">
+<code class="descname">upnp_Play</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.upnp_Play"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.upnp_Play" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.upnp_Pause">
+<code class="descname">upnp_Pause</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.upnp_Pause"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.upnp_Pause" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.upnp_Stop">
+<code class="descname">upnp_Stop</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.upnp_Stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.upnp_Stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.upnp_SetAVTransportURI">
+<code class="descname">upnp_SetAVTransportURI</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.upnp_SetAVTransportURI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.upnp_SetAVTransportURI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.upnp_SetMute">
+<code class="descname">upnp_SetMute</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.upnp_SetMute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.upnp_SetMute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="coherence.backends.elisa_renderer.ElisaPlayer.upnp_SetVolume">
+<code class="descname">upnp_SetVolume</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#ElisaPlayer.upnp_SetVolume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.ElisaPlayer.upnp_SetVolume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="coherence.backends.elisa_renderer.main">
+<code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/coherence/backends/elisa_renderer.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#coherence.backends.elisa_renderer.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="elisastorage.html" class="btn btn-neutral float-right" title="coherence.backends.elisa_storage (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dvbd.html" class="btn btn-neutral float-left" title="coherence.backends.dvbd_storage (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

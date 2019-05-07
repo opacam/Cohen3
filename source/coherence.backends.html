@@ -1,0 +1,351 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends (package) &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="coherence.backends.ampache_storage (module)" href="backends/ampache.html" />
+    <link rel="prev" title="coherence.backend (module)" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../events.html">The events system</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="coherence.html">Cohen3 source tree</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="modules.html">coherence.backend (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.base">coherence.base (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.dbus_constants">coherence.dbus_constants (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#coherence-dbus-service-module">coherence.dbus_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.json_service">coherence.json_service (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.log">coherence.log (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-coherence.transcoder">coherence.transcoder (module)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#coherence-tube-service-module">coherence.tube_service (module)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">coherence.backends (package)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="backends/ampache.html">coherence.backends.ampache_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/appletrailers.html">coherence.backends.appletrailers_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/audiocd.html">coherence.backends.audiocd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/axiscam.html">coherence.backends.axiscam_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/banshee.html">coherence.backends.banshee_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/bbc.html">coherence.backends.bbc_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/buzztard.html">coherence.backends.buzztard_control (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/dvbd.html">coherence.backends.dvbd_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/elisarenderer.html">coherence.backends.elisa_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/elisastorage.html">coherence.backends.elisa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/feed.html">coherence.backends.feed_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/flickr.html">coherence.backends.flickr_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/fs.html">coherence.backends.fs_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/gallery2.html">coherence.backends.gallery2_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/gstreamer_renderer.html">coherence.backends.gstreamer_renderer (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/iradio.html">coherence.backends.iradio_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/itv.html">coherence.backends.itv_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/lastfm.html">coherence.backends.lastfm_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/lolcats.html">coherence.backends.lolcats_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/mediadb.html">coherence.backends.mediadb_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/miroguide.html">coherence.backends.miroguide_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/picasa.html">coherence.backends.picasa_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/playlist.html">coherence.backends.playlist_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/radiotime.html">coherence.backends.radiotime_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/swr3.html">coherence.backends.swr3_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/ted.html">coherence.backends.ted_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/test.html">coherence.backends.test_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/tracker.html">coherence.backends.tracker_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/twitch.html">coherence.backends.twitch_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/yamj.html">coherence.backends.yamj_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="backends/youtube.html">coherence.backends.youtube_storage (module)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coherence-backends-models-package">coherence.backends.models (package)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="backends/models/items.html">coherence.backends.models.items (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="backends/models/containers.html">coherence.backends.models.containers (module)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="backends/models/stores.html">coherence.backends.models.stores (module)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.extern.html">coherence.extern (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.upnp.html">coherence.upnp (package)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coherence.web.html">coherence.web (package)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="coherence.html">Cohen3 source tree</a> &raquo;</li>
+        
+      <li>coherence.backends (package)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/coherence.backends.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="coherence-backends-package">
+<span id="coherence-backends"></span><h1>coherence.backends (package)<a class="headerlink" href="#coherence-backends-package" title="Permalink to this headline">¶</a></h1>
+<p>The backends package contains a sub package
+<a class="reference internal" href="#coherence-backends-models-package"><span class="std std-ref">coherence.backends.models</span></a>
+which contains some base classes meant to be used to create a custom Backend.</p>
+<p>Also contains all Cohen3 available backends. Most of them are BackendStores
+which allow to create a Media Server for specific situations. Check out each
+module for further documentation.</p>
+<p>Here are all available Cohen3 Backends:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="backends/ampache.html">coherence.backends.ampache_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/appletrailers.html">coherence.backends.appletrailers_storage (module)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="backends/appletrailers.html#appletrailersstore">AppleTrailersStore</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="backends/audiocd.html">coherence.backends.audiocd_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/axiscam.html">coherence.backends.axiscam_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/banshee.html">coherence.backends.banshee_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/bbc.html">coherence.backends.bbc_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/buzztard.html">coherence.backends.buzztard_control (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/dvbd.html">coherence.backends.dvbd_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/elisarenderer.html">coherence.backends.elisa_renderer (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/elisastorage.html">coherence.backends.elisa_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/feed.html">coherence.backends.feed_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/flickr.html">coherence.backends.flickr_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/fs.html">coherence.backends.fs_storage (module)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="backends/fs.html#fsstore-filesystem-media-server">FSStore - filesystem media server</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="backends/gallery2.html">coherence.backends.gallery2_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/gstreamer_renderer.html">coherence.backends.gstreamer_renderer (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/iradio.html">coherence.backends.iradio_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/itv.html">coherence.backends.itv_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/lastfm.html">coherence.backends.lastfm_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/lolcats.html">coherence.backends.lolcats_storage (module)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="backends/lolcats.html#lolcatsstore">LolcatsStore</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="backends/mediadb.html">coherence.backends.mediadb_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/miroguide.html">coherence.backends.miroguide_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/picasa.html">coherence.backends.picasa_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/playlist.html">coherence.backends.playlist_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/radiotime.html">coherence.backends.radiotime_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/swr3.html">coherence.backends.swr3_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/ted.html">coherence.backends.ted_storage (module)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="backends/ted.html#tedstore">TEDStore</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="backends/test.html">coherence.backends.test_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/tracker.html">coherence.backends.tracker_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/twitch.html">coherence.backends.twitch_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/yamj.html">coherence.backends.yamj_storage (module)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends/youtube.html">coherence.backends.youtube_storage (module)</a></li>
+</ul>
+</div>
+<div class="section" id="coherence-backends-models-package">
+<h2>coherence.backends.models (package)<a class="headerlink" href="#coherence-backends-models-package" title="Permalink to this headline">¶</a></h2>
+<p>If you plan to write a custom backend this classes should make easier to
+develop it:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="backends/models/items.html">coherence.backends.models.items (module)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="backends/models/items.html#backend-models-for-backenditem">Backend models for BackendItem</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="backends/models/containers.html">coherence.backends.models.containers (module)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="backends/models/containers.html#backend-models-for-container">Backend models for Container</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="backends/models/stores.html">coherence.backends.models.stores (module)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="backends/models/stores.html#backend-models-for-backendstore">Backend models for BackendStore</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>If you want to see some more examples about how to apply those
+classes you can check those backends:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="backends/appletrailers.html#coherence-backends-appletrailers"><span class="std std-ref">AppleTrailersStorage</span></a></p></li>
+<li><p><a class="reference internal" href="backends/lolcats.html#coherence-backends-lolcats"><span class="std std-ref">LolcatsStore</span></a></p></li>
+<li><p><a class="reference internal" href="backends/ted.html#coherence-backends-ted"><span class="std std-ref">TedStorage</span></a></p></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="backends/ampache.html" class="btn btn-neutral float-right" title="coherence.backends.ampache_storage (module)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="modules.html" class="btn btn-neutral float-left" title="coherence.backend (module)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

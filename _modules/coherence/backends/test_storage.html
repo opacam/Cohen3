@@ -1,0 +1,644 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>coherence.backends.test_storage &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>coherence.backends.test_storage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for coherence.backends.test_storage</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Licensed under the MIT license</span>
+<span class="c1"># http://opensource.org/licenses/mit-license.php</span>
+
+<span class="c1"># Copyright 2008 Frank Scholz &lt;coherence@beebits.net&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">A MediaServer backend to test Items.</span>
+
+<span class="sd">Item information can be passed on the commandline or in the config as an XML</span>
+<span class="sd">fragment::</span>
+
+<span class="sd">    coherence --plugin=backend:TestStore,name:Test,\\</span>
+<span class="sd">       item:&lt;item&gt;&lt;location&gt;audio.mp3&lt;/location&gt;\\</span>
+<span class="sd">            &lt;mimetype&gt;audio/mpeg&lt;/mimetype&gt;&lt;/item&gt;,\\</span>
+<span class="sd">       item:&lt;item&gt;&lt;location&gt;audio.ogg&lt;/location&gt;\\</span>
+<span class="sd">            &lt;mimetype&gt;audio/ogg&lt;/mimetype&gt;&lt;/item&gt;</span>
+
+<span class="sd">    coherence --plugin=&#39;backend:TestStore,name:Test,\\</span>
+<span class="sd">       item:&lt;item&gt;&lt;type&gt;gstreamer&lt;/type&gt;\\</span>
+<span class="sd">            &lt;pipeline&gt;v4l2src num-buffers=1 ! video/x-raw-yuv,width=640,\\</span>
+<span class="sd">            height=480 ! ffmpegcolorspace ! jpegenc name=enc&lt;/pipeline&gt;\\</span>
+<span class="sd">            &lt;mimetype&gt;image/jpeg&gt;&lt;/mimetype&gt;&lt;/item&gt;&#39;</span>
+
+<span class="sd">&#39;video/x-raw-yuv,width=640,height=480&#39; won&#39;t work here as it is a delimiter</span>
+<span class="sd">for the plugin string, so if you need things like that in the pipeline,</span>
+<span class="sd">you need to use a config file::</span>
+
+<span class="sd">    coherence --plugin=&#39;backend:TestStore,name:Test,\\</span>
+<span class="sd">        item:&lt;item&gt;&lt;type&gt;process&lt;/type&gt;\\</span>
+<span class="sd">            &lt;command&gt;man date&lt;/command&gt;\\</span>
+<span class="sd">            &lt;mimetype&gt;text/html&lt;/mimetype&gt;&lt;/item&gt;&#39;</span>
+
+<span class="sd">The XML fragment has these elements:</span>
+
+<span class="sd">    - type:</span>
+
+<span class="sd">      * file: the item is some file-system object (default)</span>
+<span class="sd">      * url: an item pointing to an object off-site</span>
+<span class="sd">      * gstreamer: the item is actually a GStreamer pipeline</span>
+<span class="sd">      * process: the items content is created by an external process</span>
+
+<span class="sd">    - location: the filesystem path or an url (mandatory)</span>
+<span class="sd">    - mimetype: the mimetype of the item (mandatory)</span>
+<span class="sd">    - extension: an optional extension to append to the url created for the</span>
+<span class="sd">      DIDLLite resource data</span>
+<span class="sd">    - title: the &#39;title&#39; this item should have (optional)</span>
+<span class="sd">    - upnp_class: the DIDLLite class the item shall have, object.item will</span>
+<span class="sd">      be taken as default</span>
+<span class="sd">    - fourth_field: value for the 4th field of the protocolInfo phalanx,</span>
+<span class="sd">      default is &#39;*&#39;</span>
+<span class="sd">    - pipeline: a GStreamer pipeline that has to end with a bin named &#39;enc&#39;,</span>
+<span class="sd">      some pipelines do only work properly when we have a glib mainloop</span>
+<span class="sd">      running, so coherence needs to be started with *-o glib:yes*</span>
+<span class="sd">    - command: the commandline for an external script to run, its output will</span>
+<span class="sd">      be returned as the items content</span>
+
+<span class="sd">In the config file the definition of this backend could look like this:</span>
+
+<span class="sd">.. code-block:: xml</span>
+
+<span class="sd">    &lt;plugin active=&#39;yes&#39;&gt;</span>
+<span class="sd">        &lt;backend&gt;TestStore&lt;/backend&gt;</span>
+<span class="sd">        &lt;name&gt;Test&lt;/name&gt;</span>
+<span class="sd">        &lt;item&gt;</span>
+<span class="sd">            &lt;location&gt;/tmp/audio.mp3&lt;/location&gt;</span>
+<span class="sd">            &lt;mimetype&gt;audio/mpeg&lt;/mimetype&gt;</span>
+<span class="sd">        &lt;/item&gt;</span>
+<span class="sd">        &lt;item&gt;</span>
+<span class="sd">            &lt;location&gt;/tmp/audio.ogg&lt;/location&gt;</span>
+<span class="sd">            &lt;mimetype&gt;audio/ogg&lt;/mimetype&gt;</span>
+<span class="sd">         &lt;/item&gt;</span>
+<span class="sd">    &lt;/plugin&gt;</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">twisted.python.filepath</span> <span class="k">import</span> <span class="n">FilePath</span>
+<span class="kn">from</span> <span class="nn">twisted.web</span> <span class="k">import</span> <span class="n">resource</span><span class="p">,</span> <span class="n">server</span>
+
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendItem</span>
+<span class="kn">from</span> <span class="nn">coherence.backend</span> <span class="k">import</span> <span class="n">BackendStore</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">coherence.transcoder</span> <span class="k">import</span> <span class="n">GStreamerPipeline</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="kn">from</span> <span class="nn">coherence.upnp.core</span> <span class="k">import</span> <span class="n">DIDLLite</span>
+
+<span class="kn">from</span> <span class="nn">coherence</span> <span class="k">import</span> <span class="n">log</span>
+
+<span class="n">ROOT_CONTAINER_ID</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+<div class="viewcode-block" id="ExternalProcessProtocol"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProtocol">[docs]</a><span class="k">class</span> <span class="nc">ExternalProcessProtocol</span><span class="p">(</span><span class="n">protocol</span><span class="o">.</span><span class="n">ProcessProtocol</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caller</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caller</span> <span class="o">=</span> <span class="n">caller</span>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.connectionMade"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProtocol.connectionMade">[docs]</a>    <span class="k">def</span> <span class="nf">connectionMade</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;pp connection made&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.outReceived"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProtocol.outReceived">[docs]</a>    <span class="k">def</span> <span class="nf">outReceived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;outReceived with {len(data):d} bytes!&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caller</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.errReceived"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProtocol.errReceived">[docs]</a>    <span class="k">def</span> <span class="nf">errReceived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="c1"># print(f&#39;errReceived! with {len(data):d} bytes!&#39;)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;pp (err):&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.inConnectionLost"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProtocol.inConnectionLost">[docs]</a>    <span class="k">def</span> <span class="nf">inConnectionLost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(&#39;inConnectionLost! stdin is closed! (we probably did it)&#39;)</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.outConnectionLost"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProtocol.outConnectionLost">[docs]</a>    <span class="k">def</span> <span class="nf">outConnectionLost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(&#39;outConnectionLost! The child closed their stdout!&#39;)</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.errConnectionLost"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProtocol.errConnectionLost">[docs]</a>    <span class="k">def</span> <span class="nf">errConnectionLost</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(&#39;errConnectionLost! The child closed their stderr.&#39;)</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProtocol.processEnded"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProtocol.processEnded">[docs]</a>    <span class="k">def</span> <span class="nf">processEnded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status_object</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;processEnded, status </span><span class="si">{status_object.value.exitCode:d}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;processEnded quitting&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caller</span><span class="o">.</span><span class="n">ended</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caller</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ExternalProcessPipeline"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessPipeline">[docs]</a><span class="k">class</span> <span class="nc">ExternalProcessPipeline</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;externalprocess&#39;</span>
+    <span class="n">addSlash</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">pipeline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">mimetype</span>
+
+<div class="viewcode-block" id="ExternalProcessPipeline.render"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessPipeline.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ExternalProcessPipeline render&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">setHeader</span><span class="p">(</span><span class="s1">&#39;content-type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span><span class="p">)</span>
+
+        <span class="n">ExternalProcessProducer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">NOT_DONE_YET</span></div></div>
+
+
+<div class="viewcode-block" id="ExternalProcessProducer"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProducer">[docs]</a><span class="k">class</span> <span class="nc">ExternalProcessProducer</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="p">):</span>
+    <span class="n">logCategory</span> <span class="o">=</span> <span class="s1">&#39;externalprocess&#39;</span>
+    <span class="n">addSlash</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">LogAble</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">request</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">written</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ended</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">registerProducer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExternalProcessProducer.write_data"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProducer.write_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;write {len(data):d} bytes of data&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">written</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="c1"># this .write will spin the reactor, calling .doWrite and then</span>
+            <span class="c1"># .resumeProducing again, so be prepared for a re-entrant call</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ended</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;closing&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">unregisterProducer</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProducer.resumeProducing"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProducer.resumeProducing">[docs]</a>    <span class="k">def</span> <span class="nf">resumeProducing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;resumeProducing&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">argv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">executable</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">spawnProcess</span><span class="p">(</span>
+                <span class="n">ExternalProcessProtocol</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+                <span class="n">executable</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="p">{})</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProducer.pauseProducing"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProducer.pauseProducing">[docs]</a>    <span class="k">def</span> <span class="nf">pauseProducing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExternalProcessProducer.stopProducing"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ExternalProcessProducer.stopProducing">[docs]</a>    <span class="k">def</span> <span class="nf">stopProducing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stopProducing&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">unregisterProducer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">loseConnection</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="Item"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Item">[docs]</a><span class="k">class</span> <span class="nc">Item</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fourth_field</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">upnp_class</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Item</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Item.get_item"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Item.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;get_item </span><span class="si">{self.item!r}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">upnp_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
+
+            <span class="n">res</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Resource</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;http-get:*:</span><span class="si">{self.mimetype}</span><span class="s1">:</span><span class="si">{self.fourth_field}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_size</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="Item.get_name"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Item.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">FilePath</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">basename</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;item&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+<div class="viewcode-block" id="Item.get_path"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Item.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">FilePath</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span></div>
+
+<div class="viewcode-block" id="Item.get_size"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Item.get_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">,</span> <span class="n">FilePath</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">getsize</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span></div></div>
+
+
+<div class="viewcode-block" id="ResourceItem"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ResourceItem">[docs]</a><span class="k">class</span> <span class="nc">ResourceItem</span><span class="p">(</span><span class="n">Item</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ResourceItem.get_name"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ResourceItem.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;item&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+<div class="viewcode-block" id="ResourceItem.get_path"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ResourceItem.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span></div>
+
+<div class="viewcode-block" id="ResourceItem.get_size"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.ResourceItem.get_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span></div></div>
+
+
+<div class="viewcode-block" id="Container"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Container">[docs]</a><span class="k">class</span> <span class="nc">Container</span><span class="p">(</span><span class="n">BackendItem</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="n">BackendItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span> <span class="o">=</span> <span class="n">parent_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="s1">&#39;directory&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="Container.add_child"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Container.add_child">[docs]</a>    <span class="k">def</span> <span class="nf">add_child</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ADD CHILD </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">child</span><span class="p">)</span>
+        <span class="c1"># id = child.id</span>
+        <span class="c1"># if isinstance(child.id, basestring):</span>
+        <span class="c1">#    _,id = child.id.split(&#39;.&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">childCount</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Container.get_children"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Container.get_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;GET CHILDREN&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span><span class="p">:</span>
+            <span class="k">def</span> <span class="nf">childs_key_sort</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span>
+
+            <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">childs_key_sort</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sorted</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">start</span><span class="p">:]</span></div>
+
+<div class="viewcode-block" id="Container.get_child_count"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Container.get_child_count">[docs]</a>    <span class="k">def</span> <span class="nf">get_child_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Container.get_path"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Container.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span></div>
+
+<div class="viewcode-block" id="Container.get_item"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Container.get_item">[docs]</a>    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span></div>
+
+<div class="viewcode-block" id="Container.get_name"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Container.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+<div class="viewcode-block" id="Container.get_id"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.Container.get_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div></div>
+
+
+<div class="viewcode-block" id="TestStore"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.TestStore">[docs]</a><span class="k">class</span> <span class="nc">TestStore</span><span class="p">(</span><span class="n">BackendStore</span><span class="p">):</span>
+    <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MediaServer&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;TestStore kwargs&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">BackendStore</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;TestServer&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">Container</span><span class="p">(</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">items</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;item&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">items</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">xml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">xml</span><span class="p">:</span>
+                    <span class="n">item</span><span class="p">[</span><span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">]</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">text</span>
+            <span class="nb">type</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;file&#39;</span><span class="p">:</span>
+                    <span class="n">location</span> <span class="o">=</span> <span class="n">FilePath</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;url&#39;</span><span class="p">:</span>
+                    <span class="n">location</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">)</span>
+
+                <span class="n">mimetype</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mimetype&#39;</span><span class="p">)</span>
+                <span class="n">item_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_next_id</span><span class="p">()</span>
+
+                <span class="n">extension</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;extension&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">extension</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span> <span class="ow">and</span> <span class="n">extension</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+                    <span class="n">extension</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">extension</span>
+
+                <span class="k">if</span> <span class="n">extension</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">item_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">item_id</span><span class="p">)</span> <span class="o">+</span> <span class="n">extension</span>
+
+                <span class="k">if</span> <span class="nb">type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">):</span>
+                    <span class="n">new_item</span> <span class="o">=</span> <span class="n">Item</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">],</span> <span class="n">item_id</span><span class="p">,</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">item_id</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;gstreamer&#39;</span><span class="p">:</span>
+                    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pipeline&#39;</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">GStreamerPipeline</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">)</span>
+                        <span class="n">new_item</span> <span class="o">=</span> <span class="n">ResourceItem</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">],</span>
+                            <span class="n">item_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">item_id</span><span class="p">))</span>
+                    <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                            <span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t enable GStreamerPipeline, &#39;</span>
+                            <span class="s1">&#39;probably pygst not installed&#39;</span><span class="p">)</span>
+                        <span class="k">continue</span>
+
+                <span class="k">elif</span> <span class="nb">type</span> <span class="o">==</span> <span class="s1">&#39;process&#39;</span><span class="p">:</span>
+                    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;command&#39;</span><span class="p">)</span>
+                    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">ExternalProcessPipeline</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">)</span>
+                    <span class="n">new_item</span> <span class="o">=</span> <span class="n">ResourceItem</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">],</span>
+                        <span class="n">item_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">urlbase</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">item_id</span><span class="p">))</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">new_item</span><span class="o">.</span><span class="n">upnp_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_upnp_class</span><span class="p">(</span>
+                        <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;upnp_class&#39;</span><span class="p">,</span> <span class="s1">&#39;object.item&#39;</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="c1"># item.description = u&#39;some text what&#39;s the file about&#39;</span>
+                <span class="c1"># item.date = something</span>
+                <span class="c1"># item.size = something</span>
+                <span class="n">new_item</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">=</span> <span class="n">mimetype</span>
+                <span class="n">new_item</span><span class="o">.</span><span class="n">fourth_field</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fourth_field&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">]</span><span class="o">.</span><span class="n">add_child</span><span class="p">(</span><span class="n">new_item</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">item_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_item</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">traceback</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+        <span class="c1"># print self.store</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_completed</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TestStore.get_upnp_class"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.TestStore.get_upnp_class">[docs]</a>    <span class="k">def</span> <span class="nf">get_upnp_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">upnp_classes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;upnp_class </span><span class="si">{name}</span><span class="s1"> not found, trying fallback&#39;</span><span class="p">)</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">DIDLLite</span><span class="o">.</span><span class="n">upnp_classes</span><span class="p">[</span><span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="n">parts</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;WTF - no fallback for upnp_class </span><span class="si">{name}</span><span class="s1"> found ?!?&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TestStore.get_next_id"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.TestStore.get_next_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_id</span></div>
+
+<div class="viewcode-block" id="TestStore.get_by_id"><a class="viewcode-back" href="../../../source/backends/test.html#coherence.backends.test_storage.TestStore.get_by_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;GET_BY_ID </span><span class="si">{id}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="p">[</span><span class="n">ROOT_CONTAINER_ID</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

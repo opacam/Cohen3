@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>2. Setting Up the Code for Local Development &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="3. Contributor Guidelines" href="contributor_guidelines.html" />
+    <link rel="prev" title="1. Types of Contributions" href="contributor_types.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">The events system</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="contributing.html">Contributing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="contributor_types.html">1. Types of Contributions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">2. Setting Up the Code for Local Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributor_guidelines.html">3. Contributor Guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="contributing.html">Contributing</a> &raquo;</li>
+        
+      <li>2. Setting Up the Code for Local Development</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/contributor_setup.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="setting-up-the-code-for-local-development">
+<h1>2. Setting Up the Code for Local Development<a class="headerlink" href="#setting-up-the-code-for-local-development" title="Permalink to this headline">¶</a></h1>
+<p>Here’s how to set up <cite>Cohen3</cite> for local development.</p>
+<ol class="arabic">
+<li><p>Fork the <cite>Cohen3</cite> repo on GitHub.</p></li>
+<li><p>Clone your fork locally:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone git@github.com:your_name_here/Cohen3.git
+</pre></div>
+</div>
+</li>
+<li><p>Install your local copy into a virtualenv. Assuming you have <a class="reference external" href="https://github.com/pyenv/pyenv">pyenv</a> installed, this is how you set up your
+fork for local development:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ CONFIGURE_OPTS=--enable-shared pyenv install 3.7-dev
+$ CONFIGURE_OPTS=--enable-shared pyenv virtualenv 3.7-dev cohen3
+$ cd Cohen3/
+$ pyenv activate cohen3
+$ pip install pipenv
+$ pipenv install
+$ pip install -e .[dev]
+</pre></div>
+</div>
+</li>
+<li><p>Create a branch for local development:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git checkout -b name-of-your-bugfix-or-feature
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Now you can make your changes locally.</p>
+<ol class="arabic" start="5">
+<li><p>When you’re done making changes, check that your changes pass the tests:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pycodestyle coherence --statistics --ignore=E402
+$ pylint -E coherence --rcfile=.pylintrc
+$ nosetests --with-coverage --cover-erase --cover-package=coherence --cover-html
+</pre></div>
+</div>
+</li>
+<li><p>Check that the test coverage hasn’t dropped:</p>
+<blockquote>
+<div><p>The last command of the above point (nosetests), will print a report at the
+end of the tests (or you can check the results via your web browser: check
+the created folder “cover” and visualize the index.htm file for a nice
+report). Check that coverage percent against the coverage before the
+changes you made.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Note</dt>
+<dd class="field-odd"><p>You also can check the coverage once you submitted the pull requests
+and travis tests are done (but this, probably, it will be  slower
+than do it manually from your os, because you can skip some steps
+that travis cannot skip).</p>
+</dd>
+</dl>
+</div></blockquote>
+</li>
+<li><p>Commit your changes and push your branch to GitHub:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git add .
+$ git commit -m &quot;Your detailed description of your changes.&quot;
+$ git push origin name-of-your-bugfix-or-feature
+</pre></div>
+</div>
+</li>
+<li><p>Submit a pull request through the GitHub website.</p></li>
+</ol>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contributor_guidelines.html" class="btn btn-neutral float-right" title="3. Contributor Guidelines" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="contributor_types.html" class="btn btn-neutral float-left" title="1. Types of Contributions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

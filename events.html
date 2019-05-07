@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>The events system &mdash; Cohen3 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Cohen3 source tree" href="source/coherence.html" />
+    <link rel="prev" title="Writing a backend (the new way)" href="example_backend_the_new_way.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Cohen3
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">Backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="write_a_backend.html">Write a backend</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The events system</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#bind-the-events">Bind the events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bind-the-properties">Bind the properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supported-old-signals">Supported old signals</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="source/coherence.html">Cohen3 source tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributor_code_of_conduct.html">Contributor Covenant Code of Conduct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Cohen3</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>The events system</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/events.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <blockquote>
+<div></div></blockquote>
+<div class="section" id="the-events-system">
+<span id="the-event-system"></span><h1>The events system<a class="headerlink" href="#the-events-system" title="Permalink to this headline">¶</a></h1>
+<p>Starting from version 0.9.0 the event system has changed from louie/dispatcher
+to EventDispatcher (external dependency). Here are the most important changes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The new event system is not a global dispatcher anymore.</p></li>
+<li><p>All the signal/receivers are connected between them only if it is necessary.</p></li>
+<li><p>We don’t connect/disconnect anymore, instead you will bind/unbind.</p></li>
+<li><p>The events has been renamed (this is necessary because the old event names
+contains dots in his names, and this could cause troubles with the new
+event system).</p></li>
+</ul>
+</div></blockquote>
+<div class="section" id="bind-the-events">
+<h2>Bind the events<a class="headerlink" href="#bind-the-events" title="Permalink to this headline">¶</a></h2>
+<p>The event system is very similar to the one’s used in
+<a class="reference external" href="https://github.com/kivy/kivy">kivy’s framework</a>, so…if you are familiar
+with the kivy’s event management you will know exactly how to proceed to
+connect events and properties, here is a simple example of a media observer,
+made to show how to detect new devices by bind the signals emitted by the class
+<a class="reference external" href="https://opacam.github.io/Cohen3/source/modules.html#coherence.base.Coherence">Coherence</a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="kn">import</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">coherence.base</span> <span class="kn">import</span> <span class="n">Coherence</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.uuid</span> <span class="kn">import</span> <span class="n">UUID</span>
+<span class="n">new_uuid</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">()</span>
+
+<span class="c1"># called for each media server found</span>
+<span class="k">def</span> <span class="nf">media_server_found</span><span class="p">(</span><span class="n">device</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Media Server found: {device.get_friendly_name()}&#39;</span><span class="p">)</span>
+
+<span class="c1"># Called whenever a device is removed</span>
+<span class="k">def</span> <span class="nf">media_server_removed</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Media Server gone: {args}&#39;</span><span class="p">)</span>
+
+<span class="c1"># Initialize Coherence with a LolCats server</span>
+<span class="n">coherence</span> <span class="o">=</span> <span class="n">Coherence</span><span class="p">(</span>
+    <span class="p">{</span><span class="s1">&#39;logmode&#39;</span><span class="p">:</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;controlpoint&#39;</span><span class="p">:</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;plugin&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;backend&#39;</span><span class="p">:</span> <span class="s1">&#39;LolcatsStore&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Cohen3 LolcatsStore&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uuid&#39;</span><span class="p">:</span> <span class="n">new_uuid</span>
+                <span class="p">}</span>
+     <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># The first parameter of the bind function is the name of the emitted</span>
+<span class="c1"># signal, and after the logical operator &quot;=&quot;, we point to a function</span>
+<span class="c1"># that will be triggered whenever the class Coherence emits the signal.</span>
+<span class="n">coherence</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+    <span class="n">coherence_device_detection_completed</span><span class="o">=</span><span class="n">media_server_found</span><span class="p">)</span>
+<span class="n">coherence</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+    <span class="n">coherence_device_removed</span><span class="o">=</span><span class="n">media_server_removed</span><span class="p">)</span>
+
+<span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If you want to disconnect some signal you will proceed like you use to connect,
+but instead of the word <strong>bind</strong> you will use the word <strong>unbind</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Unbind/disconnect the signals connected before</span>
+<span class="n">coherence</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span>
+    <span class="n">coherence_device_detection_completed</span><span class="o">=</span><span class="n">media_server_found</span><span class="p">)</span>
+<span class="n">coherence</span><span class="o">.</span><span class="n">unbind</span><span class="p">(</span>
+    <span class="n">coherence_device_removed</span><span class="o">=</span><span class="n">media_server_removed</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="bind-the-properties">
+<h2>Bind the properties<a class="headerlink" href="#bind-the-properties" title="Permalink to this headline">¶</a></h2>
+<p>We also can bind/unbind some class properties (the same way we use
+above but replacing the first parameter with the property name), but you should
+be aware that we only can do that with those properties that uses the classes
+from the EventDispatcher’s package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">Property</span>
+<span class="o">-</span> <span class="n">ListProperty</span>
+<span class="o">-</span> <span class="n">DictProperty</span>
+</pre></div>
+</div>
+<p>So, similar result got above can be achieved from another perspective, using the
+mentioned EventDispatcher’s properties, for example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="kn">import</span> <span class="n">reactor</span>
+<span class="kn">from</span> <span class="nn">coherence.base</span> <span class="kn">import</span> <span class="n">Coherence</span>
+<span class="kn">from</span> <span class="nn">coherence.upnp.core.uuid</span> <span class="kn">import</span> <span class="n">UUID</span>
+<span class="n">lol_uuid</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">()</span>
+<span class="n">apple_uuid</span> <span class="o">=</span> <span class="n">UUID</span><span class="p">()</span>
+
+<span class="c1"># called whenever the devices property</span>
+<span class="c1"># of class Coherence changes</span>
+<span class="k">def</span> <span class="nf">on_devices</span><span class="p">(</span><span class="n">coherence_instance</span><span class="p">,</span> <span class="n">devices</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Media Server devices changed: {len(devices)} found&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="n">devices</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-&gt; {device.get_friendly_name()}&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span><span class="o">.</span><span class="n">get_friendly_name</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Cohen3 AppleTrailersStore&#39;</span><span class="p">:</span>
+            <span class="c1"># Now we remove the &quot;AppleTrailersStore&quot; server</span>
+            <span class="n">coherence_instance</span><span class="o">.</span><span class="n">remove_plugin</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;uuid:{device.get_uuid()}&#39;</span><span class="p">)</span>
+
+<span class="c1"># Initialize Coherence with a LolCats server</span>
+<span class="n">coherence</span> <span class="o">=</span> <span class="n">Coherence</span><span class="p">(</span>
+    <span class="p">{</span><span class="s1">&#39;logmode&#39;</span><span class="p">:</span> <span class="s1">&#39;warning&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;controlpoint&#39;</span><span class="p">:</span> <span class="s1">&#39;yes&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;plugin&#39;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="p">{</span><span class="s1">&#39;backend&#39;</span><span class="p">:</span> <span class="s1">&#39;LolcatsStore&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Cohen3 LolcatsStore&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;uuid&#39;</span><span class="p">:</span> <span class="n">lol_uuid</span>
+          <span class="p">},</span>
+         <span class="p">{</span><span class="s1">&#39;backend&#39;</span><span class="p">:</span> <span class="s1">&#39;AppleTrailersStore&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Cohen3 AppleTrailersStore&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;uuid&#39;</span><span class="p">:</span> <span class="n">apple_uuid</span>
+          <span class="p">},</span>
+     <span class="p">]</span>
+     <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># The first parameter of the bind function is the name of the property.</span>
+<span class="c1"># Here we target the devices property (which is of kind ListProperty),</span>
+<span class="c1"># and after the logical operator &quot;=&quot;, we point to a function that</span>
+<span class="c1"># will be triggered whenever some device is added or removed.</span>
+<span class="n">coherence</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">devices</span><span class="o">=</span><span class="n">on_devices</span><span class="p">)</span>
+
+<span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If you want more information about EventDispatcher, you can take a look at the
+<a class="reference external" href="https://github.com/lobocv/eventdispatcher">EventDispatcher project</a> for
+extended information and examples.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Check the <a class="reference external" href="https://opacam.github.io/Cohen3/source/coherence.html">Cohen3’s Source Tree</a>
+documentation for specific class events/properties.</p>
+</div>
+</div>
+<div class="section" id="supported-old-signals">
+<h2>Supported old signals<a class="headerlink" href="#supported-old-signals" title="Permalink to this headline">¶</a></h2>
+<p>In order to maintain some minimal compatibility with the old event system,
+the classes <a class="reference external" href="https://opacam.github.io/Cohen3/source/modules.html#coherence.base.Coherence">Coherence</a>
+and <a class="reference external" href="https://opacam.github.io/Cohen3/source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint">ControlPoint</a>
+contains two methods: connect and disconnect which will take care to bind/unbind
+some of the old signals.</p>
+<p>The supported old signals for connect/disconnect functions for the class
+<a class="reference external" href="https://opacam.github.io/Cohen3/source/modules.html#coherence.base.Coherence">Coherence</a>
+are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.Device.detection_completed</p></li>
+<li><p>Coherence.UPnP.RootDevice.detection_completed</p></li>
+<li><p>Coherence.UPnP.Device.removed</p></li>
+<li><p>Coherence.UPnP.RootDevice.removed</p></li>
+</ul>
+</div></blockquote>
+<p>The supported old signals for connect/disconnect functions for the class
+<a class="reference external" href="https://opacam.github.io/Cohen3/source/upnp/devices/control_point.html#coherence.upnp.devices.control_point.ControlPoint">ControlPoint</a>
+are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Coherence.UPnP.ControlPoint.MediaServer.detected</p></li>
+<li><p>Coherence.UPnP.ControlPoint.MediaServer.removed</p></li>
+<li><p>Coherence.UPnP.ControlPoint.MediaRenderer.detected</p></li>
+<li><p>Coherence.UPnP.ControlPoint.MediaRenderer.removed</p></li>
+<li><p>Coherence.UPnP.ControlPoint.InternetGatewayDevice.detected</p></li>
+<li><p>Coherence.UPnP.ControlPoint.InternetGatewayDevice.removed</p></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="source/coherence.html" class="btn btn-neutral float-right" title="Cohen3 source tree" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="example_backend_the_new_way.html" class="btn btn-neutral float-left" title="Writing a backend (the new way)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Pol Canelles
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
