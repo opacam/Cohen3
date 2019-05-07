@@ -201,7 +201,7 @@ class EventSubscriptionServer(EventDispatcher, resource.Resource, log.LogAble):
             elif b'callback' not in headers:
                 request.setResponseCode(404)
                 request.setHeader(b'SERVER', to_bytes(SERVER_ID))
-                request.setHeader(b'CONTENT-LENGTH', 0)
+                request.setHeader(b'CONTENT-LENGTH', to_bytes(0))
                 return b''
             else:
                 from .uuid import UUID
@@ -222,7 +222,7 @@ class EventSubscriptionServer(EventDispatcher, resource.Resource, log.LogAble):
 
             request.setHeader(b'TIMEOUT', to_bytes(s['timeout']))
             request.setHeader(b'SERVER', to_bytes(SERVER_ID))
-            request.setHeader(b'CONTENT-LENGTH', 0)
+            request.setHeader(b'CONTENT-LENGTH', to_bytes(0))
         return b''
 
     def render_UNSUBSCRIBE(self, request):

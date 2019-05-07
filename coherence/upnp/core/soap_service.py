@@ -34,7 +34,7 @@ from eventdispatcher import EventDispatcher
 
 from coherence import log, SERVER_ID
 from coherence.upnp.core import soap_lite
-from coherence.upnp.core.utils import parse_with_lxml
+from coherence.upnp.core.utils import parse_with_lxml, to_bytes
 
 
 class errorCode(Exception):
@@ -80,7 +80,7 @@ class UPnPPublisher(EventDispatcher, resource.Resource, log.LogAble):
         else:
             mimeType = 'text/xml'
         request.setHeader(b'Content-type', mimeType.encode('ascii'))
-        request.setHeader(b'Content-length', len(response))
+        request.setHeader(b'Content-length', to_bytes(len(response)))
         request.setHeader(b'EXT', b'')
         request.setHeader(b'SERVER', SERVER_ID.encode('ascii'))
         r = response if isinstance(response, bytes) else \
