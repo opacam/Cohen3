@@ -1,3 +1,11 @@
+0.9.2 - Fixes/updates dependencies
+----------------------------------
+
+Fixes:
+    - Specify the eventdispatcher version in setup.py
+    - Update twisted dependency to 19.2.1
+    - Pipenv's lock conflict
+
 0.9.1 - Fixes SSDP datagram sending
 -----------------------------------
 
