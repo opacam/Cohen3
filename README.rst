@@ -235,6 +235,38 @@ Notes:
    :height: 5
    :width: 5
 
+Installation with pip
+---------------------
+If you want to install with pip, first make sure that the `pip` command
+triggers the python3 version of python or use `pip3` instead. You can install
+the `Cohen3` python package from `pypi` or github
+
+To install from pypi:
+^^^^^^^^^^^^^^^^^^^^^
+
+  $ pip3 install --user Cohen3
+
+To install from git:
+^^^^^^^^^^^^^^^^^^^^
+
+  $ pip3 install --user https://github.com/opacam/Cohen3/archive/master.zip
+
+.. note::
+    - An user install is recommended or use an virtualenv
+
+.. tip::
+      If you encounter problems while installing, caused by some dependency,
+      you may try to bypass this error by installing the conflicting dependency
+      before `Cohen3`, so if you face an error like this for `Twisted`:
+
+        ERROR: Could not find a version that satisfies the requirement
+        Twisted>=19.2.1 (from Cohen3) (from versions: none)
+
+      You should be able to fix it installing Twisted before the install of
+      `Cohen3`:
+
+        pip3 install --upgrade --user Twisted
+
 Installation from source
 ------------------------
 After downloading and extracting the archive or having done a git
