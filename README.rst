@@ -54,16 +54,17 @@ Cohen3
 
 Overview
 --------
-Cohen3 Framework is a DLNA/UPnP Media Server for Python 3, based on the python 2
-version named `Cohen <https://github.com/unintended/Cohen>`_. Provides several
-UPnP MediaServers and MediaRenderers to make simple publishing and streaming
-different types of media content to your network.
+Cohen3 Framework is a DLNA/UPnP Media Server for `Python 3`, based on the
+`Python 2` version named `Cohen <https://github.com/unintended/Cohen>`_.
+Provides several UPnP MediaServers and MediaRenderers to make simple publishing
+and streaming different types of media content to your network.
 
 Cohen3 is the Python 3's version of the
 `Coherence Framework <https://github.com/coherence-project/Coherence>`_
-project, originally created by `Frank Scholz <mailto:dev@coherence-project.org>`_.
-If you ever used the original Coherence project you could use Cohen3 like you
-do in the original Coherence project.
+project, originally created by
+`Frank Scholz <mailto:dev@coherence-project.org>`_. If you ever used the
+original Coherence project you could use Cohen3 like you do in the original
+Coherence project.
 
 - Documentation: https://opacam.github.io/Cohen3/
 - GitHub: https://github.com/opacam/Cohen3
@@ -93,14 +94,14 @@ And provides a lot of backends to fulfil your media streaming needs:
 
 Project Status
 --------------
-Right now Cohen is in development mode. All the code has been refactored in order
-to work for Python 3, moreover, some additions has been made to make easier
-to create a custom Backend (check the
+Right now Cohen is in development mode. All the code has been refactored in
+order to work for Python 3, moreover, some additions has been made to make
+easier to create a custom Backend (check the
 `coherence.backends.models <https://opacam.github.io/Cohen3/source/coherence.
-backends.html#coherence-backends-models-package>`_ package documentation for more
-information). The original Coherence project was unmaintained for a while and
-some of the backends has become obsolete. You can see the backends status in
-the below table.
+backends.html#coherence-backends-models-package>`_ package documentation for
+more information). The original Coherence project was unmaintained for a while
+and some of the backends has become obsolete. You can see the backends status
+in the below table.
 
 .. list-table::
    :widths: 10 25 65
@@ -206,17 +207,18 @@ the below table.
      -
    * - |fails|
      - YouTubeStore
-     - *Google moved to new api...backend should be rewrite with new api in mind*
+     - *Google moved to new api...backend should be rewrite with new api in
+       mind*
 
 Notes:
 
     - Some of the listed backends it may be removed in a future releases...
-      depending on if the target service is still available, dependencies of the
-      backend, maintainability...keep in mind that the main goal of this project
-      is to have a working media server/client capable of serve local files into
-      a dlna/upnp network, all the backends are extra features which may be handy
-      for some end-users and also may be useful as a reference of how to make
-      your own backend using the Cohen3's modules.
+      depending on if the target service is still available, dependencies of
+      the backend, maintainability...keep in mind that the main goal of this
+      project is to have a working media server/client capable of serve local
+      files into a dlna/upnp network, all the backends are extra features which
+      may be handy for some end-users and also may be useful as a reference of
+      how to make your own backend using the Cohen3's modules.
 
 .. |success| image:: misc/other-icons/checked.png
    :align: middle
@@ -233,6 +235,38 @@ Notes:
    :height: 5
    :width: 5
 
+Installation with pip
+---------------------
+If you want to install with pip, first make sure that the `pip` command
+triggers the python3 version of python or use `pip3` instead. You can install
+the `Cohen3` python package from `pypi` or github
+
+To install from pypi:
+^^^^^^^^^^^^^^^^^^^^^
+
+  $ pip3 install --user Cohen3
+
+To install from git:
+^^^^^^^^^^^^^^^^^^^^
+
+  $ pip3 install --user https://github.com/opacam/Cohen3/archive/master.zip
+
+.. note::
+    - An user install is recommended or use an virtualenv
+
+.. tip::
+      If you encounter problems while installing, caused by some dependency,
+      you may try to bypass this error by installing the conflicting dependency
+      before `Cohen3`, so if you face an error like this for `Twisted`:
+
+        ERROR: Could not find a version that satisfies the requirement
+        Twisted>=19.2.1 (from Cohen3) (from versions: none)
+
+      You should be able to fix it installing Twisted before the install of
+      `Cohen3`:
+
+        pip3 install --upgrade --user Twisted
+
 Installation from source
 ------------------------
 After downloading and extracting the archive or having done a git
@@ -244,8 +278,8 @@ the files with::
 This will copy the Python module files into your local Python package
 folder and the cohen executable to ``/usr/local/bin/cohen3``.
 
-If you want to install Cohen3 with extra dependencies you must do the steps above
-and moreover install pip, then you can run the following command
+If you want to install Cohen3 with extra dependencies you must do the steps
+above and moreover install pip, then you can run the following command
 (instead of the mentioned above) for installing the development dependencies::
 
   $ sudo pip install -e .[dev]
@@ -267,10 +301,10 @@ an UPnP MediaServer with a file-system backend enabled::
 
   $ cohen3 --plugin=backend:FSStore,content:/path/to/your/media/files
 
-You can also configure cohen via a config file. Feel free to check our example ``misc/cohen.conf.example``.
-The config file can be placed anywhere, cohen looks by default for
-``$HOME/.cohen``, but you can pass the path via the commandline option
-'-c' to it too::
+You can also configure cohen via a config file. Feel free to check our example
+``misc/cohen.conf.example``. The config file can be placed anywhere, cohen
+looks by default for ``$HOME/.cohen``, but you can pass the path via the
+command line option '-c' to it too::
 
   $ cohen3 -c /path/to/config/file
 
@@ -280,11 +314,12 @@ Starting from version 0.9.0 the event system has changed from louie/dispatcher
 to EventDispatcher (external dependency). Here are the most important changes:
 
     - The new event system is not a global dispatcher anymore
-    - All the signal/receivers are connected between them only if it is necessary.
+    - All the signal/receivers are connected between them only if it is
+      necessary.
     - We don't connect/disconnect anymore, instead we will bind/unbind.
-    - The events has been renamed (this is necessary because the old event names
-      contains dots in his names, and this could cause troubles with the new
-      event system)
+    - The events has been renamed (this is necessary because the old event
+      names contains dots in his names, and this could cause troubles with the
+      new event system)
 
 Please, check the documentation for further details at
 `"The events system" <https://opacam.github.io/Cohen3/events.html>`_ section.
@@ -293,4 +328,5 @@ Contributing
 ------------
 Report bugs at https://github.com/opacam/Cohen3/issues
 
-Feel free to fetch the repo and send your `pull requests! <https://github.com/opacam/Cohen3/pulls>`_
+Feel free to fetch the repo and send your
+`pull requests! <https://github.com/opacam/Cohen3/pulls>`_
