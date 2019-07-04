@@ -6,7 +6,7 @@ cffi==1.11.5
 chardet==3.0.4
 configobj==5.0.6
 constantly==15.1.0
-cryptography==2.3
+cryptography>=2.3
 futures==3.1.1
 git+git://github.com/lobocv/eventdispatcher@releases/tag/1.9.4#egg=eventdispatcher
 git+git://github.com/dvska/gdata-python3@master#egg=gdata
@@ -23,6 +23,6 @@ python-dateutil==2.7.3
 requests==2.20.0
 singledispatch==3.4.0.3
 six==1.11.0
-Twisted==18.7.0
+Twisted>=19.2.1
 urllib3==1.24.2
 zope.interface==4.5.0
