@@ -386,11 +386,11 @@ class MSRoot(resource.Resource, log.LogAble):
                         f'{request.method} request with content-length '
                         f'{headers[b"content-length"]} header - sanitizing')
 					# This should fix #20
-					try:
-                    	del request.received_headers[b'content-length']
-					except:
-						request.received_headers = headers
-						del request.received_headers[b'content-length']
+                    try:
+                        del request.received_headers[b'content-length']
+                    except:
+                        request.received_headers = headers
+                        del request.received_headers[b'content-length']
                 self.debug('data', )
                 if len(request.content.getvalue()) > 0:
                     # shall we remove that?
