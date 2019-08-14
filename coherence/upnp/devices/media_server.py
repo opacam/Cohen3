@@ -385,7 +385,11 @@ class MSRoot(resource.Resource, log.LogAble):
                     self.warning(
                         f'{request.method} request with content-length '
                         f'{headers[b"content-length"]} header - sanitizing')
-                    del request.received_headers[b'content-length']
+					try:
+                    	del request.received_headers[b'content-length']
+					except:
+						# For some reason 'requests.recieved_headers' doesn't exist with certain devices
+						del headers[b'content-length']
                 self.debug('data', )
                 if len(request.content.getvalue()) > 0:
                     # shall we remove that?
