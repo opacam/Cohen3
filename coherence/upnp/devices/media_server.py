@@ -385,7 +385,12 @@ class MSRoot(resource.Resource, log.LogAble):
                     self.warning(
                         f'{request.method} request with content-length '
                         f'{headers[b"content-length"]} header - sanitizing')
-                    del request.received_headers[b'content-length']
+                    # Fix missing headers for some Samsung TVs (see issue #20)
+                    try:
+                        del request.received_headers[b'content-length']
+                    except AttributeError:
+                        request.received_headers = headers
+                        del request.received_headers[b'content-length']
                 self.debug('data', )
                 if len(request.content.getvalue()) > 0:
                     # shall we remove that?
