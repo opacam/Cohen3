@@ -64,6 +64,7 @@ jobs:
     - name: Unit tests with nose
       run: |
         pip install python-coveralls==2.9.1
+        pip install nose nose-cov
         nosetests --config=.noserc
     - name: Build/deploy sphinx docs
       run: |
