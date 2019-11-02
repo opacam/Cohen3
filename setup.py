@@ -74,14 +74,19 @@ docs_require = [
     'sphinx-rtd-theme>=0.1.9',
 ]
 
-test_require = \
-    audio_store_require + \
-    youtube_store_require
+test_require = (
+    [
+        'flake8',
+        'pylint==2.1.1',
+        'python-coveralls==2.9.1',
+        'nose',
+        'nose-cov',
+    ]
+    + audio_store_require
+    + youtube_store_require
+)
 
-dev_require = \
-    test_require + \
-    youtube_store_require + \
-    gstreamer_player_require
+dev_require = test_require + gstreamer_player_require
 
 entry_points = """
     [coherence.plugins.backend.media_server]

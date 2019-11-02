@@ -49,22 +49,15 @@ jobs:
         pip install -e .[test]
     - name: Lint with flake8
       run: |
-        pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 --count --select=E9,F63,F7,F82 --show-source --statistics coherence/ tests/
         # exit-zero treats all errors as warnings
-        flake8 --count --exit-zero --max-complexity=10 --max-line-length=80 --statistics coherence/ tests/
-    - name: Lint with pycodestyle
-      run: |
-        pip install pycodestyle==2.4.0
-        pycodestyle coherence --ignore=E402,W504
+        flake8 --count --exit-zero --ignore=E402,W503 --max-complexity=10 --max-line-length=80 --statistics coherence/ tests/
     - name: Lint with pylint
       run: |
         pip install pylint==2.1.1
     - name: Unit tests with nose
       run: |
-        pip install python-coveralls==2.9.1
-        pip install nose nose-cov
         nosetests --config=.noserc
     # The following steps will only be run for python 3.7
     - name: Upload coverage to Codecov

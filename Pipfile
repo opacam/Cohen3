@@ -35,23 +35,23 @@ pygobject = "*"
 treq = "*"
 gdata = {git = "https://github.com/dvska/gdata-python3"}
 dbus-python = "*"
-epsilon = {ref = "python3", git = "git://github.com/opacam/epsilon"}
-Axiom = {ref = "python3", git = "git://github.com/opacam/axiom"}
+epsilon = {ref = "python3",git = "git://github.com/opacam/epsilon"}
+Axiom = {ref = "python3",git = "git://github.com/opacam/axiom"}
 travis-sphinx = "*"
 autobahn = "*"
-"403b5ad" = {file = "https://github.com/lobocv/eventdispatcher/archive/1.9.4.tar.gz"}
+403b5ad = {file = "https://github.com/lobocv/eventdispatcher/archive/1.9.4.tar.gz"}
+flake8 = "*"
 
 [dev-packages]
 pipenv = "==2018.7.1"
 virtualenv = "==16.0.0"
 virtualenv-clone = "==0.3.0"
-pycdb = {ref = "master", git = "https://github.com/fishstiqz/pycdb"}
-discid = {ref = "master", git = "https://github.com/JonnyJD/python-discid"}
+pycdb = {ref = "master",git = "https://github.com/fishstiqz/pycdb"}
+discid = {ref = "master",git = "https://github.com/JonnyJD/python-discid"}
 nose-cov = "*"
 coveralls = "*"
 pylint = "*"
 python-coveralls = "==2.9.1"
-pycodestyle = "*"
 sphinx = "*"
 recommonmark = "*"
 sphinx-rtd-theme = "*"
