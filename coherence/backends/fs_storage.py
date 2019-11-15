@@ -618,7 +618,7 @@ class FSStore(BackendStore):
             self.import_folder_id = id
         for bytesPath in self.content:
             if isinstance(bytesPath, (list, tuple)):
-                path = str(path[0])
+                path = str(bytesPath[0])
             else:
                 path = str(bytesPath)
             if self.ignore_file_pattern.match(path):

@@ -38,26 +38,11 @@ install:
   - pip install feedparser
   - pip install livestreamer
   - pip install service_identity
-  - pip install python-coveralls==2.9.1
-  - pip install pycodestyle==2.4.0
-  - pip install pylint==2.1.1
-  - pip install travis-sphinx
-  - pip install sphinx-rtd-theme
   - pip install -e .[test]
 script:
-  - pycodestyle coherence --ignore=E402,W504
+  # stop the build if there are Python syntax errors or undefined names
+  - flake8 --count --select=E9,F63,F7,F82 --show-source --statistics coherence/ tests/
+  # exit-zero treats all errors as warnings
+  - flake8 --count --exit-zero --ignore=E402,W503 --max-complexity=10 --max-line-length=80 --statistics coherence/ tests/
   - pylint -E coherence --rcfile=.pylintrc
   - nosetests --config=.noserc
-  - travis-sphinx build -n --source=docs
-after_success:
-  - travis-sphinx deploy
-  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
-#deploy:
-#  provider: pypi
-#  distributions: sdist bdist_wheel
-#  skip_cleanup: true
-#  user: opacam
-#  password:
-#    secure: fLJVFsyO3VIFMLG7S5HQoyzYLsIBZZiI+f8iwpxxCN8gjwKe5WadoTEBgtATpTZrkfrza61xRABBd8hrn5+dZTRcebodD0oSrZEttB15WYLDXZucVGWY1jmKCpjM5I1BzJTr6kMbOCr+bwewM30izW1mXKHsUzqRc+TarKpIKUlOoYGB65KWLKGilreGVft8Vmx58Q4/xMb3Uax5LQzDtePZmAnpXDMAD12zSGCMeHKZHDFCoTBxeij1unRIW9Bq+l/1F4Uh22gd7HWS0dkQBRQXojjqETVZgvssxfOSuQTgluvZpnjjk5obntJIitx7q924dCBKO8vq1wGF5my9jg3BFeAOkRJnM6n1+9n8e7JgC8+zQrBqlf9BuUhnBOS2rQpnc9nnD5AfL/Hsh5GcJJ06AXrxGNiVaKKT2oVwesrRrPFXW6l9vknrhza9Zy0mDqDdGLHGzEpGc+C55iKcrQzmQ4/TSqCruhBI4B3alO+zAV8cLdRxNAOwKthx60p/DjeMjyFEt5DIEtAfZfr5Jbx8k6sW72vdBrLXMX4JZIg6XmRm/buCqASEvulkd/j9/L4wBnbQJJQ6VYPlDlvzslq/NJavlko4Z/oBAJ/So4dhtJFi/g0hUIHx+40k0o8RbptRYu5vm5fALonHM0tvm3KGZyymPbn5k5OwouHFZd8=
-#  on:
-#    tags: true
