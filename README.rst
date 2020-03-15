@@ -267,22 +267,17 @@ To install from git:
 
         pip3 install --upgrade --user Twisted
 
-Installation from source
-------------------------
+Installation from source with `pip/poetry`
+------------------------------------------
 After downloading and extracting the archive or having done a git
 clone, move into the freshly created 'Cohen3' folder and install
-the files with::
+the basic dependencies with `pip`::
 
-  $ sudo python ./setup.py install
+  $ pip install .
 
-This will copy the Python module files into your local Python package
-folder and the cohen executable to ``/usr/local/bin/cohen3``.
+If you want to install Cohen3 with development dependencies::
 
-If you want to install Cohen3 with extra dependencies you must do the steps
-above and moreover install pip, then you can run the following command
-(instead of the mentioned above) for installing the development dependencies::
-
-  $ sudo pip install -e .[dev]
+  $ pip install .[dev]
 
 Note:  The supported install modes are:
 

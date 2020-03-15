@@ -1,5 +1,15 @@
+Unreleased - Poetry & autorelease
+---------------------------------
+
+General:
+    - Implement PEP517 & PEP518 (`pyproject.toml` using `poetry`)
+    - Replace `Pipenv` for `Poetry`
+
 0.9.2 - Fixes/updates dependencies
 ----------------------------------
+
+General:
+    - implement gh-actions
 
 Fixes:
     - Specify the eventdispatcher version in setup.py
