@@ -45,7 +45,7 @@ epsilon = {optional = true, version = "*"}
 feedparser = {optional = true, version = "*"}
 gdata = {optional = true, version = "*"}
 livestreamer = {optional = true, version = "*"}
-eventdispatcher = {git = "https://github.com/lobocv/eventdispatcher", rev = "1.9.4"}
+eventdispatcher = {version = "==1.9.4"}
 lxml = "*"
 pycairo = {version = ">=1.17.1", optional = true}
 pycdb = {optional = true, version = "*"}
@@ -56,7 +56,7 @@ service_identity = "^18.1.0"
 twisted = ">=19.2.1"
 "zope.interface" = "*"
 
-[tool.poetry.dev-dependencies]
+# dev-dependencies
 flake8 = {optional = true, version = "*"}
 nose = {optional = true, version = "*"}
 nose-cov = {optional = true, version = "*"}

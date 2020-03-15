@@ -1,5 +1,5 @@
 [[package]]
-category = "dev"
+category = "main"
 description = "A configurable sidebar-enabled Sphinx theme"
 name = "alabaster"
 optional = true
@@ -7,7 +7,7 @@ python-versions = "*"
 version = "0.7.12"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "An abstract syntax tree for Python with inference support."
 name = "astroid"
 optional = true
@@ -89,7 +89,7 @@ Epsilon = ">=0.7.0"
 Twisted = ">=13.2.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Internationalization utilities"
 name = "babel"
 optional = true
@@ -127,7 +127,7 @@ python-versions = "*"
 version = "3.0.4"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Cross-platform colored terminal text."
 marker = "sys_platform == \"win32\""
 name = "colorama"
@@ -136,7 +136,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 version = "0.4.3"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python parser for the CommonMark Markdown spec"
 name = "commonmark"
 optional = true
@@ -166,7 +166,7 @@ python-versions = "*"
 version = "15.1.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "plugin core for use by pytest-cov, nose-cov and nose2-cov"
 name = "cov-core"
 optional = true
@@ -177,7 +177,7 @@ version = "1.15.0"
 coverage = ">=3.6"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Code coverage measurement for Python"
 name = "coverage"
 optional = true
@@ -220,7 +220,7 @@ python-versions = "*"
 version = "1.2.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Docutils -- Python Documentation Utilities"
 name = "docutils"
 optional = true
@@ -228,7 +228,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 version = "0.16"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Discover and load entry points from installed packages."
 name = "entrypoints"
 optional = true
@@ -260,10 +260,6 @@ version = "1.9.4"
 future = "*"
 numpy = "*"
 
-[package.source]
-reference = "9ac85b4ce225bc720cf03eb0d349d64aca4fd20d"
-type = "git"
-url = "https://github.com/lobocv/eventdispatcher"
 [[package]]
 category = "main"
 description = "Universal feed parser, handles RSS 0.9x, RSS 1.0, RSS 2.0, CDF, Atom 0.3, and Atom 1.0 feeds"
@@ -273,7 +269,7 @@ python-versions = "*"
 version = "5.2.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "the modular source code checker: pep8, pyflakes and co"
 name = "flake8"
 optional = true
@@ -322,7 +318,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.9"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Getting image size from png/jpeg/jpeg2000/gif file"
 name = "imagesize"
 optional = true
@@ -341,7 +337,7 @@ version = "17.5.0"
 scripts = ["click (>=6.0)", "twisted (>=16.4.0)"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A Python utility / library to sort Python imports."
 name = "isort"
 optional = true
@@ -355,7 +351,7 @@ requirements = ["pipreqs", "pip-api"]
 xdg_home = ["appdirs (>=1.4.0)"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A very fast and expressive template engine."
 name = "jinja2"
 optional = true
@@ -369,7 +365,7 @@ MarkupSafe = ">=0.23"
 i18n = ["Babel (>=0.8)"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A fast and thorough lazy object proxy."
 name = "lazy-object-proxy"
 optional = true
@@ -402,7 +398,7 @@ htmlsoup = ["beautifulsoup4"]
 source = ["Cython (>=0.29.7)"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Safely add untrusted strings to HTML/XML markup."
 name = "markupsafe"
 optional = true
@@ -410,7 +406,7 @@ python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 version = "1.1.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "McCabe checker, plugin for flake8"
 name = "mccabe"
 optional = true
@@ -418,7 +414,7 @@ python-versions = "*"
 version = "0.6.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "nose extends unittest to make testing easier"
 name = "nose"
 optional = true
@@ -426,7 +422,7 @@ python-versions = "*"
 version = "1.3.7"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "nose plugin for coverage reporting, including subprocesses and multiprocessing"
 name = "nose-cov"
 optional = true
@@ -446,7 +442,7 @@ python-versions = ">=3.5"
 version = "1.18.2"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Core utilities for Python packages"
 name = "packaging"
 optional = true
@@ -458,7 +454,7 @@ pyparsing = ">=2.0.2"
 six = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A collection of helpful Python tools!"
 name = "pockets"
 optional = true
@@ -504,7 +500,7 @@ python-versions = "*"
 version = "0.0.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python style guide checker"
 name = "pycodestyle"
 optional = true
@@ -520,7 +516,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.20"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "passive checker of Python programs"
 name = "pyflakes"
 optional = true
@@ -528,7 +524,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.1.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Pygments is a syntax highlighting package written in Python."
 name = "pygments"
 optional = true
@@ -555,7 +551,7 @@ python-versions = ">=3.5"
 version = "2.0.2"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "python code static checker"
 name = "pylint"
 optional = true
@@ -585,7 +581,7 @@ docs = ["sphinx", "sphinx-rtd-theme"]
 test = ["flaky", "pretend", "pytest (>=3.0.1)"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python parsing module"
 name = "pyparsing"
 optional = true
@@ -593,7 +589,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 version = "2.4.7"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python interface to coveralls.io API"
 name = "python-coveralls"
 optional = true
@@ -618,7 +614,7 @@ version = "2.8.1"
 six = ">=1.5"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "World timezone definitions, modern and historical"
 name = "pytz"
 optional = true
@@ -626,7 +622,7 @@ python-versions = "*"
 version = "2019.3"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "YAML parser and emitter for Python"
 name = "pyyaml"
 optional = true
@@ -634,7 +630,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 version = "5.3.1"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A docutils-compatibility bridge to CommonMark, enabling you to write CommonMark inside of Docutils & Sphinx projects."
 name = "recommonmark"
 optional = true
@@ -693,7 +689,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 version = "1.14.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "This package provides 26 stemmers for 25 languages generated from Snowball algorithms."
 name = "snowballstemmer"
 optional = true
@@ -701,7 +697,7 @@ python-versions = "*"
 version = "2.0.0"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Python documentation generator"
 name = "sphinx"
 optional = true
@@ -733,7 +729,7 @@ lint = ["flake8 (>=3.5.0)", "flake8-import-order", "mypy (>=0.770)", "docutils-s
 test = ["pytest", "pytest-cov", "html5lib", "typed-ast", "cython"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Read the Docs theme for Sphinx"
 name = "sphinx-rtd-theme"
 optional = true
@@ -744,7 +740,7 @@ version = "0.4.3"
 sphinx = "*"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "sphinxcontrib-applehelp is a sphinx extension which outputs Apple help books"
 name = "sphinxcontrib-applehelp"
 optional = true
@@ -756,7 +752,7 @@ lint = ["flake8", "mypy", "docutils-stubs"]
 test = ["pytest"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "sphinxcontrib-devhelp is a sphinx extension which outputs Devhelp document."
 name = "sphinxcontrib-devhelp"
 optional = true
@@ -768,7 +764,7 @@ lint = ["flake8", "mypy", "docutils-stubs"]
 test = ["pytest"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files"
 name = "sphinxcontrib-htmlhelp"
 optional = true
@@ -780,7 +776,7 @@ lint = ["flake8", "mypy", "docutils-stubs"]
 test = ["pytest", "html5lib"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "A sphinx extension which renders display math in HTML via JavaScript"
 name = "sphinxcontrib-jsmath"
 optional = true
@@ -791,7 +787,7 @@ version = "1.0.1"
 test = ["pytest", "flake8", "mypy"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Sphinx \"napoleon\" extension."
 name = "sphinxcontrib-napoleon"
 optional = true
@@ -803,7 +799,7 @@ pockets = ">=0.3"
 six = ">=1.5.2"
 
 [[package]]
-category = "dev"
+category = "main"
 description = "sphinxcontrib-qthelp is a sphinx extension which outputs QtHelp document."
 name = "sphinxcontrib-qthelp"
 optional = true
@@ -815,7 +811,7 @@ lint = ["flake8", "mypy", "docutils-stubs"]
 test = ["pytest"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "sphinxcontrib-serializinghtml is a sphinx extension which outputs \"serialized\" HTML files (json and pickle)."
 name = "sphinxcontrib-serializinghtml"
 optional = true
@@ -869,7 +865,7 @@ dev = ["wheel", "pytest (>=2.6.4)", "pytest-cov (>=1.8.1)", "pep8 (>=1.6.2)", "s
 twisted = ["zope.interface (>=3.6)", "twisted (>=20.3.0)"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "a fork of Python 2 and 3 ast modules with type comment support"
 marker = "implementation_name == \"cpython\" and python_version < \"3.8\""
 name = "typed-ast"
@@ -891,7 +887,7 @@ secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "pyOpenSSL (>=0
 socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7,<2.0)"]
 
 [[package]]
-category = "dev"
+category = "main"
 description = "Module for decorators, wrappers and monkey patching."
 name = "wrapt"
 optional = true
@@ -917,19 +913,19 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [extras]
 audio = ["discid", "pycdb"]
 dbus = ["dbus-python"]
-dev = ["autobahn", "dbus-python", "discid", "gdata", "pycdb", "pycairo", "pygobject"]
-docs = []
+dev = ["autobahn", "dbus-python", "discid", "gdata", "pycdb", "pycairo", "pygobject", "flake8", "nose", "nose-cov", "pylint", "python-coveralls", "recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
+docs = ["recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
 elisa = ["axiom", "epsilon"]
 feed = ["feedparser"]
 gstreamer = ["pycairo", "pygobject"]
 picasa = ["gdata"]
-test = []
+test = ["flake8", "nose", "nose-cov", "pylint", "python-coveralls"]
 twitch = ["livestreamer"]
 web = ["autobahn"]
 youtube = ["gdata"]
 
 [metadata]
-content-hash = "83d4d9103042de53160ef05a36a1fe0f8c15de83583ac1049cfe02ef31b01d47"
+content-hash = "c98acb4d606e7041c66bb37e61c69c75b92ee6a2a3088abf0324b352904cd934"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -1085,7 +1081,9 @@ epsilon = [
     {file = "Epsilon-0.7.3-py2-none-any.whl", hash = "sha256:0a886d6ab15bd3e0bb534d030d3e03d9956e7d4f529d23a5b38a5c45b7a93475"},
     {file = "Epsilon-0.7.3.tar.gz", hash = "sha256:1289b96b799b58ea764f08e2e971266c08895975f64143818d848484199a9c39"},
 ]
-eventdispatcher = []
+eventdispatcher = [
+    {file = "eventdispatcher-1.9.4.tar.gz", hash = "sha256:9f1b96ab2a13384fd09a7837793a62d9a336c7f22f20576187d46c5070863495"},
+]
 feedparser = [
     {file = "feedparser-5.2.1.tar.bz2", hash = "sha256:ce875495c90ebd74b179855449040003a1beb40cd13d5f037a0654251e260b02"},
     {file = "feedparser-5.2.1.tar.gz", hash = "sha256:bd030652c2d08532c034c27fcd7c85868e7fa3cb2b17f230a44a6bbc92519bf9"},
