@@ -1,0 +1,136 @@
+[tool]
+
+[tool.poetry]
+name = "Cohen3"
+version = "2020.03.20"
+description = "Cohen3 - DLNA/UPnP Media Server"
+license = "MIT"
+readme = "README.rst"
+homepage = "https://github.com/opacam/Cohen3/"
+repository = "https://github.com/opacam/Cohen3/"
+documentation = "https://opacam.github.io/Cohen3/"
+keywords = ["UPnP", "DLNA", "multimedia", "gstreamer"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Internet :: WWW/HTTP", "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Multimedia :: Video", "Topic :: Utilities"
+]
+authors = ["opacam <canellestudi@gmail.com>"]
+maintainers = ["opacam <canellestudi@gmail.com>"]
+
+packages = [
+    { include = "coherence" },
+    { include = "CHANGELOG.rst", format = "sdist" },
+    { include = "LICENCE", format = "sdist" },
+    { include = "docs", format = "sdist" },
+    { include = "misc", format = "sdist" },
+    { include = "tests", format = "sdist" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+autobahn = {optional = true, version = "*"}
+axiom = {optional = true, git = "https://github.com/opacam/axiom.git", branch = "python3"}
+configobj = ">=4.3"
+dbus-python = {optional = true, version = "*"}
+discid = {optional = true, git = "https://github.com/JonnyJD/python-discid.git", branch = "master"}
+epsilon = {optional = true, git = "https://github.com/opacam/epsilon.git", branch = "python3"}
+feedparser = {optional = true, version = "*"}
+gdata = {optional = true, git = "https://github.com/dvska/gdata-python3.git", branch = "master"}
+livestreamer = {optional = true, version = "*"}
+eventdispatcher = {git = "https://github.com/lobocv/eventdispatcher.git", rev = "1.9.4"}
+lxml = "*"
+pycairo = {version = ">=1.17.1", optional = true}
+pycdb = {optional = true, git = "https://github.com/fishstiqz/pycdb.git", branch = "master"}
+pygobject = {version = ">=3.30.0", optional = true}
+pyopenssl = "*"
+python-dateutil = "*"
+service_identity = "^18.1.0"
+twisted = ">=19.2.1"
+"zope.interface" = "*"
+
+# dev-dependencies
+flake8 = {optional = true, version = "*"}
+nose = {optional = true, version = "*"}
+nose-cov = {optional = true, version = "*"}
+pylint = {version = "==2.1.1", optional = true}
+python-coveralls = {version = "==2.9.1", optional = true}
+recommonmark = {version = ">=0.4.0", optional = true}
+sphinx = {version = ">=1.3.5", optional = true}
+sphinx-rtd-theme = {version = ">=0.1.9", optional = true}
+sphinxcontrib-napoleon = {version = ">=0.4.4", optional = true}
+
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry.extras]
+web = ["autobahn"]
+elisa = ["axiom", "epsilon"]
+dbus = ["dbus-python"]
+picasa = ["gdata"]
+youtube = ["gdata"]
+test = ["flake8", "nose", "nose-cov", "pylint", "python-coveralls"]
+audio = ["discid", "pycdb"]
+feed = ["feedparser"]
+twitch = ["livestreamer"]
+gstreamer = ["pycairo", "pygobject"]
+docs = ["recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
+dev = [
+    "autobahn", "dbus-python",
+    "discid", "gdata", "pycdb",
+    "pycairo", "pygobject",
+    "flake8", "nose", "nose-cov", "pylint", "python-coveralls",
+    "recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon",
+]
+
+[tool.poetry.scripts]
+cohen3 = "coherence.cli:main"
+
+[tool.poetry.plugins."coherence.plugins.backend.media_server"]
+AmpacheStore = 'coherence.backends.ampache_storage:AmpacheStore'
+AppleTrailersStore = 'coherence.backends.appletrailers_storage:AppleTrailersStore'
+AudioCDStore = 'coherence.backends.audiocd_storage:AudioCDStore'
+AxisCamStore = 'coherence.backends.axiscam_storage:AxisCamStore'
+BansheeStore = 'coherence.backends.banshee_storage:BansheeStore'
+BBCStore = 'coherence.backends.bbc_storage:BBCStore'
+BuzztardStore = 'coherence.backends.buzztard_control:BuzztardStore'
+DVBDStore = 'coherence.backends.dvbd_storage:DVBDStore'
+ElisaMediaStore = 'coherence.backends.elisa_storage:ElisaMediaStore'
+FeedStore = 'coherence.backends.feed_storage:FeedStore'
+FlickrStore = 'coherence.backends.flickr_storage:FlickrStore'
+FSStore = 'coherence.backends.fs_storage:FSStore'
+Gallery2Store = 'coherence.backends.gallery2_storage:Gallery2Store'
+IRadioStore = 'coherence.backends.iradio_storage:IRadioStore'
+ITVStore = 'coherence.backends.itv_storage:ITVStore'
+LastFMStore = 'coherence.backends.lastfm_storage:LastFMStore'
+LolcatsStore = 'coherence.backends.lolcats_storage:LolcatsStore'
+MediaStore = 'coherence.backends.mediadb_storage:MediaStore'
+MiroGuideStore = 'coherence.backends.miroguide_storage:MiroGuideStore'
+PicasaStore = 'coherence.backends.picasa_storage:PicasaStore'
+PlaylistStore = 'coherence.backends.playlist_storage:PlaylistStore'
+RadiotimeStore = 'coherence.backends.radiotime_storage:RadiotimeStore'
+SWR3Store = 'coherence.backends.swr3_storage:SWR3Store'
+TEDStore = 'coherence.backends.ted_storage:TEDStore'
+TestStore = 'coherence.backends.test_storage:TestStore'
+TrackerStore = 'coherence.backends.tracker_storage:TrackerStore'
+TwitchStore = 'coherence.backends.twitch_storage:TwitchStore'
+YamjStore = 'coherence.backends.yamj_storage:YamjStore'
+YouTubeStore = 'coherence.backends.youtube_storage:YouTubeStore'
+
+
+[tool.poetry.plugins."coherence.plugins.backend.media_renderer"]
+BuzztardPlayer = 'coherence.backends.buzztard_control:BuzztardPlayer'
+ElisaPlayer = 'coherence.backends.elisa_renderer:ElisaPlayer'
+GStreamerPlayer = 'coherence.backends.gstreamer_renderer:GStreamerPlayer'
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/opacam/Cohen3/issues"

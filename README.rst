@@ -23,10 +23,6 @@ Cohen3
         :target: https://github.com/opacam/Cohen3/releases
         :alt: GitHub release
 
-.. image:: https://img.shields.io/packagist/dm/doctrine/orm.svg?style=flat
-        :target: https://pypi.python.org/pypi/Cohen3
-        :alt: Packagist
-
 .. image:: http://hits.dwyl.io/opacam/Cohen3.svg
         :target: http://hits.dwyl.io/opacam/Cohen3
 
@@ -44,16 +40,15 @@ Cohen3
 .. image:: https://img.shields.io/github/license/opacam/Cohen3.svg
         :target: https://github.com/opacam/Cohen3/blob/master/LICENSE
 
-.. raw:: html
-
-        <h5 align="center">Dlna/UPnP framework</h5>
-        <p align="center">
-        <img style="width: 12.5em;" src="coherence/web/static/images/coherence-icon.png">
-        </p>
-        <h5 align="center">For the Digital Living</h5>
-
 Overview
 --------
+
+**Dlna/UPnP framework**
+
+|cohen-image|
+
+**For the Digital Living**
+
 Cohen3 Framework is a DLNA/UPnP Media Server for `Python 3`, based on the
 `Python 2` version named `Cohen <https://github.com/unintended/Cohen>`_.
 Provides several UPnP MediaServers and MediaRenderers to make simple publishing
@@ -71,6 +66,10 @@ Coherence project.
 - Issue tracker: https://github.com/opacam/Cohen3/issues
 - PyPI: https://pypi.python.org/pypi/cohen3
 - Free software: MIT licence
+
+.. |cohen-image| image:: coherence/web/static/images/coherence-icon.png
+   :height: 12.5 em
+   :width: 12.5 em
 
 Features
 --------
@@ -267,24 +266,29 @@ To install from git:
 
         pip3 install --upgrade --user Twisted
 
-Installation from source
-------------------------
+Install from source with `poetry`
+---------------------------------
 After downloading and extracting the archive or having done a git
 clone, move into the freshly created 'Cohen3' folder and install
-the files with::
+all dependencies (dev included) with `poetry`, but first upgrade `pip`::
 
-  $ sudo python ./setup.py install
+  $ pip3 install pip --upgrade
+  $ pip3 install poetry
+  $ poetry install
 
-This will copy the Python module files into your local Python package
-folder and the cohen executable to ``/usr/local/bin/cohen3``.
+Personalized install from source with `pip`
+-------------------------------------------
+Also, you can perform a personalized install using `pip`. This will allow you
+to install only certain dependencies, if you want the basic dependencies to run
+the project::
 
-If you want to install Cohen3 with extra dependencies you must do the steps
-above and moreover install pip, then you can run the following command
-(instead of the mentioned above) for installing the development dependencies::
+  $ pip install .
 
-  $ sudo pip install -e .[dev]
+If you want to install Cohen3 with development dependencies::
 
-Note:  The supported install modes are:
+  $ pip install .[dev]
+
+Note: Here you have all supported install modes:
 
     - dev: all the dependencies will be installed except docs
     - test: used by travis builds (omits dbus and docs)
