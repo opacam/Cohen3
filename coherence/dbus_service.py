@@ -36,31 +36,34 @@ Used to initialize DBus from within the class
 import time
 import urllib.error
 import urllib.parse
-import urllib.parse
 import urllib.request
 
 import dbus
-from lxml import etree
-
+import dbus.service
+from dbus.mainloop.glib import DBusGMainLoop
 from eventdispatcher import EventDispatcher
+from lxml import etree
+from twisted.internet import reactor, task
+
+from coherence import __version__, log
+from coherence.dbus_constants import (
+    BUS_NAME,
+    CDS_SERVICE,
+    DEVICE_IFACE,
+    DLNA_BUS_NAME,
+    OBJECT_PATH,
+    SERVICE_IFACE,
+)
+from coherence.upnp.core import DIDLLite
 
 if dbus.__version__ < '0.82.2':
     raise ImportError(
         'dbus-python module too old, pls get a newer one from '
         'http://dbus.freedesktop.org/releases/dbus-python/')
 
-from dbus.mainloop.glib import DBusGMainLoop
 
 DBusGMainLoop(set_as_default=True)
 
-import dbus.service
-
-from coherence import __version__
-from coherence.upnp.core import DIDLLite
-from coherence.dbus_constants import *
-from coherence import log
-
-from twisted.internet import reactor, task
 
 namespaces = {'{http://purl.org/dc/elements/1.1/}': 'dc:',
               '{urn:schemas-upnp-org:metadata-1-0/upnp/}': 'upnp:',
