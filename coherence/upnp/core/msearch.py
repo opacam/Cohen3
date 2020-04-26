@@ -37,14 +37,13 @@ class MSearch(EventDispatcher, DatagramProtocol, log.LogAble):
 
             - UPnP.SSDP.datagram_received => datagram_received
     '''
+
     logCategory = 'msearch'
 
     def __init__(self, ssdp_server, test=False):
         log.LogAble.__init__(self)
         EventDispatcher.__init__(self)
-        self.register_event(
-            'datagram_received',
-        )
+        self.register_event('datagram_received')
         self.ssdp_server = ssdp_server
         if not test:
             self.port = reactor.listenUDP(0, self)
@@ -58,23 +57,30 @@ class MSearch(EventDispatcher, DatagramProtocol, log.LogAble):
             data = data.decode('utf-8')
 
         cmd, headers = utils.parse_http_response(data)
-        self.info(f'datagramReceived from {host}:{port:d}, '
-                  f'protocol {cmd[0]} code {cmd[1]}')
+        self.info(
+            f'datagramReceived from {host}:{port:d}, '
+            f'protocol {cmd[0]} code {cmd[1]}'
+        )
         if cmd[0].startswith('HTTP/1.') and cmd[1] == '200':
             self.msg(f'for {headers["usn"]}')
             if not self.ssdp_server.isKnown(headers['usn']):
-                self.info(f'register as remote {headers["usn"]}, '
-                          f'{headers["st"]}, {headers["location"]}')
+                self.info(
+                    f'register as remote {headers["usn"]}, '
+                    f'{headers["st"]}, {headers["location"]}'
+                )
                 self.ssdp_server.register(
                     'remote',
-                    headers['usn'], headers['st'],
+                    headers['usn'],
+                    headers['st'],
                     headers['location'],
                     headers['server'],
                     headers['cache-control'],
-                    host=host)
+                    host=host,
+                )
             else:
                 self.ssdp_server.known[headers['usn']][
-                    'last-seen'] = time.time()
+                    'last-seen'
+                ] = time.time()
                 self.debug(f'updating last-seen for {headers["usn"]}')
 
         # make raw data available
@@ -88,12 +94,15 @@ class MSearch(EventDispatcher, DatagramProtocol, log.LogAble):
         self.discover()
 
     def discover(self):
-        req = ['M-SEARCH * HTTP/1.1',
-               f'HOST: {SSDP_ADDR}:{SSDP_PORT:d}',
-               'MAN: "ssdp:discover"',
-               'MX: 5',
-               'ST: ssdp:all',
-               '', '']
+        req = [
+            'M-SEARCH * HTTP/1.1',
+            f'HOST: {SSDP_ADDR}:{SSDP_PORT:d}',
+            'MAN: "ssdp:discover"',
+            'MX: 5',
+            'ST: ssdp:all',
+            '',
+            '',
+        ]
         req = '\r\n'.join(req).encode('ascii')
 
         try:

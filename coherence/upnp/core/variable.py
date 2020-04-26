@@ -62,9 +62,16 @@ class StateVariable(EventDispatcher, log.LogAble):
     dispatch_targets = []
     dispatch_events = []
 
-    def __init__(self, upnp_service, name, implementation, instance,
-                 send_events,
-                 data_type, allowed_values):
+    def __init__(
+        self,
+        upnp_service,
+        name,
+        implementation,
+        instance,
+        send_events,
+        data_type,
+        allowed_values,
+    ):
         log.LogAble.__init__(self)
         EventDispatcher.__init__(self)
 
@@ -72,7 +79,8 @@ class StateVariable(EventDispatcher, log.LogAble):
 
         self.dispatch_events = [
             f'state_variable_{name}_changed',
-            'state_variable_changed']
+            'state_variable_changed',
+        ]
         self.dispatch_targets = [self]
         if isinstance(self.service, EventDispatcher):
             self.dispatch_targets.append(self.service)
@@ -114,10 +122,8 @@ class StateVariable(EventDispatcher, log.LogAble):
         r.append(('Data Type', self.data_type))
         r.append(('Default Value', self.default_value))
         r.append(('Current Value', str(self.value)))
-        if self.allowed_values is not None and \
-                len(self.allowed_values) > 0:
-            r.append(('Allowed Values',
-                      ','.join(self.allowed_values)))
+        if self.allowed_values is not None and len(self.allowed_values) > 0:
+            r.append(('Allowed Values', ','.join(self.allowed_values)))
         return r
 
     def set_default_value(self, value):
@@ -148,13 +154,18 @@ class StateVariable(EventDispatcher, log.LogAble):
                         i = 0
                         while i < len(v):
                             if v[i] == str(value[0]):
-                                del v[i:i + 2]
+                                del v[i : i + 2]
                                 old_value = ','.join(v)
                                 break
                             i += 2
                         if len(old_value):
-                            new_value = old_value + ',' + str(
-                                value[0]) + ',' + str(value[1])
+                            new_value = (
+                                old_value
+                                + ','
+                                + str(value[0])
+                                + ','
+                                + str(value[1])
+                            )
                         else:
                             new_value = str(value[0]) + ',' + str(value[1])
                     else:
@@ -171,8 +182,7 @@ class StateVariable(EventDispatcher, log.LogAble):
                 if self.data_type == 'string':
                     if isinstance(value, str):
                         value = value.split(',')
-                    if (isinstance(value, tuple) or
-                            isinstance(value, set)):
+                    if isinstance(value, tuple) or isinstance(value, set):
                         value = list(value)
                     if not isinstance(value, list):
                         value = [value]
@@ -185,14 +195,16 @@ class StateVariable(EventDispatcher, log.LogAble):
                         if len(self.allowed_values):
                             if self.has_vendor_values:
                                 new_value.append(v)
-                            elif v.upper() in [x.upper() for x in
-                                               self.allowed_values]:
+                            elif v.upper() in [
+                                x.upper() for x in self.allowed_values
+                            ]:
                                 new_value.append(v)
                             else:
                                 self.warning(
-                                    f'Variable {self.name} update, '
-                                    f'{self.has_vendor_values} value {v} '
-                                    f'doesn\'t fit in {self.allowed_values}')
+                                    f"Variable {self.name} update, "
+                                    + f"{self.has_vendor_values} value {v} "
+                                    + f"does not fit in {self.allowed_values}"
+                                )
                                 new_value = 'Coherence_Value_Error'
                         else:
                             new_value.append(v)
@@ -210,12 +222,15 @@ class StateVariable(EventDispatcher, log.LogAble):
                 if len(self.allowed_values):
                     if self.has_vendor_values:
                         new_value = value
-                    elif value.upper() in [v.upper() for v in
-                                           self.allowed_values]:
+                    elif value.upper() in [
+                        v.upper() for v in self.allowed_values
+                    ]:
                         new_value = value
                     else:
-                        self.warning(f'Variable {self.name} NOT updated, '
-                                     f'value {value} doesn\'t fit')
+                        self.warning(
+                            f'Variable {self.name} NOT updated, '
+                            + f'value {value} doesn\'t fit'
+                        )
                         new_value = 'Coherence_Value_Error'
                 else:
                     new_value = value
@@ -232,8 +247,10 @@ class StateVariable(EventDispatcher, log.LogAble):
         if new_value == 'Coherence_Value_Error':
             return
         if new_value == self.value:
-            self.info(f'variable NOT updated, no value change'
-                      f' {self.name} {self.value}')
+            self.info(
+                f'variable NOT updated, no value change'
+                + f' {self.name} {self.value}'
+            )
             return
         self.old_value = self.value
         self.value = new_value
@@ -273,9 +290,10 @@ class StateVariable(EventDispatcher, log.LogAble):
             callback(self)
 
     def __repr__(self):
-        return \
-            f'Variable: {self.name}, {str(self.service)}, {self.instance:d},' \
-            f' {self.implementation}, {self.data_type},' \
-            f' {str(self.allowed_values)}, {str(self.default_value)},' \
-            f' {str(self.old_value)}, {str(self.value)},' \
-            f' {str(self.send_events)}'
+        return (
+            f'Variable: {self.name}, {str(self.service)}, {self.instance:d},'
+            + f' {self.implementation}, {self.data_type},'
+            + f' {str(self.allowed_values)}, {str(self.default_value)},'
+            + f' {str(self.old_value)}, {str(self.value)},'
+            + f' {str(self.send_events)}'
+        )

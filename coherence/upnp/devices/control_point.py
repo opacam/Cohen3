@@ -46,8 +46,9 @@ from eventdispatcher import EventDispatcher, Property, ListProperty
 from coherence import log
 from coherence.upnp.core import service
 from coherence.upnp.core.event import EventServer
-from coherence.upnp.devices.internet_gateway_device_client import \
-    InternetGatewayDeviceClient
+from coherence.upnp.devices.internet_gateway_device_client import (
+    InternetGatewayDeviceClient,
+)
 from coherence.upnp.devices.media_renderer_client import MediaRendererClient
 from coherence.upnp.devices.media_server_client import MediaServerClient
 
@@ -60,6 +61,7 @@ class DeviceQuery(EventDispatcher):
        * Changed class variable :attr:`fired` to benefit from the
          EventDispatcher's properties
     '''
+
     fired = Property(False)
 
     def __init__(self, type, pattern, callback, timeout=0, oneshot=True):
@@ -85,14 +87,14 @@ class DeviceQuery(EventDispatcher):
     def check(self, device):
         if self.fired and self.oneshot:
             return
-        if (self.type == 'host' and
-                device.host == self.pattern):
+        if self.type == 'host' and device.host == self.pattern:
             self.fire(device)
-        elif (self.type == 'friendly_name' and
-              device.friendly_name == self.pattern):
+        elif (
+            self.type == 'friendly_name'
+            and device.friendly_name == self.pattern
+        ):
             self.fire(device)
-        elif (self.type == 'uuid' and
-              device.get_uuid() == self.pattern):
+        elif self.type == 'uuid' and device.get_uuid() == self.pattern:
             self.fire(device)
 
 
@@ -114,6 +116,7 @@ class ControlPoint(EventDispatcher, log.LogAble):
         remove the detection for specific device type in flavour of a global
         detection.
     '''
+
     logCategory = 'controlpoint'
 
     queries = ListProperty([])
@@ -122,8 +125,7 @@ class ControlPoint(EventDispatcher, log.LogAble):
         log.LogAble.__init__(self)
         EventDispatcher.__init__(self)
         self.register_event(
-            'control_point_client_detected',
-            'control_point_client_removed',
+            'control_point_client_detected', 'control_point_client_removed'
         )
 
         if not auto_client:
@@ -132,7 +134,8 @@ class ControlPoint(EventDispatcher, log.LogAble):
         self.auto_client = auto_client
         self.coherence.bind(
             coherence_device_detection_completed=self.check_device,
-            coherence_device_removed=self.remove_client)
+            coherence_device_removed=self.remove_client,
+        )
 
         self.info('Coherence UPnP ControlPoint starting...')
         self.event_server = EventServer(self)
@@ -146,11 +149,10 @@ class ControlPoint(EventDispatcher, log.LogAble):
         for device in self.get_devices():
             self.coherence.unbind(
                 coherence_device_detection_completed=self.check_device,
-                coherence_device_removed=self.remove_client
+                coherence_device_removed=self.remove_client,
             )
             if device.client is not None:
-                device.client.unbind(
-                    detection_completed=self.completed)
+                device.client.unbind(detection_completed=self.completed)
 
     def auto_client_append(self, device_type):
         if device_type in self.auto_client:
@@ -195,14 +197,19 @@ class ControlPoint(EventDispatcher, log.LogAble):
         .. versionadded:: 0.9.0
         '''
         if not callable(receiver):
-            raise Exception('The receiver should be callable in order to use'
-                            ' the method {method}')
+            raise Exception(
+                'The receiver should be callable in order to use'
+                + ' the method {method}'
+            )
         if not signal:
             raise Exception(
-                f'We need a signal in order to use method {method}')
+                f'We need a signal in order to use method {method}'
+            )
         if not signal.startswith('Coherence.UPnP.ControlPoint.'):
-            raise Exception('We need a signal an old signal starting with: '
-                            '"Coherence.UPnP.ControlPoint."')
+            raise Exception(
+                'We need a signal an old signal starting with: '
+                + '"Coherence.UPnP.ControlPoint."'
+            )
 
     def connect(self, receiver, signal=None, sender=None, weak=True):
         '''
@@ -219,14 +226,13 @@ class ControlPoint(EventDispatcher, log.LogAble):
         '''
         self.check_louie(receiver, signal, 'connect')
         if signal.endswith('.detected'):
-            self.coherence.bind(
-                coherence_device_detection_completed=receiver)
+            self.coherence.bind(coherence_device_detection_completed=receiver)
         elif signal.endswith('.removed'):
-            self.bind(
-                control_point_client_removed=receiver)
+            self.bind(control_point_client_removed=receiver)
         else:
             raise Exception(
-                f'Unknown signal {signal}, we cannot bind that signal.')
+                f'Unknown signal {signal}, we cannot bind that signal.'
+            )
 
     def disconnect(self, receiver, signal=None, sender=None, weak=True):
         '''
@@ -244,13 +250,14 @@ class ControlPoint(EventDispatcher, log.LogAble):
         self.check_louie(receiver, signal, 'disconnect')
         if signal.endswith('.detected'):
             self.coherence.unbind(
-                coherence_device_detection_completed=receiver)
+                coherence_device_detection_completed=receiver
+            )
         elif signal.endswith('.removed'):
-            self.unbind(
-                control_point_client_removed=receiver)
+            self.unbind(control_point_client_removed=receiver)
         else:
             raise Exception(
-                f'Unknown signal {signal}, we cannot unbind that signal.')
+                f'Unknown signal {signal}, we cannot unbind that signal.'
+            )
 
     def get_devices(self):
         return self.coherence.get_devices()
@@ -263,12 +270,15 @@ class ControlPoint(EventDispatcher, log.LogAble):
 
     def check_device(self, device):
         if device.client is None:
-            self.info(f'found device {device.get_friendly_name()} of type '
-                      f'{device.get_device_type()} - {device.client}')
+            self.info(
+                f'found device {device.get_friendly_name()} of type '
+                f'{device.get_device_type()} - {device.client}'
+            )
             short_type = device.get_friendly_device_type()
             if short_type in self.auto_client and short_type is not None:
                 self.info(
-                    f'identified {short_type} {device.get_friendly_name()}')
+                    f'identified {short_type} {device.get_friendly_name()}'
+                )
 
                 if short_type == 'MediaServer':
                     client = MediaServerClient(device)
@@ -286,17 +296,21 @@ class ControlPoint(EventDispatcher, log.LogAble):
         self.process_queries(device)
 
     def completed(self, client, *args):
-        self.info(f'sending signal Coherence.UPnP.ControlPoint.'
-                  f'{client.device_type}.detected {client.device.udn}')
+        self.info(
+            f'sending signal Coherence.UPnP.ControlPoint.'
+            f'{client.device_type}.detected {client.device.udn}'
+        )
         self.dispatch_event(
             'control_point_client_detected',
-            client=client, udn=client.device.udn)
+            client=client,
+            udn=client.device.udn,
+        )
 
     def remove_client(self, udn, client):
-        self.dispatch_event(
-            'control_point_client_removed', udn=udn)
-        self.info(f'removed {client.device_type} '
-                  f'{client.device.get_friendly_name()}')
+        self.dispatch_event('control_point_client_removed', udn=udn)
+        self.info(
+            f'removed {client.device_type} {client.device.get_friendly_name()}'
+        )
         client.remove()
 
     def propagate(self, event):
@@ -322,11 +336,11 @@ class ControlPoint(EventDispatcher, log.LogAble):
             f.close()
             headers = {
                 b'Content-Type': b'application/octet-stream',
-                b'Content-Length': bytes(str(len(data)), encoding='utf-8')
+                b'Content-Length': bytes(str(len(data)), encoding='utf-8'),
             }
             df = client.getPage(
-                url, method=b'POST',
-                headers=headers, postdata=data)
+                url, method=b'POST', headers=headers, postdata=data,
+            )
             df.addCallback(got_result)
             df.addErrback(got_error)
             return df
@@ -335,7 +349,6 @@ class ControlPoint(EventDispatcher, log.LogAble):
 
 
 class XMLRPC(xmlrpc.XMLRPC):
-
     def __init__(self, control_point):
         xmlrpc.XMLRPC.__init__(self)
         self.control_point = control_point
@@ -347,10 +360,12 @@ class XMLRPC(xmlrpc.XMLRPC):
         for device in self.control_point.get_devices():
             # print(device.get_friendly_name(), device.get_service_type(),
             #       device.get_location(), device.get_id())
-            d = {'friendly_name': device.get_friendly_name(),
-                 'device_type': device.get_device_type(),
-                 'location': str(device.get_location()),
-                 'id': str(device.get_id())}
+            d = {
+                'friendly_name': device.get_friendly_name(),
+                'device_type': device.get_device_type(),
+                'location': str(device.get_location()),
+                'id': str(device.get_id()),
+            }
             r.append(d)
         return r
 
@@ -449,8 +464,9 @@ class XMLRPC(xmlrpc.XMLRPC):
         device = self.control_point.get_device_with_id(device_id)
         if device is not None:
             client = device.get_client()
-            client.content_directory.import_resource(source_uri,
-                                                     destination_uri)
+            client.content_directory.import_resource(
+                source_uri, destination_uri
+            )
             return 'Ok'
         return 'Error'
 
@@ -466,6 +482,7 @@ class XMLRPC(xmlrpc.XMLRPC):
 
 def startXMLRPC(control_point, port):
     from twisted.web import server
+
     r = XMLRPC(control_point)
     print(f'XMLRPC-API on port {port:d} ready')
     reactor.listenTCP(port, server.Site(r))
@@ -478,8 +495,7 @@ if __name__ == '__main__':
     config['serverport'] = 30020
     from coherence.base import Coherence
 
-    ctrl = ControlPoint(Coherence(config),
-                        auto_client=[])
+    ctrl = ControlPoint(Coherence(config), auto_client=[])
 
     def show_devices():
         print('show_devices')
@@ -496,19 +512,29 @@ if __name__ == '__main__':
     def query_devices2():
         print('query_devices with timeout')
         ctrl.add_query(
-            DeviceQuery('host', '192.168.0.1', the_result, timeout=10,
-                        oneshot=False))
+            DeviceQuery(
+                'host', '192.168.0.1', the_result, timeout=10, oneshot=False
+            )
+        )
 
     def stop_reactor(*args):
         reactor.stop()
-        print('Stoped reactor successfully')
+        print('Stopped reactor successfully')
 
     reactor.callLater(2, show_devices)
     reactor.callLater(3, query_devices)
     reactor.callLater(4, query_devices2)
-    reactor.callLater(5, ctrl.add_query, DeviceQuery(
-        'friendly_name', 'Coherence Test Content',
-        the_result, timeout=10, oneshot=False))
+    reactor.callLater(
+        5,
+        ctrl.add_query,
+        DeviceQuery(
+            'friendly_name',
+            'Coherence Test Content',
+            the_result,
+            timeout=10,
+            oneshot=False,
+        ),
+    )
     reactor.callLater(6, stop_reactor)
 
     reactor.run()

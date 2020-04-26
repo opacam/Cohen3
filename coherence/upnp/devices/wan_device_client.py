@@ -16,10 +16,12 @@ A class representing an embedded device with a WAN client.
 from eventdispatcher import EventDispatcher, Property
 
 from coherence import log
-from coherence.upnp.devices.wan_connection_device_client import \
-    WANConnectionDeviceClient
-from coherence.upnp.services.clients.wan_common_interface_config_client import\
-    WANCommonInterfaceConfigClient
+from coherence.upnp.devices.wan_connection_device_client import (
+    WANConnectionDeviceClient,
+)
+from coherence.upnp.services.clients.wan_common_interface_config_client import (
+    WANCommonInterfaceConfigClient,
+)
 
 
 class WANDeviceClient(EventDispatcher, log.LogAble):
@@ -39,6 +41,7 @@ class WANDeviceClient(EventDispatcher, log.LogAble):
             - :attr:`service_detection_completed`
 
     '''
+
     logCategory = 'wan_device_client'
 
     embedded_device_detection_completed = Property(False)
@@ -58,14 +61,12 @@ class WANDeviceClient(EventDispatcher, log.LogAble):
     def __init__(self, device):
         log.LogAble.__init__(self)
         EventDispatcher.__init__(self)
-        self.register_event(
-            'embedded_device_client_detection_completed',
-        )
+        self.register_event('embedded_device_client_detection_completed')
 
         self.device = device
         self.device.bind(
             embedded_device_client_detection_completed=self.embedded_device_notified,  # noqa
-            service_notified=self.service_notified
+            service_notified=self.service_notified,
         )
         self.device_type = self.device.get_friendly_device_type()
 
@@ -76,23 +77,27 @@ class WANDeviceClient(EventDispatcher, log.LogAble):
         self.wan_common_interface_connection = None
 
         try:
-            wan_connection_device = \
-                self.device.get_embedded_device_by_type(
-                    'WANConnectionDevice')[0]
+            wan_connection_device = self.device.get_embedded_device_by_type(
+                'WANConnectionDevice'
+            )[0]
             self.wan_connection_device = WANConnectionDeviceClient(
-                wan_connection_device)
+                wan_connection_device
+            )
         except Exception as er:
             self.warning(
                 f'Embedded WANConnectionDevice device not available, device '
-                f'not implemented properly according to the UPnP '
-                f'specification [ERROR: {er}]')
+                + f'not implemented properly according to the UPnP '
+                + f'specification [ERROR: {er}]'
+            )
             raise
 
         for service in self.device.get_services():
             if service.get_type() in [
-                    'urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1']:
-                self.wan_common_interface_connection = \
-                    WANCommonInterfaceConfigClient(service)
+                'urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1'
+            ]:
+                self.wan_common_interface_connection = WANCommonInterfaceConfigClient(  # noqa: E501
+                    service
+                )
 
         self.info(f'WANDevice {device.get_friendly_name()}')
 
@@ -109,24 +114,34 @@ class WANDeviceClient(EventDispatcher, log.LogAble):
             return
 
         self.embedded_device_detection_completed = True
-        if self.embedded_device_detection_completed is True and \
-                self.service_detection_completed is True:
+        if (
+            self.embedded_device_detection_completed is True
+            and self.service_detection_completed is True
+        ):
             self.dispatch_event(
-                'embedded_device_client_detection_completed', self)
+                'embedded_device_client_detection_completed', self
+            )
 
     def service_notified(self, service):
         self.info(f'Service {service} sent notification')
         if self.service_detection_completed:
             return
         if self.wan_common_interface_connection is not None:
-            if not hasattr(self.wan_common_interface_connection.service,
-                           'last_time_updated'):
+            if not hasattr(
+                self.wan_common_interface_connection.service,
+                'last_time_updated',
+            ):
                 return
-            if self.wan_common_interface_connection.\
-                    service.last_time_updated is None:
+            if (
+                self.wan_common_interface_connection.service.last_time_updated
+                is None
+            ):
                 return
         self.service_detection_completed = True
-        if self.embedded_device_detection_completed is True and \
-                self.service_detection_completed is True:
+        if (
+            self.embedded_device_detection_completed is True
+            and self.service_detection_completed is True
+        ):
             self.dispatch_event(
-                'embedded_device_client_detection_completed', self)
+                'embedded_device_client_detection_completed', self
+            )

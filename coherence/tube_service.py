@@ -43,8 +43,10 @@ class MirabeauProxy(resource.Resource, log.LogAble):
         self.isLeaf = 0
 
     def getChildWithDefault(self, path, request):
-        self.info(f'MiraBeau getChildWithDefault {request.method}, '
-                  f'{path}, {request.uri} {request.client}')
+        self.info(
+            f'MiraBeau getChildWithDefault {request.method}, '
+            f'{path}, {request.uri} {request.client}'
+        )
         uri = urllib.parse.unquote_plus(path)
         self.info(f'MiraBeau  uri {uri}')
         return ReverseProxyUriResource(uri)
@@ -80,13 +82,17 @@ class TubeServiceControl(UPnPPublisher):
             # print 'get_state_variable_contents', argument.name
             if argument.name[0:11] != 'A_ARG_TYPE_':
                 variable = self.variables[instance][
-                    argument.get_state_variable()]
+                    argument.get_state_variable()
+                ]
                 variable.update(
-                    result[argument.name].decode('utf-8').encode('utf-8'))
+                    result[argument.name].decode('utf-8').encode('utf-8')
+                )
                 # print('update state variable contents',
                 #       variable.name, variable.value, variable.send_events)
-                if (variable.send_events == 'yes' and
-                        variable.moderated is False):
+                if (
+                    variable.send_events == 'yes'
+                    and variable.moderated is False
+                ):
                     notify.append(variable)
 
             self.service.propagate_notification(notify)
@@ -97,37 +103,46 @@ class TubeServiceControl(UPnPPublisher):
         for argument in action.get_out_arguments():
             if action.name == 'XXXBrowse' and argument.name == 'Result':
                 didl = DIDLLite.DIDLElement.fromString(
-                    result['Result'].decode('utf-8'))
+                    result['Result'].decode('utf-8')
+                )
                 changed = False
                 for item in didl.getItems():
                     new_res = DIDLLite.Resources()
                     for res in item.res:
-                        remote_protocol, remote_network, \
-                            remote_content_format, _ = \
-                            res.protocolInfo.split(':')
-                        if remote_protocol == 'http-get' and \
-                                remote_network == '*':
+                        (
+                            remote_protocol,
+                            remote_network,
+                            remote_content_format,
+                            _,
+                        ) = res.protocolInfo.split(':')
+                        if (
+                            remote_protocol == 'http-get'
+                            and remote_network == '*'
+                        ):
                             quoted_url = urllib.parse.quote_plus(res.data)
-                            print('modifying', res.data)
                             res.data = urllib.parse.urlunsplit(
-                                ('http',
-                                 self.service.device.external_address,
-                                 'mirabeau',
-                                 quoted_url, ''))
-                            print('--->', res.data)
+                                (
+                                    'http',
+                                    self.service.device.external_address,
+                                    'mirabeau',
+                                    quoted_url,
+                                    '',
+                                )
+                            )
                             new_res.append(res)
                             changed = True
                     item.res = new_res
                 if changed:
                     didl.rebuild()
-                    ordered_result[argument.name] = \
-                        didl.toString()  # .replace('<ns0:','<')
+                    ordered_result[argument.name] = didl.toString()
                 else:
                     ordered_result[argument.name] = result[
-                        argument.name].decode('utf-8')
+                        argument.name
+                    ].decode('utf-8')
             else:
-                ordered_result[argument.name] = result[argument.name].decode(
-                    'utf-8').encode('utf-8')
+                ordered_result[argument.name] = (
+                    result[argument.name].decode('utf-8').encode('utf-8')
+                )
         self.info(f'action_results sorted {action.name} {ordered_result}')
         return ordered_result
 
@@ -157,12 +172,14 @@ class TubeServiceControl(UPnPPublisher):
                 in_arguments.remove(al[0])
             else:
                 self.critical(
-                    f'argument {arg_name} not valid for action {action.name}')
+                    f'argument {arg_name} not valid for action {action.name}'
+                )
                 return failure.Failure(errorCode(402))
         if len(in_arguments) > 0:
             args_names = [a.get_name() for a in in_arguments]
-            self.critical(f'argument {args_names} '
-                          f'missing for action {action.name}')
+            self.critical(
+                f'argument {args_names} ' f'missing for action {action.name}'
+            )
             return failure.Failure(errorCode(402))
 
         def got_error(x):
@@ -175,12 +192,13 @@ class TubeServiceControl(UPnPPublisher):
         # print 'callit action', action
         # print 'callit dbus action', self.service.service.action
         d = defer.Deferred()
-        self.service.service.call_action(action.name,
-                                         dbus.Dictionary(kwargs,
-                                                         signature='ss'),
-                                         reply_handler=d.callback,
-                                         error_handler=d.errback,
-                                         utf8_strings=True)
+        self.service.service.call_action(
+            action.name,
+            dbus.Dictionary(kwargs, signature='ss'),
+            reply_handler=d.callback,
+            error_handler=d.errback,
+            utf8_strings=True,
+        )
         d.addCallback(self.get_action_results, action, instance)
         d.addErrback(got_error)
         return d
@@ -222,9 +240,11 @@ class TubeServiceProxy(service.ServiceServer, resource.Resource):
                 arg_name = argument.findtext(f'{{{ns}}}name')
                 arg_direction = argument.findtext(f'{{{ns}}}direction')
                 arg_state_var = argument.findtext(
-                    f'{{{ns}}}relatedStateVariable')
-                arguments.append(action.Argument(arg_name, arg_direction,
-                                                 arg_state_var))
+                    f'{{{ns}}}relatedStateVariable'
+                )
+                arguments.append(
+                    action.Argument(arg_name, arg_direction, arg_state_var)
+                )
             self._actions[name] = action.Action(self, name, 'n/a', arguments)
 
         for var_node in tree.findall(f'.//{{{ns}}}stateVariable'):
@@ -239,15 +259,9 @@ class TubeServiceProxy(service.ServiceServer, resource.Resource):
             for allowed in var_node.findall(f'.//{{{ns}}}allowedValue'):
                 values.append(allowed.text)
             instance = 0
-            self._variables.get(instance)[name] = \
-                variable.StateVariable(
-                    self,
-                    name,
-                    'n/a',
-                    instance,
-                    send_events,
-                    data_type,
-                    values)
+            self._variables.get(instance)[name] = variable.StateVariable(
+                self, name, 'n/a', instance, send_events, data_type, values,
+            )
             ''' we need to do this here, as there we don't get there our
                 {urn:schemas-beebits-net:service-1-0}X_withVendorDefines
                 attibute there
@@ -274,8 +288,10 @@ class TubeDeviceProxy(log.LogAble):
         self._devices = []
         self.icons = []
 
-        self.info(f'uuid: {self.uuid}, name: {self.friendly_name}, '
-                  f'device type: {self.device_type}, version: {self.version}')
+        self.info(
+            f'uuid: {self.uuid}, name: {self.friendly_name}, '
+            + f'device type: {self.device_type}, version: {self.version}'
+        )
 
         ''' create the http entrypoint '''
 
@@ -284,9 +300,9 @@ class TubeDeviceProxy(log.LogAble):
 
         ''' create the Service proxy(s) '''
 
-        for service in self.device.services:
-            self.debug(f'Proxying service {service}')
-            new_service = TubeServiceProxy(service, self)
+        for device_service in self.device.services:
+            self.debug(f'Proxying service {device_service}')
+            new_service = TubeServiceProxy(device_service, self)
             self._services.append(new_service)
 
         ''' create a device description xml file(s) '''
@@ -306,7 +322,9 @@ class TubeDeviceProxy(log.LogAble):
                     # model_name=f'Coherence UPnP {self.device_type}',
                     services=self._services,
                     devices=self._devices,
-                    icons=self.icons))
+                    icons=self.icons,
+                ),
+            )
             version -= 1
 
         ''' and register with SSDP server '''
@@ -319,19 +337,27 @@ class TubeDeviceProxy(log.LogAble):
         self.msg(f'{self.device_type} register')
         # we need to do this after the children
         # are there, since we send notifies
-        s.register('local',
-                   f'{uuid}::upnp:rootdevice',
-                   'upnp:rootdevice',
-                   self.coherence.urlbase + uuid[5:] +
-                   '/' + f'description-{self.version:d}.xml',
-                   host=host)
+        s.register(
+            'local',
+            f'{uuid}::upnp:rootdevice',
+            'upnp:rootdevice',
+            self.coherence.urlbase
+            + uuid[5:]
+            + '/'
+            + f'description-{self.version:d}.xml',
+            host=host,
+        )
 
-        s.register('local',
-                   uuid,
-                   uuid,
-                   self.coherence.urlbase + uuid[5:] +
-                   '/' + f'description-{self.version:d}.xml',
-                   host=host)
+        s.register(
+            'local',
+            uuid,
+            uuid,
+            self.coherence.urlbase
+            + uuid[5:]
+            + '/'
+            + f'description-{self.version:d}.xml',
+            host=host,
+        )
 
         version = self.version
         while version > 0:
@@ -341,39 +367,45 @@ class TubeDeviceProxy(log.LogAble):
                 silent = True
             s.register(
                 'local',
-                f'{uuid}::urn:schemas-upnp-org:device:{self.device_type}:{version:d}',  # noqa
+                f'{uuid}::urn:schemas-upnp-org:device:{self.device_type}:{version:d}',  # noqa: E501
                 f'urn:schemas-upnp-org:device:{self.device_type}:{version:d}',
-                self.coherence.urlbase + uuid[5:] +
-                '/' + f'description-{version:d}.xml',
+                self.coherence.urlbase
+                + uuid[5:]
+                + '/'
+                + f'description-{version:d}.xml',
                 silent=silent,
-                host=host)
+                host=host,
+            )
             version -= 1
 
-        for service in self._services:
+        for my_service in self._services:
             device_version = self.version
             service_version = self.version
-            if hasattr(service, 'version'):
-                service_version = service.version
+            if hasattr(my_service, 'version'):
+                service_version = my_service.version
             silent = False
 
             while service_version > 0:
                 try:
-                    namespace = service.namespace
+                    namespace = my_service.namespace
                 except Exception:
                     namespace = 'schemas-upnp-org'
 
                 device_description_tmpl = f'description-{device_version:d}.xml'
-                if hasattr(service, 'device_description_tmpl'):
-                    device_description_tmpl = service.device_description_tmpl
+                if hasattr(my_service, 'device_description_tmpl'):
+                    device_description_tmpl = my_service.device_description_tmpl  # noqa: E501
 
                 s.register(
                     'local',
-                    f'{uuid}::urn:{namespace}:service:{service.id}:{service_version:d}',  # noqa
-                    f'urn:{namespace}:service:{service.id}:{service_version:d}',  # noqa
-                    self.coherence.urlbase + uuid[5:] +
-                    '/' + device_description_tmpl,
+                    f'{uuid}::urn:{namespace}:service:{my_service.id}:{service_version:d}',  # noqa: E501
+                    f'urn:{namespace}:service:{my_service.id}:{service_version:d}',  # noqa: E501
+                    self.coherence.urlbase
+                    + uuid[5:]
+                    + '/'
+                    + device_description_tmpl,
                     silent=silent,
-                    host=host)
+                    host=host,
+                )
 
                 silent = True
                 service_version -= 1

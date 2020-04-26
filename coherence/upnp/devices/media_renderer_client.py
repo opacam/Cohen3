@@ -16,12 +16,15 @@ A class representing an media renderer client device.
 from eventdispatcher import EventDispatcher, Property
 
 from coherence import log
-from coherence.upnp.services.clients.av_transport_client import \
-    AVTransportClient
-from coherence.upnp.services.clients.connection_manager_client import \
-    ConnectionManagerClient
-from coherence.upnp.services.clients.rendering_control_client import \
-    RenderingControlClient
+from coherence.upnp.services.clients.av_transport_client import (
+    AVTransportClient,
+)
+from coherence.upnp.services.clients.connection_manager_client import (
+    ConnectionManagerClient,
+)
+from coherence.upnp.services.clients.rendering_control_client import (
+    RenderingControlClient,
+)
 
 
 class MediaRendererClient(EventDispatcher, log.LogAble):
@@ -37,6 +40,7 @@ class MediaRendererClient(EventDispatcher, log.LogAble):
         * Changed class variable :attr:`detection_completed` to benefit
           from the EventDispatcher's properties
     '''
+
     logCategory = 'mr_client'
 
     detection_completed = Property(False)
@@ -49,9 +53,7 @@ class MediaRendererClient(EventDispatcher, log.LogAble):
     def __init__(self, device):
         log.LogAble.__init__(self)
         EventDispatcher.__init__(self)
-        self.register_event(
-            'device_client_detection_completed',
-        )
+        self.register_event('device_client_detection_completed')
 
         self.device = device
         self.device.bind(device_service_notified=self.service_notified)
@@ -65,30 +67,33 @@ class MediaRendererClient(EventDispatcher, log.LogAble):
 
         for service in self.device.get_services():
             if service.get_type() in [
-                    'urn:schemas-upnp-org:service:RenderingControl:1',
-                    'urn:schemas-upnp-org:service:RenderingControl:2']:
+                'urn:schemas-upnp-org:service:RenderingControl:1',
+                'urn:schemas-upnp-org:service:RenderingControl:2',
+            ]:
                 self.rendering_control = RenderingControlClient(service)
             if service.get_type() in [
-                    'urn:schemas-upnp-org:service:ConnectionManager:1',
-                    'urn:schemas-upnp-org:service:ConnectionManager:2']:
+                'urn:schemas-upnp-org:service:ConnectionManager:1',
+                'urn:schemas-upnp-org:service:ConnectionManager:2',
+            ]:
                 self.connection_manager = ConnectionManagerClient(service)
             if service.get_type() in [
-                    'urn:schemas-upnp-org:service:AVTransport:1',
-                    'urn:schemas-upnp-org:service:AVTransport:2']:
+                'urn:schemas-upnp-org:service:AVTransport:1',
+                'urn:schemas-upnp-org:service:AVTransport:2',
+            ]:
                 self.av_transport = AVTransportClient(service)
             if service.detection_completed:
                 self.service_notified(service)
         self.info(f'MediaRenderer {device.get_friendly_name()}')
         if self.rendering_control:
             self.info('RenderingControl available')
-            '''
-            actions =  self.rendering_control.service.get_actions()
-            print actions
-            for action in actions:
-                print 'Action:', action
-                for arg in actions[action].get_arguments_list():
-                    print '       ', arg
-            '''
+
+            # actions =  self.rendering_control.service.get_actions()
+            # print actions
+            # for action in actions:
+            #     print 'Action:', action
+            #     for arg in actions[action].get_arguments_list():
+            #         print '       ', arg
+
             # self.rendering_control.list_presets()
             # self.rendering_control.get_mute()
             # self.rendering_control.get_volume()
@@ -96,7 +101,8 @@ class MediaRendererClient(EventDispatcher, log.LogAble):
         else:
             self.warning(
                 'RenderingControl not available, device not implemented'
-                ' properly according to the UPnP specification')
+                + ' properly according to the UPnP specification'
+            )
             return
         if self.connection_manager:
             self.info('ConnectionManager available')
@@ -104,7 +110,8 @@ class MediaRendererClient(EventDispatcher, log.LogAble):
         else:
             self.warning(
                 'ConnectionManager not available, device not implemented'
-                ' properly according to the UPnP specification')
+                + ' properly according to the UPnP specification'
+            )
             return
         if self.av_transport:
             self.info('AVTransport (optional) available')
@@ -136,14 +143,16 @@ class MediaRendererClient(EventDispatcher, log.LogAble):
         if self.detection_completed:
             return
         if self.rendering_control is not None:
-            if not hasattr(self.rendering_control.service,
-                           'last_time_updated'):
+            if not hasattr(
+                self.rendering_control.service, 'last_time_updated'
+            ):
                 return
             if self.rendering_control.service.last_time_updated is None:
                 return
         if self.connection_manager is not None:
-            if not hasattr(self.connection_manager.service,
-                           'last_time_updated'):
+            if not hasattr(
+                self.connection_manager.service, 'last_time_updated'
+            ):
                 return
             if self.connection_manager.service.last_time_updated is None:
                 return
@@ -155,8 +164,11 @@ class MediaRendererClient(EventDispatcher, log.LogAble):
         self.detection_completed = True
         self.dispatch_event(
             'device_client_detection_completed',
-            client=self, udn=self.device.udn)
+            client=self,
+            udn=self.device.udn,
+        )
 
     def state_variable_change(self, variable):
-        self.info('%(name)r changed from %(old_value)r to %(value)r',
-                  vars(variable))
+        self.info(
+            '%(name)r changed from %(old_value)r to %(value)r', vars(variable)
+        )

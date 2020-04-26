@@ -29,12 +29,19 @@ class SOAPProxy(log.LogAble):
 
     logCategory = 'soap'
 
-    def __init__(self, url, namespace=None, envelope_attrib=None, header=None,
-                 soapaction=None):
+    def __init__(
+        self,
+        url,
+        namespace=None,
+        envelope_attrib=None,
+        header=None,
+        soapaction=None,
+    ):
         log.LogAble.__init__(self)
         if not isinstance(url, bytes):
-            self.warning('SOAPProxy.__init__: '
-                         'url is not string bytes...modifying')
+            self.warning(
+                'SOAPProxy.__init__: ' 'url is not string bytes...modifying'
+            )
             url = url.encode('ascii')
         self.url = url
         self.namespace = namespace
@@ -67,17 +74,22 @@ class SOAPProxy(log.LogAble):
             soapaction = '#'.join((self.namespace[1], soapaction))
         self.action = soapaction.split('#')[1].encode('ascii')
 
-        self.info(f'callRemote {self.soapaction} {soapmethod} '
-                  f'{self.namespace} {self.action}')
+        self.info(
+            f'callRemote {self.soapaction} {soapmethod} '
+            f'{self.namespace} {self.action}'
+        )
 
-        headers = {'content-type': 'text/xml ;charset="utf-8"',
-                   'SOAPACTION': f'"{soapaction}"', }
+        headers = {
+            'content-type': 'text/xml ;charset="utf-8"',
+            'SOAPACTION': f'"{soapaction}"',
+        }
         if 'headers' in arguments:
             headers.update(arguments['headers'])
             del arguments['headers']
 
         payload = soap_lite.build_soap_call(
-            self.action, arguments, ns=self.namespace[1])
+            self.action, arguments, ns=self.namespace[1]
+        )
         self.debug(f'callRemote payload is:  {payload}')
 
         def gotError(error, url):
@@ -85,37 +97,49 @@ class SOAPProxy(log.LogAble):
             self.debug(error)
             try:
                 self.error(
-                    f'\t-> error.value.response is: {error.value.response}')
+                    f'\t-> error.value.response is: {error.value.response}'
+                )
                 try:
                     tree = etree.fromstring(error.value.response)
                 except Exception:
                     self.warning(
                         'callRemote: error on parsing soap result, probably'
-                        ' has encoding declaration, trying with another'
-                        ' method...')
+                        + ' has encoding declaration, trying with another'
+                        + ' method...'
+                    )
                     tree = parse_with_lxml(
-                        error.value.response, encoding='utf-8')
+                        error.value.response, encoding='utf-8'
+                    )
                 body = tree.find(
-                    '{http://schemas.xmlsoap.org/soap/envelope/}Body')
-                return failure.Failure(Exception('%s - %s' % (
-                    body.find(
-                        './/{urn:schemas-upnp-org:control-1-0}'
-                        'errorCode').text,
-                    body.find(
-                        './/{urn:schemas-upnp-org:control-1-0}'
-                        'errorDescription').text)))
+                    '{http://schemas.xmlsoap.org/soap/envelope/}Body'
+                )
+                return failure.Failure(
+                    Exception(
+                        '%s - %s'
+                        % (
+                            body.find(
+                                './/{urn:schemas-upnp-org:control-1-0}'
+                                + 'errorCode'
+                            ).text,
+                            body.find(
+                                './/{urn:schemas-upnp-org:control-1-0}'
+                                + 'errorDescription'
+                            ).text,
+                        )
+                    )
+                )
             except Exception as e:
                 self.error(f'callRemote error on getting traceback: {e}')
                 import traceback
+
                 self.debug(traceback.format_exc())
             return error
 
         return getPage(
-            self.url,
-            postdata=payload,
-            method=b'POST',
-            headers=headers).addCallbacks(
-            self._cbGotResult, gotError, None, None, [self.url], None)
+            self.url, postdata=payload, method=b'POST', headers=headers
+        ).addCallbacks(
+            self._cbGotResult, gotError, None, None, [self.url], None
+        )
 
     def _cbGotResult(self, result):
         page, headers = result
@@ -131,8 +155,7 @@ class SOAPProxy(log.LogAble):
         a = self.action.decode('utf-8')
         tree = etree.fromstring(page)
         body = tree.find('{http://schemas.xmlsoap.org/soap/envelope/}Body')
-        response = body.find(
-            f'{{{self.namespace[1]}}}{a}Response')
+        response = body.find(f'{{{self.namespace[1]}}}{a}Response')
         if response is None:
             # fallback for improper SOAP action responses
             response = body.find(f'{a}Response')
@@ -146,20 +169,22 @@ class SOAPProxy(log.LogAble):
 
     def decode_result(self, element):
         self.debug(f'decode_result [element]: {element}')
-        type = element.get('{http://www.w3.org/1999/XMLSchema-instance}type')
-        if type is not None:
+        element_type = element.get(
+            '{http://www.w3.org/1999/XMLSchema-instance}type'
+        )
+        if element_type is not None:
             try:
-                prefix, local = type.split(':')
+                prefix, local = element_type.split(':')
                 if prefix == 'xsd':
-                    type = local
+                    element_type = local
             except ValueError:
                 pass
 
-        if type == 'integer' or type == 'int':
+        if element_type == 'integer' or element_type == 'int':
             return int(element.text)
-        if type == 'float' or type == 'double':
+        if element_type == 'float' or element_type == 'double':
             return float(element.text)
-        if type == 'boolean':
+        if element_type == 'boolean':
             return element.text == 'true'
 
         return element.text or ''

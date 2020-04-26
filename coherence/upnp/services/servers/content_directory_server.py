@@ -24,7 +24,6 @@ from coherence.upnp.core.utils import to_string
 
 
 class ContentDirectoryControl(service.ServiceControl, UPnPPublisher):
-
     def __init__(self, server):
         service.ServiceControl.__init__(self)
         UPnPPublisher.__init__(self)
@@ -42,8 +41,9 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         if backend is None:
             backend = self.device.backend
         resource.Resource.__init__(self)
-        service.ServiceServer.__init__(self, 'ContentDirectory',
-                                       self.device.version, backend)
+        service.ServiceServer.__init__(
+            self, 'ContentDirectory', self.device.version, backend
+        )
 
         self.control = ContentDirectoryControl(self)
         self.putChild(b'scpd.xml', service.scpdXML(self, self.control))
@@ -89,13 +89,18 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
         parent_container = str(ContainerID)
 
-        didl = DIDLElement(upnp_client=kwargs.get('X_UPnPClient', ''),
-                           parent_container=parent_container,
-                           transcoding=self.transcoding)
+        didl = DIDLElement(
+            upnp_client=kwargs.get('X_UPnPClient', ''),
+            parent_container=parent_container,
+            transcoding=self.transcoding,
+        )
 
         def build_response(tm):
-            r = {'Result': didl.toString(), 'TotalMatches': tm,
-                 'NumberReturned': didl.numItems()}
+            r = {
+                'Result': didl.toString(),
+                'TotalMatches': tm,
+                'NumberReturned': didl.numItems(),
+            }
 
             if hasattr(item, 'update_id'):
                 r['UpdateID'] = item.update_id
@@ -115,20 +120,20 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
             cl = []
 
-            def process_items(result, tm):
-                if result is None:
-                    result = []
-                for i in result:
-                    if i[0]:
-                        didl.addItem(i[1])
+            def process_items(deferred_result, tm):
+                deferred_result = deferred_result or []
+                for item_result in deferred_result:
+                    if item_result[0]:
+                        didl.addItem(item_result[1])
 
                 return build_response(tm)
 
-            for i in result:
-                d = defer.maybeDeferred(i.get_item)
+            for element in result:
+                d = defer.maybeDeferred(element.get_item)
                 cl.append(d)
 
             if found_item is not None:
+
                 def got_child_count(count):
                     dl = defer.DeferredList(cl)
                     dl.addCallback(process_items, count)
@@ -146,14 +151,20 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             return dl
 
         def proceed(result):
-            if (kwargs.get('X_UPnPClient', '') == 'XBox' and
-                    hasattr(result, 'get_artist_all_tracks')):
-                d = defer.maybeDeferred(result.get_artist_all_tracks,
-                                        StartingIndex,
-                                        StartingIndex + RequestedCount)
+            if kwargs.get('X_UPnPClient', '') == 'XBox' and hasattr(
+                result, 'get_artist_all_tracks'
+            ):
+                d = defer.maybeDeferred(
+                    result.get_artist_all_tracks,
+                    StartingIndex,
+                    StartingIndex + RequestedCount,
+                )
             else:
-                d = defer.maybeDeferred(result.get_children, StartingIndex,
-                                        StartingIndex + RequestedCount)
+                d = defer.maybeDeferred(
+                    result.get_children,
+                    StartingIndex,
+                    StartingIndex + RequestedCount,
+                )
             d.addCallback(process_result, found_item=result)
             d.addErrback(got_error)
             return d
@@ -165,8 +176,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
         wmc_mapping = getattr(self.backend, 'wmc_mapping', None)
         if kwargs.get('X_UPnPClient', '') == 'XBox':
-            if (wmc_mapping is not None and
-                    ContainerID in wmc_mapping):
+            if wmc_mapping is not None and ContainerID in wmc_mapping:
                 ''' fake a Windows Media Connect Server
                 '''
                 root_id = wmc_mapping[ContainerID]
@@ -178,8 +188,10 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                             if int(RequestedCount) == 0:
                                 items = item[StartingIndex:]
                             else:
-                                items = item[StartingIndex:
-                                             StartingIndex + RequestedCount]
+                                items = item[
+                                    StartingIndex: StartingIndex
+                                    + RequestedCount
+                                ]
                             return process_result(items, total=total)
                         else:
                             if isinstance(item, defer.Deferred):
@@ -214,7 +226,8 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         except KeyError:
             self.debug(
                 'hmm, a Browse action and no ObjectID argument? '
-                'An XBox maybe?')
+                + 'An XBox maybe?'
+            )
             try:
                 ObjectID = kwargs['ContainerID']
             except KeyError:
@@ -236,14 +249,18 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         else:
             requested_id = str(ObjectID)
 
-        self.info(f'upnp_Browse request {ObjectID} {BrowseFlag} '
-                  f'{StartingIndex} {RequestedCount}')
+        self.info(
+            f'upnp_Browse request {ObjectID} {BrowseFlag} '
+            + f'{StartingIndex} {RequestedCount}'
+        )
         # self.debug(f'\t- kwargs: {kwargs}')
 
-        didl = DIDLElement(upnp_client=kwargs.get('X_UPnPClient', ''),
-                           requested_id=requested_id,
-                           parent_container=parent_container,
-                           transcoding=self.transcoding)
+        didl = DIDLElement(
+            upnp_client=kwargs.get('X_UPnPClient', ''),
+            requested_id=requested_id,
+            parent_container=parent_container,
+            transcoding=self.transcoding,
+        )
 
         def got_error(r):
             return r
@@ -268,6 +285,7 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                     cl.append(d)
 
                 if found_item is not None:
+
                     def got_child_count(count):
                         dl = defer.DeferredList(cl)
                         dl.addCallback(process_items, count)
@@ -290,9 +308,11 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
             return build_response(total)
 
         def build_response(tm):
-            r = {'Result': didl.toString(),
-                 'TotalMatches': tm,
-                 'NumberReturned': didl.numItems()}
+            r = {
+                'Result': didl.toString(),
+                'TotalMatches': tm,
+                'NumberReturned': didl.numItems(),
+            }
 
             if hasattr(item, 'update_id'):
                 r['UpdateID'] = item.update_id
@@ -305,8 +325,11 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
 
         def proceed(result):
             if BrowseFlag == 'BrowseDirectChildren':
-                d = defer.maybeDeferred(result.get_children, StartingIndex,
-                                        StartingIndex + RequestedCount)
+                d = defer.maybeDeferred(
+                    result.get_children,
+                    StartingIndex,
+                    StartingIndex + RequestedCount,
+                )
             else:
                 d = defer.maybeDeferred(result.get_item)
 
@@ -317,10 +340,12 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
         root_id = ObjectID
 
         wmc_mapping = getattr(self.backend, 'wmc_mapping', None)
-        if kwargs.get('X_UPnPClient', '') == 'XBox' and \
-                wmc_mapping is not None and ObjectID in wmc_mapping:
-            ''' fake a Windows Media Connect Server
-            '''
+        if (
+            kwargs.get('X_UPnPClient', '') == 'XBox'
+            and wmc_mapping is not None
+            and ObjectID in wmc_mapping
+        ):
+            # fake a Windows Media Connect Server
             root_id = wmc_mapping[ObjectID]
             if callable(root_id):
                 item = root_id()
@@ -330,9 +355,9 @@ class ContentDirectoryServer(service.ServiceServer, resource.Resource):
                         if int(RequestedCount) == 0:
                             items = item[StartingIndex:]
                         else:
-                            items = item[StartingIndex:
-                                         StartingIndex +
-                                         RequestedCount]
+                            items = item[
+                                StartingIndex: StartingIndex + RequestedCount
+                            ]
                         return process_result(items, total=total)
                     else:
                         if isinstance(item, defer.Deferred):

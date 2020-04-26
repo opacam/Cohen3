@@ -32,6 +32,7 @@ class InternetGatewayDeviceClient(EventDispatcher, log.LogAble):
         * Changed class variable :attr:`detection_completed` to benefit
           from the EventDispatcher's properties
     '''
+
     logCategory = 'igd_client'
 
     detection_completed = Property(False)
@@ -44,12 +45,11 @@ class InternetGatewayDeviceClient(EventDispatcher, log.LogAble):
     def __init__(self, device):
         log.LogAble.__init__(self)
         EventDispatcher.__init__(self)
-        self.register_event(
-            'device_client_detection_completed',
-        )
+        self.register_event('device_client_detection_completed')
         self.device = device
         self.device.bind(
-            embedded_device_client_detection_completed=self.embedded_device_notified)  # noqa
+            embedded_device_client_detection_completed=self.embedded_device_notified  # noqa: E501
+        )
 
         self.device_type = self.device.get_friendly_device_type()
         self.version = int(self.device.get_device_type_version())
@@ -58,13 +58,16 @@ class InternetGatewayDeviceClient(EventDispatcher, log.LogAble):
         self.wan_device = None
 
         try:
-            wan_device = self.device.get_embedded_device_by_type(
-                'WANDevice')[0]
+            wan_device = self.device.get_embedded_device_by_type('WANDevice')[
+                0
+            ]
             self.wan_device = WANDeviceClient(wan_device)
         except Exception as e:
-            self.warning(f'Embedded WANDevice device not available, device not'
-                         f' implemented properly according to the UPnP'
-                         f' specification [error: {e}]')
+            self.warning(
+                f'Embedded WANDevice device not available, device not'
+                + f' implemented properly according to the UPnP'
+                + f' specification [error: {e}]'
+            )
             raise
 
         self.info(f'InternetGatewayDevice {device.get_friendly_name()}')
@@ -81,4 +84,6 @@ class InternetGatewayDeviceClient(EventDispatcher, log.LogAble):
         self.detection_completed = True
         self.dispatch_event(
             'device_client_detection_completed',
-            client=self, udn=self.device.udn)
+            client=self,
+            udn=self.device.udn,
+        )

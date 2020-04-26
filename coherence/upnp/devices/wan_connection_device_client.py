@@ -16,10 +16,12 @@ A class representing an WAN connection client device.
 from eventdispatcher import EventDispatcher, Property
 
 from coherence import log
-from coherence.upnp.services.clients.wan_ip_connection_client import \
-    WANIPConnectionClient
-from coherence.upnp.services.clients.wan_ppp_connection_client import \
-    WANPPPConnectionClient
+from coherence.upnp.services.clients.wan_ip_connection_client import (
+    WANIPConnectionClient,
+)
+from coherence.upnp.services.clients.wan_ppp_connection_client import (
+    WANPPPConnectionClient,
+)
 
 
 class WANConnectionDeviceClient(EventDispatcher, log.LogAble):
@@ -35,6 +37,7 @@ class WANConnectionDeviceClient(EventDispatcher, log.LogAble):
         * Changed class variable :attr:`detection_completed` to benefit
           from the EventDispatcher's properties
     '''
+
     logCategory = 'igd_client'
 
     detection_completed = Property(False)
@@ -47,9 +50,7 @@ class WANConnectionDeviceClient(EventDispatcher, log.LogAble):
     def __init__(self, device):
         log.LogAble.__init__(self)
         EventDispatcher.__init__(self)
-        self.register_event(
-            'embedded_device_client_detection_completed',
-        )
+        self.register_event('embedded_device_client_detection_completed')
         self.device = device
         self.device.bind(service_notified=self.service_notified)
         self.device_type = self.device.get_friendly_device_type()
@@ -62,10 +63,12 @@ class WANConnectionDeviceClient(EventDispatcher, log.LogAble):
 
         for service in self.device.get_services():
             if service.get_type() in [
-                    'urn:schemas-upnp-org:service:WANIPConnection:1']:
+                'urn:schemas-upnp-org:service:WANIPConnection:1'
+            ]:
                 self.wan_ip_connection = WANIPConnectionClient(service)
             if service.get_type() in [
-                    'urn:schemas-upnp-org:service:WANPPPConnection:1']:
+                'urn:schemas-upnp-org:service:WANPPPConnection:1'
+            ]:
                 self.wan_ppp_connection = WANPPPConnectionClient(service)
         self.info(f'WANConnectionDevice {device.get_friendly_name()}')
         if self.wan_ip_connection:
@@ -85,17 +88,18 @@ class WANConnectionDeviceClient(EventDispatcher, log.LogAble):
         if self.detection_completed:
             return
         if self.wan_ip_connection is not None:
-            if not hasattr(self.wan_ip_connection.service,
-                           'last_time_updated'):
+            if not hasattr(
+                self.wan_ip_connection.service, 'last_time_updated'
+            ):
                 return
             if self.wan_ip_connection.service.last_time_updated is None:
                 return
         if self.wan_ppp_connection is not None:
-            if not hasattr(self.wan_ppp_connection.service,
-                           'last_time_updated'):
+            if not hasattr(
+                self.wan_ppp_connection.service, 'last_time_updated'
+            ):
                 return
             if self.wan_ppp_connection.service.last_time_updated is None:
                 return
         self.detection_completed = True
-        self.dispatch_event(
-            'embedded_device_client_detection_completed', self)
+        self.dispatch_event('embedded_device_client_detection_completed', self)

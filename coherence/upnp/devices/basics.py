@@ -53,7 +53,8 @@ class DeviceHttpRoot(resource.Resource, log.LogAble):
     def getChildWithDefault(self, path, request):
         self.info(
             f'DeviceHttpRoot {self.server.device_type} getChildWithDefault '
-            f'{path} {request.uri} {request.client}')
+            f'{path} {request.uri} {request.client}'
+        )
         self.info(request.getAllHeaders())
         if not isinstance(path, bytes):
             path = path.encode('ascii')
@@ -237,8 +238,8 @@ class DeviceHttpRoot(resource.Resource, log.LogAble):
 #         #if self.has_level(LOG_DEBUG):
 #         #    indent( root)
 #
-        # self.xml = '''<?xml version="1.0" encoding="utf-8"?>''' + \
-        #            ET.tostring(root, encoding='utf-8')
+#         # self.xml = '''<?xml version="1.0" encoding="utf-8"?>''' + \
+#         #            ET.tostring(root, encoding='utf-8')
 #         static.Data.__init__(self, self.xml, 'text/xml')
 
 
@@ -271,7 +272,8 @@ class BasicDeviceMixin(EventDispatcher):
         self.coherence = coherence
         if not hasattr(self, 'version'):
             self.version = int(
-                kwargs.get('version', self.coherence.config.get('version', 2)))
+                kwargs.get('version', self.coherence.config.get('version', 2))
+            )
 
         try:
             self.uuid = str(kwargs['uuid'])
@@ -279,6 +281,7 @@ class BasicDeviceMixin(EventDispatcher):
                 self.uuid = 'uuid:' + self.uuid
         except KeyError:
             from coherence.upnp.core.uuid import UUID
+
             self.uuid = UUID()
 
         urlbase = str(self.coherence.urlbase)
@@ -321,8 +324,10 @@ class BasicDeviceMixin(EventDispatcher):
     def init_failed(self, backend, msg):
         if self.backend != backend:
             return
-        self.warning(f'backend not installed, {self.device_type} '
-                     f'activation aborted - {msg.getErrorMessage()}')
+        self.warning(
+            f'backend not installed, {self.device_type} '
+            + f'activation aborted - {msg.getErrorMessage()}'
+        )
         self.debug(msg)
         try:
             del self.coherence.active_backends[str(self.uuid)]
@@ -336,21 +341,23 @@ class BasicDeviceMixin(EventDispatcher):
         self.msg(f'{self.device_type} register')
         # we need to do this after the children are there,
         # since we send notifies
+        uuid_url = f'{self.coherence.urlbase}{uuid[5:]}/'
+        description_xml = f'description-{self.version:d}.xml'
         s.register(
             'local',
             f'{uuid}::upnp:rootdevice',
             'upnp:rootdevice',
-            self.coherence.urlbase + uuid[5:] + '/' +
-            f'description-{self.version:d}.xml',
-            host=host)
+            uuid_url + description_xml,
+            host=host,
+        )
 
         s.register(
             'local',
             uuid,
             uuid,
-            self.coherence.urlbase + uuid[5:] + '/' +
-            f'description-{self.version:d}.xml',
-            host=host)
+            uuid_url + description_xml,
+            host=host,
+        )
 
         version = self.version
         while version > 0:
@@ -362,10 +369,10 @@ class BasicDeviceMixin(EventDispatcher):
                 'local',
                 f'{uuid}::urn:schemas-upnp-org:device:{self.device_type}:{version:d}',  # noqa
                 f'urn:schemas-upnp-org:device:{self.device_type}:{version:d}',
-                self.coherence.urlbase + uuid[5:] + '/' +
-                f'description-{version:d}.xml',
+                uuid_url + description_xml,
                 silent=silent,
-                host=host)
+                host=host,
+            )
             version -= 1
 
         for service in self._services:
@@ -389,10 +396,10 @@ class BasicDeviceMixin(EventDispatcher):
                     'local',
                     f'{uuid}::urn:{namespace}:service:{service.id}:{service_version:d}',  # noqa
                     f'urn:{namespace}:service:{service.id}:{service_version:d}',  # noqa
-                    self.coherence.urlbase + uuid[5:] +
-                    '/' + device_description_tmpl,
+                    uuid_url + device_description_tmpl,
                     silent=silent,
-                    host=host)
+                    host=host,
+                )
 
                 silent = True
                 service_version -= 1
@@ -404,9 +411,7 @@ class BasicDeviceMixin(EventDispatcher):
             self.backend.release()
 
         if not hasattr(self, '_services'):
-            ''' seems we never made it to actually
-                completing that device
-            '''
+            # seems we never made it to actually completing that device
             return
 
         for service in self._services:
@@ -418,8 +423,10 @@ class BasicDeviceMixin(EventDispatcher):
                     self.warning(ms)
                 else:
                     print('WARNING: ', ms)
-            if hasattr(service, 'check_moderated_loop') and \
-                    service.check_moderated_loop is not None:
+            if (
+                hasattr(service, 'check_moderated_loop')
+                and service.check_moderated_loop is not None
+            ):
                 try:
                     service.check_moderated_loop.stop()
                 except Exception as e2:
@@ -440,7 +447,8 @@ class BasicDeviceMixin(EventDispatcher):
         version = self.version
         while version > 0:
             s.doByebye(
-                f'{uuid}::urn:schemas-upnp-org:device:{self.device_type}:{version:d}')  # noqa
+                f'{uuid}::urn:schemas-upnp-org:device:{self.device_type}:{version:d}'  # noqa: E501
+            )
             for service in self._services:
                 if hasattr(service, 'version') and service.version < version:
                     continue

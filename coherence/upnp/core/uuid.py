@@ -10,7 +10,6 @@ import uuid
 
 
 class UUID:
-
     def __init__(self):
         self.uuid = 'uuid:' + str(uuid.uuid4())
 

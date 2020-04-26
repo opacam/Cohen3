@@ -30,7 +30,8 @@ TYPE_MAP = {
     bytes: 'bytes',
     int: 'int',
     float: 'float',
-    bool: 'boolean'}
+    bool: 'boolean',
+}
 
 UPNPERRORS = {
     401: 'Invalid Action',
@@ -48,32 +49,35 @@ UPNPERRORS = {
     609: 'Not Encrypted',
     610: 'Invalid Sequence',
     611: 'Invalid Control URL',
-    612: 'No Such Session', }
+    612: 'No Such Session',
+}
 
 logger = log.get_logger('soap_lite')
 
 
-def build_soap_error(status,
-                     description='without words',
-                     pretty_print=True):
+def build_soap_error(status, description='without words', pretty_print=True):
     '''Builds an UPnP SOAP error message.
     '''
     root = etree.Element(etree.QName(NS_SOAP_ENV, 'Fault'))
     etree.SubElement(root, 'faultcode').text = 's:Client'
     etree.SubElement(root, 'faultstring').text = 'UPnPError'
     e = etree.SubElement(root, 'detail')
-    e = etree.SubElement(e, etree.QName(NS_UPNP_ORG_CONTROL_1_0, 'UPnPError'),
-                         nsmap={None: NS_UPNP_ORG_CONTROL_1_0})
+    e = etree.SubElement(
+        e,
+        etree.QName(NS_UPNP_ORG_CONTROL_1_0, 'UPnPError'),
+        nsmap={None: NS_UPNP_ORG_CONTROL_1_0},
+    )
     etree.SubElement(e, 'errorCode').text = str(status)
-    etree.SubElement(e, 'errorDescription').text = UPNPERRORS.get(status,
-                                                                  description)
+    etree.SubElement(e, 'errorDescription').text = UPNPERRORS.get(
+        status, description
+    )
 
     return build_soap_call(None, root, pretty_print=pretty_print)
 
 
-def build_soap_call(method, arguments, ns=None,
-                    is_response=False,
-                    pretty_print=True):
+def build_soap_call(
+    method, arguments, ns=None, is_response=False, pretty_print=True
+):
     '''Create a shell for a SOAP request or response element:
 
         - set method to none to omit the method element and
@@ -83,9 +87,9 @@ def build_soap_call(method, arguments, ns=None,
     envelope = etree.Element(
         etree.QName(NS_SOAP_ENV, 'Envelope'),
         attrib={etree.QName(NS_SOAP_ENV, 'encodingStyle'): NS_SOAP_ENC},
-        nsmap={'s': NS_SOAP_ENV})
-    body = etree.SubElement(
-        envelope, etree.QName(NS_SOAP_ENV, 'Body'))
+        nsmap={'s': NS_SOAP_ENV},
+    )
+    body = etree.SubElement(envelope, etree.QName(NS_SOAP_ENV, 'Body'))
 
     if method:
         if is_response is True:
@@ -120,7 +124,11 @@ def build_soap_call(method, arguments, ns=None,
     elif isinstance(arguments, ELEMENT_TYPE):
         re.append(arguments)
 
-    xml = etree.tostring(envelope, encoding='utf-8', xml_declaration=True,
-                         pretty_print=pretty_print)
+    xml = etree.tostring(
+        envelope,
+        encoding='utf-8',
+        xml_declaration=True,
+        pretty_print=pretty_print,
+    )
     logger.debug(f'xml dump:\n{xml}')
     return xml

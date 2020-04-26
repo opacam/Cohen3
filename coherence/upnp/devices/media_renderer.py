@@ -12,12 +12,15 @@ from coherence import log
 from coherence.upnp.core.utils import StaticFile
 from coherence.upnp.devices.media_server import RootDeviceXML
 from coherence.upnp.devices.basics import DeviceHttpRoot, BasicDeviceMixin
-from coherence.upnp.services.servers.av_transport_server import \
-    AVTransportServer
-from coherence.upnp.services.servers.connection_manager_server import \
-    ConnectionManagerServer
-from coherence.upnp.services.servers.rendering_control_server import \
-    RenderingControlServer
+from coherence.upnp.services.servers.av_transport_server import (
+    AVTransportServer,
+)
+from coherence.upnp.services.servers.connection_manager_server import (
+    ConnectionManagerServer,
+)
+from coherence.upnp.services.servers.rendering_control_server import (
+    RenderingControlServer,
+)
 
 
 class HttpRoot(DeviceHttpRoot):
@@ -40,6 +43,7 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
                 backend is implemented properly '''
 
             from twisted.internet import threads
+
             d = threads.deferToThread(backend, self, **kwargs)
 
             def backend_ready(backend):
@@ -48,7 +52,8 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
             def backend_failure(x):
                 self.warning(
                     f'backend {backend} not installed, {self.device_type}'
-                    f' activation aborted - {x.getErrorMessage()}')
+                    + f' activation aborted - {x.getErrorMessage()}'
+                )
                 self.debug(x)
 
             d.addCallback(backend_ready)
@@ -115,13 +120,17 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
                     services=self._services,
                     devices=self._devices,
                     icons=self.icons,
-                    dlna_caps=dlna_caps))
+                    dlna_caps=dlna_caps,
+                ),
+            )
             version -= 1
 
-        self.web_resource.putChild(b'ConnectionManager',
-                                   self.connection_manager_server)
-        self.web_resource.putChild(b'RenderingControl',
-                                   self.rendering_control_server)
+        self.web_resource.putChild(
+            b'ConnectionManager', self.connection_manager_server
+        )
+        self.web_resource.putChild(
+            b'RenderingControl', self.rendering_control_server
+        )
         self.web_resource.putChild(b'AVTransport', self.av_transport_server)
 
         for icon in self.icons:
@@ -130,29 +139,47 @@ class MediaRenderer(log.LogAble, BasicDeviceMixin):
                     if os.path.exists(icon['url'][7:]):
                         self.web_resource.putChild(
                             os.path.basename(icon['url']).encode('ascii'),
-                            StaticFile(icon['url'][7:],
-                                       defaultType=icon['mimetype']))
+                            StaticFile(
+                                icon['url'][7:], defaultType=icon['mimetype']
+                            ),
+                        )
                 elif icon['url'] == '.face':
                     face_path = os.path.abspath(
-                        os.path.join(os.path.expanduser('~'), '.face'))
+                        os.path.join(os.path.expanduser('~'), '.face')
+                    )
                     if os.path.exists(face_path):
                         self.web_resource.putChild(
                             b'face-icon.png',
                             StaticFile(
-                                face_path, defaultType=icon['mimetype']))
+                                face_path, defaultType=icon['mimetype']
+                            ),
+                        )
                 else:
                     from pkg_resources import resource_filename
+
                     icon_path = os.path.abspath(
                         resource_filename(
                             __name__,
-                            os.path.join('..', '..', '..', 'misc',
-                                         'device-icons', icon['url'])))
+                            os.path.join(
+                                '..',
+                                '..',
+                                '..',
+                                'misc',
+                                'device-icons',
+                                icon['url'],
+                            ),
+                        )
+                    )
                     if os.path.exists(icon_path):
                         self.web_resource.putChild(
                             icon['url'].encode('ascii'),
-                            StaticFile(icon_path,
-                                       defaultType=icon['mimetype']))
+                            StaticFile(
+                                icon_path, defaultType=icon['mimetype']
+                            ),
+                        )
 
         self.register()
-        self.warning(f'{self.backend.name} {self.device_type} '
-                     f'({self.backend}) activated with {str(self.uuid)[5:]}')
+        self.warning(
+            f'{self.backend.name} {self.device_type} '
+            + f'({self.backend}) activated with {str(self.uuid)[5:]}'
+        )

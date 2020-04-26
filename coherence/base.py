@@ -60,7 +60,11 @@ from twisted.web import resource, static
 from twisted.python.util import sibpath
 
 from eventdispatcher import (
-    EventDispatcher, ListProperty, DictProperty, Property)
+    EventDispatcher,
+    ListProperty,
+    DictProperty,
+    Property,
+)
 
 from coherence import __version__
 from coherence import log
@@ -91,12 +95,18 @@ class SimpleRoot(resource.Resource, log.LogAble):
         log.LogAble.__init__(self)
         self.coherence = coherence
 
-        self.putChild(b'styles',
-                      static.File(sibpath(__file__, 'web/static/styles'),
-                                  defaultType='text/css'))
-        self.putChild(b'server-images',
-                      static.File(sibpath(__file__, 'web/static/images'),
-                                  defaultType='text/css'))
+        self.putChild(
+            b'styles',
+            static.File(
+                sibpath(__file__, 'web/static/styles'), defaultType='text/css'
+            ),
+        )
+        self.putChild(
+            b'server-images',
+            static.File(
+                sibpath(__file__, 'web/static/images'), defaultType='text/css'
+            ),
+        )
 
     def getChild(self, name, request):
         self.debug(f'SimpleRoot getChild {name}, {request}')
@@ -104,7 +114,8 @@ class SimpleRoot(resource.Resource, log.LogAble):
         if name == 'oob':
             ''' we have an out-of-band request '''
             return static.File(
-                self.coherence.dbus.pinboard[request.args['key'][0]])
+                self.coherence.dbus.pinboard[request.args['key'][0]]
+            )
 
         if name in ['', None]:
             return self
@@ -115,11 +126,11 @@ class SimpleRoot(resource.Resource, log.LogAble):
         except KeyError:
             self.warning(f'Cannot find device for requested name: {name}')
             request.setResponseCode(404)
-            return \
-                static.Data(
-                    f'<html><p>No device for requested UUID: '
-                    f'{name.encode("ascii")}</p></html>'.encode('ascii'),
-                    'text/html')
+            return static.Data(
+                f'<html><p>No device for requested UUID: '
+                f'{name.encode("ascii")}</p></html>'.encode('ascii'),
+                'text/html',
+            )
 
     def listchilds(self, uri):
         uri = to_string(uri)
@@ -136,7 +147,8 @@ class SimpleRoot(resource.Resource, log.LogAble):
                     f'{device.get_friendly_device_type()}:'
                     f'{device.get_device_type_version()} '
                     f'{device.get_friendly_name()}'
-                    f'</a></li>')
+                    f'</a></li>'
+                )
 
         # We put in a blacklist the styles and server-images folders,
         # in order to avoid to appear into the generated html list
@@ -196,12 +208,14 @@ class WebServer(log.LogAble):
             coherence.web_server_port = port
             self.warning(
                 f'WebServer on ip '
-                f'http://{coherence.hostname}:{coherence.web_server_port}'
-                f' ready')
+                + f'http://{coherence.hostname}:{coherence.web_server_port}'
+                + f' ready'
+            )
 
         def clear(whatever):
             self.endpoint_listen = None
             return whatever
+
         self.endpoint_listen.addCallback(set_listen_port).addBoth(clear)
 
 
@@ -225,6 +239,7 @@ class WebServerUi(WebServer):
             site_cls = server.Site
         else:
             from tests.web_utils import DummySite
+
             site_cls = DummySite
         self.site = site_cls(self.web_root_resource)
 
@@ -242,17 +257,20 @@ class WebServerUi(WebServer):
             coherence.web_server_port = port
             self.warning(
                 f'WebServerUi on ip '
-                f'http://{coherence.hostname}:{coherence.web_server_port}'
-                f' ready')
+                + f'http://{coherence.hostname}:{coherence.web_server_port}'
+                + f' ready'
+            )
 
         def clear(whatever):
             self.endpoint_listen = None
             return whatever
+
         self.endpoint_listen.addCallback(set_listen_port).addBoth(clear)
 
     def _ws_endpoint_listen(self, coherence):
         self.ws_endpoint_listen = self.ws_endpoint.listen(
-            self.web_root_resource.factory)
+            self.web_root_resource.factory
+        )
 
         def set_ws_listen_port(p):
             self.ws_endpoint_port = p
@@ -260,8 +278,10 @@ class WebServerUi(WebServer):
         def clear_ws(whatever):
             self.ws_endpoint_listen = None
             return whatever
-        self.ws_endpoint_listen.addCallback(
-            set_ws_listen_port).addBoth(clear_ws)
+
+        self.ws_endpoint_listen.addCallback(set_ws_listen_port).addBoth(
+            clear_ws
+        )
 
 
 class Plugins(log.LogAble):
@@ -269,10 +289,12 @@ class Plugins(log.LogAble):
     __instance = None  # Singleton
     __initialized = False
 
-    _valids = ('coherence.plugins.backend.media_server',
-               'coherence.plugins.backend.media_renderer',
-               'coherence.plugins.backend.binary_light',
-               'coherence.plugins.backend.dimmable_light')
+    _valids = (
+        'coherence.plugins.backend.media_server',
+        'coherence.plugins.backend.media_renderer',
+        'coherence.plugins.backend.binary_light',
+        'coherence.plugins.backend.dimmable_light',
+    )
 
     _plugins = {}
 
@@ -311,10 +333,15 @@ class Plugins(log.LogAble):
         if pkg_resources and isinstance(plugin, pkg_resources.EntryPoint):
             try:
                 plugin = plugin.resolve()
-            except (ImportError, AttributeError,
-                    pkg_resources.ResolutionError) as msg:
-                self.warning(f'Can\'t load plugin {plugin.name} ({msg}), '
-                             f'maybe missing dependencies...')
+            except (
+                ImportError,
+                AttributeError,
+                pkg_resources.ResolutionError,
+            ) as msg:
+                self.warning(
+                    f'Can\'t load plugin {plugin.name} ({msg}), '
+                    f'maybe missing dependencies...'
+                )
                 self.info(traceback.format_exc())
                 del self._plugins[key]
                 raise KeyError
@@ -339,9 +366,11 @@ class Plugins(log.LogAble):
 
     def _collect_from_module(self):
         from coherence.extern.simple_plugin import Reception
+
         reception = Reception(
             os.path.join(os.path.dirname(__file__), 'backends'),
-            log=self.warning)
+            log=self.warning,
+        )
         self.info(reception.guestlist())
         for cls in reception.guestlist():
             self._plugins[cls.__name__.split('.')[-1]] = cls
@@ -551,18 +580,23 @@ class Coherence(EventDispatcher, log.LogAble):
                         continue
                 except (KeyError, TypeError):
                     pass
-                self.info(f'setting log-level for subsystem '
-                          f'{subsystem["name"]} to {subsystem["level"]}')
+                self.info(
+                    f'setting log-level for subsystem '
+                    + f'{subsystem["name"]} to {subsystem["level"]}'
+                )
                 logging.getLogger(subsystem['name'].lower()).setLevel(
-                    subsystem['level'].upper())
+                    subsystem['level'].upper()
+                )
         except (KeyError, TypeError):
             subsystem_log = self.config.get('subsystem_log', {})
             for subsystem, level in list(subsystem_log.items()):
                 logging.getLogger(subsystem.lower()).setLevel(level.upper())
 
         log.init(self.log_file, self.log_level)
-        self.warning(f'Coherence UPnP framework version {__version__} '
-                     f'starting [log level: {self.log_level}]...')
+        self.warning(
+            f'Coherence UPnP framework version {__version__} '
+            + f'starting [log level: {self.log_level}]...'
+        )
 
     def setup_hostname(self):
         '''
@@ -577,15 +611,17 @@ class Coherence(EventDispatcher, log.LogAble):
             try:
                 self.hostname = socket.gethostbyname(socket.gethostname())
             except socket.gaierror:
-                self.warning('hostname can\'t be resolved, '
-                             'maybe a system misconfiguration?')
+                self.warning(
+                    'hostname can\'t be resolved, '
+                    + 'maybe a system misconfiguration?'
+                )
                 self.hostname = '127.0.0.1'
 
         self.info(f'running on host: {self.hostname}')
         if self.hostname.startswith('127.'):
             self.warning(
                 f'detection of own ip failed, using {self.hostname} '
-                f'as own address, functionality will be limited'
+                + f'as own address, functionality will be limited'
             )
 
     def setup_ssdp_server(self):
@@ -615,14 +651,15 @@ class Coherence(EventDispatcher, log.LogAble):
         try:
             # TODO: add ip/interface bind
             if self.config.get('web-ui', 'no') != 'yes':
-                self.web_server = WebServer(
-                    None, self.web_server_port, self)
+                self.web_server = WebServer(None, self.web_server_port, self)
             else:
                 self.web_server = WebServerUi(
-                    self.web_server_port, self, unittests=self.is_unittest)
+                    self.web_server_port, self, unittests=self.is_unittest
+                )
         except CannotListenError:
             self.error(
-                f'port {self.web_server_port} already in use, aborting!')
+                f'port {self.web_server_port} already in use, aborting!'
+            )
             reactor.stop()
             return
 
@@ -698,24 +735,29 @@ class Coherence(EventDispatcher, log.LogAble):
         self.setup_plugins()
 
         # Control Point Initialization
-        if self.config.get('controlpoint', 'no') == 'yes' or self.config.get(
-                'json', 'no') == 'yes':
+        if (
+            self.config.get('controlpoint', 'no') == 'yes'
+            or self.config.get('json', 'no') == 'yes'
+        ):
             self.ctrl = ControlPoint(self)
 
         # Json Interface Initialization
         if self.config.get('json', 'no') == 'yes':
             from coherence.json_service import JsonInterface
+
             self.json = JsonInterface(self.ctrl)
 
         # Transcoder Initialization
         if self.config.get('transcoding', 'no') == 'yes':
             from coherence.transcoder import TranscoderManager
+
             self.transcoder_manager = TranscoderManager(self)
 
         # DBus Initialization
         if self.config.get('use_dbus', 'no') == 'yes':
             try:
                 from coherence import dbus_service
+
                 if self.ctrl is None:
                     self.ctrl = ControlPoint(self)
                 self.ctrl.auto_client_append('InternetGatewayDevice')
@@ -744,11 +786,15 @@ class Coherence(EventDispatcher, log.LogAble):
                     self.active_backends[str(new_backend.uuid)] = new_backend
                     return new_backend
                 except KeyError:
-                    self.warning(f'Can\'t enable {plugin} plugin, '
-                                 f'sub-system {device} not found!')
+                    self.warning(
+                        f'Can\'t enable {plugin} plugin, '
+                        f'sub-system {device} not found!'
+                    )
                 except Exception as e1:
-                    self.exception(f'Can\'t enable {plugin} plugin for '
-                                   f'sub-system {device} [exception: {e1}]')
+                    self.exception(
+                        f'Can\'t enable {plugin} plugin for '
+                        f'sub-system {device} [exception: {e1}]'
+                    )
                     self.debug(traceback.format_exc())
         except KeyError:
             self.warning(f'Can\'t enable {plugin} plugin, not found!')
@@ -789,8 +835,10 @@ class Coherence(EventDispatcher, log.LogAble):
         and value pair(s).'''
         plugins = self.config.get('plugin')
         if plugins is None:
-            self.warning('storing a plugin config option is only possible'
-                         ' with the new config file format')
+            self.warning(
+                'storing a plugin config option is only possible'
+                ' with the new config file format'
+            )
             return
         if isinstance(plugins, dict):
             plugins = [plugins]
@@ -806,8 +854,10 @@ class Coherence(EventDispatcher, log.LogAble):
             except Exception as e:
                 self.warning(f'Coherence.store_plugin_config: {e}')
         else:
-            self.info(f'storing plugin config option '
-                      f'for {uuid} failed, plugin not found')
+            self.info(
+                f'storing plugin config option '
+                f'for {uuid} failed, plugin not found'
+            )
 
     def receiver(self, signal, *args, **kwargs):
         pass
@@ -856,7 +906,8 @@ class Coherence(EventDispatcher, log.LogAble):
         for root_device in self.get_devices():
             if hasattr(root_device, 'root_device_detection_completed'):
                 root_device.unbind(
-                    root_device_detection_completed=self.add_device)
+                    root_device_detection_completed=self.add_device
+                )
             for device in root_device.get_devices():
                 dd = device.unsubscribe_service_subscriptions()
                 dd.addCallback(device.remove)
@@ -963,7 +1014,8 @@ class Coherence(EventDispatcher, log.LogAble):
         if self.is_device_added(infos):
             self.warning(
                 f'No need to create the device, we already added device: '
-                f'{infos["ST"]} with usn {infos["USN"]}...!!')
+                f'{infos["ST"]} with usn {infos["USN"]}...!!'
+            )
             return
         self.info(f'creating {infos["ST"]} {infos["USN"]}')
         if infos['ST'] == 'upnp:rootdevice':
@@ -972,30 +1024,36 @@ class Coherence(EventDispatcher, log.LogAble):
             root.bind(root_detection_completed=self.add_device)
         else:
             self.info(f'creating device/service  {infos["USN"]}')
-            root_id = infos['USN'][:-len(infos['ST']) - 2]
+            root_id = infos['USN'][: -len(infos['ST']) - 2]
             root = self.get_device_with_id(root_id)
             # TODO: must check that this is working as expected
             device = Device(root, udn=infos['UDN'])
 
     def add_device(self, device, *args):
-        self.info(f'adding device {device.get_id()} {device.get_usn()} '
-                  f'{device.friendly_device_type}')
+        self.info(
+            f'adding device {device.get_id()} {device.get_usn()} '
+            + f'{device.friendly_device_type}'
+        )
         self.devices.append(device)
         self.dispatch_event(
-            'coherence_device_detection_completed', device=device)
+            'coherence_device_detection_completed', device=device
+        )
 
     def remove_device(self, device_type, infos):
         self.info(f'removed device {infos["ST"]} {infos["USN"]}')
         device = self.get_device_with_usn(infos['USN'])
         if device:
-            self.dispatch_event('coherence_device_removed',
-                                infos['USN'], device.client)
+            self.dispatch_event(
+                'coherence_device_removed', infos['USN'], device.client
+            )
             self.devices.remove(device)
             device.remove()
             if infos['ST'] == 'upnp:rootdevice':
                 self.dispatch_event(
                     'coherence_root_device_removed',
-                    infos['USN'], device.client)
+                    infos['USN'],
+                    device.client,
+                )
                 self.callback('removed_device', infos['ST'], infos['USN'])
 
     def add_web_resource(self, name, sub):
@@ -1023,16 +1081,22 @@ class Coherence(EventDispatcher, log.LogAble):
         .. versionadded:: 0.9.0
         '''
         if not callable(receiver):
-            raise Exception('The receiver should be callable in order to use'
-                            ' the method {method}')
+            raise Exception(
+                'The receiver should be callable in order to use'
+                + ' the method {method}'
+            )
         if not signal:
             raise Exception(
-                f'We need a signal in order to use method {method}')
-        if not (signal.startswith('Coherence.UPnP.Device.') or
-                signal.startswith('Coherence.UPnP.RootDevice.')):
+                f'We need a signal in order to use method {method}'
+            )
+        if not (
+            signal.startswith('Coherence.UPnP.Device.')
+            or signal.startswith('Coherence.UPnP.RootDevice.')
+        ):
             raise Exception(
                 'We need a signal an old signal starting with: '
-                '"Coherence.UPnP.Device." or "Coherence.UPnP.RootDevice."')
+                + '"Coherence.UPnP.Device." or "Coherence.UPnP.RootDevice."'
+            )
 
     def connect(self, receiver, signal=None, sender=None, weak=True):
         '''
@@ -1056,7 +1120,8 @@ class Coherence(EventDispatcher, log.LogAble):
             self.bind(coherence_root_device_removed=receiver)
         else:
             raise Exception(
-                f'Unknown signal {signal}, we cannot bind that signal.')
+                f'Unknown signal {signal}, we cannot bind that signal.'
+            )
 
     def disconnect(self, receiver, signal=None, sender=None, weak=True):
         '''
@@ -1073,11 +1138,10 @@ class Coherence(EventDispatcher, log.LogAble):
         '''
         self.check_louie(receiver, signal, 'disconnect')
         if signal.endswith('.detected'):
-            self.unbind(
-                coherence_device_detection_completed=receiver)
+            self.unbind(coherence_device_detection_completed=receiver)
         elif signal.endswith('.removed'):
-            self.unbind(
-                control_point_client_removed=receiver)
+            self.unbind(control_point_client_removed=receiver)
         else:
             raise Exception(
-                f'Unknown signal {signal}, we cannot unbind that signal.')
+                f'Unknown signal {signal}, we cannot unbind that signal.'
+            )

@@ -10,7 +10,6 @@ from coherence import log
 
 
 class Argument:
-
     def __init__(self, name, direction, state_variable):
         self.name = name
         self.direction = direction
@@ -26,9 +25,10 @@ class Argument:
         return self.state_variable
 
     def __repr__(self):
-        return \
-            f'Argument: {self.get_name()}, {self.get_direction()}, ' \
-            f'{self.get_state_variable()}'
+        return (
+            f'Argument: {self.get_name()}, {self.get_direction()}, '
+            + f'{self.get_state_variable()}'
+        )
 
     def as_tuples(self):
         r = []
@@ -38,8 +38,11 @@ class Argument:
         return r
 
     def as_dict(self):
-        return {'name': self.name, 'direction': self.direction,
-                'related_state_variable': self.state_variable}
+        return {
+            'name': self.name,
+            'direction': self.direction,
+            'related_state_variable': self.state_variable,
+        }
 
 
 class Action(log.LogAble):
@@ -66,12 +69,14 @@ class Action(log.LogAble):
         return self.arguments_list
 
     def get_in_arguments(self):
-        return [arg for arg in self.arguments_list if
-                arg.get_direction() == 'in']
+        return [
+            arg for arg in self.arguments_list if arg.get_direction() == 'in'
+        ]
 
     def get_out_arguments(self):
-        return [arg for arg in self.arguments_list if
-                arg.get_direction() == 'out']
+        return [
+            arg for arg in self.arguments_list if arg.get_direction() == 'out'
+        ]
 
     def get_service(self):
         return self.service
@@ -97,32 +102,40 @@ class Action(log.LogAble):
                 in_arguments.remove(al[0])
             else:
                 self.error(
-                    f'argument {arg_name} not valid for action {self.name}')
+                    f'argument {arg_name} not valid for action {self.name}',
+                )
                 return
             if arg_name == 'InstanceID':
                 instance_id = int(arg)
         if len(in_arguments) > 0:
             args_names = [a.get_name() for a in in_arguments]
-            self.error(f'argument {[args_names]} '
-                       f'missing for action {self.name}')
+            self.error(
+                f'argument {[args_names]} ' f'missing for action {self.name}',
+            )
             return
 
         action_name = self.name
 
-        if (hasattr(self.service.device.client, 'overlay_actions') and
-                self.name in self.service.device.client.overlay_actions):
+        if (
+            hasattr(self.service.device.client, 'overlay_actions')
+            and self.name in self.service.device.client.overlay_actions
+        ):
             self.info(
                 f'we have an overlay method '
-                f'{self.service.device.client.overlay_actions[self.name]} '
-                f'for action {self.name}')
+                + f'{self.service.device.client.overlay_actions[self.name]} '
+                + f'for action {self.name}'
+            )
             action_name, kwargs = self.service.device.client.overlay_actions[
-                self.name](**kwargs)
+                self.name
+            ](**kwargs)
             self.info(f'changing action to {action_name} {kwargs}')
 
         def got_error(failure):
-            self.warning(f'error on {self.name} request with '
-                         f'{self.service.service_type} '
-                         f'{self.service.control_url}')
+            self.warning(
+                f'error on {self.name} request with '
+                + f'{self.service.service_type} '
+                + f'{self.service.control_url}'
+            )
             self.info(failure)
             return failure
 
@@ -130,11 +143,13 @@ class Action(log.LogAble):
             self.info(f'action call has headers {"headers"}' in kwargs)
             if 'headers' in kwargs:
                 kwargs['headers'].update(
-                    self.service.device.client.overlay_headers)
+                    self.service.device.client.overlay_headers
+                )
             else:
                 kwargs['headers'] = self.service.device.client.overlay_headers
-            self.info(f'action call with new/updated headers '
-                      f'{kwargs["headers"]}')
+            self.info(
+                f'action call with new/updated headers ' f'{kwargs["headers"]}'
+            )
 
         client = self._get_client()
 
@@ -145,16 +160,19 @@ class Action(log.LogAble):
             ordered_arguments['headers'] = kwargs['headers']
 
         d = client.callRemote(action_name, ordered_arguments)
-        d.addCallback(self.got_results, instance_id=instance_id,
-                      name=action_name)
+        d.addCallback(
+            self.got_results, instance_id=instance_id, name=action_name
+        )
         d.addErrback(got_error)
         return d
 
     def got_results(self, results, instance_id, name):
         instance_id = int(instance_id)
         out_arguments = self.get_out_arguments()
-        self.info(f'call {name} (instance {instance_id:d}) '
-                  f'returns {len(out_arguments):d} arguments')
+        self.info(
+            f'call {name} (instance {instance_id:d}) '
+            + f'returns {len(out_arguments):d} arguments'
+        )
 
         # XXX A_ARG_TYPE_ arguments probably don't need a variable update
         # if len(out_arguments) == 1:
@@ -165,24 +183,32 @@ class Action(log.LogAble):
 
         if len(out_arguments) > 0:
             for arg_name, value in list(results.items()):
-                state_variable_name = \
-                    [a.get_state_variable() for a in out_arguments if
-                     a.get_name() == arg_name]
+                state_variable_name = [
+                    a.get_state_variable()
+                    for a in out_arguments
+                    if a.get_name() == arg_name
+                ]
                 self.service.get_state_variable(
-                    state_variable_name[0], instance_id).update(value)
+                    state_variable_name[0], instance_id
+                ).update(value)
 
         return results
 
     def __repr__(self):
-        return \
-            f'Action: {self.get_name()} [{self.get_implementation()}], ' \
-            f'({len(self.get_arguments_list())} args)'
+        return (
+            f'Action: {self.get_name()} [{self.get_implementation()}], '
+            + f'({len(self.get_arguments_list())} args)'
+        )
 
     def as_tuples(self):
-        return [('Name', self.get_name()),
-                ('Number of \'in\' arguments', len(self.get_in_arguments())),
-                ('Number of \'out\' arguments', len(self.get_out_arguments()))]
+        return [
+            ('Name', self.get_name()),
+            ("Number of 'in' arguments", len(self.get_in_arguments())),
+            ("Number of 'out' arguments", len(self.get_out_arguments())),
+        ]
 
     def as_dict(self):
-        return {'name': self.get_name(),
-                'arguments': [a.as_dict() for a in self.arguments_list]}
+        return {
+            'name': self.get_name(),
+            'arguments': [a.as_dict() for a in self.arguments_list],
+        }
