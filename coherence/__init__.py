@@ -1,6 +1,6 @@
 import platform
 
-__version_info__ = (0, 9, 4)
+__version_info__ = (0, 9, 3)
 __version__ = '.'.join(map(str, __version_info__))
 __url__ = 'https://github.com/opacam/Cohen3'
 __service_name__ = 'Cohen3'

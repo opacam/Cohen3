@@ -1,18 +1,13 @@
-0.9.4 - Remove BBC backend
+0.9.3 - Remove BBC backend
 --------------------------
 
 General:
     - Remove `bbc` backend  (because bbc shutdown rss service)
+    - Implement PEP517 & PEP518 (`pyproject.toml` using `poetry`)
+    - Replace `Pipenv` for `Poetry`
 
 Fixes:
     - PkgResourcesDeprecationWarning: Parameters to load are deprecated (when loading plugin)
-
-0.9.3 - Poetry & autorelease
-----------------------------
-
-General:
-    - Implement PEP517 & PEP518 (`pyproject.toml` using `poetry`)
-    - Replace `Pipenv` for `Poetry`
 
 0.9.2 - Fixes/updates dependencies
 ----------------------------------
