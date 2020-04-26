@@ -53,7 +53,7 @@ pygobject = {version = ">=3.30.0", optional = true}
 pyopenssl = "*"
 python-dateutil = "*"
 service_identity = "^18.1.0"
-twisted = ">=19.2.1"
+twisted = ">=20.3.0"
 "zope.interface" = "*"
 
 # dev-dependencies

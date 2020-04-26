@@ -982,7 +982,7 @@ web = ["autobahn"]
 youtube = ["gdata"]
 
 [metadata]
-content-hash = "a2e866589cdb24b456ae76bf4164fa8f20c6b909af50c28f698b5361c9d81879"
+content-hash = "661aa97091389f282017a695a5987b9f42b3ddaa3d0871df64aece40324ff966"
 python-versions = "^3.6"
 
 [metadata.files]
