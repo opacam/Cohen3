@@ -8,7 +8,6 @@ jobs:
   build-n-publish:
     name: Build and publish Cohen3🐍 distributions 📦 to PyPI and TestPyPI
     runs-on: ubuntu-18.04
-    if: startsWith(github.event.ref, 'refs/tags') && github.ref == 'refs/heads/master'
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.7
