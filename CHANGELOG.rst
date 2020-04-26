@@ -1,5 +1,5 @@
-Unreleased - Poetry & autorelease
----------------------------------
+0.9.3 - Poetry & autorelease
+----------------------------
 
 General:
     - Implement PEP517 & PEP518 (`pyproject.toml` using `poetry`)

@@ -2,7 +2,7 @@
 
 [tool.poetry]
 name = "Cohen3"
-version = "2020.03.20"
+version = "0.9.3"
 description = "Cohen3 - DLNA/UPnP Media Server"
 license = "MIT"
 readme = "README.rst"
