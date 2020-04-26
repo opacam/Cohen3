@@ -310,7 +310,7 @@ class Plugins(log.LogAble):
         plugin = self._plugins.__getitem__(key)
         if pkg_resources and isinstance(plugin, pkg_resources.EntryPoint):
             try:
-                plugin = plugin.load(require=False)
+                plugin = plugin.resolve()
             except (ImportError, AttributeError,
                     pkg_resources.ResolutionError) as msg:
                 self.warning(f'Can\'t load plugin {plugin.name} ({msg}), '
