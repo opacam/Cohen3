@@ -120,7 +120,7 @@ index_result = '''\
 </body>
 <script type="text/javascript" src="js/redirect.js" class="js" id="jsredirect">
 </script>
-</html>'''
+</html>'''  # noqa: E501,W293
 
 
 class DummyDevice(device.Device):
@@ -153,11 +153,12 @@ class DummyDevice(device.Device):
 class WebUICoherenceTest(unittest.TestCase):
     def setUp(self):
         self.coherence = Coherence(
-            {'unittest': 'yes',
-             'web-ui': 'yes',
-             'serverport': '9001',
-             'logmode': 'error',
-             }
+            {
+                'unittest': 'yes',
+                'web-ui': 'yes',
+                'serverport': '9001',
+                'logmode': 'error',
+            }
         )
 
     @inlineCallbacks
@@ -169,25 +170,27 @@ class WebUICoherenceTest(unittest.TestCase):
     def test_web_ui_get_child(self):
         req = DummyRequest(b'styles')
         res = yield self.coherence.web_server.web_root_resource.getChild(
-            b'styles', req)
+            b'styles', req
+        )
         self.assertIsInstance(res, static.File)
 
     @inlineCallbacks
     def test_web_ui_ws_callback(self):
         self.coherence.web_server.web_root_resource.ws_recived.clear()
-        response = yield self.coherence.web_server.site.get(b"")
+        yield self.coherence.web_server.site.get(b"")
         factory = self.coherence.web_server.web_root_resource.factory
         factory.protocol.factory = factory
         factory.protocol.onMessage(factory.protocol, b'WebSocket Ready', None)
         self.assertEqual(
             self.coherence.web_server.web_root_resource.ws_recived,
-            [b'WebSocket Ready'])
+            [b'WebSocket Ready'],
+        )
 
     @inlineCallbacks
     def test_web_ui_devices(self):
         c_dev = DummyDevice(friendly_name='CoherenceDummyDevice')
         self.coherence.add_device(c_dev)
-        response = yield self.coherence.web_server.site.get(b"")
+        yield self.coherence.web_server.site.get(b"")
         factory = self.coherence.web_server.web_root_resource.factory
         factory.protocol.message_callback(b'WebSocket Ready', False)
 
@@ -195,19 +198,23 @@ class WebUICoherenceTest(unittest.TestCase):
         self.coherence.web_server.web_root_resource.devices.add_device(dev)
         self.assertEqual(
             self.coherence.web_server.web_root_resource.devices.detected,
-            [("CoherenceDummyDevice", "CoherenceDummyDevice USN"),
-             ("DummyDevice", "DummyDevice USN")]
+            [
+                ("CoherenceDummyDevice", "CoherenceDummyDevice USN"),
+                ("DummyDevice", "DummyDevice USN"),
+            ],
         )
 
         self.coherence.web_server.web_root_resource.devices.remove_device(
-            dev.get_usn())
+            dev.get_usn()
+        )
         self.assertEqual(
             self.coherence.web_server.web_root_resource.devices.detected,
-            [("CoherenceDummyDevice", "CoherenceDummyDevice USN")]
+            [("CoherenceDummyDevice", "CoherenceDummyDevice USN")],
         )
 
         self.coherence.web_server.web_root_resource.devices.remove_device(
-            c_dev.get_usn())
+            c_dev.get_usn()
+        )
 
     def tearDown(self):
         self.coherence.shutdown()

@@ -155,7 +155,8 @@ class ValidButEmptyDescriptionXML(unittest.TestCase):
                                                 {'pretty_print': False})):
             self.assertSequenceEqual(
                 srv.build_single_notification(0, 'DummyVariable', 987),
-                # :todo: this tested result heavily depends on how ElementTree handles the namespace.
+                # todo: this tested result heavily depends
+                #  on how ElementTree handles the namespace.
                 (b'<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0">'
                  b'<e:property><DummyVariable>987</DummyVariable></e:property>'
                  b'</e:propertyset>'))

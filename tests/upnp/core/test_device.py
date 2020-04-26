@@ -32,19 +32,31 @@ FILE_BASE = os.path.dirname(__file__)
 
 
 class _DummyParentDevice:
-    def get_location(self): return "DummyParentDevice's Location"
+    @staticmethod
+    def get_location():
+        return "DummyParentDevice's Location"
 
-    def get_usn(self): return "DummyParentDevice's USN"
+    @staticmethod
+    def get_usn():
+        return "DummyParentDevice's USN"
 
-    def get_urlbase(self): return "DummyParentDevice's URL base"
+    @staticmethod
+    def get_urlbase():
+        return "DummyParentDevice's URL base"
 
-    def get_upnp_version(self): return "DummyParentDevice's UPNP version"
+    @staticmethod
+    def get_upnp_version():
+        return "DummyParentDevice's UPNP version"
 
 
 class _DummyParentDevice2(_DummyParentDevice):
-    def get_id(self): return "DummyParentDevice2's ID"
+    @staticmethod
+    def get_id():
+        return "DummyParentDevice2's ID"
 
-    def make_fullyqualified(self, url): return "DummyParentDevice2's FQ-URL"
+    @staticmethod
+    def make_fullyqualified(url):
+        return "DummyParentDevice2's FQ-URL"
 
 
 # :todo: put this into a central module
@@ -54,7 +66,8 @@ def raiseError(url):
     the file was not read.
     """
 
-    def _raiseError(*args): raise Exception('Meaningless Error')
+    def _raiseError(*args):
+        raise Exception('Meaningless Error')
 
     d = Deferred()
     d.addCallback(_raiseError)
@@ -98,7 +111,6 @@ def fakeGetPageURL(url):
 
 
 class DeviceWithoutDescription(unittest.TestCase):
-
     def test_init(self):
         """ Test initialization of Device() instance """
         parent = _DummyParentDevice()
@@ -127,8 +139,9 @@ class DeviceWithoutDescription(unittest.TestCase):
         self.assertEqual(dev.get_client(), None)
         self.assertEqual(dev.get_location(), "DummyParentDevice's Location")
         self.assertEqual(dev.get_usn(), "DummyParentDevice's USN")
-        self.assertEqual(dev.get_upnp_version(),
-                         "DummyParentDevice's UPNP version")
+        self.assertEqual(
+            dev.get_upnp_version(), "DummyParentDevice's UPNP version"
+        )
         self.assertEqual(dev.get_urlbase(), "DummyParentDevice's URL base")
         self.assertEqual(dev.get_presentation_url(), '')
 
@@ -136,13 +149,16 @@ class DeviceWithoutDescription(unittest.TestCase):
         """ Test Device.as_dict() """
         parent = _DummyParentDevice()
         dev = device.Device(parent)
-        self.assertEqual(dev.as_dict(),
-                         {'device_type': '',
-                          'friendly_name': '',
-                          'udn': None,
-                          'services': [],
-                          'icons': [],
-                          })
+        self.assertEqual(
+            dev.as_dict(),
+            {
+                'device_type': '',
+                'friendly_name': '',
+                'udn': None,
+                'services': [],
+                'icons': [],
+            },
+        )
 
     def test_as_tuple(self):
         """ Test Device.as_tuples() """
@@ -150,16 +166,23 @@ class DeviceWithoutDescription(unittest.TestCase):
         dev = device.Device(parent)
         # Most of the values in the tuple are not set if the
         # description has not yet been parsed.
-        self.assertEqual(dev.as_tuples(),
-                         [('Location',
-                           ("DummyParentDevice's Location",
-                            "DummyParentDevice's Location")),
-                          ('URL base', "DummyParentDevice's URL base"),
-                          ('UDN', None),
-                          ('Type', ''),
-                          ('UPnP Version', 'n/a'),
-                          ('Friendly Name', ''),
-                          ])
+        self.assertEqual(
+            dev.as_tuples(),
+            [
+                (
+                    'Location',
+                    (
+                        "DummyParentDevice's Location",
+                        "DummyParentDevice's Location",
+                    ),
+                ),
+                ('URL base', "DummyParentDevice's URL base"),
+                ('UDN', None),
+                ('Type', ''),
+                ('UPnP Version', 'n/a'),
+                ('Friendly Name', ''),
+            ],
+        )
 
     def test_get_parent_id(self):
         parent = None
@@ -180,15 +203,19 @@ class DeviceWithoutDescription(unittest.TestCase):
         parent = None
         dev = device.Device(parent)
         self.assertRaises(AttributeError, dev.make_fullyqualified, '')
-        self.assertRaises(AttributeError,
-                          dev.make_fullyqualified, 'some-file.xml')
+        self.assertRaises(
+            AttributeError, dev.make_fullyqualified, 'some-file.xml'
+        )
 
         parent = _DummyParentDevice2()
         dev = device.Device(parent)
-        self.assertEqual(dev.make_fullyqualified(''),
-                         "DummyParentDevice2's FQ-URL")
-        self.assertEqual(dev.make_fullyqualified('some-file.xml'),
-                         "DummyParentDevice2's FQ-URL")
+        self.assertEqual(
+            dev.make_fullyqualified(''), "DummyParentDevice2's FQ-URL"
+        )
+        self.assertEqual(
+            dev.make_fullyqualified('some-file.xml'),
+            "DummyParentDevice2's FQ-URL",
+        )
 
     def test_get_markup_name(self):
         dev = device.Device(None)
@@ -196,7 +223,6 @@ class DeviceWithoutDescription(unittest.TestCase):
 
 
 class RootDeviceDescriptionNotFound(unittest.TestCase):
-
     def setUp(self):
         with mock.patch('coherence.upnp.core.utils.getPage', raiseError):
             self.setUp_main()
@@ -269,31 +295,38 @@ class RootDeviceDescriptionNotFound(unittest.TestCase):
     def test_as_dict(self):
         """ Test RootDevice.as_dict() """
         dev = self.rootdevice
-        self.assertEqual(dev.as_dict(),
-                         {'device_type': '',
-                          'friendly_name': '',
-                          'udn': None,
-                          'services': [],
-                          'icons': [],
-                          })
+        self.assertEqual(
+            dev.as_dict(),
+            {
+                'device_type': '',
+                'friendly_name': '',
+                'udn': None,
+                'services': [],
+                'icons': [],
+            },
+        )
 
     def test_as_tuple(self):
         """ Test RootDevice.as_tuples() """
         dev = self.rootdevice
         # Most of the values in the tupel are not set if the
         # description has not yet been parsed.
-        self.assertEqual(dev.as_tuples(),
-                         [('Location',
-                           (b"RootDevice\'s Location",
-                            b"RootDevice\'s Location")),
-                          # :fixme: should behave like a normal
-                          # Device, see test_rootdevice_init  above
-                          # ('URL base', "RootDevice's URL base"),
-                          ('UDN', None),
-                          ('Type', ''),
-                          ('UPnP Version', 'n/a'),
-                          ('Friendly Name', ''),
-                          ])
+        self.assertEqual(
+            dev.as_tuples(),
+            [
+                (
+                    'Location',
+                    (b"RootDevice\'s Location", b"RootDevice\'s Location"),
+                ),
+                # :fixme: should behave like a normal
+                # Device, see test_rootdevice_init  above
+                # ('URL base', "RootDevice's URL base"),
+                ('UDN', None),
+                ('Type', ''),
+                ('UPnP Version', 'n/a'),
+                ('Friendly Name', ''),
+            ],
+        )
 
     def test_get_parent_id(self):
         dev = self.rootdevice
@@ -317,8 +350,7 @@ class RootDeviceEmptyDescription(RootDeviceDescriptionNotFound):
     """
 
     def setUp(self):
-        with mock.patch('coherence.upnp.core.utils.getPage',
-                        fakeGetPage('')):
+        with mock.patch('coherence.upnp.core.utils.getPage', fakeGetPage('')):
             self.setUp_main()
 
 
@@ -329,8 +361,9 @@ class RootDeviceInvalidDescriptionXML(RootDeviceDescriptionNotFound):
     """
 
     def setUp(self):
-        with mock.patch('coherence.upnp.core.utils.getPage',
-                        fakeGetPage('<x>')):
+        with mock.patch(
+            'coherence.upnp.core.utils.getPage', fakeGetPage('<x>')
+        ):
             self.setUp_main()
 
 
@@ -351,11 +384,13 @@ class RootDeviceWithDescription(unittest.TestCase):
         self._location_url = self.__getURL('device-description-1.xml')
         info = {
             'ST': 'upnp:rootdevice',
-            'USN': 'uuid:12345678-ABCE-klmn-RSTU-987654321098::upnp:rootdevice',
+            'USN': 'uuid:12345678-ABCE-klmn-RSTU-987654321098::upnp:rootdevice',  # noqa: E501
             'MANIFESTATION': 'remote',
             'HOST': '192.168.123.123',
-            'SERVER': ('Linux/armv5tel-linux UPnP/1.0 DLNADOC/1.50 '
-                       'SqueezeboxMediaServer/7.3.1/12345'),
+            'SERVER': (
+                'Linux/armv5tel-linux UPnP/1.0 DLNADOC/1.50 '
+                'SqueezeboxMediaServer/7.3.1/12345'
+            ),
             'LOCATION': self._location_url,
         }
         with mock.patch('coherence.upnp.core.utils.getPage', fakeGetPageURL):
@@ -364,12 +399,17 @@ class RootDeviceWithDescription(unittest.TestCase):
     def test_init(self):
         """ Test initialization of RootDevice() instance """
         dev = self.rootdevice
-        self.assertEqual(dev.usn,
-                         ('uuid:12345678-ABCE-klmn-RSTU-987654321098::'
-                          'upnp:rootdevice'))
-        self.assertEqual(dev.server,
-                         ('Linux/armv5tel-linux UPnP/1.0 DLNADOC/1.50 '
-                          'SqueezeboxMediaServer/7.3.1/12345'))
+        self.assertEqual(
+            dev.usn,
+            ('uuid:12345678-ABCE-klmn-RSTU-987654321098::' 'upnp:rootdevice'),
+        )
+        self.assertEqual(
+            dev.server,
+            (
+                'Linux/armv5tel-linux UPnP/1.0 DLNADOC/1.50 '
+                'SqueezeboxMediaServer/7.3.1/12345'
+            ),
+        )
         self.assertEqual(dev.st, 'upnp:rootdevice')
         self.assertEqual(dev.location, self._location_url)
         self.assertEqual(dev.manifestation, 'remote')
@@ -381,8 +421,9 @@ class RootDeviceWithDescription(unittest.TestCase):
         # services are tested more in detail below
         self.assertEqual(len(dev.services), 3)
         self.assertEqual(dev.friendly_name, 'This is my Squeeze Box')
-        self.assertEqual(dev.device_type,
-                         'urn:schemas-upnp-org:device:MediaRenderer:1')
+        self.assertEqual(
+            dev.device_type, 'urn:schemas-upnp-org:device:MediaRenderer:1'
+        )
         self.assertEqual(dev.friendly_device_type, 'MediaRenderer')
         self.assertEqual(dev.device_type_version, '1')
         self.assertEqual(dev.udn, 'uuid:12345678-ABCE-KLMN-rstu-987654321098')
@@ -394,11 +435,14 @@ class RootDeviceWithDescription(unittest.TestCase):
 
     def test_getters(self):
         dev = self.rootdevice
-        self.assertEqual(dev.get_usn(),
-                         ('uuid:12345678-ABCE-klmn-RSTU-987654321098::'
-                          'upnp:rootdevice'))
+        self.assertEqual(
+            dev.get_usn(),
+            ('uuid:12345678-ABCE-klmn-RSTU-987654321098::' 'upnp:rootdevice'),
+        )
         self.assertEqual(dev.get_st(), 'upnp:rootdevice')
-        self.assertEqual(dev.get_location(), self._location_url.encode('ascii'))
+        self.assertEqual(
+            dev.get_location(), self._location_url.encode('ascii')
+        )
         self.assertEqual(dev.get_upnp_version(), '1.0')
         # device-description-1.xml does not contain a URL base
         self.assertEqual(dev.get_urlbase(), None)
@@ -408,21 +452,28 @@ class RootDeviceWithDescription(unittest.TestCase):
         self.assertTrue(dev.is_remote())
         self.assertFalse(dev.is_local())
 
-        self.assertEqual(dev.get_id(),
-                         'uuid:12345678-ABCE-KLMN-rstu-987654321098')
-        self.assertEqual(dev.get_uuid(), '12345678-ABCE-KLMN-rstu-987654321098')
+        self.assertEqual(
+            dev.get_id(), 'uuid:12345678-ABCE-KLMN-rstu-987654321098'
+        )
+        self.assertEqual(
+            dev.get_uuid(), '12345678-ABCE-KLMN-rstu-987654321098'
+        )
         # devices are not set up by this test
         self.assertEqual(dev.get_embedded_devices(), [])
         self.assertEqual(dev.get_friendly_name(), 'This is my Squeeze Box')
-        self.assertEqual(dev.get_device_type(),
-                         'urn:schemas-upnp-org:device:MediaRenderer:1')
+        self.assertEqual(
+            dev.get_device_type(),
+            'urn:schemas-upnp-org:device:MediaRenderer:1',
+        )
         self.assertEqual(dev.get_friendly_device_type(), 'MediaRenderer')
-        self.assertEqual(dev.get_markup_name(),
-                         'MediaRenderer:1 This is my Squeeze Box')
+        self.assertEqual(
+            dev.get_markup_name(), 'MediaRenderer:1 This is my Squeeze Box'
+        )
         self.assertEqual(dev.get_device_type_version(), '1')
         self.assertEqual(dev.get_client(), None)
-        self.assertEqual(dev.get_presentation_url(),
-                         b'http://192.168.123.123:9000')
+        self.assertEqual(
+            dev.get_presentation_url(), b'http://192.168.123.123:9000'
+        )
 
         # services are tested more in detail below
         self.assertEqual(len(dev.get_services()), 3)
@@ -434,60 +485,86 @@ class RootDeviceWithDescription(unittest.TestCase):
 
         # test the icons
         self.assertEqual(len(as_dict['icons']), 4)
-        self.assertEqual(as_dict['icons'][0], {
-            'mimetype': 'image/png',
-            'url': self.__getURL('html/images/Players/baby_120x120.png'),
-            'width': '120',
-            'height': '120',
-            'depth': '24'
-        })
-        self.assertEqual(as_dict['icons'][1], {
-            'mimetype': 'image/png',
-            'url': self.__getURL('html/images/Players/baby_48x48.png'),
-            'width': '48',
-            'height': '48',
-            'depth': '24'
-        })
-        self.assertEqual(as_dict['icons'][2], {
-            'mimetype': 'image/jpeg',
-            'url': self.__getURL('html/images/Players/baby_120x120.jpg'),
-            'width': '120',
-            'height': '120',
-            'depth': '24'
-        })
-        self.assertEqual(as_dict['icons'][3], {
-            'mimetype': 'image/jpeg',
-            'url': self.__getURL('html/images/Players/baby_48x48.jpg'),
-            'width': '48',
-            'height': '48',
-            'depth': '24'
-        })
+        self.assertEqual(
+            as_dict['icons'][0],
+            {
+                'mimetype': 'image/png',
+                'url': self.__getURL('html/images/Players/baby_120x120.png'),
+                'width': '120',
+                'height': '120',
+                'depth': '24',
+            },
+        )
+        self.assertEqual(
+            as_dict['icons'][1],
+            {
+                'mimetype': 'image/png',
+                'url': self.__getURL('html/images/Players/baby_48x48.png'),
+                'width': '48',
+                'height': '48',
+                'depth': '24',
+            },
+        )
+        self.assertEqual(
+            as_dict['icons'][2],
+            {
+                'mimetype': 'image/jpeg',
+                'url': self.__getURL('html/images/Players/baby_120x120.jpg'),
+                'width': '120',
+                'height': '120',
+                'depth': '24',
+            },
+        )
+        self.assertEqual(
+            as_dict['icons'][3],
+            {
+                'mimetype': 'image/jpeg',
+                'url': self.__getURL('html/images/Players/baby_48x48.jpg'),
+                'width': '48',
+                'height': '48',
+                'depth': '24',
+            },
+        )
         del as_dict['icons']
 
         # test the services
         # actions are tested in test_service, skip here.
         self.assertEqual(len(as_dict['services']), 3)
         del as_dict['services'][0]['actions']
-        self.assertEqual(as_dict['services'][0], {
-            # 'actions': [],
-            'type': 'urn:schemas-upnp-org:service:RenderingControl:1'})
+        self.assertEqual(
+            as_dict['services'][0],
+            {
+                # 'actions': [],
+                'type': 'urn:schemas-upnp-org:service:RenderingControl:1'
+            },
+        )
         del as_dict['services'][1]['actions']
-        self.assertEqual(as_dict['services'][1], {
-            # 'actions': [],
-            'type': 'urn:schemas-upnp-org:service:ConnectionManager:1'})
+        self.assertEqual(
+            as_dict['services'][1],
+            {
+                # 'actions': [],
+                'type': 'urn:schemas-upnp-org:service:ConnectionManager:1'
+            },
+        )
         del as_dict['services'][2]['actions']
-        self.assertEqual(as_dict['services'][2], {
-            # 'actions': [],
-            'type': 'urn:schemas-upnp-org:service:AVTransport:1'})
+        self.assertEqual(
+            as_dict['services'][2],
+            {
+                # 'actions': [],
+                'type': 'urn:schemas-upnp-org:service:AVTransport:1'
+            },
+        )
         del as_dict['services']
 
         # test the remaining data
-        self.assertEqual(as_dict, {
-            'device_type':
-                'urn:schemas-upnp-org:device:MediaRenderer:1',
-            'friendly_name': 'This is my Squeeze Box',
-            'udn': 'uuid:12345678-ABCE-KLMN-rstu-987654321098',
-        })
+        self.assertEqual(
+            as_dict,
+            {
+                'device_type': 'urn:schemas-upnp-org:device:MediaRenderer:1',
+                'friendly_name': 'This is my Squeeze Box',
+                'udn': 'uuid:12345678-ABCE-KLMN-rstu-987654321098',
+            },
+        )
 
     def test_as_tuple(self):
         """ Test RootDevice.as_tuples() """
@@ -496,116 +573,210 @@ class RootDeviceWithDescription(unittest.TestCase):
         icons = [e for e in as_tuples if e[0] == 'Icon']
         as_tuples = [e for e in as_tuples if e[0] != 'Icon']
 
-        self.assertEqual(as_tuples, [
-            ('Location', (self._location_url.encode('ascii'), self._location_url.encode('ascii'))),
-            # device-description-1.xml does not contain a URL base
-            # ('URL base', self.__getURL('')),
-            ('UDN', 'uuid:12345678-ABCE-KLMN-rstu-987654321098'),
-            ('Type', 'urn:schemas-upnp-org:device:MediaRenderer:1'),
-            ('UPnP Version', '1.0'),
-            ('DLNA Device Class', 'DMR-1.50'),
-            ('Friendly Name', 'This is my Squeeze Box'),
-            ('Manufacturer', 'Slim Devices'),
-            ('Manufacturer URL',
-             ('http://www.mysqueezebox.com', 'http://www.mysqueezebox.com')),
-            ('Model Description',
-             'Squeezebox Server UPnP/DLNA Plugin'),
-            ('Model Name', 'Squeezebox Radio'),
-            ('Model Number', '1'),
-            ('Model URL',
-             ('http://wiki.slimdevices.com/Squeezebox_Radio',
-              'http://wiki.slimdevices.com/Squeezebox_Radio')),
-            ('Serial Number', '00:04:20:12:34:56'),
-            # device-description-1.xml does not contain a UPC
-            ('Presentation URL',
-             ('http://192.168.123.123:9000', b'http://192.168.123.123:9000')),
-        ])
+        self.assertEqual(
+            as_tuples,
+            [
+                (
+                    'Location',
+                    (
+                        self._location_url.encode('ascii'),
+                        self._location_url.encode('ascii'),
+                    ),
+                ),
+                # device-description-1.xml does not contain a URL base
+                # ('URL base', self.__getURL('')),
+                ('UDN', 'uuid:12345678-ABCE-KLMN-rstu-987654321098'),
+                ('Type', 'urn:schemas-upnp-org:device:MediaRenderer:1'),
+                ('UPnP Version', '1.0'),
+                ('DLNA Device Class', 'DMR-1.50'),
+                ('Friendly Name', 'This is my Squeeze Box'),
+                ('Manufacturer', 'Slim Devices'),
+                (
+                    'Manufacturer URL',
+                    (
+                        'http://www.mysqueezebox.com',
+                        'http://www.mysqueezebox.com',
+                    ),
+                ),  # noqa: E501
+                ('Model Description', 'Squeezebox Server UPnP/DLNA Plugin'),
+                ('Model Name', 'Squeezebox Radio'),
+                ('Model Number', '1'),
+                (
+                    'Model URL',
+                    (
+                        'http://wiki.slimdevices.com/Squeezebox_Radio',
+                        'http://wiki.slimdevices.com/Squeezebox_Radio',
+                    ),
+                ),
+                ('Serial Number', '00:04:20:12:34:56'),
+                # device-description-1.xml does not contain a UPC
+                (
+                    'Presentation URL',
+                    (
+                        'http://192.168.123.123:9000',
+                        b'http://192.168.123.123:9000',
+                    ),
+                ),  # noqa: E501
+            ],
+        )
 
         self.assertEqual(len(icons), 4)
-        self.assertEqual(icons[0],
-                         ('Icon',
-                          ('/html/images/Players/baby_120x120.png',
-                           self.__getURL(
-                               'html/images/Players/baby_120x120.png').encode('ascii'),
-                           {'Width': '120', 'Height': '120', 'Depth': '24',
-                            'Mimetype': 'image/png'})))
-        self.assertEqual(icons[1],
-                         ('Icon',
-                          ('/html/images/Players/baby_48x48.png',
-                           self.__getURL('html/images/Players/baby_48x48.png').encode('ascii'),
-                           {'Width': '48', 'Height': '48', 'Depth': '24',
-                            'Mimetype': 'image/png'})))
-        self.assertEqual(icons[2],
-                         ('Icon',
-                          ('/html/images/Players/baby_120x120.jpg',
-                           self.__getURL(
-                               'html/images/Players/baby_120x120.jpg').encode('ascii'),
-                           {'Width': '120', 'Height': '120', 'Depth': '24',
-                            'Mimetype': 'image/jpeg'})))
-        self.assertEqual(icons[3],
-                         ('Icon',
-                          ('/html/images/Players/baby_48x48.jpg',
-                           self.__getURL('html/images/Players/baby_48x48.jpg').encode('ascii'),
-                           {'Width': '48', 'Height': '48', 'Depth': '24',
-                            'Mimetype': 'image/jpeg'})))
+        self.assertEqual(
+            icons[0],
+            (
+                'Icon',
+                (
+                    '/html/images/Players/baby_120x120.png',
+                    self.__getURL(
+                        'html/images/Players/baby_120x120.png'
+                    ).encode('ascii'),
+                    {
+                        'Width': '120',
+                        'Height': '120',
+                        'Depth': '24',
+                        'Mimetype': 'image/png',
+                    },
+                ),
+            ),
+        )
+        self.assertEqual(
+            icons[1],
+            (
+                'Icon',
+                (
+                    '/html/images/Players/baby_48x48.png',
+                    self.__getURL('html/images/Players/baby_48x48.png').encode(
+                        'ascii'
+                    ),
+                    {
+                        'Width': '48',
+                        'Height': '48',
+                        'Depth': '24',
+                        'Mimetype': 'image/png',
+                    },
+                ),
+            ),
+        )
+        self.assertEqual(
+            icons[2],
+            (
+                'Icon',
+                (
+                    '/html/images/Players/baby_120x120.jpg',
+                    self.__getURL(
+                        'html/images/Players/baby_120x120.jpg'
+                    ).encode('ascii'),
+                    {
+                        'Width': '120',
+                        'Height': '120',
+                        'Depth': '24',
+                        'Mimetype': 'image/jpeg',
+                    },
+                ),
+            ),
+        )
+        self.assertEqual(
+            icons[3],
+            (
+                'Icon',
+                (
+                    '/html/images/Players/baby_48x48.jpg',
+                    self.__getURL('html/images/Players/baby_48x48.jpg').encode(
+                        'ascii'
+                    ),
+                    {
+                        'Width': '48',
+                        'Height': '48',
+                        'Depth': '24',
+                        'Mimetype': 'image/jpeg',
+                    },
+                ),
+            ),
+        )
 
     def test_icons(self):
         dev = self.rootdevice
         self.assertEqual(len(dev.icons), 4)
         # :todo: get_icons()
-        self.assertEqual(dev.icons[0], {
-            'mimetype': 'image/png',
-            'realurl': '/html/images/Players/baby_120x120.png',
-            'url': self.__getURL('html/images/Players/baby_120x120.png'),
-            'width': '120',
-            'height': '120',
-            'depth': '24'
-        })
-        self.assertEqual(dev.icons[1], {
-            'mimetype': 'image/png',
-            'realurl': '/html/images/Players/baby_48x48.png',
-            'url': self.__getURL('html/images/Players/baby_48x48.png'),
-            'width': '48',
-            'height': '48',
-            'depth': '24'
-        })
-        self.assertEqual(dev.icons[2], {
-            'mimetype': 'image/jpeg',
-            'realurl': '/html/images/Players/baby_120x120.jpg',
-            'url': self.__getURL('html/images/Players/baby_120x120.jpg'),
-            'width': '120',
-            'height': '120',
-            'depth': '24'
-        })
-        self.assertEqual(dev.icons[3], {
-            'mimetype': 'image/jpeg',
-            'realurl': '/html/images/Players/baby_48x48.jpg',
-            'url': self.__getURL('html/images/Players/baby_48x48.jpg'),
-            'width': '48',
-            'height': '48',
-            'depth': '24'
-        })
+        self.assertEqual(
+            dev.icons[0],
+            {
+                'mimetype': 'image/png',
+                'realurl': '/html/images/Players/baby_120x120.png',
+                'url': self.__getURL('html/images/Players/baby_120x120.png'),
+                'width': '120',
+                'height': '120',
+                'depth': '24',
+            },
+        )
+        self.assertEqual(
+            dev.icons[1],
+            {
+                'mimetype': 'image/png',
+                'realurl': '/html/images/Players/baby_48x48.png',
+                'url': self.__getURL('html/images/Players/baby_48x48.png'),
+                'width': '48',
+                'height': '48',
+                'depth': '24',
+            },
+        )
+        self.assertEqual(
+            dev.icons[2],
+            {
+                'mimetype': 'image/jpeg',
+                'realurl': '/html/images/Players/baby_120x120.jpg',
+                'url': self.__getURL('html/images/Players/baby_120x120.jpg'),
+                'width': '120',
+                'height': '120',
+                'depth': '24',
+            },
+        )
+        self.assertEqual(
+            dev.icons[3],
+            {
+                'mimetype': 'image/jpeg',
+                'realurl': '/html/images/Players/baby_48x48.jpg',
+                'url': self.__getURL('html/images/Players/baby_48x48.jpg'),
+                'width': '48',
+                'height': '48',
+                'depth': '24',
+            },
+        )
 
     def test_services(self):
         def test_service(service, type):
-            self.assertEqual(service.get_type(),
-                             'urn:schemas-upnp-org:service:%s:1' % type)
-            self.assertEqual(service.get_id(),
-                             'urn:upnp-org:serviceId:%s' % type)
-            self.assertEqual(service.get_control_url(),
-                             ('http://127.0.0.1/plugins/UPnP/'
-                             'MediaRenderer/%s/control' % type +
-                             '?player=00%3A04%3A20%3A12%3A34%3A56').encode('ascii'))
-            self.assertEqual(service.get_event_sub_url(),
-                             ('http://192.168.123.123:40872/plugins/UPnP/'
-                             'MediaRenderer/%s/eventsub' % type +
-                             '?player=00%3A04%3A20%3A12%3A34%3A56').encode('ascii'))
+            self.assertEqual(
+                service.get_type(), 'urn:schemas-upnp-org:service:%s:1' % type
+            )
+            self.assertEqual(
+                service.get_id(), 'urn:upnp-org:serviceId:%s' % type
+            )
+            self.assertEqual(
+                service.get_control_url(),
+                (
+                    'http://127.0.0.1/plugins/UPnP/'
+                    'MediaRenderer/%s/control' % type
+                    + '?player=00%3A04%3A20%3A12%3A34%3A56'
+                ).encode('ascii'),
+            )
+            self.assertEqual(
+                service.get_event_sub_url(),
+                (
+                    'http://192.168.123.123:40872/plugins/UPnP/'
+                    'MediaRenderer/%s/eventsub' % type
+                    + '?player=00%3A04%3A20%3A12%3A34%3A56'
+                ).encode('ascii'),
+            )
             # :fixme: this crashes as this test-case does not have a
             # presentation_url. Need to fix Service.get_presentation_url()
             # self.assertEqual(service.get_presentation_url(), '')
-            self.assertEqual(service.get_scpd_url(),
-                             ('http://127.0.0.1'
-                             '/plugins/UPnP/MediaRenderer/%s-1.xml' % type).encode('ascii'))
+            self.assertEqual(
+                service.get_scpd_url(),
+                (
+                    'http://127.0.0.1'
+                    '/plugins/UPnP/MediaRenderer/%s-1.xml' % type
+                ).encode('ascii'),
+            )
             self.assertIs(service.device, dev)
 
         dev = self.rootdevice
@@ -623,26 +794,27 @@ class RootDeviceWithDescription(unittest.TestCase):
 
     def test_get_service_by_type(self):
         dev = self.rootdevice
-        self.assertIs(dev.get_service_by_type('RenderingControl'),
-                      dev.services[0])
-        self.assertIs(dev.get_service_by_type('ConnectionManager'),
-                      dev.services[1])
-        self.assertIs(dev.get_service_by_type('AVTransport'),
-                      dev.services[2])
+        self.assertIs(
+            dev.get_service_by_type('RenderingControl'), dev.services[0]
+        )
+        self.assertIs(
+            dev.get_service_by_type('ConnectionManager'), dev.services[1]
+        )
+        self.assertIs(dev.get_service_by_type('AVTransport'), dev.services[2])
 
     # :fixme: This fails as Service.get_usn() is not implemented.
     # Rethink if remove_service_with_usn is needed at all and if
     # Service.get_usn should be implemented.
-    ## def test_remove_service_with_usn(self):
-    ##     dev = self.rootdevice
-    ##     dev.remove_service_with_usn(
-    ##         'uuid:12345678-ABCE-KLMN-rstu-987654321098'
-    ##         '::urn:schemas-upnp-org:service:ConnectionManager:1')
-    ##     self.assertEqual(len(dev.services), 2)
-    ##     self.assertEqual(dev.services[0].get_type(),
-    ##                      'urn:schemas-upnp-org:service:RenderingControl:1')
-    ##     self.assertEqual(dev.services[1].get_type(),
-    ##                      'urn:schemas-upnp-org:service:AVTransport:1')
+    # def test_remove_service_with_usn(self):
+    #     dev = self.rootdevice
+    #     dev.remove_service_with_usn(
+    #         'uuid:12345678-ABCE-KLMN-rstu-987654321098'
+    #         '::urn:schemas-upnp-org:service:ConnectionManager:1')
+    #     self.assertEqual(len(dev.services), 2)
+    #     self.assertEqual(dev.services[0].get_type(),
+    #                      'urn:schemas-upnp-org:service:RenderingControl:1')
+    #     self.assertEqual(dev.services[1].get_type(),
+    #                      'urn:schemas-upnp-org:service:AVTransport:1')
 
     def test_get_parent_id(self):
         dev = self.rootdevice
@@ -653,15 +825,21 @@ class RootDeviceWithDescription(unittest.TestCase):
         # :todo: Find out what is the intented semantic for
         # make_fullyqualified and implement proper test-cases.
         dev = self.rootdevice
-        self.assertEqual(dev.make_fullyqualified(''),
-                         self.__getURL('device-description-1.xml').encode('ascii'))
-        self.assertEqual(dev.make_fullyqualified('test-test.html'),
-                         self.__getURL('test-test.html').encode('ascii'))
+        self.assertEqual(
+            dev.make_fullyqualified(''),
+            self.__getURL('device-description-1.xml').encode('ascii'),
+        )
+        self.assertEqual(
+            dev.make_fullyqualified('test-test.html'),
+            self.__getURL('test-test.html').encode('ascii'),
+        )
 
     def test_get_markup_name(self):
         dev = self.rootdevice
-        self.assertEqual(dev.get_markup_name(),
-                         'MediaRenderer:1 This is my Squeeze Box')
+        self.assertEqual(
+            dev.get_markup_name(), 'MediaRenderer:1 This is my Squeeze Box'
+        )
+
 
 # :todo: test-cases for service-subscription
 # :todo: test-cases with incomplete device description

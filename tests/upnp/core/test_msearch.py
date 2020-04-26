@@ -55,7 +55,8 @@ class TestMSearch(unittest.TestCase):
             'LOCATION': 'http://192.168.1.4:9000/plugins/UPnP/MediaServer.xml',
             'USN': USN_1,
             'CACHE-CONTROL': 'max-age=1802',
-            'SERVER': 'Linux/armv5-linux UPnP/1.0 DLNADOC/1.50 MediaServer/7.3/735',
+            'SERVER':
+                'Linux/armv5-linux UPnP/1.0 DLNADOC/1.50 MediaServer/7.3/735',
             'MANIFESTATION': 'remote',
             'SILENT': False,
             'EXT': '',

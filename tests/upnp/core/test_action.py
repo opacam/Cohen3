@@ -72,7 +72,6 @@ class DummyServiceWithStateVariables(DummyService):
 
 
 class TestArguments(unittest.TestCase):
-
     def test_argument(self):
         """ Test initialization of Argument() instance """
         arg = action.Argument('SomeArgument', 'in-and-out', 'Brightness')
@@ -83,20 +82,26 @@ class TestArguments(unittest.TestCase):
     def test_argument_as_dict(self):
         """ Test Argument.as_dict() """
         arg = action.Argument('SomeArgument', 'in-and-out', 'Brightness')
-        self.assertEqual(arg.as_dict(),
-                         {'name': 'SomeArgument',
-                          'direction': 'in-and-out',
-                          'related_state_variable': 'Brightness',
-                          })
+        self.assertEqual(
+            arg.as_dict(),
+            {
+                'name': 'SomeArgument',
+                'direction': 'in-and-out',
+                'related_state_variable': 'Brightness',
+            },
+        )
 
     def test_argument_as_tuple(self):
         """ Test Argument.as_tuples() """
         arg = action.Argument('SomeArgument', 'in-and-out', 'Brightness')
-        self.assertEqual(arg.as_tuples(),
-                         [('Name', 'SomeArgument'),
-                          ('Direction', 'in-and-out'),
-                          ('Related State Variable', 'Brightness'),
-                          ])
+        self.assertEqual(
+            arg.as_tuples(),
+            [
+                ('Name', 'SomeArgument'),
+                ('Direction', 'in-and-out'),
+                ('Related State Variable', 'Brightness'),
+            ],
+        )
 
 
 def _build_action_arguments():
@@ -109,12 +114,12 @@ def _build_action_arguments():
 
 
 class TestAction(unittest.TestCase):
-
     def setUp(self):
         self.service = DummyService()
         self.arguments = _build_action_arguments()
-        self.action = action.Action(self.service, 'SomeTestAction',
-                                    NoImplementation, self.arguments)
+        self.action = action.Action(
+            self.service, 'SomeTestAction', NoImplementation, self.arguments
+        )
 
     def test_action(self):
         """ Test initialization of Action() instance """
@@ -133,35 +138,46 @@ class TestAction(unittest.TestCase):
 
     def test_action_as_dict(self):
         """ Test Action.as_dict() """
-        self.assertEqual(self.action.as_dict(),
-                         {'name': 'SomeTestAction',
-                          'arguments': [
-                              {'name': 'InstanceID',
-                               'direction': 'in',
-                               'related_state_variable': 'A_ARG_TYPE_InstanceID',
-                               },
-                              {'name': 'CurrentBrightness',
-                               'direction': 'out',
-                               'related_state_variable': 'Brightness',
-                               },
-                              {'name': 'Color',
-                               'direction': 'in',
-                               'related_state_variable': 'Color',
-                               },
-                          ]})
+        self.assertEqual(
+            self.action.as_dict(),
+            {
+                'name': 'SomeTestAction',
+                'arguments': [
+                    {
+                        'name': 'InstanceID',
+                        'direction': 'in',
+                        'related_state_variable': 'A_ARG_TYPE_InstanceID',
+                    },
+                    {
+                        'name': 'CurrentBrightness',
+                        'direction': 'out',
+                        'related_state_variable': 'Brightness',
+                    },
+                    {
+                        'name': 'Color',
+                        'direction': 'in',
+                        'related_state_variable': 'Color',
+                    },
+                ],
+            },
+        )
 
     def test_action_as_tuple(self):
         """ Test Action.as_tuples() """
-        self.assertEqual(self.action.as_tuples(),
-                         [("Name", 'SomeTestAction'),
-                          ("Number of 'in' arguments", 2),
-                          ("Number of 'out' arguments", 1),
-                          ])
+        self.assertEqual(
+            self.action.as_tuples(),
+            [
+                ("Name", 'SomeTestAction'),
+                ("Number of 'in' arguments", 2),
+                ("Number of 'out' arguments", 1),
+            ],
+        )
 
     def test_action_set_callback(self):
         """ Test Action.set_callback() """
 
-        def _this_callback(): pass
+        def _this_callback():
+            pass
 
         act = self.action
         self.assertIs(act.get_callback(), None)
@@ -191,12 +207,12 @@ class TestAction(unittest.TestCase):
 
 
 class TestAction2(unittest.TestCase):
-
     def setUp(self):
         self.arguments = _build_action_arguments()
         self.service = DummyServiceWithStateVariables('Brightness')
-        self.action = action.Action(self.service, b'SomeTestAction',
-                                    NoImplementation, self.arguments)
+        self.action = action.Action(
+            self.service, b'SomeTestAction', NoImplementation, self.arguments
+        )
 
     def test_setup(self):
         """ Test is setup of this test-case works as expected. """
@@ -209,14 +225,17 @@ class TestAction2(unittest.TestCase):
     def test_call_action(self):
         def check_result(*args, **kw):
             self.assertEqual(
-                self.service.get_state_variable('Brightness').value,
-                12)
+                self.service.get_state_variable('Brightness').value, 12
+            )
             self.assertEqual(client._called_action_name, b'SomeTestAction')
-            self.assertEqual(client._passed_arguments,
-                             {'InstanceID': 23, 'Color': 'red'})
+            self.assertEqual(
+                client._passed_arguments, {'InstanceID': 23, 'Color': 'red'}
+            )
 
-        self.assertIs(self.service.get_state_variable('Brightness').value,
-                      NoImplementation)
+        self.assertIs(
+            self.service.get_state_variable('Brightness').value,
+            NoImplementation,
+        )
         client = DummyClient({'CurrentBrightness': 12})
         self.service._set_client(client)
         result = self.action.call(InstanceID=23, Color='red')
@@ -231,10 +250,13 @@ class TestAction2(unittest.TestCase):
         def check_result(*args, **kw):
             self.assertEqual(
                 self.service.get_state_variable('Brightness').value,
-                NoImplementation)
+                NoImplementation,
+            )
 
-        self.assertIs(self.service.get_state_variable('Brightness').value,
-                      NoImplementation)
+        self.assertIs(
+            self.service.get_state_variable('Brightness').value,
+            NoImplementation,
+        )
         client = DummyClient({})
         self.service._set_client(client)
         result = self.action.call(InstanceID=23, Color='red')

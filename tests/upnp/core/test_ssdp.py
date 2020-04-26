@@ -86,11 +86,11 @@ class TestSSDP(unittest.TestCase):
             b'CACHE-CONTROL: max-age=1842\r\n',
             b'EXT: \r\n',
             b'HOST: 239.255.255.250:1900\r\n',
-            b'LOCATION: http://10.10.222.94:2869/upnp?content=uuid:e711a4bf\r\n',
+            b'LOCATION: http://10.10.222.94:2869/upnp?content=uuid:e711a4bf\r\n',  # noqa: E501
             b'NOTIFY * HTTP/1.1\r\n',
             b'NT: upnp:rootdevice\r\n',
             b'NTS: ssdp:alive\r\n',
-            b'SERVER: Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0\r\n',
+            b'SERVER: Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0\r\n',  # noqa: E501
             b'USN: uuid:e711a4bf::upnp:rootdevice\r\n']
         self.assertEqual(len(self.tr.written), 1)
         data, (host, port) = self.tr.written[0]
@@ -112,11 +112,11 @@ class TestSSDP(unittest.TestCase):
             b'CACHE-CONTROL: max-age=1842\r\n',
             b'EXT: \r\n',
             b'HOST: 239.255.255.250:1900\r\n',
-            b'LOCATION: http://10.10.222.94:2869/upnp?content=uuid:e711a4bf\r\n',
+            b'LOCATION: http://10.10.222.94:2869/upnp?content=uuid:e711a4bf\r\n',  # noqa: E501
             b'NOTIFY * HTTP/1.1\r\n',
             b'NT: upnp:rootdevice\r\n',
             b'NTS: ssdp:byebye\r\n',
-            b'SERVER: Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0\r\n',
+            b'SERVER: Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0\r\n',  # noqa: E501
             b'USN: uuid:e711a4bf::upnp:rootdevice\r\n']
         self.assertEqual(len(self.tr.written), 1)
         data, (host, port) = self.tr.written[0]

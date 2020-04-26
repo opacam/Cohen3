@@ -79,10 +79,15 @@ class TestFSStorageWithMultiContentAssumptions(unittest.TestCase):
 
 
 # todo: test get_xml()
-'''
-self.storage.get_by_id("1000").get_xml()
-<container xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/" childCount="2" id="1000" parentID="-1" restricted="0"><dc:title>media</dc:title><upnp:class>object.container</upnp:class><dc:date>2003-07-23T01:18:00+02:00</dc:date></container>
-'''
+# self.storage.get_by_id("1000").get_xml()
+# expected_result = '''
+# <container xmlns:dc="http://purl.org/dc/elements/1.1/"
+# xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/"
+# childCount="2" id="1000" parentID="-1" restricted="0">
+#     <dc:title>media</dc:title>
+#     <upnp:class>object.container</upnp:class>
+#     <dc:date>2003-07-23T01:18:00+02:00</dc:date>
+# </container>'''
 
 
 class TestFSStorage(unittest.TestCase):

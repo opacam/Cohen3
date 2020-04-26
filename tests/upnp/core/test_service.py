@@ -24,13 +24,20 @@ class DummyDevice:
     client = None
     friendly_name = 'Dummy Device'
 
-    def get_location(self): return "DummyDevice's Location"
+    @staticmethod
+    def get_location():
+        return "DummyDevice's Location"
 
-    def get_urlbase(self): return "DummyDevice's URL base"
+    @staticmethod
+    def get_urlbase():
+        return "DummyDevice's URL base"
 
-    def get_id(self): return "DummyDevice's ID"
+    @staticmethod
+    def get_id():
+        return "DummyDevice's ID"
 
-    def make_fullyqualified(self, url):
+    @staticmethod
+    def make_fullyqualified(url):
         return "DummyDevice's FQ-URL/{}".format(
             url if isinstance(url, str) else
             url.decode('utf-8')).encode('ascii')
@@ -43,7 +50,8 @@ def raiseError(url):
     the file was not read.
     """
 
-    def _raiseError(*args): raise Exception('Meaningless Error')
+    def _raiseError(*args):
+        raise Exception('Meaningless Error')
 
     d = Deferred()
     d.addCallback(_raiseError)

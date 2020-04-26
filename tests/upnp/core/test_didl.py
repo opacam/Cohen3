@@ -10,7 +10,6 @@ Test cases for L{upnp.core.DIDLLite}
 """
 
 from copy import copy
-
 from twisted.trial import unittest
 
 from coherence.upnp.core import DIDLLite
@@ -27,7 +26,7 @@ didl_fragment = """
         <upnp:albumArtURI dlna:profileID="JPEG_TN" xmlns:dlna="urn:schemas-dlna-org:metadata-1-0">http://192.168.1.1:30020/776dec17-1ce1-4c87-841e-cac61a14a2e0/1161?cover.jpg</upnp:albumArtURI>
         <upnp:artist>Herby Sängermeister</upnp:artist>
     </container>
-</DIDL-Lite>"""
+</DIDL-Lite>"""  # noqa: E501
 
 test_didl_fragment = """
 <DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -43,7 +42,6 @@ test_didl_fragment = """
 
 
 class TestDIDLLite(unittest.TestCase):
-
     def test_DIDLElement_class_detect(self):
         """ tests class creation from an XML DIDLLite fragment,
             expects a MusicAlbum container in return
@@ -70,7 +68,8 @@ class TestDIDLLite(unittest.TestCase):
         wrong_didl_fragment = copy(didl_fragment)
         wrong_didl_fragment = wrong_didl_fragment.replace(
             'object.container.album.musicAlbum',
-            'object.container.album.videoAlbum')
+            'object.container.album.videoAlbum',
+        )
         didl_element = DIDLLite.DIDLElement.fromString(wrong_didl_fragment)
         items = didl_element.getItems()
         self.assertEqual(len(items), 1)
@@ -84,6 +83,10 @@ class TestDIDLLite(unittest.TestCase):
         wrong_didl_fragment = copy(didl_fragment)
         wrong_didl_fragment = wrong_didl_fragment.replace(
             'object.container.album.musicAlbum',
-            'object.wrongcontainer.wrongalbum.videoAlbum')
-        self.assertRaises(AttributeError,
-                          DIDLLite.DIDLElement.fromString, wrong_didl_fragment)
+            'object.wrongcontainer.wrongalbum.videoAlbum',
+        )
+        self.assertRaises(
+            AttributeError,
+            DIDLLite.DIDLElement.fromString,
+            wrong_didl_fragment,
+        )
