@@ -45,8 +45,7 @@ class PlaylistItem(BackendItem):
             if self.stream_url.startswith('rtsp://'):
                 protocol = 'rtsp-rtp-udp'
 
-            res = Resource(self.stream_url,
-                           f'{protocol}:*:{self.mimetype}:*')
+            res = Resource(self.stream_url, f'{protocol}:*:{self.mimetype}:*')
             res.size = None
             item.res.append(res)
 
@@ -62,6 +61,7 @@ class PlaylistStore(AbstractBackendStore):
     .. versionchanged:: 0.9.0
         Migrated from louie/dispatcher to EventDispatcher
     '''
+
     logCategory = 'playlist_store'
 
     implements = ['MediaServer']
@@ -71,24 +71,42 @@ class PlaylistStore(AbstractBackendStore):
     description = (
         'Playlist',
         'exposes the list of video/audio streams from a m3u playlist (e.g. '
-        'web TV listings published by french ISPs such as Free, SFR...).',
-        None)
+        + 'web TV listings published by french ISPs such as Free, SFR...).',
+        None,
+    )
 
     options = [
-        {'option': 'name', 'text': 'Server Name:', 'type': 'string',
-         'default': 'my media',
-         'help': 'the name under this MediaServer '
-                 'shall show up with on other UPnP clients'},
-        {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
-         'default': 2, 'enum': (2, 1),
-         'help': 'the highest UPnP version this MediaServer shall support',
-         'level': 'advance'},
-        {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
-         'help': 'the unique (UPnP) identifier for this MediaServer, '
-                 'usually automatically set',
-         'level': 'advance'},
-        {'option': 'playlist_url', 'text': 'Playlist file URL:',
-         'type': 'string', 'help': 'URL to the playlist file (M3U).'},
+        {
+            'option': 'name',
+            'text': 'Server Name:',
+            'type': 'string',
+            'default': 'my media',
+            'help': 'the name under this MediaServer '
+            'shall show up with on other UPnP clients',
+        },
+        {
+            'option': 'version',
+            'text': 'UPnP Version:',
+            'type': 'int',
+            'default': 2,
+            'enum': (2, 1),
+            'help': 'the highest UPnP version this MediaServer shall support',
+            'level': 'advance',
+        },
+        {
+            'option': 'uuid',
+            'text': 'UUID Identifier:',
+            'type': 'string',
+            'help': 'the unique (UPnP) identifier for this MediaServer, '
+            'usually automatically set',
+            'level': 'advance',
+        },
+        {
+            'option': 'playlist_url',
+            'text': 'Playlist file URL:',
+            'type': 'string',
+            'help': 'URL to the playlist file (M3U).',
+        },
     ]
 
     playlist_url = None
@@ -98,7 +116,7 @@ class PlaylistStore(AbstractBackendStore):
 
         self.playlist_url = self.config.get(
             'playlist_url',
-            'https://mafreebox.freebox.fr/freeboxtv/playlist.m3u'
+            'https://mafreebox.freebox.fr/freeboxtv/playlist.m3u',
         )
         self.name = self.config.get('name', 'playlist')
 
@@ -120,11 +138,14 @@ class PlaylistStore(AbstractBackendStore):
             update = True
 
         item = PlaylistItem(
-            id, obj, mimetype,
+            id,
+            obj,
+            mimetype,
             parent=parent,
             storageid=parent,
             upnpclass=UPnPClass,
-            update=update)
+            update=update,
+        )
 
         self.store[id] = item
         self.store[id].store = self
@@ -132,12 +153,14 @@ class PlaylistStore(AbstractBackendStore):
             self.update_id += 1
             if self.server:
                 self.server.content_directory_server.set_variable(
-                    0, 'SystemUpdateID', self.update_id)
+                    0, 'SystemUpdateID', self.update_id
+                )
             if parent:
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
                     self.server.content_directory_server.set_variable(
-                        0, 'ContainerUpdateIDs', value)
+                        0, 'ContainerUpdateIDs', value
+                    )
 
         if mimetype == 'directory':
             return self.store[id]
@@ -150,18 +173,20 @@ class PlaylistStore(AbstractBackendStore):
             self.server.connection_manager_server.set_variable(
                 0,
                 'SourceProtocolInfo',
-                ['rtsp-rtp-udp:*:video/mpeg:*',
-                 'http-get:*:video/mpeg:*',
-                 'rtsp-rtp-udp:*:audio/mpeg:*',
-                 'http-get:*:audio/mpeg:*'],
-                default=True)
+                [
+                    'rtsp-rtp-udp:*:video/mpeg:*',
+                    'http-get:*:video/mpeg:*',
+                    'rtsp-rtp-udp:*:audio/mpeg:*',
+                    'http-get:*:audio/mpeg:*',
+                ],
+                default=True,
+            )
 
         rootItem = Container(None, self.name)
         self.set_root_item(rootItem)
         return self.retrievePlaylistItems(self.playlist_url, rootItem)
 
     def retrievePlaylistItems(self, url, parent_item):
-
         def gotPlaylist(playlist):
             self.info('got playlist')
             items = []
@@ -176,8 +201,10 @@ class PlaylistStore(AbstractBackendStore):
                     if re.search('#EXTINF', line):
                         channel = re.match('#EXTINF:.*,(.*)', line).group(1)
                         mimetype = 'video/mpeg'
-                        self.info('\t- channel found: [%r] => %r' % (
-                            mimetype, channel))
+                        self.info(
+                            '\t- channel found: [%r] => %r'
+                            % (mimetype, channel)
+                        )
                         line = next(lines)
                         while re.search('#EXTVLCOPT', line):
                             option = re.match('#EXTVLCOPT:(.*)', line).group(1)

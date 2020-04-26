@@ -46,8 +46,13 @@ TRACK_FOURTH_FIELD = '*'
 class TrackItem(BackendItem):
     logCategory = 'audiocd'
 
-    def __init__(self, device_name='/dev/cdrom', track_number=1,
-                 artist='Unknown', title='Unknown'):
+    def __init__(
+        self,
+        device_name='/dev/cdrom',
+        track_number=1,
+        artist='Unknown',
+        title='Unknown',
+    ):
         BackendItem.__init__(self)
         self.device_name = device_name
         self.track_number = track_number
@@ -59,7 +64,9 @@ class TrackItem(BackendItem):
         self.item = None
         self.parent = None
         self.pipeline = PLAY_TRACK_GST_PIPELINE % (
-            self.device_name, self.track_number)
+            self.device_name,
+            self.track_number,
+        )
         self.location = GStreamerPipeline(self.pipeline, self.mimetype)
 
     def get_item(self):
@@ -68,10 +75,12 @@ class TrackItem(BackendItem):
             upnp_parent_id = self.parent.get_id()
             url = self.store.urlbase + str(self.storage_id)
             self.item = DIDLLite.MusicTrack(
-                upnp_id, upnp_parent_id, self.title)
+                upnp_id, upnp_parent_id, self.title
+            )
 
             res = DIDLLite.Resource(
-                url, f'http-get:*:{self.mimetype}:{self.fourth_field}')
+                url, f'http-get:*:{self.mimetype}:{self.fourth_field}'
+            )
             # res.duration = self.duration
             # res.size = self.get_size()
             self.item.res.append(res)
@@ -98,17 +107,29 @@ class AudioCDStore(AbstractBackendStore):
     description = ('audioCD', '', None)
 
     options = [
-        {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
-         'default': 2, 'enum': (2, 1),
-         'help': 'the highest UPnP version this MediaServer shall support',
-         'level': 'advance'},
-        {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
-         'help': 'the unique (UPnP) identifier for this MediaServer, '
-                 'usually automatically set',
-         'level': 'advance'},
-        {'option': 'device_name', 'text': 'device name for audio CD:',
-         'type': 'string',
-         'help': 'device name containing the audio cd.'}
+        {
+            'option': 'version',
+            'text': 'UPnP Version:',
+            'type': 'int',
+            'default': 2,
+            'enum': (2, 1),
+            'help': 'the highest UPnP version this MediaServer shall support',
+            'level': 'advance',
+        },
+        {
+            'option': 'uuid',
+            'text': 'UUID Identifier:',
+            'type': 'string',
+            'help': 'the unique (UPnP) identifier for this MediaServer, '
+            'usually automatically set',
+            'level': 'advance',
+        },
+        {
+            'option': 'device_name',
+            'text': 'device name for audio CD:',
+            'type': 'string',
+            'help': 'device name containing the audio cd.',
+        },
     ]
 
     disc_title = None
@@ -129,11 +150,14 @@ class AudioCDStore(AbstractBackendStore):
         self.current_connection_id = None
         if self.server:
             self.server.connection_manager_server.set_variable(
-                0, 'SourceProtocolInfo',
+                0,
+                'SourceProtocolInfo',
                 [f'http-get:*:{TRACK_MIMETYPE}:{TRACK_FOURTH_FIELD}'],
-                default=True)
+                default=True,
+            )
             self.server.content_directory_server.set_variable(
-                0, 'SystemUpdateID', self.update_id)
+                0, 'SystemUpdateID', self.update_id
+            )
             # self.server.content_directory_server.set_variable(
             #     0, 'SortCapabilities', '*')
 
@@ -148,8 +172,9 @@ class AudioCDStore(AbstractBackendStore):
         (query_status, query_info) = CDDB.query(disc_id)
         if query_status in (210, 211):
             query_info = query_info[0]
-        (read_status, read_info) = CDDB.read(query_info['category'],
-                                             query_info['disc_id'])
+        (read_status, read_info) = CDDB.read(
+            query_info['category'], query_info['disc_id']
+        )
         # print(query_info['title'])
         # print(disc_id[1])
         # for i in range(disc_id[1]):
@@ -160,8 +185,11 @@ class AudioCDStore(AbstractBackendStore):
         self.disc_title = query_info['title'].encode('utf-8')
         tracks = {}
         for i in range(track_count):
-            tracks[i + 1] = read_info[f'TTITLE{repr(i)}'].decode(
-                'ISO-8859-1').encode('utf-8')
+            tracks[i + 1] = (
+                read_info[f'TTITLE{repr(i)}']
+                .decode('ISO-8859-1')
+                .encode('utf-8')
+            )
 
         self.name = self.disc_title
 
@@ -184,8 +212,9 @@ class AudioCDStore(AbstractBackendStore):
             disc_id = DiscID.disc_id(self.cdrom)
             reactor.callLater(2, self.checkIfAudioCdStillPresent)
         except Exception:
-            self.warning(f'audio CD {self.disc_title} ejected:'
-                         f' closing UPnP server!')
+            self.warning(
+                f'audio CD {self.disc_title} ejected:' f' closing UPnP server!'
+            )
             self.server.coherence.remove_plugin(self.server)
 
     def __repr__(self):

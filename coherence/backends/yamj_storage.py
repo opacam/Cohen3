@@ -5,18 +5,23 @@
 # see http://code.google.com/p/moviejukebox/ for
 # more info on YAMJ (Yet Another Movie Jukebox):
 
+# Copyright 2007, Frank Scholz <coherence@beebits.net>
+# Copyright 2009, Jean-Michel Sizun <jm.sizun AT free.fr>
+# Copyright 2019, Pol Canelles <canellestudi@gmail.com>
+
 import mimetypes
 import urllib.error
 import urllib.parse
 import urllib.request
-
-# Copyright 2007, Frank Scholz <coherence@beebits.net>
-# Copyright 2009, Jean-Michel Sizun <jm.sizun AT free.fr>
 #
 from lxml import etree
 
-from coherence.backend import BackendItem, Container, LazyContainer, \
-    AbstractBackendStore
+from coherence.backend import (
+    BackendItem,
+    Container,
+    LazyContainer,
+    AbstractBackendStore,
+)
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.utils import getPage
 
@@ -30,7 +35,6 @@ mimetypes.add_type('video/x-matroska', '.mkv')
 
 
 class MovieItem(BackendItem):
-
     def __init__(self, movie, store, title=None, url=None):
         BackendItem.__init__(self)
         self.movie_id = 'UNK'
@@ -89,7 +93,8 @@ class MovieItem(BackendItem):
             upnp_id = self.get_id()
             upnp_parent_id = self.parent.get_id()
             self.item = DIDLLite.Movie(
-                upnp_id, upnp_parent_id, self.upnp_title)
+                upnp_id, upnp_parent_id, self.upnp_title
+            )
             self.item.album = None
             self.item.albumArtURI = self.posterURL
             self.item.artist = None
@@ -109,7 +114,8 @@ class MovieItem(BackendItem):
             self.item.actors = self.str_actors
 
             res = DIDLLite.Resource(
-                self.movie_url, f'http-get:*:{self.mimetype}:*')
+                self.movie_url, f'http-get:*:{self.mimetype}:*'
+            )
             res.duration = self.duration
             res.size = self.size
             res.nrAudioChannels = self.audioChannels
@@ -133,25 +139,42 @@ class YamjStore(AbstractBackendStore):
         'YAMJ',
         'exposes the movie/TV series data files and metadata from '
         'a given YAMJ (Yet Another Movie Jukebox) library.',
-        None)
+        None,
+    )
 
     options = [
-        {'option': 'name', 'text': 'Server Name:', 'type': 'string',
-         'default': 'my media',
-         'help': 'the name under this MediaServer shall '
-                 'show up with on other UPnP clients'},
-        {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
-         'default': 2, 'enum': (2, 1),
-         'help': 'the highest UPnP version this MediaServer shall support',
-         'level': 'advance'},
-        {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
-         'help': 'the unique (UPnP) identifier for this MediaServer, '
-                 'usually automatically set',
-         'level': 'advance'},
-        {'option': 'refresh', 'text': 'Refresh period',
-         'type': 'string'},
-        {'option': 'yamj_url', 'text': 'Library URL:', 'type': 'string',
-         'help': 'URL to the library root directory.'}
+        {
+            'option': 'name',
+            'text': 'Server Name:',
+            'type': 'string',
+            'default': 'my media',
+            'help': 'the name under this MediaServer shall '
+            'show up with on other UPnP clients',
+        },
+        {
+            'option': 'version',
+            'text': 'UPnP Version:',
+            'type': 'int',
+            'default': 2,
+            'enum': (2, 1),
+            'help': 'the highest UPnP version this MediaServer shall support',
+            'level': 'advance',
+        },
+        {
+            'option': 'uuid',
+            'text': 'UUID Identifier:',
+            'type': 'string',
+            'help': 'the unique (UPnP) identifier for this MediaServer, '
+            'usually automatically set',
+            'level': 'advance',
+        },
+        {'option': 'refresh', 'text': 'Refresh period', 'type': 'string'},
+        {
+            'option': 'yamj_url',
+            'text': 'Library URL:',
+            'type': 'string',
+            'help': 'URL to the library root directory.',
+        },
     ]
 
     def __init__(self, server, **kwargs):
@@ -174,22 +197,27 @@ class YamjStore(AbstractBackendStore):
         if self.server:
             self.server.presentationURL = self.yamj_url
             self.server.connection_manager_server.set_variable(
-                0, 'SourceProtocolInfo',
-                [f'internal:{self.server.coherence.hostname}:video/mp4:*',
-                 'http-get:*:video/mp4:*',
-                 f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',  # noqa
-                 'http-get:*:video/x-msvideo:*',
-                 f'internal:{self.server.coherence.hostname}:video/mpeg:*',
-                 'http-get:*:video/mpeg:*',
-                 f'internal:{self.server.coherence.hostname}:video/avi:*',
-                 'http-get:*:video/avi:*',
-                 f'internal:{self.server.coherence.hostname}:video/divx:*',
-                 'http-get:*:video/divx:*',
-                 f'internal:{self.server.coherence.hostname}:video/quicktime:*',  # noqa
-                 'http-get:*:video/quicktime:*'],
-                default=True)
+                0,
+                'SourceProtocolInfo',
+                [
+                    f'internal:{self.server.coherence.hostname}:video/mp4:*',
+                    'http-get:*:video/mp4:*',
+                    f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',  # noqa: E501
+                    'http-get:*:video/x-msvideo:*',
+                    f'internal:{self.server.coherence.hostname}:video/mpeg:*',
+                    'http-get:*:video/mpeg:*',
+                    f'internal:{self.server.coherence.hostname}:video/avi:*',
+                    'http-get:*:video/avi:*',
+                    f'internal:{self.server.coherence.hostname}:video/divx:*',
+                    'http-get:*:video/divx:*',
+                    f'internal:{self.server.coherence.hostname}:video/quicktime:*',  # noqa: E501
+                    'http-get:*:video/quicktime:*',
+                ],
+                default=True,
+            )
             self.server.content_directory_server.set_variable(
-                0, 'SystemUpdateID', self.update_id)
+                0, 'SystemUpdateID', self.update_id
+            )
             # self.server.content_directory_server.set_variable(
             #     0, 'SortCapabilities', '*')
 
@@ -214,45 +242,58 @@ class YamjStore(AbstractBackendStore):
                     if type == 'Other':
                         parent = parent_item
                     indexItem = LazyContainer(
-                        parent, name, None, self.refresh,
+                        parent,
+                        name,
+                        None,
+                        self.refresh,
                         self.retrieveIndexMovies,
-                        per_page=1, name=name,
-                        root_name=root_name)
+                        per_page=1,
+                        name=name,
+                        root_name=root_name,
+                    )
                     parent.add_child(indexItem)
             self.init_completed()
 
         def fail_categories_read(f):
             self.warning(
                 f'failure reading yamj categories '
-                f'({filepath}): {f.getErrorMessage()!r}')
+                + f'({filepath}): {f.getErrorMessage()!r}'
+            )
             return f
 
         dfr.addCallback(etree.fromstring)
         dfr.addErrback(fail_categories_read)
-        dfr.addCallback(read_categories, parent_item=parent,
-                        jukebox_url=self.jukebox_url)
+        dfr.addCallback(
+            read_categories, parent_item=parent, jukebox_url=self.jukebox_url
+        )
         dfr.addErrback(fail_categories_read)
         return dfr
 
-    def retrieveIndexMovies(self, parent, name, root_name,
-                            per_page=10, page=0, offset=0):
+    def retrieveIndexMovies(
+        self, parent, name, root_name, per_page=10, page=0, offset=0
+    ):
         # print offset, per_page
         if self.nbMoviesPerFile is None:
             counter = 1
         else:
             counter = abs(offset / self.nbMoviesPerFile) + 1
-        fileUrl = \
-            f'{self.jukebox_url}/{urllib.parse.quote(root_name)}' \
-            f'_{counter:d}.xml'
+        fileUrl = (
+            f'{self.jukebox_url}/{urllib.parse.quote(root_name)}'
+            + f'_{counter:d}.xml'
+        )
 
         def fail_readPage(f):
-            self.warning(f'failure reading yamj index ({fileUrl}): '
-                         f'{f.getErrorMessage()!r}')
+            self.warning(
+                f'failure reading yamj index ({fileUrl}): '
+                + f'{f.getErrorMessage()!r}'
+            )
             return f
 
         def fail_parseIndex(f):
-            self.warning(f'failure parsing yamj index ({fileUrl}): '
-                         f'{f.getErrorMessage()!r}')
+            self.warning(
+                f'failure parsing yamj index ({fileUrl}): '
+                + f'{f.getErrorMessage()!r}'
+            )
             return f
 
         def readIndex(data):
@@ -269,7 +310,7 @@ class YamjStore(AbstractBackendStore):
             if self.nbMoviesPerFile is None:
                 self.nbMoviesPerFile = len(movies)
             for movie in movies:
-                isSet = (movie.attrib['isSet'] == 'true')
+                isSet = movie.attrib['isSet'] == 'true'
 
                 if isSet is True:
                     # the movie corresponds to a set
@@ -278,9 +319,15 @@ class YamjStore(AbstractBackendStore):
                     set_root_name = index_name[:-2]
                     self.debug(f'adding set {name}')
                     indexItem = LazyContainer(
-                        parent, name, None, self.refresh,
+                        parent,
+                        name,
+                        None,
+                        self.refresh,
                         self.retrieveIndexMovies,
-                        per_page=1, name=name, root_name=set_root_name)
+                        per_page=1,
+                        name=name,
+                        root_name=set_root_name,
+                    )
                     parent.add_child(indexItem, set_root_name)
 
                 else:
@@ -315,10 +362,12 @@ class YamjStore(AbstractBackendStore):
                                 title = f'{episodeIndex} - {episodeTitle} '
                             episodeUrl = file.find('./fileURL').text
                             fileItem = MovieItem(
-                                movie, self, title=title, url=episodeUrl)
+                                movie, self, title=title, url=episodeUrl
+                            )
                             file_external_id = f'{movie_id}/{episodeUrl}'
                             container_item.add_child(
-                                fileItem, file_external_id)
+                                fileItem, file_external_id
+                            )
 
         self.debug(f'Reading index file {fileUrl}')
         d = getPage(fileUrl)

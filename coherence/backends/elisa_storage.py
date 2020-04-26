@@ -8,8 +8,12 @@ from twisted.python import failure
 from twisted.spread import pb
 
 from coherence.backend import Backend
-from coherence.upnp.core.DIDLLite import classChooser, Container, Resource, \
-    DIDLElement
+from coherence.upnp.core.DIDLLite import (
+    classChooser,
+    Container,
+    Resource,
+    DIDLElement,
+)
 from coherence.upnp.core.soap_service import errorCode
 
 
@@ -84,17 +88,23 @@ class ElisaMediaStore(Backend):
         ''' ask Elisa to tell us the id of the top item
             representing the media_type == 'something' collection '''
         store = self.get_store()
-        dfr = store.addCallback(lambda object:
-                                object.callRemote('get_cache_manager'))
-        dfr.addCallback(lambda cache_mgr:
-                        cache_mgr.callRemote('get_media_root_id', media_type))
+        dfr = store.addCallback(
+            lambda object: object.callRemote('get_cache_manager')
+        )
+        dfr.addCallback(
+            lambda cache_mgr: cache_mgr.callRemote(
+                'get_media_root_id', media_type
+            )
+        )
         dfr.addCallback(self.set_root_id)
 
     def upnp_init(self):
         if self.server:
             self.server.connection_manager_server.set_variable(
-                0, 'SourceProtocolInfo',
-                [f'internal:{self.host}:*:*', 'http-get:*:audio/mpeg:*'])
+                0,
+                'SourceProtocolInfo',
+                [f'internal:{self.host}:*:*', 'http-get:*:audio/mpeg:*'],
+            )
 
     def upnp_Browse(self, *args, **kwargs):
         ObjectID = kwargs['ObjectID']
@@ -108,9 +118,11 @@ class ElisaMediaStore(Backend):
             UPnPClass = classChooser(elisa_item['mimetype'])
             upnp_item = None
             if UPnPClass:
-                upnp_item = UPnPClass(elisa_item['id'],
-                                      elisa_item['parent_id'],
-                                      elisa_item['name'])
+                upnp_item = UPnPClass(
+                    elisa_item['id'],
+                    elisa_item['parent_id'],
+                    elisa_item['name'],
+                )
                 if isinstance(upnp_item, Container):
                     upnp_item.childCount = len(elisa_item.get('children', []))
                     if len(Filter) > 0:
@@ -130,12 +142,12 @@ class ElisaMediaStore(Backend):
                     except IndexError:
                         pass
 
-                    res = Resource(internal_url,
-                                   f'internal:{self.host}:*:*')
+                    res = Resource(internal_url, f'internal:{self.host}:*:*')
                     res.size = size
                     upnp_item.res.append(res)
-                    res = Resource(external_url,
-                                   f'http-get:*:{elisa_item["mimetype"]}:*')
+                    res = Resource(
+                        external_url, f'http-get:*:{elisa_item["mimetype"]}:*'
+                    )
                     res.size = size
                     upnp_item.res.append(res)
 
@@ -148,9 +160,9 @@ class ElisaMediaStore(Backend):
                 if RequestedCount == 0:
                     childs = children[StartingIndex:]
                 else:
-                    childs = \
-                        children[StartingIndex:
-                                 StartingIndex + RequestedCount]
+                    childs = children[
+                        StartingIndex : StartingIndex + RequestedCount
+                    ]
                 for child in childs:
                     if child is not None:
                         item = build_upnp_item(child)
@@ -163,8 +175,11 @@ class ElisaMediaStore(Backend):
                     didl.addItem(item)
                 total = 1
 
-            r = {'Result': didl.toString(), 'TotalMatches': total,
-                 'NumberReturned': didl.numItems()}
+            r = {
+                'Result': didl.toString(),
+                'TotalMatches': total,
+                'NumberReturned': didl.numItems(),
+            }
 
             if hasattr(elisa_item, 'update_id'):
                 r['UpdateID'] = item.update_id  # pylint: disable=no-member
@@ -181,32 +196,40 @@ class ElisaMediaStore(Backend):
             id = self.root_id
 
         store = self.get_store()
-        dfr = store.addCallback(lambda object:
-                                object.callRemote('get_cache_manager'))
+        dfr = store.addCallback(
+            lambda object: object.callRemote('get_cache_manager')
+        )
         dfr.addErrback(errback)
-        dfr.addCallback(lambda cache_mgr:
-                        cache_mgr.callRemote('get_media_node_with_id', id))
+        dfr.addCallback(
+            lambda cache_mgr: cache_mgr.callRemote(
+                'get_media_node_with_id', id
+            )
+        )
         dfr.addCallback(got_result)
         return dfr
 
 
 if __name__ == '__main__':
-    def main():
 
+    def main():
         def got_result(result):
             print(result)
-        f = ElisaMediaStore(None,
-                            name='My Elisa Store',
-                            host='localhost',
-                            urlbase='http://localhost/'
-                            )
 
-        dfr = f.upnp_Browse(BrowseFlag='BrowseDirectChildren',
-                            RequestedCount=0,
-                            StartingIndex=0,
-                            ObjectID=23,
-                            SortCriteria='*',
-                            Filter='')
+        f = ElisaMediaStore(
+            None,
+            name='My Elisa Store',
+            host='localhost',
+            urlbase='http://localhost/',
+        )
+
+        dfr = f.upnp_Browse(
+            BrowseFlag='BrowseDirectChildren',
+            RequestedCount=0,
+            StartingIndex=0,
+            ObjectID=23,
+            SortCriteria='*',
+            Filter='',
+        )
         dfr.addCallback(got_result)
         dfr.addCallback(lambda _: reactor.stop())
 

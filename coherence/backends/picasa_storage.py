@@ -9,15 +9,17 @@ import gdata.media
 import gdata.photos.service
 from twisted.internet import threads
 
-from coherence.backend import BackendItem, Container, \
-    LazyContainer, \
-    AbstractBackendStore
+from coherence.backend import (
+    BackendItem,
+    Container,
+    LazyContainer,
+    AbstractBackendStore,
+)
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.utils import ReverseProxyUriResource
 
 
 class PicasaProxy(ReverseProxyUriResource):
-
     def __init__(self, uri):
         ReverseProxyUriResource.__init__(self, uri)
 
@@ -68,10 +70,8 @@ class PicasaPhotoItem(BackendItem):
         if self.item is None:
             upnp_id = self.get_id()
             upnp_parent_id = self.parent.get_id()
-            self.item = DIDLLite.Photo(
-                upnp_id, upnp_parent_id, self.name)
-            res = DIDLLite.Resource(
-                self.url, f'http-get:*:{self.mimetype}:*')
+            self.item = DIDLLite.Photo(upnp_id, upnp_parent_id, self.name)
+            res = DIDLLite.Resource(self.url, f'http-get:*:{self.mimetype}:*')
             self.item.res.append(res)
         self.item.childCount = 0
         return self.item
@@ -92,27 +92,48 @@ class PicasaStore(AbstractBackendStore):
         'Picasa Web Albums',
         'connects to the Picasa Web Albums service and exposes the '
         'featured photos and albums for a given user.',
-        None)
+        None,
+    )
 
     options = [
-        {'option': 'name', 'text': 'Server Name:', 'type': 'string',
-         'default': 'my media',
-         'help': 'the name under this MediaServer shall '
-                 'show up with on other UPnP clients'},
-        {'option': 'version', 'text': 'UPnP Version:', 'type': 'int',
-         'default': 2, 'enum': (2, 1),
-         'help': 'the highest UPnP version this MediaServer shall support',
-         'level': 'advance'},
-        {'option': 'uuid', 'text': 'UUID Identifier:', 'type': 'string',
-         'help': 'the unique (UPnP) identifier for this MediaServer, '
-                 'usually automatically set',
-         'level': 'advance'},
-        {'option': 'refresh', 'text': 'Refresh period',
-         'type': 'string'},
-        {'option': 'login', 'text': 'User ID:', 'type': 'string',
-         'group': 'User Account'},
-        {'option': 'password', 'text': 'Password:', 'type': 'string',
-         'group': 'User Account'},
+        {
+            'option': 'name',
+            'text': 'Server Name:',
+            'type': 'string',
+            'default': 'my media',
+            'help': 'the name under this MediaServer shall '
+            'show up with on other UPnP clients',
+        },
+        {
+            'option': 'version',
+            'text': 'UPnP Version:',
+            'type': 'int',
+            'default': 2,
+            'enum': (2, 1),
+            'help': 'the highest UPnP version this MediaServer shall support',
+            'level': 'advance',
+        },
+        {
+            'option': 'uuid',
+            'text': 'UUID Identifier:',
+            'type': 'string',
+            'help': 'the unique (UPnP) identifier for this MediaServer, '
+            'usually automatically set',
+            'level': 'advance',
+        },
+        {'option': 'refresh', 'text': 'Refresh period', 'type': 'string'},
+        {
+            'option': 'login',
+            'text': 'User ID:',
+            'type': 'string',
+            'group': 'User Account',
+        },
+        {
+            'option': 'password',
+            'text': 'Password:',
+            'type': 'string',
+            'group': 'User Account',
+        },
     ]
 
     def __init__(self, server, **kwargs):
@@ -129,14 +150,17 @@ class PicasaStore(AbstractBackendStore):
         self.set_root_item(rootContainer)
 
         self.AlbumsContainer = LazyContainer(
-            rootContainer, 'My Albums', None,
-            self.refresh, self.retrieveAlbums)
+            rootContainer, 'My Albums', None, self.refresh, self.retrieveAlbums
+        )
         rootContainer.add_child(self.AlbumsContainer)
 
         self.FeaturedContainer = LazyContainer(
-            rootContainer, 'Featured photos',
-            None, self.refresh,
-            self.retrieveFeaturedPhotos)
+            rootContainer,
+            'Featured photos',
+            None,
+            self.refresh,
+            self.retrieveFeaturedPhotos,
+        )
         rootContainer.add_child(self.FeaturedContainer)
 
         self.init_completed()
@@ -162,7 +186,8 @@ class PicasaStore(AbstractBackendStore):
                 'http-get:*:image/jpeg:*,'
                 'http-get:*:image/gif:*,'
                 'http-get:*:image/png:*',
-                default=True)
+                default=True,
+            )
 
         self.wmc_mapping = {'16': self.get_root_id()}
 
@@ -183,9 +208,14 @@ class PicasaStore(AbstractBackendStore):
             for album in albums.entry:
                 title = album.title.text
                 album_id = album.gphoto_id.text
-                item = LazyContainer(parent, title, album_id, self.refresh,
-                                     self.retrieveAlbumPhotos,
-                                     album_id=album_id)
+                item = LazyContainer(
+                    parent,
+                    title,
+                    album_id,
+                    self.refresh,
+                    self.retrieveAlbumPhotos,
+                    album_id=album_id,
+                )
                 parent.add_child(item, external_id=album_id)
 
         def gotError(error):
@@ -215,8 +245,9 @@ class PicasaStore(AbstractBackendStore):
         return photos
 
     def retrieveAlbumPhotos(self, parent=None, album_id=''):
-        album_feed_uri = \
+        album_feed_uri = (
             f'/data/feed/api/user/{self.login}/albumid/{album_id}?kind=photo'
+        )
         return self.retrieveFeedPhotos(parent, album_feed_uri)
 
     def retrieveFeaturedPhotos(self, parent=None):

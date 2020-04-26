@@ -10,6 +10,7 @@ import tokenize
 from io import StringIO
 
 from twisted.internet import gtk3reactor
+
 gtk3reactor.install()
 
 from twisted.internet import reactor, defer
@@ -20,8 +21,10 @@ from coherence.upnp.core import DIDLLite
 from coherence.upnp.core.soap_service import errorCode
 
 import gi
+
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
+
 Gst.init(None)
 
 from coherence.backend import Backend
@@ -31,11 +34,16 @@ from coherence import log
 
 class Player(log.LogAble):
     logCategory = 'gstreamer_player'
-    max_playbin_volume = 1.
+    max_playbin_volume = 1.0
 
-    def __init__(self, default_mimetype='audio/mpeg', audio_sink_name=None,
-                 video_sink_name=None, audio_sink_options=None,
-                 video_sink_options=None):
+    def __init__(
+        self,
+        default_mimetype='audio/mpeg',
+        audio_sink_name=None,
+        video_sink_name=None,
+        audio_sink_options=None,
+        video_sink_options=None,
+    ):
         log.LogAble.__init__(self)
         self.audio_sink_name = audio_sink_name or 'autoaudiosink'
         self.video_sink_name = video_sink_name or 'autovideosink'
@@ -88,20 +96,23 @@ class Player(log.LogAble):
             if mimetype == 'application/ogg':
                 self.player = Gst.parse_launch(
                     'gnomevfssrc name=source ! oggdemux ! ivorbisdec !'
-                    ' audioconvert ! dsppcmsink name=sink')
+                    + ' audioconvert ! dsppcmsink name=sink'
+                )
                 self.player.set_name('oggplayer')
                 self.set_volume = self.set_volume_dsp_pcm_sink
                 self.get_volume = self.get_volume_dsp_pcm_sink
             elif mimetype == 'application/flac':
                 self.player = Gst.parse_launch(
                     'gnomevfssrc name=source ! flacdemux ! flacdec !'
-                    ' audioconvert ! dsppcmsink name=sink')
+                    + ' audioconvert ! dsppcmsink name=sink'
+                )
                 self.player.set_name('flacplayer')
                 self.set_volume = self.set_volume_dsp_pcm_sink
                 self.get_volume = self.get_volume_dsp_pcm_sink
             else:
                 self.player = Gst.parse_launch(
-                    'gnomevfssrc name=source ! id3lib ! dspmp3sink name=sink')
+                    'gnomevfssrc name=source ! id3lib ! dspmp3sink name=sink'
+                )
                 self.player.set_name('mp3player')
                 self.set_volume = self.set_volume_dsp_mp3_sink
                 self.get_volume = self.get_volume_dsp_mp3_sink
@@ -166,7 +177,7 @@ class Player(log.LogAble):
             volume = 0
         if volume > 100:
             volume = 100
-        volume = (volume * self.max_playbin_volume) / 100.
+        volume = (volume * self.max_playbin_volume) / 100.0
         self.sink.set_property('volume', volume)
 
     def get_volume_dsp_mp3_sink(self):
@@ -267,8 +278,11 @@ class Player(log.LogAble):
             if self.playing:
                 self.seek('-0')
             # self.player.set_state(Gst.State.READY)
-        elif t == Gst.MessageType.TAG and \
-                message.parse_tag() and struct.has_field('taglist'):
+        elif (
+            t == Gst.MessageType.TAG
+            and message.parse_tag()
+            and struct.has_field('taglist')
+        ):
             taglist = struct.get_value('taglist')
             for x in range(taglist.n_tags()):
                 key = taglist.nth_tag_name(x)
@@ -278,8 +292,10 @@ class Player(log.LogAble):
         elif t == Gst.MessageType.STATE_CHANGED:
             if message.src == self.player:
                 old, new, pending = message.parse_state_changed()
-                print(f'player ({message.src.get_path_string()}) '
-                      f'state_change: {old} {new} {pending}')
+                print(
+                    f'player ({message.src.get_path_string()}) '
+                    f'state_change: {old} {new} {pending}'
+                )
                 if new == Gst.State.PLAYING:
                     self.playing = True
                     self.update_LC.start(1, False)
@@ -310,7 +326,8 @@ class Player(log.LogAble):
         if self.duration is None:
             try:
                 self.duration, format = self.player.query_duration(
-                    Gst.Format.TIME)
+                    Gst.Format.TIME
+                )
             except Exception:
                 self.duration = Gst.CLOCK_TIME_NONE
                 self.duration = 0
@@ -322,19 +339,27 @@ class Player(log.LogAble):
             self.duration = None
             self.debug('duration unknown')
             return r
-        r['raw'] = {'position': str(position),
-                    'remaining': str(self.duration - position),
-                    'duration': str(self.duration)}
+        r['raw'] = {
+            'position': str(position),
+            'remaining': str(self.duration - position),
+            'duration': str(self.duration),
+        }
 
         position_human = '%d:%02d' % (divmod(position / Gst.SECOND, 60))
         duration_human = '%d:%02d' % (divmod(self.duration / Gst.SECOND, 60))
         remaining_human = '%d:%02d' % (
-            divmod((self.duration - position) / Gst.SECOND, 60))
+            divmod((self.duration - position) / Gst.SECOND, 60)
+        )
 
-        r['human'] = {'position': position_human, 'remaining': remaining_human,
-                      'duration': duration_human}
-        r['percent'] = {'position': position * 100 / self.duration,
-                        'remaining': 100 - (position * 100 / self.duration)}
+        r['human'] = {
+            'position': position_human,
+            'remaining': remaining_human,
+            'duration': duration_human,
+        }
+        r['percent'] = {
+            'position': position * 100 / self.duration,
+            'remaining': 100 - (position * 100 / self.duration),
+        }
 
         self.debug(r)
         return r
@@ -431,10 +456,14 @@ class Player(log.LogAble):
 
         # Event seek mode
         event = Gst.Event.new_seek(
-            1.0, Gst.Format.TIME,
+            1.0,
+            Gst.Format.TIME,
             Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
-            Gst.SeekType.SET, loc,
-            Gst.SeekType.NONE, 0)
+            Gst.SeekType.SET,
+            loc,
+            Gst.SeekType.NONE,
+            0,
+        )
         event_send = self.player.send_event(event)
 
         if event_send:
@@ -488,16 +517,21 @@ class GStreamerPlayer(Backend):
     vendor_value_defaults = {
         'RenderingControl': {'A_ARG_TYPE_Channel': 'Master'},
         'AVTransport': {
-            'A_ARG_TYPE_SeekMode': ('ABS_TIME', 'REL_TIME', 'TRACK_NR')}}
+            'A_ARG_TYPE_SeekMode': ('ABS_TIME', 'REL_TIME', 'TRACK_NR')
+        },
+    }
     vendor_range_defaults = {'RenderingControl': {'Volume': {'maximum': 100}}}
 
     def __init__(self, server, **kwargs):
         Backend.__init__(self, server, **kwargs)
-        if (server.coherence.config.get('use_dbus', 'no') != 'yes' and
-                server.coherence.config.get('glib', 'no') != 'yes'):
+        if (
+            server.coherence.config.get('use_dbus', 'no') != 'yes'
+            and server.coherence.config.get('glib', 'no') != 'yes'
+        ):
             raise Exception(
                 'this media renderer needs use_dbus '
-                'enabled in the configuration')
+                'enabled in the configuration'
+            )
         self.name = kwargs.get('name', 'GStreamer Audio Player')
 
         audio_sink_name = kwargs.get('audio_sink_name')
@@ -505,10 +539,12 @@ class GStreamerPlayer(Backend):
         video_sink_name = kwargs.get('video_sink_name')
         video_sink_options = kwargs.get('video_sink_options')
 
-        self.player = Player(audio_sink_name=audio_sink_name,
-                             video_sink_name=video_sink_name,
-                             audio_sink_options=audio_sink_options,
-                             video_sink_options=video_sink_options)
+        self.player = Player(
+            audio_sink_name=audio_sink_name,
+            video_sink_name=video_sink_name,
+            audio_sink_options=audio_sink_options,
+            video_sink_options=video_sink_options,
+        )
         self.player.add_view(self.update)
 
         self.metadata = None
@@ -537,70 +573,77 @@ class GStreamerPlayer(Backend):
             av_transport.set_variable(conn_id, 'TransportState', 'PLAYING')
         elif current == Gst.State.PAUSED:
             state = 'paused'
-            av_transport.set_variable(conn_id, 'TransportState',
-                                      'PAUSED_PLAYBACK')
-        elif self.playcontainer is not None and \
-                message == Gst.MessageType.EOS and \
-                self.playcontainer[0] + 1 < len(self.playcontainer[2]):
+            av_transport.set_variable(
+                conn_id, 'TransportState', 'PAUSED_PLAYBACK'
+            )
+        elif (
+            self.playcontainer is not None
+            and message == Gst.MessageType.EOS
+            and self.playcontainer[0] + 1 < len(self.playcontainer[2])
+        ):
             state = 'transitioning'
-            av_transport.set_variable(conn_id, 'TransportState',
-                                      'TRANSITIONING')
+            av_transport.set_variable(
+                conn_id, 'TransportState', 'TRANSITIONING'
+            )
 
             next_track = ()
             item = self.playcontainer[2][self.playcontainer[0] + 1]
             infos = connection_manager.get_variable('SinkProtocolInfo')
             local_protocol_infos = infos.value.split(',')
-            res = item.res.get_matching(local_protocol_infos,
-                                        protocol_type='internal')
+            res = item.res.get_matching(
+                local_protocol_infos, protocol_type='internal'
+            )
             if len(res) == 0:
                 res = item.res.get_matching(local_protocol_infos)
             if len(res) > 0:
                 res = res[0]
                 infos = res.protocolInfo.split(':')
-                remote_protocol, remote_network, \
-                    remote_content_format, _ = infos
+                remote_protocol, remote_network, remote_content_format, _ = (
+                    infos
+                )
                 didl = DIDLLite.DIDLElement()
                 didl.addItem(item)
                 next_track = (res.data, didl.toString(), remote_content_format)
                 self.playcontainer[0] = self.playcontainer[0] + 1
 
             if len(next_track) == 3:
-                av_transport.set_variable(conn_id, 'CurrentTrack',
-                                          self.playcontainer[0] + 1)
+                av_transport.set_variable(
+                    conn_id, 'CurrentTrack', self.playcontainer[0] + 1
+                )
                 self.load(next_track[0], next_track[1], next_track[2])
                 self.play()
             else:
                 state = 'idle'
-                av_transport.set_variable(
-                    conn_id, 'TransportState', 'STOPPED')
-        elif message == Gst.MessageType.EOS and \
-                len(av_transport.get_variable(
-                    'NextAVTransportURI').value) > 0:
+                av_transport.set_variable(conn_id, 'TransportState', 'STOPPED')
+        elif (
+            message == Gst.MessageType.EOS
+            and len(av_transport.get_variable('NextAVTransportURI').value) > 0
+        ):
             state = 'transitioning'
             av_transport.set_variable(
-                conn_id, 'TransportState', 'TRANSITIONING')
-            CurrentURI = av_transport.get_variable(
-                'NextAVTransportURI').value
-            metadata = av_transport.get_variable(
-                'NextAVTransportURIMetaData')
+                conn_id, 'TransportState', 'TRANSITIONING'
+            )
+            CurrentURI = av_transport.get_variable('NextAVTransportURI').value
+            metadata = av_transport.get_variable('NextAVTransportURIMetaData')
             CurrentURIMetaData = metadata.value
+            av_transport.set_variable(conn_id, 'NextAVTransportURI', '')
             av_transport.set_variable(
-                conn_id, 'NextAVTransportURI', '')
-            av_transport.set_variable(
-                conn_id, 'NextAVTransportURIMetaData', '')
+                conn_id, 'NextAVTransportURIMetaData', ''
+            )
             r = self.upnp_SetAVTransportURI(
-                self, InstanceID=0, CurrentURI=CurrentURI,
-                CurrentURIMetaData=CurrentURIMetaData)
+                self,
+                InstanceID=0,
+                CurrentURI=CurrentURI,
+                CurrentURIMetaData=CurrentURIMetaData,
+            )
             if r == {}:
                 self.play()
             else:
                 state = 'idle'
-                av_transport.set_variable(
-                    conn_id, 'TransportState', 'STOPPED')
+                av_transport.set_variable(conn_id, 'TransportState', 'STOPPED')
         else:
             state = 'idle'
-            av_transport.set_variable(
-                conn_id, 'TransportState', 'STOPPED')
+            av_transport.set_variable(conn_id, 'TransportState', 'STOPPED')
 
         self.info('update %r', state)
         self._update_transport_position(state)
@@ -626,18 +669,19 @@ class GStreamerPlayer(Backend):
                     for item in elt.getItems():
                         for res in item.findall('res'):
                             formatted_duration = self._format_time(
-                                self.duration)
+                                self.duration
+                            )
                             res.attrib['duration'] = formatted_duration
 
                     self.metadata = elt.toString()
                     # print self.metadata
                     if self.server is not None:
-                        av_transport.set_variable(conn_id,
-                                                  'AVTransportURIMetaData',
-                                                  self.metadata)
-                        av_transport.set_variable(conn_id,
-                                                  'CurrentTrackMetaData',
-                                                  self.metadata)
+                        av_transport.set_variable(
+                            conn_id, 'AVTransportURIMetaData', self.metadata
+                        )
+                        av_transport.set_variable(
+                            conn_id, 'CurrentTrackMetaData', self.metadata
+                        )
 
             self.info(
                 f'{state} {int(position["raw"]["position"]) / Gst.SECOND:d}/'
@@ -647,21 +691,26 @@ class GStreamerPlayer(Backend):
                 f'{position["percent"]["remaining"]:d}%% - '
                 f'{position["human"]["position"]}/'
                 f'{position["human"]["remaining"]}/'
-                f'{position["human"]["duration"]}')
+                f'{position["human"]["duration"]}'
+            )
 
             duration = int(position['raw']['duration'])
             formatted = self._format_time(duration)
-            av_transport.set_variable(conn_id, 'CurrentTrackDuration',
-                                      formatted)
-            av_transport.set_variable(conn_id, 'CurrentMediaDuration',
-                                      formatted)
+            av_transport.set_variable(
+                conn_id, 'CurrentTrackDuration', formatted
+            )
+            av_transport.set_variable(
+                conn_id, 'CurrentMediaDuration', formatted
+            )
 
             position = int(position['raw']['position'])
             formatted = self._format_time(position)
-            av_transport.set_variable(conn_id, 'RelativeTimePosition',
-                                      formatted)
-            av_transport.set_variable(conn_id, 'AbsoluteTimePosition',
-                                      formatted)
+            av_transport.set_variable(
+                conn_id, 'RelativeTimePosition', formatted
+            )
+            av_transport.set_variable(
+                conn_id, 'AbsoluteTimePosition', formatted
+            )
 
     def _format_time(self, time):
         fmt = '%d:%02d:%02d'
@@ -678,7 +727,8 @@ class GStreamerPlayer(Backend):
         self.info(f'loading: {uri} {mimetype} ')
         _, state, _ = self.player.get_state()
         connection_id = self.server.connection_manager_server.lookup_avt_id(
-            self.current_connection_id)
+            self.current_connection_id
+        )
         # the check whether a stop is really needed is done inside stop
         self.stop(silent=True)
 
@@ -698,25 +748,34 @@ class GStreamerPlayer(Backend):
 
         if self.playcontainer is None:
             self.server.av_transport_server.set_variable(
-                connection_id, 'AVTransportURI', uri)
+                connection_id, 'AVTransportURI', uri
+            )
             self.server.av_transport_server.set_variable(
-                connection_id, 'AVTransportURIMetaData', metadata)
+                connection_id, 'AVTransportURIMetaData', metadata
+            )
             self.server.av_transport_server.set_variable(
-                connection_id, 'NumberOfTracks', 1)
+                connection_id, 'NumberOfTracks', 1
+            )
             self.server.av_transport_server.set_variable(
-                connection_id, 'CurrentTrack', 1)
+                connection_id, 'CurrentTrack', 1
+            )
         else:
             self.server.av_transport_server.set_variable(
-                connection_id, 'AVTransportURI', self.playcontainer[1])
+                connection_id, 'AVTransportURI', self.playcontainer[1]
+            )
             self.server.av_transport_server.set_variable(
-                connection_id, 'NumberOfTracks', len(self.playcontainer[2]))
+                connection_id, 'NumberOfTracks', len(self.playcontainer[2])
+            )
             self.server.av_transport_server.set_variable(
-                connection_id, 'CurrentTrack', self.playcontainer[0] + 1)
+                connection_id, 'CurrentTrack', self.playcontainer[0] + 1
+            )
 
         self.server.av_transport_server.set_variable(
-            connection_id, 'CurrentTrackURI', uri)
+            connection_id, 'CurrentTrackURI', uri
+        )
         self.server.av_transport_server.set_variable(
-            connection_id, 'CurrentTrackMetaData', metadata)
+            connection_id, 'CurrentTrackMetaData', metadata
+        )
 
         # self.server.av_transport_server.set_variable(
         #     connection_id, 'TransportState', 'TRANSITIONING')
@@ -724,12 +783,18 @@ class GStreamerPlayer(Backend):
         #     connection_id, 'CurrentTransportActions',
         #     'PLAY,STOP,PAUSE,SEEK,NEXT,PREVIOUS')
         if uri.startswith('http://'):
-            transport_actions = set(['PLAY,STOP,PAUSE'])
+            transport_actions = {'PLAY,STOP,PAUSE'}
         else:
-            transport_actions = set(['PLAY,STOP,PAUSE,SEEK'])
+            transport_actions = {'PLAY,STOP,PAUSE,SEEK'}
 
-        if len(self.server.av_transport_server.get_variable(
-                'NextAVTransportURI').value) > 0:
+        if (
+            len(
+                self.server.av_transport_server.get_variable(
+                    'NextAVTransportURI'
+                ).value
+            )
+            > 0
+        ):
             transport_actions.add('NEXT')
 
         if self.playcontainer is not None:
@@ -739,7 +804,8 @@ class GStreamerPlayer(Backend):
                 transport_actions.add('PREVIOUS')
 
         self.server.av_transport_server.set_variable(
-            connection_id, 'CurrentTransportActions', transport_actions)
+            connection_id, 'CurrentTransportActions', transport_actions
+        )
 
         if state == Gst.State.PLAYING:
             self.info('was playing...')
@@ -751,8 +817,7 @@ class GStreamerPlayer(Backend):
         if uri is None:
             return {'state': 'idle', 'uri': ''}
         else:
-            r = {'uri': str(uri),
-                 'position': position}
+            r = {'uri': str(uri), 'position': position}
             if self.tags != {}:
                 try:
                     r['artist'] = str(self.tags['artist'])
@@ -789,8 +854,11 @@ class GStreamerPlayer(Backend):
             if silent is True:
                 self.server.av_transport_server.set_variable(
                     self.server.connection_manager_server.lookup_avt_id(
-                        self.current_connection_id), 'TransportState',
-                    'STOPPED')
+                        self.current_connection_id
+                    ),
+                    'TransportState',
+                    'STOPPED',
+                )
 
     def play(self):
         self.info(f'Playing: {self.player.get_uri()}')
@@ -799,35 +867,47 @@ class GStreamerPlayer(Backend):
         self.player.play()
         self.server.av_transport_server.set_variable(
             self.server.connection_manager_server.lookup_avt_id(
-                self.current_connection_id), 'TransportState', 'PLAYING')
+                self.current_connection_id
+            ),
+            'TransportState',
+            'PLAYING',
+        )
 
     def pause(self):
         self.info(f'Pausing: {self.player.get_uri()}')
         self.player.pause()
         self.server.av_transport_server.set_variable(
             self.server.connection_manager_server.lookup_avt_id(
-                self.current_connection_id), 'TransportState',
-            'PAUSED_PLAYBACK')
+                self.current_connection_id
+            ),
+            'TransportState',
+            'PAUSED_PLAYBACK',
+        )
 
     def seek(self, location, old_state):
         self.player.seek(location)
         if old_state is not None:
             self.server.av_transport_server.set_variable(
-                0, 'TransportState', old_state)
+                0, 'TransportState', old_state
+            )
 
     def mute(self):
         self.player.mute()
         rcs_id = self.server.connection_manager_server.lookup_rcs_id(
-            self.current_connection_id)
+            self.current_connection_id
+        )
         self.server.rendering_control_server.set_variable(
-            rcs_id, 'Mute', 'True')
+            rcs_id, 'Mute', 'True'
+        )
 
     def unmute(self):
         self.player.unmute()
         rcs_id = self.server.connection_manager_server.lookup_rcs_id(
-            self.current_connection_id)
+            self.current_connection_id
+        )
         self.server.rendering_control_server.set_variable(
-            rcs_id, 'Mute', 'False')
+            rcs_id, 'Mute', 'False'
+        )
 
     def get_mute(self):
         return self.player.get_mute()
@@ -838,9 +918,11 @@ class GStreamerPlayer(Backend):
     def set_volume(self, volume):
         self.player.set_volume(volume)
         rcs_id = self.server.connection_manager_server.lookup_rcs_id(
-            self.current_connection_id)
+            self.current_connection_id
+        )
         self.server.rendering_control_server.set_variable(
-            rcs_id, 'Volume', volume)
+            rcs_id, 'Volume', volume
+        )
 
     def playcontainer_browse(self, uri):
         '''
@@ -856,21 +938,31 @@ class GStreamerPlayer(Backend):
                 next_track = ()
                 elt = DIDLLite.DIDLElement.fromString(r['Result'])
                 item = elt.getItems()[0]
-                local_protocol_infos = \
-                    self.server.connection_manager_server.get_variable(
-                        'SinkProtocolInfo').value.split(',')
-                res = item.res.get_matching(local_protocol_infos,
-                                            protocol_type='internal')
+                local_protocol_infos = self.server.connection_manager_server.get_variable(  # noqa: E501
+                    'SinkProtocolInfo'
+                ).value.split(
+                    ','
+                )
+                res = item.res.get_matching(
+                    local_protocol_infos, protocol_type='internal'
+                )
                 if len(res) == 0:
                     res = item.res.get_matching(local_protocol_infos)
                 if len(res) > 0:
                     res = res[0]
-                    remote_protocol, remote_network, \
-                        remote_content_format, _ = res.protocolInfo.split(':')
+                    (
+                        remote_protocol,
+                        remote_network,
+                        remote_content_format,
+                        _,
+                    ) = res.protocolInfo.split(':')
                     didl = DIDLLite.DIDLElement()
                     didl.addItem(item)
-                    next_track = \
-                        (res.data, didl.toString(), remote_content_format)
+                    next_track = (
+                        res.data,
+                        didl.toString(),
+                        remote_content_format,
+                    )
                 ''' a list with these elements:
 
                     the current track index
@@ -882,13 +974,21 @@ class GStreamerPlayer(Backend):
                      - kwargs['StartingIndex'] will be modified
                         during further Browse requests
                 '''
-                self.playcontainer = [int(kw['StartingIndex']), uri,
-                                      elt.getItems()[:], action, kw]
+                self.playcontainer = [
+                    int(kw['StartingIndex']),
+                    uri,
+                    elt.getItems()[:],
+                    action,
+                    kw,
+                ]
 
                 def browse_more(
-                        starting_index, number_returned, total_matches):
-                    self.info(f'browse_more {starting_index} '
-                              f'{number_returned} {total_matches}')
+                    starting_index, number_returned, total_matches
+                ):
+                    self.info(
+                        f'browse_more {starting_index} '
+                        f'{number_returned} {total_matches}'
+                    )
                     try:
 
                         def handle_error(r):
@@ -897,45 +997,68 @@ class GStreamerPlayer(Backend):
                         def handle_reply(r, starting_index):
                             elt = DIDLLite.DIDLElement.fromString(r['Result'])
                             self.playcontainer[2] += elt.getItems()[:]
-                            browse_more(starting_index,
-                                        int(r['NumberReturned']),
-                                        int(r['TotalMatches']))
+                            browse_more(
+                                starting_index,
+                                int(r['NumberReturned']),
+                                int(r['TotalMatches']),
+                            )
 
-                        if ((number_returned != 5 or
-                             number_returned <
-                             (total_matches - starting_index)) and
-                                (total_matches - number_returned) !=
-                                starting_index):
+                        if (
+                            (
+                                number_returned != 5
+                                or number_returned
+                                < (total_matches - starting_index)
+                            )
+                            and (total_matches - number_returned)
+                            != starting_index
+                        ):
                             self.info(
                                 'seems we have been returned only '
-                                'a part of the result')
-                            self.info(f'requested {5:d}, '
-                                      f'starting at {starting_index:d}')
-                            self.info(f'got {number_returned:d} '
-                                      f'out of {total_matches:d}')
-                            self.info(f'requesting more starting now at '
-                                      f'{starting_index + number_returned:d}')
+                                + 'a part of the result'
+                            )
+                            self.info(
+                                f'requested {5:d}, '
+                                + f'starting at {starting_index:d}'
+                            )
+                            self.info(
+                                f'got {number_returned:d} '
+                                + f'out of {total_matches:d}'
+                            )
+                            self.info(
+                                f'requesting more starting now at '
+                                + f'{starting_index + number_returned:d}'
+                            )
                             self.playcontainer[4]['StartingIndex'] = str(
-                                starting_index + number_returned)
+                                starting_index + number_returned
+                            )
                             d = self.playcontainer[3].call(
-                                **self.playcontainer[4])
-                            d.addCallback(handle_reply,
-                                          starting_index + number_returned)
+                                **self.playcontainer[4]
+                            )
+                            d.addCallback(
+                                handle_reply, starting_index + number_returned
+                            )
                             d.addErrback(handle_error)
                     except Exception as e1:
-                        self.error(f'playcontainer_browse.'
-                                   f'handle_reply.browse_more: {e1!r}')
+                        self.error(
+                            f'playcontainer_browse.'
+                            + f'handle_reply.browse_more: {e1!r}'
+                        )
                         import traceback
+
                         traceback.print_exc()
 
-                browse_more(int(kw['StartingIndex']), int(r['NumberReturned']),
-                            int(r['TotalMatches']))
+                browse_more(
+                    int(kw['StartingIndex']),
+                    int(r['NumberReturned']),
+                    int(r['TotalMatches']),
+                )
 
                 if len(next_track) == 3:
                     return next_track
             except Exception as e2:
                 self.error(f'playcontainer_browse.handle_reply: {e2!r}')
                 import traceback
+
                 traceback.print_exc()
 
             return failure.Failure(errorCode(714))
@@ -959,12 +1082,14 @@ class GStreamerPlayer(Backend):
             service = device.get_service_by_type(type)
             action = service.get_action('Browse')
 
-            kw = {'ObjectID': args['cid'][0],
-                  'BrowseFlag': 'BrowseDirectChildren',
-                  'StartingIndex': args['fii'][0],
-                  'RequestedCount': str(5),
-                  'Filter': '*',
-                  'SortCriteria': sc}
+            kw = {
+                'ObjectID': args['cid'][0],
+                'BrowseFlag': 'BrowseDirectChildren',
+                'StartingIndex': args['fii'][0],
+                'RequestedCount': str(5),
+                'Filter': '*',
+                'SortCriteria': sc,
+            }
 
             d = action.call(**kw)
             d.addCallback(handle_reply, uri, action, kw)
@@ -979,46 +1104,55 @@ class GStreamerPlayer(Backend):
         self.server.connection_manager_server.set_variable(
             0,
             'SinkProtocolInfo',
-            [f'internal:{self.server.coherence.hostname}:audio/mpeg:*',
-             'http-get:*:audio/mpeg:*',
-             f'internal:{self.server.coherence.hostname}:audio/mp4:*',
-             'http-get:*:audio/mp4:*',
-             f'internal:{self.server.coherence.hostname}:application/ogg:*',
-             'http-get:*:application/ogg:*',
-             f'internal:{self.server.coherence.hostname}:audio/ogg:*',
-             'http-get:*:audio/ogg:*',
-             f'internal:{self.server.coherence.hostname}:video/ogg:*',
-             'http-get:*:video/ogg:*',
-             f'internal:{self.server.coherence.hostname}:application/flac:*',
-             'http-get:*:application/flac:*',
-             f'internal:{self.server.coherence.hostname}:audio/flac:*',
-             'http-get:*:audio/flac:*',
-             f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',
-             'http-get:*:video/x-msvideo:*',
-             f'internal:{self.server.coherence.hostname}:video/mp4:*',
-             'http-get:*:video/mp4:*',
-             f'internal:{self.server.coherence.hostname}:video/quicktime:*',
-             'http-get:*:video/quicktime:*',
-             f'internal:{self.server.coherence.hostname}:image/gif:*',
-             'http-get:*:image/gif:*',
-             f'internal:{self.server.coherence.hostname}:image/jpeg:*',
-             'http-get:*:image/jpeg:*',
-             f'internal:{self.server.coherence.hostname}:image/png:*',
-             'http-get:*:image/png:*',
-             'http-get:*:*:*'],
-            default=True)
+            [
+                f'internal:{self.server.coherence.hostname}:audio/mpeg:*',
+                'http-get:*:audio/mpeg:*',
+                f'internal:{self.server.coherence.hostname}:audio/mp4:*',
+                'http-get:*:audio/mp4:*',
+                f'internal:{self.server.coherence.hostname}:application/ogg:*',
+                'http-get:*:application/ogg:*',
+                f'internal:{self.server.coherence.hostname}:audio/ogg:*',
+                'http-get:*:audio/ogg:*',
+                f'internal:{self.server.coherence.hostname}:video/ogg:*',
+                'http-get:*:video/ogg:*',
+                f'internal:{self.server.coherence.hostname}:application/flac:*',  # noqa: E501
+                'http-get:*:application/flac:*',
+                f'internal:{self.server.coherence.hostname}:audio/flac:*',
+                'http-get:*:audio/flac:*',
+                f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',
+                'http-get:*:video/x-msvideo:*',
+                f'internal:{self.server.coherence.hostname}:video/mp4:*',
+                'http-get:*:video/mp4:*',
+                f'internal:{self.server.coherence.hostname}:video/quicktime:*',
+                'http-get:*:video/quicktime:*',
+                f'internal:{self.server.coherence.hostname}:image/gif:*',
+                'http-get:*:image/gif:*',
+                f'internal:{self.server.coherence.hostname}:image/jpeg:*',
+                'http-get:*:image/jpeg:*',
+                f'internal:{self.server.coherence.hostname}:image/png:*',
+                'http-get:*:image/png:*',
+                'http-get:*:*:*',
+            ],
+            default=True,
+        )
         self.server.av_transport_server.set_variable(
-            0, 'TransportState', 'NO_MEDIA_PRESENT', default=True)
+            0, 'TransportState', 'NO_MEDIA_PRESENT', default=True
+        )
         self.server.av_transport_server.set_variable(
-            0, 'TransportStatus', 'OK', default=True)
+            0, 'TransportStatus', 'OK', default=True
+        )
         self.server.av_transport_server.set_variable(
-            0, 'CurrentPlayMode', 'NORMAL', default=True)
+            0, 'CurrentPlayMode', 'NORMAL', default=True
+        )
         self.server.av_transport_server.set_variable(
-            0, 'CurrentTransportActions', '', default=True)
+            0, 'CurrentTransportActions', '', default=True
+        )
         self.server.rendering_control_server.set_variable(
-            0, 'Volume', self.get_volume())
+            0, 'Volume', self.get_volume()
+        )
         self.server.rendering_control_server.set_variable(
-            0, 'Mute', self.get_mute())
+            0, 'Mute', self.get_mute()
+        )
 
     def upnp_Play(self, *args, **kwargs):
         InstanceID = int(kwargs['InstanceID'])
@@ -1044,9 +1178,11 @@ class GStreamerPlayer(Backend):
             return failure.Failure(errorCode(718))
         if Unit in ['ABS_TIME', 'REL_TIME']:
             old_state = self.server.av_transport_server.get_variable(
-                'TransportState').value
+                'TransportState'
+            ).value
             self.server.av_transport_server.set_variable(
-                InstanceID, 'TransportState', 'TRANSITIONING')
+                InstanceID, 'TransportState', 'TRANSITIONING'
+            )
 
             sign = ''
             if Target[0] == '+':
@@ -1062,45 +1198,61 @@ class GStreamerPlayer(Backend):
         if Unit in ['TRACK_NR']:
             if self.playcontainer is None:
                 NextURI = self.server.av_transport_server.get_variable(
-                    'NextAVTransportURI', InstanceID).value
+                    'NextAVTransportURI', InstanceID
+                ).value
                 if NextURI != '':
                     self.server.av_transport_server.set_variable(
-                        InstanceID, 'TransportState', 'TRANSITIONING')
-                    NextURIMetaData = \
-                        self.server.av_transport_server.get_variable(
-                            'NextAVTransportURIMetaData').value
+                        InstanceID, 'TransportState', 'TRANSITIONING'
+                    )
+                    NextURIMetaData = self.server.av_transport_server.get_variable(  # noqa: E501
+                        'NextAVTransportURIMetaData'
+                    ).value
                     self.server.av_transport_server.set_variable(
-                        InstanceID, 'NextAVTransportURI', '')
+                        InstanceID, 'NextAVTransportURI', ''
+                    )
                     self.server.av_transport_server.set_variable(
-                        InstanceID, 'NextAVTransportURIMetaData', '')
+                        InstanceID, 'NextAVTransportURIMetaData', ''
+                    )
                     r = self.upnp_SetAVTransportURI(
-                        self, InstanceID=InstanceID,
+                        self,
+                        InstanceID=InstanceID,
                         CurrentURI=NextURI,
-                        CurrentURIMetaData=NextURIMetaData)
+                        CurrentURIMetaData=NextURIMetaData,
+                    )
                     return r
             else:
                 Target = int(Target)
                 if 0 < Target <= len(self.playcontainer[2]):
                     self.server.av_transport_server.set_variable(
-                        InstanceID, 'TransportState', 'TRANSITIONING')
+                        InstanceID, 'TransportState', 'TRANSITIONING'
+                    )
                     next_track = ()
                     item = self.playcontainer[2][Target - 1]
-                    local_protocol_infos = \
-                        self.server.connection_manager_server.get_variable(
-                            'SinkProtocolInfo').value.split(',')
-                    res = item.res.get_matching(local_protocol_infos,
-                                                protocol_type='internal')
+                    local_protocol_infos = self.server.connection_manager_server.get_variable(  # noqa: E501
+                        'SinkProtocolInfo'
+                    ).value.split(
+                        ','
+                    )
+                    res = item.res.get_matching(
+                        local_protocol_infos, protocol_type='internal'
+                    )
                     if len(res) == 0:
                         res = item.res.get_matching(local_protocol_infos)
                     if len(res) > 0:
                         res = res[0]
-                        remote_protocol, remote_network, \
-                            remote_content_format, _ = \
-                            res.protocolInfo.split(':')
+                        (
+                            remote_protocol,
+                            remote_network,
+                            remote_content_format,
+                            _,
+                        ) = res.protocolInfo.split(':')
                         didl = DIDLLite.DIDLElement()
                         didl.addItem(item)
-                        next_track = \
-                            (res.data, didl.toString(), remote_content_format)
+                        next_track = (
+                            res.data,
+                            didl.toString(),
+                            remote_content_format,
+                        )
                         self.playcontainer[0] = Target - 1
 
                     if len(next_track) == 3:
@@ -1108,7 +1260,8 @@ class GStreamerPlayer(Backend):
                         self.server.av_transport_server.set_variable(
                             cm.lookup_avt_id(self.current_connection_id),
                             'CurrentTrack',
-                            Target)
+                            Target,
+                        )
                         self.load(next_track[0], next_track[1], next_track[2])
                         self.play()
                         return {}
@@ -1119,45 +1272,59 @@ class GStreamerPlayer(Backend):
     def upnp_Next(self, *args, **kwargs):
         InstanceID = int(kwargs['InstanceID'])
         track_nr = self.server.av_transport_server.get_variable('CurrentTrack')
-        return self.upnp_Seek(self, InstanceID=InstanceID, Unit='TRACK_NR',
-                              Target=str(int(track_nr.value) + 1))
+        return self.upnp_Seek(
+            self,
+            InstanceID=InstanceID,
+            Unit='TRACK_NR',
+            Target=str(int(track_nr.value) + 1),
+        )
 
     def upnp_Previous(self, *args, **kwargs):
         InstanceID = int(kwargs['InstanceID'])
         track_nr = self.server.av_transport_server.get_variable('CurrentTrack')
-        return self.upnp_Seek(self, InstanceID=InstanceID, Unit='TRACK_NR',
-                              Target=str(int(track_nr.value) - 1))
+        return self.upnp_Seek(
+            self,
+            InstanceID=InstanceID,
+            Unit='TRACK_NR',
+            Target=str(int(track_nr.value) - 1),
+        )
 
     def upnp_setNextAVTransportURI(self, *args, **kwargs):
         InstanceID = int(kwargs['InstanceID'])
         NextURI = kwargs['NextURI']
-        current_connection_id = \
-            self.server.connection_manager_server.lookup_avt_id(
-                self.current_connection_id)
+        current_connection_id = self.server.connection_manager_server.lookup_avt_id(  # noqa: E501
+            self.current_connection_id
+        )
         NextMetaData = kwargs['NextURIMetaData']
         self.server.av_transport_server.set_variable(
-            current_connection_id, 'NextAVTransportURI', NextURI)
+            current_connection_id, 'NextAVTransportURI', NextURI
+        )
         self.server.av_transport_server.set_variable(
-            current_connection_id, 'NextAVTransportURIMetaData', NextMetaData)
+            current_connection_id, 'NextAVTransportURIMetaData', NextMetaData
+        )
         if len(NextURI) == 0 and self.playcontainer is None:
             transport_actions = self.server.av_transport_server.get_variable(
-                'CurrentTransportActions').value
+                'CurrentTransportActions'
+            ).value
             transport_actions = set(transport_actions.split(','))
             try:
                 transport_actions.remove('NEXT')
                 self.server.av_transport_server.set_variable(
-                    current_connection_id, 'CurrentTransportActions',
-                    transport_actions)
+                    current_connection_id,
+                    'CurrentTransportActions',
+                    transport_actions,
+                )
             except KeyError:
                 pass
             return {}
         transport_actions = self.server.av_transport_server.get_variable(
-            'CurrentTransportActions').value
+            'CurrentTransportActions'
+        ).value
         transport_actions = set(transport_actions.split(','))
         transport_actions.add('NEXT')
         self.server.av_transport_server.set_variable(
-            current_connection_id, 'CurrentTransportActions',
-            transport_actions)
+            current_connection_id, 'CurrentTransportActions', transport_actions
+        )
         return {}
 
     def upnp_SetAVTransportURI(self, *args, **kwargs):
@@ -1167,6 +1334,7 @@ class GStreamerPlayer(Backend):
         # print('upnp_SetAVTransportURI', InstanceID,
         #       CurrentURI, CurrentURIMetaData)
         if CurrentURI.startswith('dlna-playcontainer://'):
+
             def handle_result(r):
                 self.load(r[0], r[1], mimetype=r[2])
                 return {}
@@ -1183,25 +1351,32 @@ class GStreamerPlayer(Backend):
             self.load(CurrentURI, CurrentURIMetaData)
             return {}
         else:
-            local_protocol_infos = \
-                self.server.connection_manager_server.get_variable(
-                    'SinkProtocolInfo').value.split(',')
+            local_protocol_infos = self.server.connection_manager_server.get_variable(  # noqa: E501
+                'SinkProtocolInfo'
+            ).value.split(',')
             # print local_protocol_infos
             elt = DIDLLite.DIDLElement.fromString(CurrentURIMetaData)
             if elt.numItems() == 1:
                 item = elt.getItems()[0]
-                res = item.res.get_matching(local_protocol_infos,
-                                            protocol_type='internal')
+                res = item.res.get_matching(
+                    local_protocol_infos, protocol_type='internal'
+                )
                 if len(res) == 0:
                     res = item.res.get_matching(local_protocol_infos)
                 if len(res) > 0:
                     res = res[0]
-                    remote_protocol, remote_network, \
-                        remote_content_format, _ = \
-                        res.protocolInfo.split(':')
+                    (
+                        remote_protocol,
+                        remote_network,
+                        remote_content_format,
+                        _,
+                    ) = res.protocolInfo.split(':')
                     self.playcontainer = None
-                    self.load(res.data, CurrentURIMetaData,
-                              mimetype=remote_content_format)
+                    self.load(
+                        res.data,
+                        CurrentURIMetaData,
+                        mimetype=remote_content_format,
+                    )
                     return {}
         return failure.Failure(errorCode(714))
 
@@ -1234,11 +1409,14 @@ if __name__ == '__main__':
 
     # Test Video
     # uri = 'file:///home/user/videos/sample.mp4'  # example for local files
-    uri = 'https://www.sample-videos.com/video/' \
-          'mp4/720/big_buck_bunny_720p_1mb.mp4'
-    p = Player(default_mimetype='video/x-h264',
-               # video_sink_name='ximagesink'
-               )
+    uri = (
+        'https://www.sample-videos.com/video/'
+        'mp4/720/big_buck_bunny_720p_1mb.mp4'
+    )
+    p = Player(
+        default_mimetype='video/x-h264',
+        # video_sink_name='ximagesink'
+    )
 
     def check_bus_state(bus, message):
         '''Example function to check the player bus state and act accordingly

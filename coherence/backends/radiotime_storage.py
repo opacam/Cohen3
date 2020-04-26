@@ -9,8 +9,12 @@
 from lxml import etree
 from twisted.python.failure import Failure
 
-from coherence.backend import BackendItem, Container, LazyContainer, \
-    AbstractBackendStore
+from coherence.backend import (
+    BackendItem,
+    Container,
+    LazyContainer,
+    AbstractBackendStore,
+)
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core import utils
 from coherence.upnp.core.DIDLLite import Resource
@@ -23,6 +27,7 @@ DEFAULT_MIMETYPE = 'audio/mpeg'
 
 
 # TODO : extend format handling using radiotime API
+
 
 class RadiotimeAudioItem(BackendItem):
     logCategory = 'radiotime'
@@ -48,17 +53,21 @@ class RadiotimeAudioItem(BackendItem):
         if self.item is None:
             upnp_id = self.get_id()
             upnp_parent_id = self.parent.get_id()
-            self.item = DIDLLite.AudioBroadcast(upnp_id, upnp_parent_id,
-                                                self.name)
+            self.item = DIDLLite.AudioBroadcast(
+                upnp_id, upnp_parent_id, self.name
+            )
             self.item.albumArtURI = self.image
             protocols = ';'.join(
-                        ('DLNA.ORG_PN=MP3',
-                         'DLNA.ORG_CI=0',
-                         'DLNA.ORG_OP=01',
-                         'DLNA.ORG_FLAGS=01700000000000000000000000000000'))
+                (
+                    'DLNA.ORG_PN=MP3',
+                    'DLNA.ORG_CI=0',
+                    'DLNA.ORG_OP=01',
+                    'DLNA.ORG_FLAGS=01700000000000000000000000000000',
+                )
+            )
             res = Resource(
-                self.stream_url,
-                f'http-get:*:{self.mimetype}:{protocols}')
+                self.stream_url, f'http-get:*:{self.mimetype}:{protocols}'
+            )
             res.size = 0  # None
             self.item.res.append(res)
         return self.item
@@ -93,14 +102,21 @@ class RadiotimeStore(AbstractBackendStore):
         else:
             identification_param = f'serial={self.serial}'
         formats_value = DEFAULT_FORMAT
-        root_url = \
-            f'{self.browse_url}?partnerId={self.partner_id}&' \
-            f'{identification_param}&formats={formats_value}&' \
+        root_url = (
+            f'{self.browse_url}?partnerId={self.partner_id}&'
+            f'{identification_param}&formats={formats_value}&'
             f'locale={self.locale}'
+        )
 
         # set root item
-        root_item = LazyContainer(None, 'root', 'root', self.refresh,
-                                  self.retrieveItemsForOPML, url=root_url)
+        root_item = LazyContainer(
+            None,
+            'root',
+            'root',
+            self.refresh,
+            self.retrieveItemsForOPML,
+            url=root_url,
+        )
         self.set_root_item(root_item)
 
         self.init_completed()
@@ -112,13 +128,13 @@ class RadiotimeStore(AbstractBackendStore):
 
         if self.server:
             self.server.connection_manager_server.set_variable(
-                0, 'SourceProtocolInfo',
-                ['http-get:*:audio/mpeg:*',
-                 'http-get:*:audio/x-scpls:*'],
-                default=True)
+                0,
+                'SourceProtocolInfo',
+                ['http-get:*:audio/mpeg:*', 'http-get:*:audio/x-scpls:*'],
+                default=True,
+            )
 
     def retrieveItemsForOPML(self, parent, url):
-
         def append_outline(parent, outline):
             type = outline.get('type')
             outline_url = outline.get('URL', None)
@@ -152,8 +168,13 @@ class RadiotimeStore(AbstractBackendStore):
                 if external_id is None:
                     external_id = outline_url
                 item = LazyContainer(
-                    parent, text, external_id, self.refresh,
-                    self.retrieveItemsForOPML, url=outline_url)
+                    parent,
+                    text,
+                    external_id,
+                    self.refresh,
+                    self.retrieveItemsForOPML,
+                    url=outline_url,
+                )
                 parent.add_child(item, external_id=external_id)
 
             elif type == 'audio':
@@ -162,7 +183,8 @@ class RadiotimeStore(AbstractBackendStore):
 
         def got_page(result):
             self.info(
-                f'connection to Radiotime service successful for url {url}')
+                f'connection to Radiotime service successful for url {url}'
+            )
 
             outlines = result.findall('body/outline')
             for outline in outlines:
@@ -172,20 +194,22 @@ class RadiotimeStore(AbstractBackendStore):
 
         def got_error(error):
             self.warning(
-                f'connection to Radiotime service failed for url {url}')
+                f'connection to Radiotime service failed for url {url}'
+            )
             self.debug('%r', error.getTraceback())
             parent.childrenRetrievingNeeded = True  # we retry
             return Failure(f'Unable to retrieve items for url {url}')
 
         def got_xml_error(error):
             self.warning(
-                f'Data received from Radiotime service is invalid: {url}')
+                f'Data received from Radiotime service is invalid: {url}'
+            )
             # self.debug('%r', error.getTraceback())
             print(error.getTraceback())
             parent.childrenRetrievingNeeded = True  # we retry
             return Failure(f'Unable to retrieve items for url {url}')
 
-        d = utils.getPage(url, )
+        d = utils.getPage(url)
         d.addCallback(etree.fromstring)
         d.addErrback(got_error)
         d.addCallback(got_page)

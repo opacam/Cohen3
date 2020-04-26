@@ -54,16 +54,16 @@ class LastFMUser(log.LogAble):
     def __init__(self, user, passwd):
         log.LogAble.__init__(self)
         if user is None:
-            self.warn('No User', )
+            self.warn('No User')
         if passwd is None:
-            self.warn('No Passwd', )
+            self.warn('No Passwd')
         self.user = user
         self.passwd = passwd
 
     def login(self):
 
         if self.sessionid is not None:
-            self.warning('Session seems to be valid', )
+            self.warning('Session seems to be valid')
             return
 
         def got_page(result):
@@ -97,12 +97,17 @@ class LastFMUser(log.LogAble):
             return result
 
         password = hexify(md5(self.passwd).digest())
-        req = \
-            self.basepath + '/handshake.php/?version=1&platform=win&username='\
-            + self.user + '&passwordmd5=' + password\
+        req = (
+            self.basepath
+            + '/handshake.php/?version=1&platform=win&username='
+            + self.user
+            + '&passwordmd5='
+            + password
             + '&language=en&player=coherence'
+        )
         utils.getPage('http://' + self.host + req).addCallbacks(
-            got_page, got_error, None, None, None, None)
+            got_page, got_error, None, None, None, None
+        )
 
     def get_tracks(self):
         if self.getting_tracks:
@@ -141,11 +146,15 @@ class LastFMUser(log.LogAble):
             self.getting_tracks = False
 
         self.getting_tracks = True
-        req = \
-            self.basepath + '/xspf.php?sk=' + self.sessionid \
+        req = (
+            self.basepath
+            + '/xspf.php?sk='
+            + self.sessionid
             + '&discovery=0&desktop=1.3.1.1'
+        )
         utils.getPage('http://' + self.host + req).addCallbacks(
-            got_page, got_error, None, None, None, None)
+            got_page, got_error, None, None, None, None
+        )
 
     def update(self, item):
         if 0 < self.tracks.count(item):
@@ -194,8 +203,9 @@ class LFMProxyStream(utils.ReverseProxyResource, log.LogAble):
 class LastFMItem(log.LogAble):
     logCategory = 'LastFM_item'
 
-    def __init__(self, id, obj, parent, mimetype, urlbase, UPnPClass,
-                 update=False):
+    def __init__(
+        self, id, obj, parent, mimetype, urlbase, UPnPClass, update=False
+    ):
         log.LogAble.__init__(self)
         self.id = id
 
@@ -235,13 +245,16 @@ class LastFMItem(log.LogAble):
         if self.mimetype == 'directory':
             self.update_id = 0
         else:
-            protocols = ('DLNA.ORG_PN=MP3',
-                         'DLNA.ORG_CI=0',
-                         'DLNA.ORG_OP=01',
-                         'DLNA.ORG_FLAGS=01700000000000000000000000000000')
+            protocols = (
+                'DLNA.ORG_PN=MP3',
+                'DLNA.ORG_CI=0',
+                'DLNA.ORG_OP=01',
+                'DLNA.ORG_FLAGS=01700000000000000000000000000000',
+            )
             res = Resource(
                 self.url,
-                f'http-get:*:{obj.get("mimetype")}:{";".join(protocols)}')
+                f'http-get:*:{obj.get("mimetype")}:{";".join(protocols)}',
+            )
             res.size = -1  # None
             self.item.res.append(res)
 
@@ -261,8 +274,10 @@ class LastFMItem(log.LogAble):
             self.update_id += 1
 
     def remove_child(self, child):
-        self.info(f'remove_from {self.id:d} ({self.get_name()}) '
-                  f'child {child.id:d} ({child.get_name()})')
+        self.info(
+            f'remove_from {self.id:d} ({self.get_name()}) '
+            f'child {child.id:d} ({child.get_name()})'
+        )
         if child in self.children:
             self.child_count -= 1
             if isinstance(self.item, Container):
@@ -318,6 +333,7 @@ class LastFMStore(Backend):
         * Migrated from louie/dispatcher to EventDispatcher
         * Introduced :class:`~coherence.backend.Backend`'s inheritance
     '''
+
     logCategory = 'lastFM_store'
 
     implements = ['MediaServer']
@@ -353,21 +369,24 @@ class LastFMStore(Backend):
         if hasattr(self, 'update_id'):
             update = True
 
-        self.store[id] = LastFMItem(id, obj, parent, mimetype, self.urlbase,
-                                    UPnPClass, update=update)
+        self.store[id] = LastFMItem(
+            id, obj, parent, mimetype, self.urlbase, UPnPClass, update=update
+        )
         self.store[id].store = self
 
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
                 self.server.content_directory_server.set_variable(
-                    0, 'SystemUpdateID', self.update_id)
+                    0, 'SystemUpdateID', self.update_id
+                )
             if parent:
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
                     self.server.content_directory_server.set_variable(
-                        0, 'ContainerUpdateIDs', value)
+                        0, 'ContainerUpdateIDs', value
+                    )
 
         return self.store[id]
 
@@ -380,12 +399,14 @@ class LastFMStore(Backend):
                 self.update_id += 1
                 if self.server:
                     self.server.content_directory_server.set_variable(
-                        0, 'SystemUpdateID', self.update_id)
+                        0, 'SystemUpdateID', self.update_id
+                    )
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
                     self.server.content_directory_server.set_variable(
-                        0, 'ContainerUpdateIDs', value)
+                        0, 'ContainerUpdateIDs', value
+                    )
         except (ValueError, KeyError):
             pass
 
@@ -415,15 +436,19 @@ class LastFMStore(Backend):
 
         parent = self.append({'name': 'LastFM', 'mimetype': 'directory'}, None)
 
-        self.LFM = LastFMUser(self.config.get('login'),
-                              self.config.get('password'))
+        self.LFM = LastFMUser(
+            self.config.get('login'), self.config.get('password')
+        )
         self.LFM.parent = parent
         self.LFM.login()
 
         if self.server:
             self.server.connection_manager_server.set_variable(
-                0, 'SourceProtocolInfo', ['http-get:*:audio/mpeg:*'],
-                default=True)
+                0,
+                'SourceProtocolInfo',
+                ['http-get:*:audio/mpeg:*'],
+                default=True,
+            )
 
 
 def main():

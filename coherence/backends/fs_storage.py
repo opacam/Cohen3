@@ -69,8 +69,15 @@ from coherence.upnp.core import utils
 
 try:
     from twisted.internet.inotify import (
-        INotify, IN_CREATE, IN_DELETE, IN_MOVED_FROM, IN_MOVED_TO,
-        IN_ISDIR, IN_CHANGED, _FLAG_TO_HUMAN)
+        INotify,
+        IN_CREATE,
+        IN_DELETE,
+        IN_MOVED_FROM,
+        IN_MOVED_TO,
+        IN_ISDIR,
+        IN_CHANGED,
+        _FLAG_TO_HUMAN,
+    )
 except Exception as msg:
     INotify = None
     no_inotify_reason = msg
@@ -86,8 +93,9 @@ NUMS = re.compile('([0-9]+)')
 def _natural_key(s):
     # strip the spaces
     s = s.get_name().strip()
-    return [part.isdigit() and int(part) or part.lower() for part in
-            NUMS.split(s)]
+    return [
+        part.isdigit() and int(part) or part.lower() for part in NUMS.split(s)
+    ]
 
 
 class NoThumbnailFound(Exception):
@@ -102,8 +110,9 @@ def _find_thumbnail(filename, thumbnail_folder='.thumbs'):
         the correspondig DLNA PN string or throws an Exception otherwise
     '''
     name, ext = os.path.splitext(os.path.basename(filename))
-    pattern = os.path.join(os.path.dirname(filename), thumbnail_folder,
-                           name + '.*')
+    pattern = os.path.join(
+        os.path.dirname(filename), thumbnail_folder, name + '.*'
+    )
     for f in glob.glob(pattern):
         mimetype, _ = mimetypes.guess_type(f, strict=False)
         if mimetype in ('image/jpeg', 'image/png'):
@@ -119,8 +128,17 @@ def _find_thumbnail(filename, thumbnail_folder='.thumbs'):
 class FSItem(BackendItem):
     logCategory = 'fs_item'
 
-    def __init__(self, object_id, parent, path, mimetype, urlbase, UPnPClass,
-                 update=False, store=None):
+    def __init__(
+        self,
+        object_id,
+        parent,
+        path,
+        mimetype,
+        urlbase,
+        UPnPClass,
+        update=False,
+        store=None,
+    ):
         BackendItem.__init__(self)
         self.id = object_id
         self.parent = parent
@@ -158,15 +176,18 @@ class FSItem(BackendItem):
             self.get_url = lambda: self.url
             # self.item.searchable = True
             # self.item.searchClass = 'object'
-            if (isinstance(self.location, FilePath) and
-                    self.location.isdir() is True):
+            if (
+                isinstance(self.location, FilePath)
+                and self.location.isdir() is True
+            ):
                 self.check_for_cover_art()
                 if getattr(self, 'cover', None):
                     _, ext = os.path.splitext(self.cover)
                     ''' add the cover image extension to help clients
                         not reacting on the mimetype '''
-                    self.item.albumArtURI = \
-                        ''.join((urlbase, str(self.id), '?cover', str(ext)))
+                    self.item.albumArtURI = ''.join(
+                        (urlbase, str(self.id), '?cover', str(ext))
+                    )
         else:
             self.get_url = lambda: self.url
 
@@ -175,8 +196,9 @@ class FSItem(BackendItem):
                     _, ext = os.path.splitext(parent.cover)
                     ''' add the cover image extension to help clients
                         not reacting on the mimetype '''
-                    self.item.albumArtURI = \
-                        ''.join((urlbase, str(self.id), '?cover', ext))
+                    self.item.albumArtURI = ''.join(
+                        (urlbase, str(self.id), '?cover', ext)
+                    )
 
             _, host_port, _, _, _ = urlsplit(urlbase)
             if host_port.find(':') != -1:
@@ -189,24 +211,30 @@ class FSItem(BackendItem):
             except Exception:
                 size = 0
 
-            if (self.store.server and
-                    self.store.server.coherence.config.get('transcoding',
-                                                           'no') == 'yes'):
-                if self.mimetype in ('application/ogg', 'audio/ogg',
-                                     'audio/x-wav',
-                                     'audio/x-m4a',
-                                     'application/x-flac'):
-                    new_res = Resource(self.url + '/transcoded.mp3',
-                                       f'http-get:*:{"audio/mpeg"}:*')
+            if (
+                self.store.server
+                and self.store.server.coherence.config.get('transcoding', 'no')
+                == 'yes'
+            ):
+                if self.mimetype in (
+                    'application/ogg',
+                    'audio/ogg',
+                    'audio/x-wav',
+                    'audio/x-m4a',
+                    'application/x-flac',
+                ):
+                    new_res = Resource(
+                        self.url + '/transcoded.mp3',
+                        f'http-get:*:{"audio/mpeg"}:*',
+                    )
                     new_res.size = None
                     # self.item.res.append(new_res)
 
             if mimetype != 'item':
                 res = Resource(
-                    'file://' + quote(
-                        self.get_path(),
-                        encoding='utf-8'),
-                    f'internal:{host}:{self.mimetype}:*')
+                    'file://' + quote(self.get_path(), encoding='utf-8'),
+                    f'internal:{host}:{self.mimetype}:*',
+                )
                 res.size = size
                 self.item.res.append(res)
 
@@ -234,15 +262,20 @@ class FSItem(BackendItem):
                 self.item.res.append(res)
             '''
 
-            if (self.store.server and
-                    self.store.server.coherence.config.get(
-                        'transcoding', 'no') == 'yes'):
-                if self.mimetype in ('audio/mpeg',
-                                     'application/ogg', 'audio/ogg',
-                                     'audio/x-wav',
-                                     'audio/x-m4a',
-                                     'audio/flac',
-                                     'application/x-flac'):
+            if (
+                self.store.server
+                and self.store.server.coherence.config.get('transcoding', 'no')
+                == 'yes'
+            ):
+                if self.mimetype in (
+                    'audio/mpeg',
+                    'application/ogg',
+                    'audio/ogg',
+                    'audio/x-wav',
+                    'audio/x-m4a',
+                    'audio/flac',
+                    'application/x-flac',
+                ):
                     dlna_pn = 'DLNA.ORG_PN=LPCM'
                     dlna_tags = simple_dlna_tags[:]
                     # dlna_tags[1] = 'DLNA.ORG_OP=00'
@@ -250,13 +283,16 @@ class FSItem(BackendItem):
                     new_res = Resource(
                         self.url + '?transcoded=lpcm',
                         f'http-get:*:{"audio/L16;rate=44100;channels=2"}:'
-                        f'{";".join([dlna_pn] + dlna_tags)}')
+                        f'{";".join([dlna_pn] + dlna_tags)}',
+                    )
                     new_res.size = None
                     # self.item.res.append(new_res)
 
                     if self.mimetype != 'audio/mpeg':
-                        new_res = Resource(self.url + '?transcoded=mp3',
-                                           f'http-get:*:{"audio/mpeg"}:*')
+                        new_res = Resource(
+                            self.url + '?transcoded=mp3',
+                            f'http-get:*:{"audio/mpeg"}:*',
+                        )
                         new_res.size = None
                         # self.item.res.append(new_res)
 
@@ -290,7 +326,8 @@ class FSItem(BackendItem):
                     self.mimetype.startswith('video/')):
                 try:
                     filename, mimetype, dlna_pn = _find_thumbnail(
-                        self.get_path())
+                        self.get_path()
+                    )
                 except NoThumbnailFound:
                     pass
                 except Exception:
@@ -298,19 +335,22 @@ class FSItem(BackendItem):
                 else:
                     dlna_tags = simple_dlna_tags[:]
                     dlna_tags[
-                        3] = 'DLNA.ORG_FLAGS=00f00000000000000000000000000000'
+                        3
+                    ] = 'DLNA.ORG_FLAGS=00f00000000000000000000000000000'
 
                     hash_from_path = str(id(filename))
                     new_res = Resource(
                         self.url + '?attachment=' + hash_from_path,
                         f'http-get:*:{mimetype}:'
-                        f'{";".join([dlna_pn] + dlna_tags)}')
+                        f'{";".join([dlna_pn] + dlna_tags)}',
+                    )
                     new_res.size = os.path.getsize(filename)
                     self.item.res.append(new_res)
                     if not hasattr(self.item, 'attachments'):
                         self.item.attachments = {}
                     self.item.attachments[hash_from_path] = utils.StaticFile(
-                        filename)
+                        filename
+                    )
 
             if self.mimetype.startswith('video/'):
                 # check for a subtitles file
@@ -321,19 +361,22 @@ class FSItem(BackendItem):
                     mimetype = 'smi/caption'
                     new_res = Resource(
                         self.url + '?attachment=' + hash_from_path,
-                        f'http-get:*:{mimetype}:{"*"}')
+                        f'http-get:*:{mimetype}:{"*"}',
+                    )
                     new_res.size = os.path.getsize(caption)
                     self.caption = new_res.data
                     self.item.res.append(new_res)
                     if not hasattr(self.item, 'attachments'):
                         self.item.attachments = {}
                     self.item.attachments[hash_from_path] = utils.StaticFile(
-                        caption)
+                        caption
+                    )
 
             try:
                 # FIXME: getmtime is deprecated in Twisted 2.6
                 self.item.date = datetime.fromtimestamp(
-                    self.location.getmtime())
+                    self.location.getmtime()
+                )
             except Exception:
                 self.item.date = None
 
@@ -351,10 +394,11 @@ class FSItem(BackendItem):
         self.item = UPnPClass(self.id, self.parent.id, self.get_name())
         if getattr(self.parent, 'cover', None):
             _, ext = os.path.splitext(self.parent.cover)
-            ''' add the cover image extension to help clients not reacting on
-                the mimetype '''
+            # add the cover image extension to help
+            # clients not reacting on the mimetype
             self.item.albumArtURI = ''.join(
-                (urlbase, str(self.id), '?cover', ext))
+                (urlbase, str(self.id), '?cover', ext)
+            )
 
         _, host_port, _, _, _ = urlsplit(urlbase)
         if host_port.find(':') != -1:
@@ -363,9 +407,9 @@ class FSItem(BackendItem):
             host = host_port
 
         res = Resource(
-            'file://' + quote(
-                self.get_path()),
-            f'internal:{host}:{self.mimetype}:*')
+            'file://' + quote(self.get_path()),
+            f'internal:{host}:{self.mimetype}:*',
+        )
         try:
             res.size = self.location.getsize()
         except Exception:
@@ -393,13 +437,19 @@ class FSItem(BackendItem):
             that comes around
         '''
         try:
-            jpgs = [i.path for i in self.location.children() if
-                    i.splitext()[1] in ('.jpg', '.JPG')]
+            jpgs = [
+                i.path
+                for i in self.location.children()
+                if i.splitext()[1] in ('.jpg', '.JPG')
+            ]
             try:
                 self.cover = jpgs[0]
             except IndexError:
-                pngs = [i.path for i in self.location.children() if
-                        i.splitext()[1] in ('.png', '.PNG')]
+                pngs = [
+                    i.path
+                    for i in self.location.children()
+                    if i.splitext()[1] in ('.png', '.PNG')
+                ]
                 try:
                     self.cover = pngs[0]
                 except IndexError:
@@ -407,7 +457,8 @@ class FSItem(BackendItem):
         except UnicodeDecodeError:
             self.warning(
                 f'UnicodeDecodeError - there is something wrong with a '
-                f'file located in {self.location.path}')
+                + f'file located in {self.location.path}'
+            )
 
     def remove(self):
         # print('FSItem remove', self.id, self.get_name(), self.parent)
@@ -506,8 +557,12 @@ class FSItem(BackendItem):
         return self.item.toString()
 
     def __repr__(self):
-        return 'id: ' + str(self.id) + ' @ ' + \
-               str(self.get_name().encode('ascii', 'xmlcharrefreplace'))
+        return (
+            'id: '
+            + str(self.id)
+            + ' @ '
+            + str(self.get_name().encode('ascii', 'xmlcharrefreplace'))
+        )
 
 
 class FSStore(BackendStore):
@@ -515,6 +570,7 @@ class FSStore(BackendStore):
     .. versionchanged:: 0.9.0
         Migrated from louie/dispatcher to EventDispatcher
     '''
+
     logCategory = 'fs_store'
 
     implements = ['MediaServer']
@@ -522,27 +578,57 @@ class FSStore(BackendStore):
     description = '''MediaServer exporting files from the file-system'''
 
     options = [
-        {'option': 'name', 'type': 'string', 'default': 'my media',
-         'help': 'the name under this MediaServer '
-                 'shall show up with on other UPnP clients'},
-        {'option': 'version', 'type': 'int', 'default': 2, 'enum': (2, 1),
-         'help': 'the highest UPnP version this MediaServer shall support',
-         'level': 'advance'},
-        {'option': 'uuid', 'type': 'string',
-         'help': 'the unique (UPnP) identifier for this MediaServer,'
-                 ' usually automatically set',
-         'level': 'advance'},
-        {'option': 'content', 'type': 'string', 'default': xdg_content(),
-         'help': 'the path(s) this MediaServer shall export'},
-        {'option': 'ignore_patterns', 'type': 'string',
-         'help': 'list of regex patterns, matching filenames will be ignored'},
-        {'option': 'enable_inotify', 'type': 'string', 'default': 'yes',
-         'help': 'enable real-time monitoring of the content folders'},
-        {'option': 'enable_destroy', 'type': 'string', 'default': 'no',
-         'help': 'enable deleting a file via an UPnP method'},
-        {'option': 'import_folder', 'type': 'string',
-         'help': 'The path to store files imported via an UPnP method, '
-                 'if empty the Import method is disabled'}
+        {
+            'option': 'name',
+            'type': 'string',
+            'default': 'my media',
+            'help': 'the name under this MediaServer '
+            'shall show up with on other UPnP clients',
+        },
+        {
+            'option': 'version',
+            'type': 'int',
+            'default': 2,
+            'enum': (2, 1),
+            'help': 'the highest UPnP version this MediaServer shall support',
+            'level': 'advance',
+        },
+        {
+            'option': 'uuid',
+            'type': 'string',
+            'help': 'the unique (UPnP) identifier for this MediaServer,'
+            ' usually automatically set',
+            'level': 'advance',
+        },
+        {
+            'option': 'content',
+            'type': 'string',
+            'default': xdg_content(),
+            'help': 'the path(s) this MediaServer shall export',
+        },
+        {
+            'option': 'ignore_patterns',
+            'type': 'string',
+            'help': 'list of regex patterns, matching filenames will be ignored',  # noqa: E501
+        },
+        {
+            'option': 'enable_inotify',
+            'type': 'string',
+            'default': 'yes',
+            'help': 'enable real-time monitoring of the content folders',
+        },
+        {
+            'option': 'enable_destroy',
+            'type': 'string',
+            'default': 'no',
+            'help': 'enable deleting a file via an UPnP method',
+        },
+        {
+            'option': 'import_folder',
+            'type': 'string',
+            'help': 'The path to store files imported via an UPnP method, '
+            'if empty the Import method is disabled',
+        },
     ]
 
     def __init__(self, server, **kwargs):
@@ -593,28 +679,46 @@ class FSStore(BackendStore):
                 self.import_folder = None
 
         self.ignore_file_pattern = re.compile(
-            r'|'.join([r'^\..*'] + list(ignore_patterns)))
+            r'|'.join([r'^\..*'] + list(ignore_patterns))
+        )
         parent = None
         self.update_id = 0
-        if (len(self.content) > 1 or
-                utils.means_true(kwargs.get('create_root', False)) or
-                self.import_folder is not None):
+        if (
+            len(self.content) > 1
+            or utils.means_true(kwargs.get('create_root', False))
+            or self.import_folder is not None
+        ):
             UPnPClass = classChooser('root')
             id = str(self.getnextID())
             try:
                 parent = self.store[id] = FSItem(
-                    id, parent, 'media', 'root',
-                    self.urlbase, UPnPClass, update=True, store=self)
+                    id,
+                    parent,
+                    'media',
+                    'root',
+                    self.urlbase,
+                    UPnPClass,
+                    update=True,
+                    store=self,
+                )
             except Exception as e:
                 self.error(
-                    f'Error on setting self.store[id], Error on FSItem: {e}')
+                    f'Error on setting self.store[id], Error on FSItem: {e}'
+                )
                 exit(1)
 
         if self.import_folder is not None:
             id = str(self.getnextID())
             self.store[id] = FSItem(
-                id, parent, self.import_folder, 'directory',
-                self.urlbase, UPnPClass, update=True, store=self)
+                id,
+                parent,
+                self.import_folder,
+                'directory',
+                self.urlbase,
+                UPnPClass,
+                update=True,
+                store=self,
+            )
             self.import_folder_id = id
         for bytesPath in self.content:
             if isinstance(bytesPath, (list, tuple)):
@@ -628,13 +732,10 @@ class FSStore(BackendStore):
             except Exception as msg:
                 self.warning(f'on walk of {path!r}: {msg!r}')
                 import traceback
+
                 self.debug(traceback.format_exc())
 
-        self.wmc_mapping.update({'14': '0',
-                                 '15': '0',
-                                 '16': '0',
-                                 '17': '0'
-                                 })
+        self.wmc_mapping.update({'14': '0', '15': '0', '16': '0', '17': '0'})
 
         self.init_completed = True
 
@@ -680,13 +781,16 @@ class FSStore(BackendStore):
             for child in parent.children:
                 # if not isinstance(name, unicode):
                 #    name = name.decode('utf8')
-                self.debug(f'{child.get_name()} {child.get_realpath()} '
-                           f'{name == child.get_realpath()}')
+                self.debug(
+                    f'{child.get_name()} {child.get_realpath()} '
+                    + f'{name == child.get_realpath()}'
+                )
                 if name == child.get_realpath():
                     return child.id
         except Exception as e:
             self.error(f'get_id_by_name: {e!r}')
             import traceback
+
             self.info(traceback.format_exc())
         self.debug('get_id_by_name not found')
 
@@ -705,11 +809,14 @@ class FSStore(BackendStore):
         if 'content' in kwargs:
             new_content = kwargs['content']
             new_content = set(
-                [os.path.abspath(x) for x in new_content.split(',')])
+                [os.path.abspath(x) for x in new_content.split(',')]
+            )
             new_folders = new_content.difference(self.content)
             obsolete_folders = self.content.difference(new_content)
-            self.debug(f'new folders: {new_folders}\n'
-                       f'obsolete folders: {obsolete_folders}')
+            self.debug(
+                f'new folders: {new_folders}\n'
+                f'obsolete folders: {obsolete_folders}'
+            )
             for folder in obsolete_folders:
                 self.remove_content_folder(folder)
             for folder in new_folders:
@@ -749,7 +856,8 @@ class FSStore(BackendStore):
             except UnicodeDecodeError:
                 self.warning(
                     f'UnicodeDecodeError - there is something wrong with a '
-                    f'file located in {container.get_path()!r}')
+                    + f'file located in {container.get_path()!r}'
+                )
 
     def create(self, mimetype, path, parent):
         self.debug(f'create  {mimetype} {path} {type(path)} {parent}')
@@ -767,21 +875,31 @@ class FSStore(BackendStore):
         if hasattr(self, 'update_id'):
             update = True
 
-        self.store[id] = FSItem(id, parent, path, mimetype, self.urlbase,
-                                UPnPClass, update=True, store=self)
+        self.store[id] = FSItem(
+            id,
+            parent,
+            path,
+            mimetype,
+            self.urlbase,
+            UPnPClass,
+            update=True,
+            store=self,
+        )
         if hasattr(self, 'update_id'):
             self.update_id += 1
             # print(self.update_id)
             if self.server:
                 if hasattr(self.server, 'content_directory_server'):
                     self.server.content_directory_server.set_variable(
-                        0, 'SystemUpdateID', self.update_id)
+                        0, 'SystemUpdateID', self.update_id
+                    )
             if parent is not None:
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
                     if hasattr(self.server, 'content_directory_server'):
                         self.server.content_directory_server.set_variable(
-                            0, 'ContainerUpdateIDs', value)
+                            0, 'ContainerUpdateIDs', value
+                        )
 
         return id
 
@@ -808,18 +926,22 @@ class FSStore(BackendStore):
 
             if mimetype == 'directory':
                 if self.inotify is not None:
-                    mask = \
-                        IN_CREATE | IN_DELETE | IN_MOVED_FROM | \
-                        IN_MOVED_TO | IN_CHANGED
+                    mask = (
+                        IN_CREATE
+                        | IN_DELETE
+                        | IN_MOVED_FROM
+                        | IN_MOVED_TO
+                        | IN_CHANGED
+                    )
                     self.inotify.watch(
                         FilePath(os.path.abspath(path)),
-                        mask=mask, autoAdd=False,
-                        callbacks=[partial(self.notify, parameter=id)])
+                        mask=mask,
+                        autoAdd=False,
+                        callbacks=[partial(self.notify, parameter=id)],
+                    )
                 return self.store[id]
         except OSError as os_msg:
-            '''
-            seems we have some permissions issues along the content path
-            '''
+            # seems we have some permissions issues along the content path
             self.warning(f'path {path} isn\'t accessible, error {os_msg}')
 
         return None
@@ -835,20 +957,25 @@ class FSStore(BackendStore):
                 self.update_id += 1
                 if self.server:
                     self.server.content_directory_server.set_variable(
-                        0, 'SystemUpdateID', self.update_id)
+                        0, 'SystemUpdateID', self.update_id
+                    )
                 # value = f'{parent.get_id():d},{parent_get_update_id():d}'
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
                     self.server.content_directory_server.set_variable(
-                        0, 'ContainerUpdateIDs', value)
+                        0, 'ContainerUpdateIDs', value
+                    )
 
         except KeyError:
             pass
 
     def notify(self, ignore, path, mask, parameter=None):
-        self.info('Event %s on %s - parameter %r',
-                  ', '.join([fl for fl in _FLAG_TO_HUMAN if fl[0] == mask][0]),
-                  path.path, parameter)
+        self.info(
+            'Event %s on %s - parameter %r',
+            ', '.join([fl for fl in _FLAG_TO_HUMAN if fl[0] == mask][0]),
+            path.path,
+            parameter,
+        )
 
         if mask & IN_CHANGED:
             # FIXME react maybe on access right changes, loss of read rights?
@@ -856,27 +983,36 @@ class FSStore(BackendStore):
             pass
 
         if mask & IN_DELETE or mask & IN_MOVED_FROM:
-            self.info(f'{path.path} was deleted, '
-                      f'parent {parameter!r} ({path.parent.path})')
+            self.info(
+                f'{path.path} was deleted, '
+                f'parent {parameter!r} ({path.parent.path})'
+            )
             id = self.get_id_by_name(parameter, path.path)
             if id is not None:
                 self.remove(id)
         if mask & IN_CREATE or mask & IN_MOVED_TO:
             if mask & IN_ISDIR:
-                self.info(f'directory {path.path} was created, '
-                          f'parent {parameter!r} ({path.parent.path})')
+                self.info(
+                    f'directory {path.path} was created, '
+                    f'parent {parameter!r} ({path.parent.path})'
+                )
             else:
-                self.info(f'file {path.path} was created, '
-                          f'parent {parameter!r} ({path.parent.path})')
+                self.info(
+                    f'file {path.path} was created, '
+                    f'parent {parameter!r} ({path.parent.path})'
+                )
             if self.get_id_by_name(parameter, path.path) is None:
                 if path.isdir():
-                    self.walk(path.path, self.get_by_id(parameter),
-                              self.ignore_file_pattern)
+                    self.walk(
+                        path.path,
+                        self.get_by_id(parameter),
+                        self.ignore_file_pattern,
+                    )
                 else:
                     if self.ignore_file_pattern.match(parameter) is None:
                         self.append(
-                            str(path.path),
-                            str(self.get_by_id(parameter)))
+                            str(path.path), str(self.get_by_id(parameter))
+                        )
 
     def getnextID(self):
         ret = self.next_id
@@ -896,6 +1032,7 @@ class FSStore(BackendStore):
             self.warning(f'import of file {item.get_path()} failed')
         except Exception as msg:
             import traceback
+
             self.warning(traceback.format_exc())
         return 500
 
@@ -905,53 +1042,56 @@ class FSStore(BackendStore):
             self.server.connection_manager_server.set_variable(
                 0,
                 'SourceProtocolInfo',
-                [f'internal:{self.server.coherence.hostname}:audio/mpeg:*',
-                 'http-get:*:audio/mpeg:*',
-                 f'internal:{self.server.coherence.hostname}:video/mp4:*',
-                 'http-get:*:video/mp4:*',
-                 f'internal:{self.server.coherence.hostname}:application/ogg:*',  # noqa
-                 'http-get:*:application/ogg:*',
-                 f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',  # noqa
-                 'http-get:*:video/x-msvideo:*',
-                 f'internal:{self.server.coherence.hostname}:video/mpeg:*',
-                 'http-get:*:video/mpeg:*',
-                 f'internal:{self.server.coherence.hostname}:video/avi:*',
-                 'http-get:*:video/avi:*',
-                 f'internal:{self.server.coherence.hostname}:video/divx:*',
-                 'http-get:*:video/divx:*',
-                 f'internal:{self.server.coherence.hostname}:video/quicktime:*',  # noqa
-                 'http-get:*:video/quicktime:*',
-                 f'internal:{self.server.coherence.hostname}:image/gif:*',
-                 'http-get:*:image/gif:*',
-                 f'internal:{self.server.coherence.hostname}:image/jpeg:*',
-                 'http-get:*:image/jpeg:*'
-                 # 'http-get:*:audio/mpeg:DLNA.ORG_PN=MP3;DLNA.ORG_OP=11;'
-                 # 'DLNA.ORG_FLAGS=01700000000000000000000000000000',
-                 # 'http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMABASE;'
-                 # 'DLNA.ORG_OP=11;DLNA.ORG_FLAGS'
-                 # '=01700000000000000000000000000000',
-                 # 'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;'
-                 # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
-                 # '=00f00000000000000000000000000000',
-                 # 'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;'
-                 # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
-                 # '=00f00000000000000000000000000000',
-                 # 'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;'
-                 # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
-                 # '=00f00000000000000000000000000000',
-                 # 'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;'
-                 # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
-                 # '=00f00000000000000000000000000000',
-                 # 'http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL;'
-                 # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
-                 # '=01700000000000000000000000000000',
-                 # 'http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_BASE;'
-                 # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
-                 # '=01700000000000000000000000000000',
-                 ],
-                default=True)
+                [
+                    f'internal:{self.server.coherence.hostname}:audio/mpeg:*',
+                    'http-get:*:audio/mpeg:*',
+                    f'internal:{self.server.coherence.hostname}:video/mp4:*',
+                    'http-get:*:video/mp4:*',
+                    f'internal:{self.server.coherence.hostname}:application/ogg:*',  # noqa: E501
+                    'http-get:*:application/ogg:*',
+                    f'internal:{self.server.coherence.hostname}:video/x-msvideo:*',  # noqa: E501
+                    'http-get:*:video/x-msvideo:*',
+                    f'internal:{self.server.coherence.hostname}:video/mpeg:*',
+                    'http-get:*:video/mpeg:*',
+                    f'internal:{self.server.coherence.hostname}:video/avi:*',
+                    'http-get:*:video/avi:*',
+                    f'internal:{self.server.coherence.hostname}:video/divx:*',
+                    'http-get:*:video/divx:*',
+                    f'internal:{self.server.coherence.hostname}:video/quicktime:*',  # noqa: E501
+                    'http-get:*:video/quicktime:*',
+                    f'internal:{self.server.coherence.hostname}:image/gif:*',
+                    'http-get:*:image/gif:*',
+                    f'internal:{self.server.coherence.hostname}:image/jpeg:*',
+                    'http-get:*:image/jpeg:*'
+                    # 'http-get:*:audio/mpeg:DLNA.ORG_PN=MP3;DLNA.ORG_OP=11;'
+                    # 'DLNA.ORG_FLAGS=01700000000000000000000000000000',
+                    # 'http-get:*:audio/x-ms-wma:DLNA.ORG_PN=WMABASE;'
+                    # 'DLNA.ORG_OP=11;DLNA.ORG_FLAGS'
+                    # '=01700000000000000000000000000000',
+                    # 'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;'
+                    # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
+                    # '=00f00000000000000000000000000000',
+                    # 'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_SM;'
+                    # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
+                    # '=00f00000000000000000000000000000',
+                    # 'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_MED;'
+                    # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
+                    # '=00f00000000000000000000000000000',
+                    # 'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;'
+                    # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
+                    # '=00f00000000000000000000000000000',
+                    # 'http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_PS_PAL;'
+                    # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
+                    # '=01700000000000000000000000000000',
+                    # 'http-get:*:video/x-ms-wmv:DLNA.ORG_PN=WMVMED_BASE;'
+                    # 'DLNA.ORG_OP=01;DLNA.ORG_FLAGS'
+                    # '=01700000000000000000000000000000',
+                ],
+                default=True,
+            )
             self.server.content_directory_server.set_variable(
-                0, 'SystemUpdateID', self.update_id)
+                0, 'SystemUpdateID', self.update_id
+            )
             # self.server.content_directory_server.set_variable(
             #     0, 'SortCapabilities', '*')
 
@@ -975,8 +1115,9 @@ class FSStore(BackendStore):
             if not isinstance(content_type, list):
                 content_type = list(content_type)
             if len(content_type) > 0:
-                extension = mimetypes.guess_extension(content_type[0],
-                                                      strict=False)
+                extension = mimetypes.guess_extension(
+                    content_type[0], strict=False
+                )
                 item.set_path(None, extension)
             shutil.move(tmp_path, item.get_path())
             item.rebuild(self.urlbase)
@@ -985,13 +1126,15 @@ class FSStore(BackendStore):
                 if self.server:
                     if hasattr(self.server, 'content_directory_server'):
                         self.server.content_directory_server.set_variable(
-                            0, 'SystemUpdateID', self.update_id)
+                            0, 'SystemUpdateID', self.update_id
+                        )
                 if item.parent is not None:
                     value = (item.parent.get_id(), item.parent.get_update_id())
                     if self.server:
                         if hasattr(self.server, 'content_directory_server'):
                             self.server.content_directory_server.set_variable(
-                                0, 'ContainerUpdateIDs', value)
+                                0, 'ContainerUpdateIDs', value
+                            )
 
         def gotError(error, url):
             self.warning(f'error requesting {url}')
@@ -1002,9 +1145,9 @@ class FSStore(BackendStore):
         tmp_fp, tmp_path = tempfile.mkstemp()
         os.close(tmp_fp)
 
-        utils.downloadPage(
-            SourceURI, tmp_path).addCallbacks(
-                gotPage, gotError, None, None, [SourceURI], None)
+        utils.downloadPage(SourceURI, tmp_path).addCallbacks(
+            gotPage, gotError, None, None, [SourceURI], None
+        )
 
         transfer_id = 0  # FIXME
 
@@ -1037,15 +1180,15 @@ class FSStore(BackendStore):
         item = elt.getItems()[0]
         if item.parentID == 'DLNA.ORG_AnyContainer':
             item.parentID = ContainerID
-        if (item.id != '' or
-                item.parentID != ContainerID or
-                item.restricted is True or
-                item.title == ''):
+        if (
+            item.id != ''
+            or item.parentID != ContainerID
+            or item.restricted is True
+            or item.title == ''
+        ):
             return failure.Failure(errorCode(712))
 
-        if ('..' in item.title or
-                '~' in item.title or
-                os.sep in item.title):
+        if '..' in item.title or '~' in item.title or os.sep in item.title:
             return failure.Failure(errorCode(712))
 
         if item.upnp_class == 'object.container.storageFolder':
@@ -1060,12 +1203,19 @@ class FSStore(BackendStore):
                 return failure.Failure(errorCode(712))
 
             if self.inotify is not None:
-                mask = \
-                    IN_CREATE | IN_DELETE | IN_MOVED_FROM | \
-                    IN_MOVED_TO | IN_CHANGED
+                mask = (
+                    IN_CREATE
+                    | IN_DELETE
+                    | IN_MOVED_FROM
+                    | IN_MOVED_TO
+                    | IN_CHANGED
+                )
                 self.inotify.watch(
-                    path, mask=mask, autoAdd=False,
-                    callbacks=[partial(self.notify, parameter=id)])
+                    path,
+                    mask=mask,
+                    autoAdd=False,
+                    callbacks=[partial(self.notify, parameter=id)],
+                )
 
             new_item = self.get_by_id(id)
             didl = DIDLElement()
@@ -1075,8 +1225,9 @@ class FSStore(BackendStore):
         if item.upnp_class.startswith('object.item'):
             _, _, content_format, _ = item.res[0].protocolInfo.split(':')
             extension = mimetypes.guess_extension(content_format, strict=False)
-            path = os.path.join(parent_item.get_realpath(),
-                                item.title + extension)
+            path = os.path.join(
+                parent_item.get_realpath(), item.title + extension
+            )
             id = self.create('item', path, parent_item)
 
             new_item = self.get_by_id(id)
@@ -1110,8 +1261,9 @@ if __name__ == '__main__':
     from twisted.internet import reactor
 
     p = 'tests/content'
-    f = FSStore(None, name='my media', content=p,
-                urlbase='http://localhost/xyz')
+    f = FSStore(
+        None, name='my media', content=p, urlbase='http://localhost/xyz'
+    )
 
     print(f.len())
     print(f.get_by_id(1000).child_count, f.get_by_id(1000).get_xml())

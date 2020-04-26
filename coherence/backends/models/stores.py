@@ -61,6 +61,7 @@ class BackendBaseStore(BackendStore):
     .. versionchanged:: 0.9.0
         Migrated from louie/dispatcher to EventDispatcher
     '''
+
     logCategory = 'BackendBaseStore'
     implements = ['MediaServer']
 
@@ -103,21 +104,19 @@ class BackendBaseStore(BackendStore):
 
         super(BackendBaseStore, self).__init__(server, **kwargs)
 
-        for prop in [
-                'item_cls', 'item_type',
-                'root_url', 'root_find_items']:
+        for prop in ['item_cls', 'item_type', 'root_url', 'root_find_items']:
             if prop in [None, '', [], {}]:
                 raise Exception(
                     f'Error: The property for {self!r}.{prop}'
-                    f' cannot be empty')
+                    + f' cannot be empty'
+                )
 
         if 'name' in kwargs:
             self.name = kwargs.get('name')
 
         self.refresh = int(kwargs.get('refresh', 8)) * (60 * 60)
 
-        if kwargs.get('proxy', 'no') in [
-                1, 'Yes', 'yes', 'True', 'true']:
+        if kwargs.get('proxy', 'no') in [1, 'Yes', 'yes', 'True', 'true']:
             self.proxy = True
         else:
             self.proxy = False
@@ -126,11 +125,10 @@ class BackendBaseStore(BackendStore):
 
         self.items = {}
         self.container = self.container_cls(
-            self.root_id, -1, self.name,
-            store=self, storage_id=self.root_id)
+            self.root_id, -1, self.name, store=self, storage_id=self.root_id
+        )
 
-        self.wmc_mapping = kwargs.get(
-            'wmc_mapping', {'15': self.root_id})
+        self.wmc_mapping = kwargs.get('wmc_mapping', {'15': self.root_id})
 
         dfr = self.update_data()
         # first get the first bunch of data before sending init_completed
@@ -203,11 +201,14 @@ class BackendBaseStore(BackendStore):
         :meth:`~coherence.backend_modules.BackendBaseStore.parse_item`
         '''
         backend_item = self.item_cls(
-            self.root_id, self.next_id, self.urlbase,
-            is_proxy=self.proxy, **data)
+            self.root_id,
+            self.next_id,
+            self.urlbase,
+            is_proxy=self.proxy,
+            **data,
+        )
 
-        res = DIDLLite.Resource(
-            backend_item.get_path(), self.item_type)
+        res = DIDLLite.Resource(backend_item.get_path(), self.item_type)
         backend_item.item.res.append(res)
 
         self.items[self.next_id] = backend_item
@@ -219,13 +220,14 @@ class BackendBaseStore(BackendStore):
         self.update_id += 1
 
         # Update the content_directory_server
-        if self.server and hasattr(
-                self.server, 'content_directory_server'):
+        if self.server and hasattr(self.server, 'content_directory_server'):
             self.server.content_directory_server.set_variable(
-                0, 'SystemUpdateID', self.update_id)
+                0, 'SystemUpdateID', self.update_id
+            )
             value = (self.root_id, self.container.update_id)
             self.server.content_directory_server.set_variable(
-                0, 'ContainerUpdateIDs', value)
+                0, 'ContainerUpdateIDs', value
+            )
         return backend_item
 
     def get_by_id(self, item_id):
@@ -255,8 +257,8 @@ class BackendBaseStore(BackendStore):
         self.info(f'BackendBaseStore.upnp_init: server => {self.server}')
         if self.server:
             self.server.connection_manager_server.set_variable(
-                0, 'SourceProtocolInfo',
-                self.upnp_protocols)
+                0, 'SourceProtocolInfo', self.upnp_protocols
+            )
 
     def __repr__(self):
         return self.__class__.__name__
@@ -275,6 +277,7 @@ class BackendVideoStore(BackendBaseStore):
                  'http-get:*:video/mp4:*'. Make sure to set the right video
                  protocol for your needs
     '''
+
     logCategory = 'BackendVideoStore'
     upnp_protocols = [
         'http-get:*:video/mp4:*',
@@ -308,6 +311,7 @@ class BackendAudioStore(BackendBaseStore):
                  'http-get:*:audio/mpeg:*' (which should be fine for mp3).
                  Make sure to set the right audio protocol for your needs.
     '''
+
     logCategory = 'BackendAudioStore'
     upnp_protocols = [
         'http-get:*:audio/mp4:*',
@@ -337,6 +341,7 @@ class BackendImageStore(BackendBaseStore):
                  'http-get:*:audio/jpeg:*'. Make sure to set the right image
                  protocol for your needs.
     '''
+
     logCategory = 'BackendImageStore'
     upnp_protocols = [
         'http-get:*:image/jpeg:*',

@@ -48,11 +48,11 @@ class TedTalk(BackendVideoItem):
        Refactored using the class
        :class:`~coherence.backends.models.items.BackendVideoItem`
     '''
+
     mimetype = 'video/mp4'
 
     def __init__(self, parent_id, item_id, urlbase, **kwargs):
-        super(TedTalk, self).__init__(
-            parent_id, item_id, urlbase, **kwargs)
+        super(TedTalk, self).__init__(parent_id, item_id, urlbase, **kwargs)
 
         self.item.res.size = kwargs.get('size', None)
         self.item.res.duration = kwargs.get('duration', None)
@@ -66,15 +66,13 @@ class TEDStore(BackendVideoStore):
        Refactored using the class
        :class:`~coherence.backends.models.stores.BackendVideoStore`
     '''
+
     logCategory = 'ted_store'
     implements = ['MediaServer']
 
     name = 'TEDTalks'
 
-    upnp_protocols = [
-        'http-get:*:video/quicktime:*',
-        'http-get:*:video/mp4:*',
-    ]
+    upnp_protocols = ['http-get:*:video/quicktime:*', 'http-get:*:video/mp4:*']
 
     root_url = b'http://feeds.feedburner.com/tedtalks_video?format=xml'
     root_find_items = './channel/item'
@@ -103,10 +101,9 @@ class TEDStore(BackendVideoStore):
         summary = itunes + 'summary'
 
         data = {
-            'name': item.find(
-                './title').text.replace('TEDTalks : ', ''),
+            'name': item.find('./title').text.replace('TEDTalks : ', ''),
             'summary': item.find(summary).text,
-            'duration': item.find(duration).text
+            'duration': item.find(duration).text,
         }
 
         try:

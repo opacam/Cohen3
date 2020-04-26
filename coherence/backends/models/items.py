@@ -103,10 +103,9 @@ class BackendBaseItem(BackendItem):
 
         self.id = item_id
         self.parent_id = parent_id
-        self.name = self.title = \
-            kwargs.get('title',
-                       kwargs.get('name',
-                                  'My Backend Item'))
+        self.name = self.title = kwargs.get(
+            'title', kwargs.get('name', 'My Backend Item')
+        )
         self.http_url = kwargs.get('url', None)
 
         if len(urlbase) and urlbase[-1] != '/':
@@ -121,12 +120,13 @@ class BackendBaseItem(BackendItem):
         if self.is_proxy and self.proxy_cls is not None:
             self.location = self.proxy_cls(self.http_url)
         elif self.is_proxy:
-            self.warning('BackendBaseItem was unable to create a Proxy '
-                         'location, falling back to non proxy...')
+            self.warning(
+                'BackendBaseItem was unable to create a Proxy '
+                + 'location, falling back to non proxy...'
+            )
             self.is_proxy = False
 
-        self.item = self.item_cls(
-            self.id, self.parent_id, self.name)
+        self.item = self.item_cls(self.id, self.parent_id, self.name)
         self.item.attachments = {}
         self.item.title = self.title
 
@@ -147,20 +147,23 @@ class BackendBaseItem(BackendItem):
         return self.url
 
     def __repr__(self):
-        return \
-            f'<BackendBaseItem {self.id} {self.title}' \
-            f' [parent id: {self.parent_id}]>'
+        return (
+            f'<BackendBaseItem {self.id} {self.title}'
+            + f' [parent id: {self.parent_id}]>'
+        )
 
 
 class BackendVideoItem(BackendBaseItem):
     '''
     This Represents a Backend Video Item.
     '''
+
     item_cls = DIDLLite.VideoItem
 
     def __init__(self, parent_id, item_id, urlbase, **kwargs):
         super(BackendVideoItem, self).__init__(
-            parent_id, item_id, urlbase, **kwargs)
+            parent_id, item_id, urlbase, **kwargs
+        )
 
         self.director = kwargs.get('director', None)
         self.actors = kwargs.get('actors', [])
@@ -175,9 +178,10 @@ class BackendVideoItem(BackendBaseItem):
         self.item.albumArtURI = self.image
 
     def __repr__(self):
-        return \
-            f'<BackendVideoItem{self.id} title="{self.title}" ' \
-            f'genres="{", ".join(self.genres)}" director="{self.director}">'
+        return (
+            f'<BackendVideoItem{self.id} title="{self.title}" '
+            + f'genres="{", ".join(self.genres)}" director="{self.director}">'
+        )
 
 
 class BackendAudioItem(BackendBaseItem):
@@ -189,11 +193,13 @@ class BackendAudioItem(BackendBaseItem):
         - :attr:`genre`: The music genre for the audio
         - :attr:`playlist`: Playlist
     '''
+
     item_cls = DIDLLite.AudioItem
 
     def __init__(self, parent_id, item_id, urlbase, **kwargs):
         super(BackendAudioItem, self).__init__(
-            parent_id, item_id, urlbase, **kwargs)
+            parent_id, item_id, urlbase, **kwargs
+        )
 
         self.artist = kwargs.get('artist', None)
         self.album = kwargs.get('album', None)
@@ -209,21 +215,24 @@ class BackendAudioItem(BackendBaseItem):
 
     def __repr__(self):
         album = 'None' if not self.album else self.album.title
-        return \
-            f'<BackendAudioItem{self.id} title="{self.title}" ' \
-            f'album={self.album}" genre="{self.genre}" ' \
-            f'artist="{self.artist}" path="{self.get_path()}">'
+        return (
+            f'<BackendAudioItem{self.id} title="{self.title}" '
+            + f'album={self.album}" genre="{self.genre}" '
+            + f'artist="{self.artist}" path="{self.get_path()}">'
+        )
 
 
 class BackendMusicTrackItem(BackendAudioItem):
     '''
     This is like :class:`BackendAudioItem` but with a track number added.
     '''
+
     item_cls = DIDLLite.MusicTrack
 
     def __init__(self, parent_id, item_id, urlbase, **kwargs):
         super(BackendMusicTrackItem, self).__init__(
-            parent_id, item_id, urlbase, **kwargs)
+            parent_id, item_id, urlbase, **kwargs
+        )
 
         self.track_number = kwargs.get('track_number', 1)
 
@@ -231,23 +240,26 @@ class BackendMusicTrackItem(BackendAudioItem):
 
     def __repr__(self):
         album = 'None' if not self.album else self.album.title
-        return \
-            f'<BackendMusicTrackItem{self.id} title="{self.title}" ' \
-            f'track="{self.track_number}" album={album}" ' \
-            f'genre="{self.genre}" artist="{self.artist}" ' \
-            f'path="{self.get_path()}">'
+        return (
+            f'<BackendMusicTrackItem{self.id} title="{self.title}" '
+            + f'track="{self.track_number}" album={album}" '
+            + f'genre="{self.genre}" artist="{self.artist}" '
+            + f'path="{self.get_path()}">'
+        )
 
 
 class BackendImageItem(BackendBaseItem):
     '''
     This Represents a Backend Image Item.
     '''
+
     item_cls = DIDLLite.ImageItem
     mimetype = ''
 
     def __init__(self, parent_id, item_id, urlbase, **kwargs):
         super(BackendImageItem, self).__init__(
-            parent_id, item_id, urlbase, **kwargs)
+            parent_id, item_id, urlbase, **kwargs
+        )
 
         self.artist = kwargs.get('artist', None)
         self.rating = kwargs.get('rating', None)
@@ -260,9 +272,10 @@ class BackendImageItem(BackendBaseItem):
         self.item.rights = self.rights
 
     def __repr__(self):
-        return \
-            f'<BackendImageItem {self.id} artist="{self.artist}" ' \
-            f'rating="{self.rating}" publisher="{self.publisher}">'
+        return (
+            f'<BackendImageItem {self.id} artist="{self.artist}" '
+            + f'rating="{self.rating}" publisher="{self.publisher}">'
+        )
 
 
 class BackendPhotoItem(BackendImageItem):
@@ -270,16 +283,19 @@ class BackendPhotoItem(BackendImageItem):
     This Represents a Backend Photo Item. Iis like :class:`BackendImageItem`
     but with additional attribute added :attr:`album`.
     '''
+
     item_cls = DIDLLite.Photo
 
     def __init__(self, parent_id, item_id, urlbase, **kwargs):
         super(BackendPhotoItem, self).__init__(
-            parent_id, item_id, urlbase, **kwargs)
+            parent_id, item_id, urlbase, **kwargs
+        )
 
         self.album = kwargs.get('album', None)
         self.item.album = self.album
 
     def __repr__(self):
-        return \
-            f'<BackendPhotoItem {self.id} artist="{self.artist}" ' \
-            f'album="{self.album}" rating="{self.rating}">'
+        return (
+            f'<BackendPhotoItem {self.id} artist="{self.artist}" '
+            + f'album="{self.album}" rating="{self.rating}">'
+        )

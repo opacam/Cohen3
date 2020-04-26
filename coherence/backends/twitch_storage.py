@@ -43,8 +43,12 @@ from twisted.web import server, http
 from twisted.web.resource import Resource
 from twisted.web.static import NoRangeStaticProducer
 
-from coherence.backend import AbstractBackendStore, Container, BackendItem, \
-    LazyContainer
+from coherence.backend import (
+    AbstractBackendStore,
+    Container,
+    BackendItem,
+    LazyContainer,
+)
 from coherence.log import LogAble
 from coherence.upnp.core import utils, DIDLLite
 
@@ -64,8 +68,10 @@ class LiveStreamerProxyResource(Resource, LogAble):
         self.content_type = content_type
 
     def render_GET(self, request):
-        self.debug(f'serving {request.method} request from '
-                   f'{request.getClientIP()} for {request.uri}')
+        self.debug(
+            f'serving {request.method} request from '
+            f'{request.getClientIP()} for {request.uri}'
+        )
 
         def stream_opened(fd):
             producer = NoRangeStaticProducer(request, fd)
@@ -73,14 +79,16 @@ class LiveStreamerProxyResource(Resource, LogAble):
 
         def got_streams(streams):
             if self.stream_id not in streams:
-                self.warning(f'stream not found for '
-                             f'{self.url}@{self.stream_id}')
+                self.warning(
+                    f'stream not found for ' f'{self.url}@{self.stream_id}'
+                )
                 request.setResponseCode(http.NOT_FOUND)
                 request.write(b'')
                 return
 
-            request.setHeader(b'Content-Type',
-                              self.content_type.encode('ascii'))
+            request.setHeader(
+                b'Content-Type', self.content_type.encode('ascii')
+            )
             request.setResponseCode(http.OK)
 
             if request.method == b'HEAD':
@@ -117,8 +125,11 @@ class TwitchLazyContainer(LazyContainer):
         kwargs.update({'limit': self.limit})
         kwargs = {k: v for k, v in list(kwargs.items()) if v is not None}
 
-        url = '%s?%s' % (self.children_url, urllib.parse.urlencode(
-            kwargs)) if kwargs else self.children_url
+        url = (
+            '%s?%s' % (self.children_url, urllib.parse.urlencode(kwargs))
+            if kwargs
+            else self.children_url
+        )
 
         d = utils.getPage(url)
         d.addCallbacks(self._got_page, self._got_error)
@@ -131,17 +142,26 @@ class TwitchLazyContainer(LazyContainer):
 
     def _got_error(self, error):
         self.warning(
-            f'connection to twitch.tv service failed: {self.children_url}')
+            f'connection to twitch.tv service failed: {self.children_url}'
+        )
         self.debug(f'{error.getTraceback()}')
         self.childrenRetrievingNeeded = True  # we retry
         return Failure('Unable to retrieve game list')
 
 
 class GamesContainer(TwitchLazyContainer):
-    def __init__(self, parent, title='Games', description=None, limit=None,
-                 children_limit=None, **kwargs):
-        super(GamesContainer, self).__init__(parent, title, limit=limit,
-                                             **kwargs)
+    def __init__(
+        self,
+        parent,
+        title='Games',
+        description=None,
+        limit=None,
+        children_limit=None,
+        **kwargs,
+    ):
+        super(GamesContainer, self).__init__(
+            parent, title, limit=limit, **kwargs
+        )
         self.description = description
 
         self.children_url = f'{TWITCH_API_URL}/games/top'
@@ -152,12 +172,14 @@ class GamesContainer(TwitchLazyContainer):
         for game_info in result['top']:
             game_name = game_info['game']['name']
             item = StreamsContainer(
-                self, game_name,
+                self,
+                game_name,
                 viewers=game_info['viewers'],
                 channels=game_info['channels'],
                 cover_url=game_info['game']['box']['large'],
                 game=game_name,
-                limit=self.children_limit)
+                limit=self.children_limit,
+            )
             # item.description = f'{game_info["viewers"]:d} viewers'
             self.add_child(item, external_id=game_info['game']['_id'])
         return True
@@ -166,8 +188,16 @@ class GamesContainer(TwitchLazyContainer):
 class StreamsContainer(TwitchLazyContainer):
     URL = '%s/streams/'
 
-    def __init__(self, parent, title, viewers=0, channels=0, streams_url=URL,
-                 cover_url=None, **kwargs):
+    def __init__(
+        self,
+        parent,
+        title,
+        viewers=0,
+        channels=0,
+        streams_url=URL,
+        cover_url=None,
+        **kwargs,
+    ):
         super(StreamsContainer, self).__init__(parent, title, **kwargs)
         self.viewers = viewers
         self.channels = channels
@@ -185,7 +215,8 @@ class StreamsContainer(TwitchLazyContainer):
                 status=stream['channel']['status'],
                 viewers=stream['viewers'],
                 preview_url=stream['preview']['medium'],
-                created_at=created_at)
+                created_at=created_at,
+            )
             self.add_child(item, external_id=f'stream{stream["_id"]:d}')
         return True
 
@@ -193,8 +224,15 @@ class StreamsContainer(TwitchLazyContainer):
 class TwitchStreamItem(BackendItem):
     logCategory = 'twitch_store'
 
-    def __init__(self, title, url, status=None, viewers=0, created_at=None,
-                 preview_url=None):
+    def __init__(
+        self,
+        title,
+        url,
+        status=None,
+        viewers=0,
+        created_at=None,
+        preview_url=None,
+    ):
         BackendItem.__init__(self)
         self.name = title
         self.status = status
@@ -242,30 +280,39 @@ class TwitchStore(AbstractBackendStore):
     description = ('twitch.tv', 'twitch.tv', None)
 
     options = [
-        {'option': 'name',
-         'text': 'Server Name:',
-         'type': 'string',
-         'default': 'twitch.tv',
-         'help': 'the name under this MediaServer shall '
-                 'show up with on other UPnP clients'},
-        {'option': 'access_token',
-         'text': 'OAuth Access Token:',
-         'type': 'string',
-         'default': '',
-         'help': 'access token to show personalized list of followed streams'},
-        {'option': 'version',
-         'text': 'UPnP Version:',
-         'type': 'int',
-         'default': 2,
-         'enum': (2, 1),
-         'help': 'the highest UPnP version this MediaServer shall support',
-         'level': 'advance'},
-        {'option': 'uuid',
-         'text': 'UUID Identifier:',
-         'type': 'string',
-         'default': 'twitch_tv',
-         'help': 'the unique (UPnP) identifier for this MediaServer',
-         'level': 'advance'}]
+        {
+            'option': 'name',
+            'text': 'Server Name:',
+            'type': 'string',
+            'default': 'twitch.tv',
+            'help': 'the name under this MediaServer shall '
+            'show up with on other UPnP clients',
+        },
+        {
+            'option': 'access_token',
+            'text': 'OAuth Access Token:',
+            'type': 'string',
+            'default': '',
+            'help': 'access token to show personalized list of followed streams',  # noqa: E501
+        },
+        {
+            'option': 'version',
+            'text': 'UPnP Version:',
+            'type': 'int',
+            'default': 2,
+            'enum': (2, 1),
+            'help': 'the highest UPnP version this MediaServer shall support',
+            'level': 'advance',
+        },
+        {
+            'option': 'uuid',
+            'text': 'UUID Identifier:',
+            'type': 'string',
+            'default': 'twitch_tv',
+            'help': 'the unique (UPnP) identifier for this MediaServer',
+            'level': 'advance',
+        },
+    ]
 
     def __init__(self, server, **kwargs):
         AbstractBackendStore.__init__(self, server, **kwargs)
@@ -282,9 +329,11 @@ class TwitchStore(AbstractBackendStore):
     def upnp_init(self):
         if self.server:
             self.server.connection_manager_server.set_variable(
-                0, 'SourceProtocolInfo',
+                0,
+                'SourceProtocolInfo',
                 [f'http-get:*:{MPEG_MIME}:*'],
-                default=True)
+                default=True,
+            )
         # root item
         root_item = Container(None, self.name)
         self.set_root_item(root_item)
@@ -297,7 +346,8 @@ class TwitchStore(AbstractBackendStore):
                 title=settings.get('name') or 'Following',
                 streams_url='%s/streams/followed',
                 limit=settings.get('limit', 25),
-                oauth_token=self.access_token)
+                oauth_token=self.access_token,
+            )
             root_item.add_child(games_dir)
 
         # 'Games' directory
@@ -307,7 +357,8 @@ class TwitchStore(AbstractBackendStore):
                 root_item,
                 title=settings.get('name', 'Top Games'),
                 limit=settings.get('limit', 10),
-                children_limit=settings.get('children_limit', 25))
+                children_limit=settings.get('children_limit', 25),
+            )
             root_item.add_child(games_dir)
 
         # 'Top Streams' directory
@@ -316,7 +367,8 @@ class TwitchStore(AbstractBackendStore):
             games_dir = StreamsContainer(
                 root_item,
                 title=settings.get('name', 'Top Streams'),
-                limit=settings.get('limit', 25))
+                limit=settings.get('limit', 25),
+            )
             root_item.add_child(games_dir)
 
 

@@ -55,6 +55,7 @@ class BackendContainer(Container):
           which will allow us to perform most of the operations we need to
           operate with your BackendItem/s
     '''
+
     logCategory = 'BackendContainer'
 
     item = None
@@ -78,9 +79,10 @@ class BackendContainer(Container):
         self.item.childCount = len(self.children)
 
     def __repr__(self):
-        return \
-            f'<BackendContainer {self.id} {self.get_name()} ' \
-            f'[parent id: {self.parent_id}]>'
+        return (
+            f'<BackendContainer {self.id} {self.get_name()} '
+            + f'[parent id: {self.parent_id}]>'
+        )
 
 
 class BackendMusicAlbum(BackendContainer):
@@ -95,15 +97,15 @@ class BackendMusicAlbum(BackendContainer):
 
     def __init__(self, item_id, parent_id, name, **kwargs):
         super(BackendMusicAlbum, self).__init__(
-            item_id, parent_id, name, **kwargs)
+            item_id, parent_id, name, **kwargs
+        )
 
         self.title = name
         self.artist = kwargs.get('artist', None)
         self.genre = kwargs.get('genre', None)
         self.cover = kwargs.get('cover', None)
 
-        self.item = self.item_cls(
-            self.id, self.parent_id, self.name)
+        self.item = self.item_cls(self.id, self.parent_id, self.name)
         self.item.attachments = {}
         self.item.title = self.title
         self.item.artist = self.artist
@@ -117,10 +119,11 @@ class BackendMusicAlbum(BackendContainer):
         return self.cover
 
     def __repr__(self):
-        return \
-            f'<BackendMusicAlbum {self.id} title="{self.title}" ' \
-            f'genre="{self.genre}" artist="{self.artist}" ' \
-            f'cover="{self.cover}">'
+        return (
+            f'<BackendMusicAlbum {self.id} title="{self.title}" '
+            + f'genre="{self.genre}" artist="{self.artist}" '
+            + f'cover="{self.cover}">'
+        )
 
 
 class BackendBasePlaylist(BackendContainer):
@@ -135,7 +138,8 @@ class BackendBasePlaylist(BackendContainer):
 
     def __init__(self, item_id, parent_id, name, **kwargs):
         super(BackendBasePlaylist, self).__init__(
-            item_id, parent_id, name, **kwargs)
+            item_id, parent_id, name, **kwargs
+        )
 
         self.title = name
 
@@ -143,5 +147,4 @@ class BackendBasePlaylist(BackendContainer):
         return self.title
 
     def __repr__(self):
-        return \
-            f'<BackendBasePlaylist {self.id} title="{self.title}>'
+        return f'<BackendBasePlaylist {self.id} title="{self.title}>'

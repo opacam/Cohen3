@@ -61,7 +61,8 @@ class AppleTrailerProxy(ReverseProxyUriResource):
     def render(self, request):
         request.requestHeaders.setRawHeaders(
             b'user-agent',
-            [b'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)'])
+            [b'QuickTime/7.6.2 (qtver=7.6.2;os=Windows NT 5.1Service Pack 3)'],
+        )
         return super(AppleTrailerProxy, self).render(request)
 
 
@@ -74,13 +75,13 @@ class Trailer(BackendVideoItem):
        Refactored using the class
        :class:`~coherence.backends.models.items.BackendVideoItem`
     '''
+
     is_proxy = False
     proxy_cls = AppleTrailerProxy
     mimetype = 'video/quicktime'
 
     def __init__(self, parent_id, item_id, urlbase, **kwargs):
-        super(Trailer, self).__init__(
-            parent_id, item_id, urlbase, **kwargs)
+        super(Trailer, self).__init__(parent_id, item_id, urlbase, **kwargs)
 
         self.runtime = kwargs.get('runtime', None)
         self.rating = kwargs.get('rating', None)
@@ -99,12 +100,11 @@ class AppleTrailersStore(BackendVideoStore):
        Refactored using the class
        :class:`~coherence.backends.models.stores.BackendVideoStore`
     '''
+
     logCategory = 'apple_trailers'
     implements = ['MediaServer']
 
-    upnp_protocols = [
-        'http-get:*:video/quicktime:*',
-        'http-get:*:video/mp4:*']
+    upnp_protocols = ['http-get:*:video/quicktime:*', 'http-get:*:video/mp4:*']
 
     root_url = b'http://www.apple.com/trailers/home/xml/current.xml'
     root_find_items = './movieinfo'
@@ -158,8 +158,9 @@ class AppleTrailersStore(BackendVideoStore):
             duration = f'{int(hours):d}:{int(minutes):02d}:{int(seconds):02d}'
         data['duration'] = duration
         try:
-            data['video_size'] = item.find(
-                './preview/large').get('filesize', None)
+            data['video_size'] = item.find('./preview/large').get(
+                'filesize', None
+            )
         except Exception:
             data['video_size'] = None
         return data
@@ -178,7 +179,8 @@ class AppleTrailersStore(BackendVideoStore):
             url = self.urlbase + str(trailer.id) + '?transcoded=mp4'
             new_res = DIDLLite.Resource(
                 url,
-                f'http-get:*:{"video/mp4"}:{";".join([dlna_pn] + dlna_tags)}')
+                f'http-get:*:{"video/mp4"}:{";".join([dlna_pn] + dlna_tags)}',
+            )
             new_res.size = None
             new_res.duration = data['duration']
             trailer.item.res.append(new_res)
@@ -187,16 +189,20 @@ class AppleTrailersStore(BackendVideoStore):
             dlna_tags = DIDLLite.simple_dlna_tags[:]
             dlna_tags[2] = 'DLNA.ORG_CI=1'
             dlna_tags[3] = 'DLNA.ORG_FLAGS=00f00000000000000000000000000000'
-            url = self.urlbase + str(
-                trailer.id) + '?attachment=poster&transcoded=thumb&type=jpeg'
+            url = (
+                self.urlbase
+                + str(trailer.id)
+                + '?attachment=poster&transcoded=thumb&type=jpeg'
+            )
             new_res = DIDLLite.Resource(
                 url,
-                f'http-get:*:{"image/jpeg"}:{";".join([dlna_pn] + dlna_tags)}')
+                f'http-get:*:{"image/jpeg"}:{";".join([dlna_pn] + dlna_tags)}',
+            )
             new_res.size = None
             # new_res.resolution = '160x160'
             trailer.item.res.append(new_res)
             if not hasattr(trailer.item, 'attachments'):
                 trailer.item.attachments = {}
-            trailer.item.attachments['poster'] = (data['image'])  # noqa pylint: disable=E1101
+            trailer.item.attachments['poster'] = (data['image'])  # pylint: disable=E1101
 
         return trailer

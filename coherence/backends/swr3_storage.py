@@ -15,7 +15,6 @@ ROOT_CONTAINER_ID = 0
 
 
 class Item(BackendItem):
-
     def __init__(self, parent, id, title, url):
         BackendItem.__init__(self)
         self.parent = parent
@@ -39,8 +38,9 @@ class Item(BackendItem):
             if hasattr(self.parent, 'cover'):
                 self.item.albumArtURI = self.parent.cover
 
-            res = DIDLLite.Resource(self.location,
-                                    f'http-get:*:{self.mimetype}:*')
+            res = DIDLLite.Resource(
+                self.location, f'http-get:*:{self.mimetype}:*'
+            )
             res.duration = self.duration
             res.size = self.size
             self.item.res.append(res)
@@ -48,7 +48,6 @@ class Item(BackendItem):
 
 
 class Container(BackendItem):
-
     def __init__(self, id, store, parent_id, title):
         BackendItem.__init__(self)
         self.url = store.urlbase + str(id)
@@ -74,6 +73,7 @@ class Container(BackendItem):
 
     def get_children(self, start=0, end=0):
         if not self.sorted:
+
             def childs_key_sort(x):
                 return x.name
 
@@ -115,7 +115,9 @@ class SWR3Store(BackendStore, BackendRssMixin):
         self.last_updated = None
         self.store = {
             ROOT_CONTAINER_ID: Container(
-                ROOT_CONTAINER_ID, self, -1, self.name)}
+                ROOT_CONTAINER_ID, self, -1, self.name
+            )
+        }
 
         self.parse_opml()
         self.init_completed()
@@ -128,8 +130,10 @@ class SWR3Store(BackendStore, BackendRssMixin):
         def create_containers(data):
             feeds = []
             for feed in data.findall('body/outline'):
-                if (feed.attrib['type'] == 'link' and
-                        feed.attrib['url'] not in feeds):
+                if (
+                    feed.attrib['type'] == 'link'
+                    and feed.attrib['url'] not in feeds
+                ):
                     feeds.append(feed.attrib['url'])
                     self.update_data(feed.attrib['url'], self.get_next_id())
 
@@ -157,15 +161,17 @@ class SWR3Store(BackendStore, BackendRssMixin):
     def upnp_init(self):
         if self.server:
             self.server.connection_manager_server.set_variable(
-                0, 'SourceProtocolInfo', ['http-get:*:audio/mpeg:*'])
+                0, 'SourceProtocolInfo', ['http-get:*:audio/mpeg:*']
+            )
 
     def parse_data(self, xml_data, container):
         root = xml_data.getroot()
 
         title = root.find('./channel/title').text
         title = title.encode(self.encoding).decode('utf-8')
-        self.store[container] = Container(container, self, ROOT_CONTAINER_ID,
-                                          title)
+        self.store[container] = Container(
+            container, self, ROOT_CONTAINER_ID, title
+        )
         description = root.find('./channel/description').text
         description = description.encode(self.encoding).decode('utf-8')
         self.store[container].description = description
@@ -176,8 +182,12 @@ class SWR3Store(BackendStore, BackendRssMixin):
             enclosure = podcast.find('./enclosure')
             title = podcast.find('./title').text
             title = title.encode(self.encoding).decode('utf-8')
-            item = Item(self.store[container], self.get_next_id(), title,
-                        enclosure.attrib['url'])
+            item = Item(
+                self.store[container],
+                self.get_next_id(),
+                title,
+                enclosure.attrib['url'],
+            )
             item.size = int(enclosure.attrib['length'])
             item.mimetype = enclosure.attrib['type']
             self.store[container].add_child(item)
@@ -185,6 +195,7 @@ class SWR3Store(BackendStore, BackendRssMixin):
             if description is not None:
                 description = description.text
                 item.description = description.encode(self.encoding).decode(
-                    'utf-8')
+                    'utf-8'
+                )
 
         self.update_id += 1

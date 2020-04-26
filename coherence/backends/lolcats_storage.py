@@ -33,14 +33,15 @@ class LolCatsImage(BackendImageItem):
         Refactored using the class
          :class:`~coherence.backends.models.items.BackendImageItem`
     '''
+
     mimetype = 'image/jpeg'
 
     def __init__(self, parent_id, item_id, urlbase, **kwargs):
         super(LolCatsImage, self).__init__(
-            parent_id, item_id, urlbase, **kwargs)
+            parent_id, item_id, urlbase, **kwargs
+        )
 
-        res = DIDLLite.Resource(
-            self.location, f'http-get:*:{self.mimetype}:*')
+        res = DIDLLite.Resource(self.location, f'http-get:*:{self.mimetype}:*')
         res.size = None  # FIXME: we should have a size here
         self.item.res.append(res)
 
@@ -53,6 +54,7 @@ class LolcatsStore(BackendImageStore):
        Refactored using the class
        :class:`~coherence.backends.models.stores.BackendVideoStore`
     '''
+
     logCategory = 'lolcats'
     implements = ['MediaServer']
 
@@ -65,7 +67,8 @@ class LolcatsStore(BackendImageStore):
         'DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
         'http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_LRG;'
         'DLNA.ORG_OP=01;DLNA.ORG_FLAGS=00f00000000000000000000000000000',
-        'http-get:*:image/jpeg:*']
+        'http-get:*:image/jpeg:*',
+    ]
 
     root_url = b'https://icanhas.cheezburger.com/lolcats/rss'
     root_find_items = './channel/item'
@@ -93,7 +96,8 @@ class LolcatsStore(BackendImageStore):
 
         try:
             img_html = item.find(
-                '{http://purl.org/rss/1.0/modules/content/}encoded').text
+                '{http://purl.org/rss/1.0/modules/content/}encoded'
+            ).text
             img_xml = parse_with_lxml(img_html)
         except Exception as e:
             self.error('Error on searching lol cat image: {}'.format(e))
@@ -104,8 +108,5 @@ class LolcatsStore(BackendImageStore):
         if url is None:
             return None
 
-        data = {
-            'title': title,
-            'url': url,
-        }
+        data = {'title': title, 'url': url}
         return data

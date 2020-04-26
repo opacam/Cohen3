@@ -15,8 +15,9 @@ from coherence.upnp.core.DIDLLite import classChooser, Container, Resource
 class AxisCamItem(BackendItem):
     logCategory = 'axis_cam_item'
 
-    def __init__(self, id, obj, parent, mimetype, urlbase, UPnPClass,
-                 update=False):
+    def __init__(
+        self, id, obj, parent, mimetype, urlbase, UPnPClass, update=False
+    ):
         BackendItem.__init__(self)
         self.id = id
         if mimetype == 'directory':
@@ -40,7 +41,7 @@ class AxisCamItem(BackendItem):
             self.item.childCount = 0
         self.children = []
 
-        if (len(urlbase) and urlbase[-1] != '/'):
+        if len(urlbase) and urlbase[-1] != '/':
             urlbase += '/'
 
         if self.mimetype == 'directory':
@@ -75,7 +76,8 @@ class AxisCamItem(BackendItem):
     def remove_child(self, child):
         self.info(
             f'remove_from {self.id:d} {self.get_name():s} '
-            f'child {child.id:d} ({child.get_name():s})')
+            + f'child {child.id:d} ({child.get_name():s})'
+        )
         if child in self.children:
             if isinstance(self.item, Container):
                 self.item.childCount -= 1
@@ -154,19 +156,22 @@ class AxisCamStore(BackendStore):
         if hasattr(self, 'update_id'):
             update = True
 
-        self.store[id] = AxisCamItem(id, obj, parent, mimetype, self.urlbase,
-                                     UPnPClass, update=update)
+        self.store[id] = AxisCamItem(
+            id, obj, parent, mimetype, self.urlbase, UPnPClass, update=update
+        )
         if hasattr(self, 'update_id'):
             self.update_id += 1
             if self.server:
                 self.server.content_directory_server.set_variable(
-                    0, 'SystemUpdateID', self.update_id)
+                    0, 'SystemUpdateID', self.update_id
+                )
             if parent:
                 # value = '%d,%d' % (parent.get_id(),parent_get_update_id())
                 value = (parent.get_id(), parent.get_update_id())
                 if self.server:
                     self.server.content_directory_server.set_variable(
-                        0, 'ContainerUpdateIDs', value)
+                        0, 'ContainerUpdateIDs', value
+                    )
 
         if mimetype == 'directory':
             return self.store[id]
@@ -208,7 +213,8 @@ class AxisCamStore(BackendStore):
 
         if self.server:
             self.server.connection_manager_server.set_variable(
-                0, 'SourceProtocolInfo', source_protocols, default=True)
+                0, 'SourceProtocolInfo', source_protocols, default=True
+            )
 
 
 def main():

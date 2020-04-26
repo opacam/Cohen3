@@ -97,7 +97,6 @@ ROOT_CONTAINER_ID = 0
 
 
 class ExternalProcessProtocol(protocol.ProcessProtocol):
-
     def __init__(self, caller):
         self.caller = caller
 
@@ -186,8 +185,8 @@ class ExternalProcessProducer(log.LogAble):
             executable = argv[0]
             argv[0] = os.path.basename(argv[0])
             self.process = reactor.spawnProcess(
-                ExternalProcessProtocol(self),
-                executable, argv, {})
+                ExternalProcessProtocol(self), executable, argv, {}
+            )
 
     def pauseProducing(self):
         pass
@@ -201,7 +200,6 @@ class ExternalProcessProducer(log.LogAble):
 
 
 class Item(BackendItem):
-
     def __init__(self, parent, id, title, location, url):
         BackendItem.__init__(self)
         self.parent = parent
@@ -223,13 +221,15 @@ class Item(BackendItem):
     def get_item(self):
         print(f'get_item {self.item!r}')
         if self.item is None:
-            self.item = self.upnp_class(self.id, self.parent.id,
-                                        self.get_name())
+            self.item = self.upnp_class(
+                self.id, self.parent.id, self.get_name()
+            )
             self.item.description = self.description
             self.item.date = self.date
 
             res = DIDLLite.Resource(
-                self.url, f'http-get:*:{self.mimetype}:{self.fourth_field}')
+                self.url, f'http-get:*:{self.mimetype}:{self.fourth_field}'
+            )
             res.duration = self.duration
             res.size = self.get_size()
             self.item.res.append(res)
@@ -260,7 +260,6 @@ class Item(BackendItem):
 
 
 class ResourceItem(Item):
-
     def get_name(self):
         if self.name is None:
             self.name = 'item'
@@ -274,7 +273,6 @@ class ResourceItem(Item):
 
 
 class Container(BackendItem):
-
     def __init__(self, id, store, parent_id, title):
         BackendItem.__init__(self)
         self.url = store.urlbase + str(id)
@@ -302,6 +300,7 @@ class Container(BackendItem):
     def get_children(self, start=0, end=0):
         print('GET CHILDREN')
         if not self.sorted:
+
             def childs_key_sort(x):
                 return x.name
 
@@ -338,8 +337,9 @@ class TestStore(BackendStore):
         self.update_id = 0
         self.store = {}
 
-        self.store[ROOT_CONTAINER_ID] = \
-            Container(ROOT_CONTAINER_ID, self, -1, self.name)
+        self.store[ROOT_CONTAINER_ID] = Container(
+            ROOT_CONTAINER_ID, self, -1, self.name
+        )
 
         items = kwargs.get('item', [])
         if not isinstance(items, list):
@@ -373,20 +373,28 @@ class TestStore(BackendStore):
 
                 if type in ('file', 'url'):
                     new_item = Item(
-                        self.store[ROOT_CONTAINER_ID], item_id,
-                        name, location, self.urlbase + str(item_id))
+                        self.store[ROOT_CONTAINER_ID],
+                        item_id,
+                        name,
+                        location,
+                        self.urlbase + str(item_id),
+                    )
                 elif type == 'gstreamer':
                     pipeline = item.get('pipeline')
                     try:
                         pipeline = GStreamerPipeline(pipeline, mimetype)
                         new_item = ResourceItem(
                             self.store[ROOT_CONTAINER_ID],
-                            item_id, name, pipeline,
-                            self.urlbase + str(item_id))
+                            item_id,
+                            name,
+                            pipeline,
+                            self.urlbase + str(item_id),
+                        )
                     except NameError:
                         self.warning(
                             'Can\'t enable GStreamerPipeline, '
-                            'probably pygst not installed')
+                            'probably pygst not installed'
+                        )
                         continue
 
                 elif type == 'process':
@@ -394,12 +402,16 @@ class TestStore(BackendStore):
                     pipeline = ExternalProcessPipeline(pipeline, mimetype)
                     new_item = ResourceItem(
                         self.store[ROOT_CONTAINER_ID],
-                        item_id, name, pipeline,
-                        self.urlbase + str(item_id))
+                        item_id,
+                        name,
+                        pipeline,
+                        self.urlbase + str(item_id),
+                    )
 
                 try:
                     new_item.upnp_class = self.get_upnp_class(
-                        item.get('upnp_class', 'object.item'))
+                        item.get('upnp_class', 'object.item')
+                    )
                 except Exception:
                     pass
                 # item.description = u'some text what's the file about'
@@ -413,6 +425,7 @@ class TestStore(BackendStore):
 
             except Exception:
                 import traceback
+
                 self.warning(traceback.format_exc())
         # print self.store
 
