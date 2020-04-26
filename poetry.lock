@@ -78,25 +78,6 @@ visualize = ["graphviz (>0.5.1)", "Twisted (>=16.1.1)"]
 
 [[package]]
 category = "main"
-description = "An in-process object-relational database"
-name = "Axiom"
-optional = true
-python-versions = "*"
-version = "0.7.5"
-
-[package.dependencies]
-Epsilon = ">=0.7.3"
-Twisted = ">=13.2.0"
-
-[package.extras]
-test = ["hypothesis (>=2.0.0,<3.0.0)"]
-
-[package.source]
-reference = "ca210f12863becc31346ffec126f9ec13af90dc3"
-type = "git"
-url = "https://github.com/opacam/axiom.git"
-[[package]]
-category = "main"
 description = "Internationalization utilities"
 name = "babel"
 optional = true
@@ -220,38 +201,11 @@ version = "1.2.16"
 
 [[package]]
 category = "main"
-description = ""
-name = "discid"
-optional = true
-python-versions = "*"
-version = "1.2.0"
-
-[package.source]
-reference = "e5c2a6c77e4d5b7d527c465b8dc37015b4da743d"
-type = "git"
-url = "https://github.com/JonnyJD/python-discid.git"
-[[package]]
-category = "main"
 description = "Docutils -- Python Documentation Utilities"
 name = "docutils"
 optional = true
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 version = "0.16"
-
-[[package]]
-category = "main"
-description = "ECDSA cryptographic signature library (pure python)"
-name = "ecdsa"
-optional = true
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-version = "0.15"
-
-[package.dependencies]
-six = ">=1.9.0"
-
-[package.extras]
-gmpy = ["gmpy"]
-gmpy2 = ["gmpy2"]
 
 [[package]]
 category = "main"
@@ -261,23 +215,6 @@ optional = true
 python-versions = ">=2.7"
 version = "0.3"
 
-[[package]]
-category = "main"
-description = "A set of utility modules used by Divmod projects"
-name = "Epsilon"
-optional = true
-python-versions = "*"
-version = "0.7.3+4.g0a55024"
-
-[package.dependencies]
-PyOpenSSL = ">=0.13"
-Twisted = ">=13.2.0"
-"zope.interface" = "*"
-
-[package.source]
-reference = "0a55024900f4dca6981313c705f546f33126e75b"
-type = "git"
-url = "https://github.com/opacam/epsilon.git"
 [[package]]
 category = "main"
 description = "An event dispatcher framework inspired by the Kivy project."
@@ -290,10 +227,6 @@ version = "1.9.4"
 future = "*"
 numpy = "*"
 
-[package.source]
-reference = "9ac85b4ce225bc720cf03eb0d349d64aca4fd20d"
-type = "git"
-url = "https://github.com/lobocv/eventdispatcher.git"
 [[package]]
 category = "main"
 description = "Universal feed parser, handles RSS 0.9x, RSS 1.0, RSS 2.0, CDF, Atom 0.3, and Atom 1.0 feeds"
@@ -324,22 +257,6 @@ optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 version = "0.18.2"
 
-[[package]]
-category = "main"
-description = ""
-name = "gdata"
-optional = true
-python-versions = "*"
-version = "3.0.2"
-
-[package.dependencies]
-lxml = "*"
-tlslite-ng = "*"
-
-[package.source]
-reference = "0ca54d7781a7b9425fb8f20de453414949ef57c5"
-type = "git"
-url = "https://github.com/dvska/gdata-python3.git"
 [[package]]
 category = "main"
 description = "A featureful, immutable, and correct URL for Python."
@@ -533,18 +450,6 @@ optional = true
 python-versions = ">=3.5, <4"
 version = "1.19.1"
 
-[[package]]
-category = "main"
-description = "A python wrapper for the CDB Debugger"
-name = "PyCDB"
-optional = true
-python-versions = "*"
-version = "0.1"
-
-[package.source]
-reference = "f2b952918f2e32c752dee938ab829396f0de99f4"
-type = "git"
-url = "https://github.com/fishstiqz/pycdb.git"
 [[package]]
 category = "main"
 description = "Python style guide checker"
@@ -870,17 +775,6 @@ test = ["pytest"]
 
 [[package]]
 category = "main"
-description = "Pure python implementation of SSL and TLS."
-name = "tlslite-ng"
-optional = true
-python-versions = "*"
-version = "0.7.5"
-
-[package.dependencies]
-ecdsa = "*"
-
-[[package]]
-category = "main"
 description = "An asynchronous networking framework written in Python"
 name = "twisted"
 optional = false
@@ -968,21 +862,21 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [extras]
-audio = ["discid", "pycdb"]
+audio = []
 dbus = ["dbus-python"]
-dev = ["autobahn", "dbus-python", "discid", "gdata", "pycdb", "pycairo", "pygobject", "flake8", "nose", "nose-cov", "pylint", "python-coveralls", "recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
+dev = ["autobahn", "dbus-python", "pycairo", "pygobject", "flake8", "nose", "nose-cov", "pylint", "python-coveralls", "recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
 docs = ["recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
-elisa = ["axiom", "epsilon"]
+elisa = []
 feed = ["feedparser"]
 gstreamer = ["pycairo", "pygobject"]
-picasa = ["gdata"]
+picasa = []
 test = ["flake8", "nose", "nose-cov", "pylint", "python-coveralls"]
 twitch = ["livestreamer"]
 web = ["autobahn"]
-youtube = ["gdata"]
+youtube = []
 
 [metadata]
-content-hash = "661aa97091389f282017a695a5987b9f42b3ddaa3d0871df64aece40324ff966"
+content-hash = "fcc94925674ad16cfb9c7150e25e441d84e1238a9b4de26d4ba803c618635538"
 python-versions = "^3.6"
 
 [metadata.files]
@@ -1006,7 +900,6 @@ automat = [
     {file = "Automat-20.2.0-py2.py3-none-any.whl", hash = "sha256:b6feb6455337df834f6c9962d6ccf771515b7d939bca142b29c20c2376bc6111"},
     {file = "Automat-20.2.0.tar.gz", hash = "sha256:7979803c74610e11ef0c0d68a2942b152df52da55336e0c9d58daf1831cbdf33"},
 ]
-Axiom = []
 babel = [
     {file = "Babel-2.8.0-py2.py3-none-any.whl", hash = "sha256:d670ea0b10f8b723672d3a6abeb87b565b244da220d76b4dba1b66269ec152d4"},
     {file = "Babel-2.8.0.tar.gz", hash = "sha256:1aac2ae2d0d8ea368fa90906567f5c08463d98ade155c0c4bfedd6a0f7160e38"},
@@ -1120,21 +1013,17 @@ cryptography = [
 dbus-python = [
     {file = "dbus-python-1.2.16.tar.gz", hash = "sha256:11238f1d86c995d8aed2e22f04a1e3779f0d70e587caffeab4857f3c662ed5a4"},
 ]
-discid = []
 docutils = [
     {file = "docutils-0.16-py2.py3-none-any.whl", hash = "sha256:0c5b78adfbf7762415433f5515cd5c9e762339e23369dbe8000d84a4bf4ab3af"},
     {file = "docutils-0.16.tar.gz", hash = "sha256:c2de3a60e9e7d07be26b7f2b00ca0309c207e06c100f9cc2a94931fc75a478fc"},
-]
-ecdsa = [
-    {file = "ecdsa-0.15-py2.py3-none-any.whl", hash = "sha256:867ec9cf6df0b03addc8ef66b56359643cb5d0c1dc329df76ba7ecfe256c8061"},
-    {file = "ecdsa-0.15.tar.gz", hash = "sha256:8f12ac317f8a1318efa75757ef0a651abe12e51fc1af8838fb91079445227277"},
 ]
 entrypoints = [
     {file = "entrypoints-0.3-py2.py3-none-any.whl", hash = "sha256:589f874b313739ad35be6e0cd7efde2a4e9b6fea91edcc34e58ecbb8dbe56d19"},
     {file = "entrypoints-0.3.tar.gz", hash = "sha256:c70dd71abe5a8c85e55e12c19bd91ccfeec11a6e99044204511f9ed547d48451"},
 ]
-Epsilon = []
-eventdispatcher = []
+eventdispatcher = [
+    {file = "eventdispatcher-1.9.4.tar.gz", hash = "sha256:9f1b96ab2a13384fd09a7837793a62d9a336c7f22f20576187d46c5070863495"},
+]
 feedparser = [
     {file = "feedparser-5.2.1.tar.bz2", hash = "sha256:ce875495c90ebd74b179855449040003a1beb40cd13d5f037a0654251e260b02"},
     {file = "feedparser-5.2.1.tar.gz", hash = "sha256:bd030652c2d08532c034c27fcd7c85868e7fa3cb2b17f230a44a6bbc92519bf9"},
@@ -1147,7 +1036,6 @@ flake8 = [
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
 ]
-gdata = []
 hyperlink = [
     {file = "hyperlink-19.0.0-py2.py3-none-any.whl", hash = "sha256:ab4a308feb039b04f855a020a6eda3b18ca5a68e6d8f8c899cbe9e653721d04f"},
     {file = "hyperlink-19.0.0.tar.gz", hash = "sha256:4288e34705da077fada1111a24a0aa08bb1e76699c9ce49876af722441845654"},
@@ -1338,7 +1226,6 @@ pyasn1-modules = [
 pycairo = [
     {file = "pycairo-1.19.1.tar.gz", hash = "sha256:2c143183280feb67f5beb4e543fd49990c28e7df427301ede04fc550d3562e84"},
 ]
-PyCDB = []
 pycodestyle = [
     {file = "pycodestyle-2.5.0-py2.py3-none-any.whl", hash = "sha256:95a2219d12372f05704562a14ec30bc76b05a5b297b21a5dfe3f6fac3491ae56"},
     {file = "pycodestyle-2.5.0.tar.gz", hash = "sha256:e40a936c9a450ad81df37f549d676d127b1b66000a6c500caa2b085bc0ca976c"},
@@ -1454,9 +1341,6 @@ sphinxcontrib-qthelp = [
 sphinxcontrib-serializinghtml = [
     {file = "sphinxcontrib-serializinghtml-1.1.4.tar.gz", hash = "sha256:eaa0eccc86e982a9b939b2b82d12cc5d013385ba5eadcc7e4fed23f4405f77bc"},
     {file = "sphinxcontrib_serializinghtml-1.1.4-py2.py3-none-any.whl", hash = "sha256:f242a81d423f59617a8e5cf16f5d4d74e28ee9a66f9e5b637a18082991db5a9a"},
-]
-tlslite-ng = [
-    {file = "tlslite-ng-0.7.5.tar.gz", hash = "sha256:823bc35c89c336635751852b2a26ffed3b1258e1a5827279074b7dbf409187ab"},
 ]
 twisted = [
     {file = "Twisted-20.3.0-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:cdbc4c7f0cd7a2218b575844e970f05a1be1861c607b0e048c9bceca0c4d42f7"},
