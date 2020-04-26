@@ -487,52 +487,9 @@ class Coherence(EventDispatcher, log.LogAble):
         self.urlbase = None
         self.web_server_port = int(config.get('serverport', 8080))
 
-        # initializes log's system, a COHEN_DEBUG environment
-        # variable overwrites all level settings here.
-        try:
-            logmode = config.get('logging').get('level', 'warning')
-        except (KeyError, AttributeError):
-            logmode = config.get('logmode', 'warning')
-        try:
-            subsystems = config.get('logging')['subsystem']
-            if isinstance(subsystems, dict):
-                subsystems = [subsystems]
-            for subsystem in subsystems:
-                try:
-                    if subsystem['active'] == 'no':
-                        continue
-                except (KeyError, TypeError):
-                    pass
-                self.info(f'setting log-level for subsystem '
-                          f'{subsystem["name"]} to {subsystem["level"]}')
-                logging.getLogger(subsystem['name'].lower()).setLevel(
-                    subsystem['level'].upper())
-        except (KeyError, TypeError):
-            subsystem_log = config.get('subsystem_log', {})
-            for subsystem, level in list(subsystem_log.items()):
-                logging.getLogger(subsystem.lower()).setLevel(level.upper())
-        try:
-            logfile = config.get('logging').get('logfile', None)
-            if logfile is not None:
-                logfile = str(logfile)
-        except (KeyError, AttributeError, TypeError):
-            logfile = config.get('logfile', None)
-        log.init(logfile, logmode.upper())
+        self.setup_logger()
 
-        self.warning(f'Coherence UPnP framework version {__version__} '
-                     f'starting [log level: {logmode}]...')
-
-        network_if = config.get('interface')
-        if network_if:
-            self.hostname = get_ip_address(f'{network_if}')
-        else:
-            try:
-                self.hostname = socket.gethostbyname(socket.gethostname())
-            except socket.gaierror:
-                self.warning('hostname can\'t be resolved, '
-                             'maybe a system misconfiguration?')
-                self.hostname = '127.0.0.1'
-
+        self.setup_hostname()
         if self.hostname.startswith('127.'):
             # use interface detection via routing table as last resort
             def catch_result(hostname):
@@ -549,6 +506,72 @@ class Coherence(EventDispatcher, log.LogAble):
         during trial tests'''
         self.unbind_all()
         self.__cls.__instance = None
+
+    @property
+    def log_level(self):
+        '''Read config and return the log level.'''
+        try:
+            log_level = self.config.get('logging').get('level', 'warning')
+        except (KeyError, AttributeError):
+            log_level = self.config.get('logmode', 'warning')
+        return log_level.upper()
+
+    @property
+    def log_file(self):
+        '''Read config and return the logfile or `None`.'''
+        try:
+            logfile = self.config.get('logging').get('logfile', None)
+            if logfile is not None:
+                logfile = str(logfile)
+        except (KeyError, AttributeError, TypeError):
+            logfile = self.config.get('logfile', None)
+        return logfile
+
+    def setup_logger(self):
+        '''Initializes log's system based on config.
+
+         .. note:: the COHEN_DEBUG environment variable overwrites all level
+                   settings in here
+         '''
+        try:
+            subsystems = self.config.get('logging')['subsystem']
+            if isinstance(subsystems, dict):
+                subsystems = [subsystems]
+            for subsystem in subsystems:
+                try:
+                    if subsystem['active'] == 'no':
+                        continue
+                except (KeyError, TypeError):
+                    pass
+                self.info(f'setting log-level for subsystem '
+                          f'{subsystem["name"]} to {subsystem["level"]}')
+                logging.getLogger(subsystem['name'].lower()).setLevel(
+                    subsystem['level'].upper())
+        except (KeyError, TypeError):
+            subsystem_log = self.config.get('subsystem_log', {})
+            for subsystem, level in list(subsystem_log.items()):
+                logging.getLogger(subsystem.lower()).setLevel(level.upper())
+
+        log.init(self.log_file, self.log_level)
+        self.warning(f'Coherence UPnP framework version {__version__} '
+                     f'starting [log level: {self.log_level}]...')
+
+    def setup_hostname(self):
+        '''
+        Configure the `hostname`.
+
+        .. note:: If something goes wrong will default to `127.0.0.1`
+        '''
+        network_if = self.config.get('interface')
+        if network_if:
+            self.hostname = get_ip_address(f'{network_if}')
+        else:
+            try:
+                self.hostname = socket.gethostbyname(socket.gethostname())
+            except socket.gaierror:
+                self.warning('hostname can\'t be resolved, '
+                             'maybe a system misconfiguration?')
+                self.hostname = '127.0.0.1'
 
     def setup_part2(self):
         '''Initializes the basic and optional services/devices and the enabled
