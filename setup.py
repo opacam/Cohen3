@@ -95,7 +95,6 @@ entry_points = """
     AudioCDStore = coherence.backends.audiocd_storage:AudioCDStore
     AxisCamStore = coherence.backends.axiscam_storage:AxisCamStore
     BansheeStore = coherence.backends.banshee_storage:BansheeStore
-    BBCStore = coherence.backends.bbc_storage:BBCStore
     BuzztardStore = coherence.backends.buzztard_control:BuzztardStore
     DVBDStore = coherence.backends.dvbd_storage:DVBDStore
     ElisaMediaStore = coherence.backends.elisa_storage:ElisaMediaStore

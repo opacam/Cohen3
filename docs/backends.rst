@@ -52,14 +52,22 @@ Untested Backends
 *Note 1: Those backends depends on twisted.axiom and twisted.epsilon, which has
 been partially migrated to python 3...and may not work.*
 
-Not working backends
+Non working backends
 --------------------
     - :ref:`Miroguide storage <coherence.backends.miroguide>`: miroguide's api is not working anymore
-    - :ref:`BBC storage <coherence.backends.bbc>`: bbc shutdown rss service
     - :ref:`LastFM storage <coherence.backends.lastfm>`: service moved to new api...needs update
     - :ref:`Picasa storage <coherence.backends.picasa>`: google shutdown this service
     - :ref:`Twitch storage <coherence.backends.twitch>`: Partially working, video play is not working
     - :ref:`Youtube storage <coherence.backends.youtube>`: api must be updated to v3
+
+Removed backends
+----------------
+Some of the backends that were in the original Coherence project are not
+working anymore. In order to keep the project as most as simple and
+maintainable as possible we will remove some of them, mostly because it's
+unlikely that those backends could work:
+
+    - `BBC storage`: bbc shutdown rss service
 
 Note: Some of this non working backends, may be removed in a future releases
 (if we not find some way around the backend's problem).

@@ -124,9 +124,6 @@ in the below table.
    * - |question|
      - BansheeStore
      -
-   * - |fails|
-     - BBCStore
-     - *BBC shutdown the uri service, this backend will not work*
    * - |question|
      - BuzztardStore
      -

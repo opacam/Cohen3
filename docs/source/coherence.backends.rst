@@ -20,7 +20,6 @@ Here are all available Cohen3 Backends:
     backends/audiocd
     backends/axiscam
     backends/banshee
-    backends/bbc
     backends/buzztard
     backends/dvbd
     backends/elisarenderer
