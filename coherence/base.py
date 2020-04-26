@@ -508,6 +508,14 @@ class Coherence(EventDispatcher, log.LogAble):
         self.__cls.__instance = None
 
     @property
+    def is_unittest(self):
+        '''
+        Reads config and returns if we are testing or not via `unittest` key.
+        '''
+        unittest = self.config.get('unittest', 'no')
+        return False if unittest in {'no', False, None} else True
+
+    @property
     def log_level(self):
         '''Read config and return the log level.'''
         try:
@@ -573,20 +581,18 @@ class Coherence(EventDispatcher, log.LogAble):
                              'maybe a system misconfiguration?')
                 self.hostname = '127.0.0.1'
 
-    def setup_part2(self):
-        '''Initializes the basic and optional services/devices and the enabled
-        plugins (backends).'''
         self.info(f'running on host: {self.hostname}')
         if self.hostname.startswith('127.'):
-            self.warning(f'detection of own ip failed, using {self.hostname} '
-                         f'as own address, functionality will be limited')
+            self.warning(
+                f'detection of own ip failed, using {self.hostname} '
+                f'as own address, functionality will be limited'
+            )
 
-        unittest = self.config.get('unittest', 'no')
-        unittest = False if unittest == 'no' else True
-
+    def setup_ssdp_server(self):
+        '''Initialize the :class:`~coherence.upnp.core.ssdp.SSDPServer`.'''
         try:
             # TODO: add ip/interface bind
-            self.ssdp_server = SSDPServer(test=unittest)
+            self.ssdp_server = SSDPServer(test=self.is_unittest)
         except CannotListenError as err:
             self.error(f'Error starting the SSDP-server: {err}')
             self.debug('Error starting the SSDP-server', exc_info=True)
@@ -604,12 +610,8 @@ class Coherence(EventDispatcher, log.LogAble):
         self.ssdp_server.subscribe('new_device', self.add_device)
         self.ssdp_server.subscribe('removed_device', self.remove_device)
 
-        self.msearch = MSearch(self.ssdp_server, test=unittest)
-
-        reactor.addSystemEventTrigger('before', 'shutdown', self.shutdown,
-                                      force=True)
-
-        # Web Server Initialization
+    def setup_web_server(self):
+        '''Initialize the web server.'''
         try:
             # TODO: add ip/interface bind
             if self.config.get('web-ui', 'no') != 'yes':
@@ -617,7 +619,7 @@ class Coherence(EventDispatcher, log.LogAble):
                     None, self.web_server_port, self)
             else:
                 self.web_server = WebServerUi(
-                    self.web_server_port, self, unittests=unittest)
+                    self.web_server_port, self, unittests=self.is_unittest)
         except CannotListenError:
             self.error(
                 f'port {self.web_server_port} already in use, aborting!')
@@ -625,11 +627,15 @@ class Coherence(EventDispatcher, log.LogAble):
             return
 
         self.urlbase = f'http://{self.hostname}:{self.web_server_port:d}/'
+        self.external_address = ':'.join(
+            (self.hostname, str(self.web_server_port))
+        )
         # self.renew_service_subscription_loop = \
         #     task.LoopingCall(self.check_devices)
         # self.renew_service_subscription_loop.start(20.0, now=False)
 
-        # Plugins Initialization
+    def setup_plugins(self):
+        '''Initialize the plugins.'''
         try:
             plugins = self.config['plugin']
             if isinstance(plugins, dict):
@@ -670,10 +676,26 @@ class Coherence(EventDispatcher, log.LogAble):
                                 self.config.save()
                     except Exception as msg:
                         self.warning(f'Can\'t enable plugin, {plugin}: {msg}!')
-                        self.info(traceback.format_exc())
+                        self.error(traceback.format_exc())
 
-        self.external_address = ':'.join(
-            (self.hostname, str(self.web_server_port)))
+    def setup_part2(self):
+        '''Initializes the basic and optional services/devices and the enabled
+        plugins (backends).'''
+        self.setup_ssdp_server()
+        if not self.ssdp_server:
+            raise Exception('Unable to initialize an ssdp server')
+
+        self.msearch = MSearch(self.ssdp_server, test=self.is_unittest)
+
+        reactor.addSystemEventTrigger(
+            'before', 'shutdown', self.shutdown, force=True,
+        )
+
+        self.setup_web_server()
+        if not self.urlbase:
+            raise Exception('Unable to initialize an web server')
+
+        self.setup_plugins()
 
         # Control Point Initialization
         if self.config.get('controlpoint', 'no') == 'yes' or self.config.get(
