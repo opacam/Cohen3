@@ -53,7 +53,7 @@ Examples
 Available stores
 ----------------
 
-BetterLight, AmpacheStore, FlickrStore, MiroStore, ElisaPlayer,
+BetterLight, AmpacheStore, FlickrStore, ElisaPlayer,
 ElisaMediaStore, Gallery2Store, DVBDStore, FSStore, BuzztardPlayer,
 BuzztardStore, GStreamerPlayer, ITVStore, SWR3Store, TrackerStore,
 LolcatsStore, MediaStore, AppleTrailerStore, LastFMStore,

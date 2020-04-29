@@ -1,3 +1,9 @@
+unreleased - Remove BBC backend
+--------------------------
+
+General:
+    - Remove `miroguide` backend
+
 0.9.3 - Remove BBC backend
 --------------------------
 

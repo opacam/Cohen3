@@ -107,7 +107,6 @@ entry_points = """
     LastFMStore = coherence.backends.lastfm_storage:LastFMStore
     LolcatsStore = coherence.backends.lolcats_storage:LolcatsStore
     MediaStore = coherence.backends.mediadb_storage:MediaStore
-    MiroGuideStore = coherence.backends.miroguide_storage:MiroGuideStore
     PicasaStore = coherence.backends.picasa_storage:PicasaStore
     PlaylistStore = coherence.backends.playlist_storage:PlaylistStore
     RadiotimeStore = coherence.backends.radiotime_storage:RadiotimeStore

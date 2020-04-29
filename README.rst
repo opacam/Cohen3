@@ -166,9 +166,6 @@ in the below table.
    * - |question|
      - MediaStore
      -
-   * - |fails|
-     - MiroGuideStore
-     - The miroguide's api is not working anymore :(
    * - |question|
      - PicasaStore
      - *Partially tested, may work until starting year 2019, where google will

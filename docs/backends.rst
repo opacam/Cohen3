@@ -54,7 +54,6 @@ been partially migrated to python 3...and may not work.*
 
 Non working backends
 --------------------
-    - :ref:`Miroguide storage <coherence.backends.miroguide>`: miroguide's api is not working anymore
     - :ref:`LastFM storage <coherence.backends.lastfm>`: service moved to new api...needs update
     - :ref:`Picasa storage <coherence.backends.picasa>`: google shutdown this service
     - :ref:`Twitch storage <coherence.backends.twitch>`: Partially working, video play is not working
@@ -68,6 +67,7 @@ maintainable as possible we will remove some of them, mostly because it's
 unlikely that those backends could work:
 
     - `BBC storage`: bbc shutdown rss service
+    - `Miroguide storage`: miroguide's api is not working anymore
 
 Note: Some of this non working backends, may be removed in a future releases
 (if we not find some way around the backend's problem).

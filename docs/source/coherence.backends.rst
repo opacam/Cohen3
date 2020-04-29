@@ -34,7 +34,6 @@ Here are all available Cohen3 Backends:
     backends/lastfm
     backends/lolcats
     backends/mediadb
-    backends/miroguide
     backends/picasa
     backends/playlist
     backends/radiotime
