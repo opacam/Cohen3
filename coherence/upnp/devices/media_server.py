@@ -183,7 +183,7 @@ class MSRoot(resource.Resource, log.LogAble):
                                 )
                         else:
                             return ch.item.attachments[
-                                request.args['attachment'][0]
+                                to_string(request.args[b'attachment'][0])
                             ]
                     except Exception:
                         request.setResponseCode(404)
