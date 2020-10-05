@@ -113,14 +113,14 @@ def _find_thumbnail(filename, thumbnail_folder='.thumbs'):
     pattern = os.path.join(
         os.path.dirname(filename), thumbnail_folder, name + '.*'
     )
-    for f in glob.glob(pattern):
-        mimetype, _ = mimetypes.guess_type(f, strict=False)
+    for file_path in glob.glob(glob.escape(pattern)):
+        mimetype, _ = mimetypes.guess_type(file_path, strict=False)
         if mimetype in ('image/jpeg', 'image/png'):
             if mimetype == 'image/jpeg':
                 dlna_pn = 'DLNA.ORG_PN=JPEG_TN'
             else:
                 dlna_pn = 'DLNA.ORG_PN=PNG_TN'
-            return os.path.abspath(f), mimetype, dlna_pn
+            return os.path.abspath(file_path), mimetype, dlna_pn
     else:
         raise NoThumbnailFound()
 
