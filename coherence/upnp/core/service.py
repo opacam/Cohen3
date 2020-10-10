@@ -592,9 +592,7 @@ class Service(EventDispatcher, log.LogAble):
             # print('service parse:', self, self.device)
             self.detection_completed = True
             self.dispatch_event(
-                'service_detection_completed',
-                sender=self.device,
-                device=self.device,
+                'service_detection_completed', self.device, self.device,
             )
             self.info(
                 f'send signal Coherence.UPnP.Service.detection_'
@@ -611,9 +609,7 @@ class Service(EventDispatcher, log.LogAble):
         def gotError(failure, url):
             self.warning(f'error requesting {url}')
             self.info(f'failure {failure}')
-            self.dispatch_event(
-                'service_detection_failed', self.device, device=self.device
-            )
+            self.dispatch_event('service_detection_failed', self.device)
 
         d = utils.getPage(self.get_scpd_url())
         d.addCallbacks(
