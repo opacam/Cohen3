@@ -547,10 +547,12 @@ class Coherence(EventDispatcher, log.LogAble):
     @property
     def log_level(self):
         '''Read config and return the log level.'''
-        try:
-            log_level = self.config.get('logging').get('level', 'warning')
-        except (KeyError, AttributeError):
-            log_level = self.config.get('logmode', 'warning')
+        if "logmode" in self.config:
+            log_level = self.config['logmode']
+        elif "logging" in self.config and "level" in self.config['logging']:
+            log_level = self.config['logging']['level']
+        else:
+            log_level = self.config.get('logging', 'warning')
         return log_level.upper()
 
     @property
