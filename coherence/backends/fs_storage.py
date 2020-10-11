@@ -369,7 +369,7 @@ class FSItem(BackendItem):
                     if not hasattr(self.item, 'attachments'):
                         self.item.attachments = {}
                     self.item.attachments[hash_from_path] = utils.StaticFile(
-                        caption
+                        caption, defaultType=mimetype,
                     )
 
             try:
