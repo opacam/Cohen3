@@ -78,7 +78,7 @@ test_require = (
     [
         'flake8',
         'pylint==2.1.1',
-        'python-coveralls==2.9.1',
+        'python-coveralls',
         'nose',
         'nose-cov',
     ]

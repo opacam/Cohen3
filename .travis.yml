@@ -1,9 +1,10 @@
 os: linux
-dist: xenial
+dist: bionic
 language: python
 python:
   - '3.6-dev'
   - '3.7-dev'
+  - '3.8-dev'
 services:
   - xvfb
 before_install:
@@ -23,7 +24,7 @@ before_install:
   - sudo apt-get install -y xvfb
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
 install:
-  - python -m pip install --upgrade --user pip
+  - python -m pip install --upgrade --user pip setuptools wheel
   - pip install --upgrade setuptools
   - pip install --upgrade cython
   - pip install .[dev]
