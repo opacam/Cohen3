@@ -177,15 +177,10 @@ class Device(EventDispatcher, log.LogAble):
                 f'embedded device {self.friendly_name} '
                 + f'{self.device_type} initialized, parent {self.parent}'
             )
-        self.dispatch_event('device_detection_completed', None, device=self)
         if self.parent is not None:
-            self.dispatch_event(
-                'device_detection_completed', self.parent, device=self
-            )
+            self.dispatch_event('device_detection_completed', self.parent)
         else:
-            self.dispatch_event(
-                'device_detection_completed', self, device=self
-            )
+            self.dispatch_event('device_detection_completed', self)
 
     def service_detection_failed(self, device):
         self.remove()
@@ -746,7 +741,7 @@ class RootDevice(Device):
             f'rootdevice {self.friendly_name} {self.st} {self.host} '
             + f'initialized, manifestation {self.manifestation}'
         )
-        self.dispatch_event('root_device_detection_completed', device=self)
+        self.dispatch_event('root_device_detection_completed', self)
 
     def add_device(self, device):
         self.debug(f'RootDevice add_device {device}')

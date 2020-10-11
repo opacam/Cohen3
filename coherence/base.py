@@ -1038,7 +1038,7 @@ class Coherence(EventDispatcher, log.LogAble):
         )
         self.devices.append(device)
         self.dispatch_event(
-            'coherence_device_detection_completed', device=device
+            'coherence_device_detection_completed', device,
         )
 
     def remove_device(self, device_type, infos):

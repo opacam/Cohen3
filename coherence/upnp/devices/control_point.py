@@ -291,7 +291,11 @@ class ControlPoint(EventDispatcher, log.LogAble):
 
                 device.set_client(client)
 
-        if device.client.detection_completed:
+        if (
+                device.client and
+                hasattr(device.client, 'detection_completed') and
+                device.client.detection_completed
+        ):
             self.completed(device.client)
         self.process_queries(device)
 
