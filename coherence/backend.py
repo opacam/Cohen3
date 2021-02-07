@@ -514,9 +514,9 @@ class Container(BackendItem):
         self.sorted = False
         self.sorting_method = 'name'
 
-    def on_parent(self, parent):
-        if self.parent is not None:
-            self.parent_id = self.parent.get_id()
+    def on_parent(self, obj, parent):
+        if parent is not None:
+            self.parent_id = parent.get_id()
 
     def register_child(self, child, external_id=None):
         id = self.store.append_item(child)
