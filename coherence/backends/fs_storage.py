@@ -76,7 +76,7 @@ try:
         IN_MOVED_TO,
         IN_ISDIR,
         IN_CHANGED,
-        _FLAG_TO_HUMAN,
+        humanReadableMask,
     )
 except Exception as msg:
     INotify = None
@@ -972,7 +972,7 @@ class FSStore(BackendStore):
     def notify(self, ignore, path, mask, parameter=None):
         self.info(
             'Event %s on %s - parameter %r',
-            ', '.join([fl for fl in _FLAG_TO_HUMAN if fl[0] == mask][0]),
+            ', '.join(humanReadableMask(mask)),
             path.path,
             parameter,
         )
@@ -985,7 +985,7 @@ class FSStore(BackendStore):
         if mask & IN_DELETE or mask & IN_MOVED_FROM:
             self.info(
                 f'{path.path} was deleted, '
-                f'parent {parameter!r} ({path.parent.path})'
+                f'parent {parameter!r} ({path.parent().path})'
             )
             id = self.get_id_by_name(parameter, path.path)
             if id is not None:
@@ -994,12 +994,12 @@ class FSStore(BackendStore):
             if mask & IN_ISDIR:
                 self.info(
                     f'directory {path.path} was created, '
-                    f'parent {parameter!r} ({path.parent.path})'
+                    f'parent {parameter!r} ({path.parent().path})'
                 )
             else:
                 self.info(
                     f'file {path.path} was created, '
-                    f'parent {parameter!r} ({path.parent.path})'
+                    f'parent {parameter!r} ({path.parent().path})'
                 )
             if self.get_id_by_name(parameter, path.path) is None:
                 if path.isdir():
