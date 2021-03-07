@@ -45,16 +45,6 @@ from datetime import datetime
 from functools import partial
 from urllib.parse import quote
 
-mimetypes.init()
-mimetypes.add_type('audio/x-m4a', '.m4a')
-mimetypes.add_type('audio/x-musepack', '.mpc')
-mimetypes.add_type('audio/x-wavpack', '.wv')
-mimetypes.add_type('video/mp4', '.mp4')
-mimetypes.add_type('video/mpegts', '.ts')
-mimetypes.add_type('video/divx', '.divx')
-mimetypes.add_type('video/divx', '.avi')
-mimetypes.add_type('video/x-matroska', '.mkv')
-
 from urllib.parse import urlsplit
 
 from twisted.python.filepath import FilePath
@@ -139,6 +129,7 @@ class FSItem(BackendItem):
         update=False,
         store=None,
     ):
+        #print('init; mimetype={},path={}'.format(mimetype,path))
         BackendItem.__init__(self)
         self.id = object_id
         self.parent = parent
@@ -632,6 +623,19 @@ class FSStore(BackendStore):
     ]
 
     def __init__(self, server, **kwargs):
+        mimetypes.init()
+        #mimetypes.add_type('audio/x-m4a', '.m4a')
+        mimetypes.add_type('audio/x-musepack', '.mpc')
+        mimetypes.add_type('audio/x-wavpack', '.wv')
+        mimetypes.add_type('video/mp4', '.mp4')
+        mimetypes.add_type('video/mpegts', '.ts')
+        mimetypes.add_type('video/divx', '.divx')
+        mimetypes.add_type('video/divx', '.avi')
+        mimetypes.add_type('video/x-matroska', '.mkv')
+        mimetypes.add_type('audio/mp4', '.m4a') # _not_ audio/m4a, spec demands audio/mp4
+        mimetypes.add_type('audio/flac', '.flac')
+        mimetypes.add_type('audio/ogg', '.ogg')
+
         BackendStore.__init__(self, server, **kwargs)
         self.next_id = 1000
         self.name = kwargs.get('name', 'my media')
@@ -916,6 +920,7 @@ class FSStore(BackendStore):
 
         try:
             mimetype, _ = mimetypes.guess_type(path, strict=False)
+            #print("append, path={}, mimetype={}".format(path,mimetype))
             if mimetype is None:
                 if os.path.isdir(path):
                     mimetype = 'directory'
