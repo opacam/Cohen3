@@ -36,6 +36,11 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
+
+# Need https://github.com/twisted/axiom/pull/119 for Python 3 support
+axiom = {optional=true, git = "https://github.com/twisted/axiom.git", rev="f0fce994f894b0aa767daa392ac0a4ce9dbf9717"}
+epsilon = {optional=true, version=">= 0.8.0"}
+
 autobahn = {optional = true, version = "*"}
 configobj = ">=4.3"
 dbus-python = {optional = true, version = "*"}
@@ -48,6 +53,7 @@ pygobject = {version = ">=3.30.0", optional = true}
 pyopenssl = "*"
 python-dateutil = "*"
 service_identity = "^18.1.0"
+tagpy = {optional = true, git = "https://github.com/palfrey/tagpy.git", rev="810a02fcac35d0973d8123a65657c00a5c5e1c78"}
 twisted = ">=20.3.0"
 "zope.interface" = "*"
 
@@ -78,6 +84,7 @@ audio = ["discid", "pycdb"]
 feed = ["feedparser"]
 twitch = ["livestreamer"]
 gstreamer = ["pycairo", "pygobject"]
+mediadb = ["axiom", "epsilon", "tagpy"]
 docs = ["recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
 dev = [
     "autobahn", "dbus-python",
