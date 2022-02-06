@@ -267,7 +267,7 @@ clone, move into the freshly created 'Cohen3' folder and install
 all dependencies (dev included) with `poetry`, but first upgrade `pip`::
 
   $ pip3 install pip --upgrade
-  $ pip3 install poetry
+  $ pip3 install poetry==1.1.12
   $ poetry install
 
 Personalized install from source with `pip`
