@@ -9,6 +9,8 @@
 Test cases for L{upnp.backends.mediadb_storage}
 """
 
+import os
+import time
 from twisted.python.filepath import FilePath
 from twisted.trial import unittest
 
@@ -22,17 +24,24 @@ class TestMediaDBStorage(unittest.TestCase):
 
     def setUp(self):
         self.tmp_content = FilePath(self.mktemp())
-        self.tmp_content.makedirs()
-        self.storage = mediadb_storage.MediaStore(None, name='my media',
-                                          content=self.tmp_content.path,
-                                          urlbase='http://fsstore-host/xyz',
-                                          enable_inotify=False)
+        self.tmp_content.makedirs()        
+        songs = os.path.join(os.path.dirname(__file__), "..", "content")
+        self.storage = mediadb_storage.MediaStore(
+            None,
+            name='my media',
+            mediadb=os.path.join(self.tmp_content.path, "media.db"),
+            medialocation=songs
+        )
+        self.storage.info(songs)        
 
     def tearDown(self):
-        self.tmp_content.remove()
         pass
 
     def test_ContentLen(self):
-        self.assertEqual(len(self.storage.content), 1)
-        self.assertEqual(len(self.storage.store), 1)
-        self.assertEqual(self.storage.len(), 1)
+        self.storage.upnp_init()
+        for x in range(10):
+            if self.storage.db.query(mediadb_storage.Track).count() == 1:
+                break
+            self.storage.info(f"waiting {x}")
+            time.sleep(1)
+        self.assertEqual(self.storage.db.query(mediadb_storage.Track).count(), 1)
