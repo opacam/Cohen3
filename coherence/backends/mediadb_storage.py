@@ -548,7 +548,6 @@ class MediaStore(BackendStore):
                     self.walk(os.path.join(path, filename))
                 else:
                     _, ext = os.path.splitext(filename)
-                    self.info(f"found {filename} {ext}")
                     if ext.lower() in KNOWN_AUDIO_TYPES:
                         self.filelist.append(os.path.join(path, filename))
 
@@ -763,8 +762,6 @@ class MediaStore(BackendStore):
         db_is_new = False
         if os.path.exists(self.mediadb) is False:
             db_is_new = True
-        else:
-            raise Exception
         self.db = store.Store(self.mediadb)
 
         self.containers[AUDIO_ALL_CONTAINER_ID] = Container(
