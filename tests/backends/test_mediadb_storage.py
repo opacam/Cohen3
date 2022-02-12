@@ -13,16 +13,24 @@ import os
 import time
 from twisted.python.filepath import FilePath
 from twisted.trial import unittest
+from unittest.case import SkipTest
 
 import coherence.log
 from coherence.backends import mediadb_storage
+
+try:
+    import tagpy
+    has_tagpy = True
+except ImportError:
+    has_tagpy = False
 
 coherence.log.init()
 
 
 class TestMediaDBStorage(unittest.TestCase):
-
     def setUp(self):
+        if has_tagpy is False:
+            raise SkipTest
         self.tmp_content = FilePath(self.mktemp())
         self.tmp_content.makedirs()        
         songs = os.path.join(os.path.dirname(__file__), "..", "content")

@@ -1026,7 +1026,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [extras]
 audio = []
 dbus = ["dbus-python"]
-dev = ["autobahn", "dbus-python", "pycairo", "pygobject", "axiom", "epsilon", "tagpy", "flake8", "nose", "nose-cov", "pylint", "python-coveralls", "recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
+dev = ["autobahn", "dbus-python", "pycairo", "pygobject", "flake8", "nose", "nose-cov", "pylint", "python-coveralls", "recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
 docs = ["recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
 elisa = ["axiom", "epsilon"]
 feed = ["feedparser"]
@@ -1041,7 +1041,7 @@ youtube = []
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "6a87a9f4b5da9c881eb9c9b92e84e3b90d08818056f4db9dadae198111b0d35c"
+content-hash = "3b9c349b299e571f899bc79b7e753d6ff7884ef5b9509846aa572832a4d121a3"
 
 [metadata.files]
 alabaster = [

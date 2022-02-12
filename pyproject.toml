@@ -91,7 +91,6 @@ dev = [
     "autobahn", "dbus-python",
     "discid", "gdata", "pycdb",
     "pycairo", "pygobject",
-    "axiom", "epsilon", "tagpy",
     "flake8", "nose", "nose-cov", "pylint", "python-coveralls",
     "recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon",
 ]
