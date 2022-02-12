@@ -16,20 +16,19 @@ from twisted.trial import unittest
 from unittest.case import SkipTest
 
 import coherence.log
-from coherence.backends import mediadb_storage
-
 try:
-    import tagpy
-    has_tagpy = True
-except ImportError:
-    has_tagpy = False
+    from coherence.backends import mediadb_storage
+    has_mediadb = True
+except ModuleNotFoundError:
+    has_mediadb = False
+
 
 coherence.log.init()
 
 
 class TestMediaDBStorage(unittest.TestCase):
     def setUp(self):
-        if has_tagpy is False:
+        if has_mediadb is False:
             raise SkipTest
         self.tmp_content = FilePath(self.mktemp())
         self.tmp_content.makedirs()        
