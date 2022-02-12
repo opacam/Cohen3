@@ -54,7 +54,7 @@ pyopenssl = "*"
 python-dateutil = "*"
 service_identity = "^18.1.0"
 # Using a branch, as the upstream is mostly incompatible with pip-style installs and seems fairly dead! 
-tagpy = {optional = true, git = "https://github.com/palfrey/tagpy.git", rev="810a02fcac35d0973d8123a65657c00a5c5e1c78"}
+tagpy = {optional = true, git = "https://github.com/palfrey/tagpy.git", rev="fb452e4d46c6521de7a0f7b1ed7db4006b7d4a7c"}
 twisted = ">=20.3.0"
 "zope.interface" = "*"
 
