@@ -904,7 +904,7 @@ youtube = []
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "efdb8736d76fe02b4cf4ca9cdc5e0f2b936519a4222bcb20fe80965fc9e98b20"
+content-hash = "4e8b16bdeade287586cf2c920779992090045b72888eb19e78b0b11bfae2a987"
 
 [metadata.files]
 alabaster = [

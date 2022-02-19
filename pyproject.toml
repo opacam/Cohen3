@@ -48,7 +48,7 @@ pygobject = {version = ">=3.30.0", optional = true}
 pyopenssl = "*"
 python-dateutil = "*"
 service_identity = "^18.1.0"
-twisted = ">=20.3.0"
+twisted = ">=20.3.0, <22.1.0" # 22.1.0 removed HTTPPageGetter as it's now deprecated
 "zope.interface" = "*"
 
 # dev-dependencies
