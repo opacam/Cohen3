@@ -30,7 +30,7 @@ install:
   - python -m pip install --upgrade --user pip setuptools wheel
   - pip install --upgrade setuptools
   - pip install --upgrade cython
-  # Because libboost-python-dev only includes libraries for 3.6
+  # Because libboost-python-dev only includes libraries for 3.6 (see https://packages.ubuntu.com/bionic/amd64/libboost-python1.65-dev/filelist)
   - if [ "$TRAVIS_PYTHON_VERSION" == "3.6-dev" ]; then pip install .[dev,mediadb]; else pip install .[dev]; fi
 script:
   # stop the build if there are Python syntax errors or undefined names
