@@ -585,10 +585,10 @@ class MediaStore(BackendStore):
         def got_tags(tags, file):
             self.debug('got_tags', tags)
 
-            album: bytes = tags.get('album', '')
-            artist: bytes = tags.get('artist', '')
-            title: bytes = tags.get('title', '')
-            track: bytes = tags.get('track', 0)
+            album: bytes = tags.get('album', b'')
+            artist: bytes = tags.get('artist', b'')
+            title: bytes = tags.get('title', b'')
+            track: int = tags.get('track', 0)
 
             if len(artist) == 0:
                 return
@@ -619,10 +619,10 @@ class MediaStore(BackendStore):
                     )
                     album_ds.cover = filename
             # print album_ds.cover
-            track_ds = self.db.findOrCreate(
+            self.db.findOrCreate(
                 Track,
                 title=title.decode('utf-8'),
-                track_nr=int(track),
+                track_nr=track,
                 album=album_ds,
                 location=file,
             )
