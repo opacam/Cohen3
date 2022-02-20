@@ -56,22 +56,22 @@ jobs:
     - name: Unit tests with nose
       run: |
         nosetests --config=.noserc
-    # The following steps will only be run for python 3.7
+    # The following steps will only be run for python 3.8 (because that gets the mediadb testing)
     - name: Upload coverage to Codecov
-      if: matrix.python-version == '3.7'
+      if: matrix.python-version == '3.8'
       uses: codecov/codecov-action@v1.0.3
       with:
         token: ${{secrets.CODECOV_TOKEN}}
         flags: unittest
         name: Cohen3
     - name: Build sphinx docs
-      if: matrix.python-version == '3.7'
+      if: matrix.python-version == '3.8'
       run: |
         pip install travis-sphinx
         pip install sphinx-rtd-theme
         travis-sphinx build -n --source=docs
     # We only deploy docs when we merging to master branch
     - name: Deploy sphinx docs
-      if: matrix.python-version == '3.7' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+      if: matrix.python-version == '3.8' && github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: |
         travis-sphinx deploy
