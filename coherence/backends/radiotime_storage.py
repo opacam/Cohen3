@@ -6,6 +6,7 @@
 
 # Copyright 2007, Frank Scholz <coherence@beebits.net>
 # Copyright 2009-2010, Jean-Michel Sizun <jmDOTsizunATfreeDOTfr>
+# Copyright 2020, Till Riedel <github.com/riedel>
 from lxml import etree
 from twisted.python.failure import Failure
 
@@ -15,6 +16,7 @@ from coherence.backend import (
     LazyContainer,
     AbstractBackendStore,
 )
+from .playlist_storage import PlaylistItem
 from coherence.upnp.core import DIDLLite
 from coherence.upnp.core import utils
 from coherence.upnp.core.DIDLLite import Resource
@@ -23,61 +25,8 @@ OPML_BROWSE_URL = 'http://opml.radiotime.com/Browse.ashx'
 
 # we only handle mp3 audio streams for now
 DEFAULT_FORMAT = 'mp3'
-DEFAULT_MIMETYPE = 'audio/mpeg'
-
 
 # TODO : extend format handling using radiotime API
-
-
-class RadiotimeAudioItem(BackendItem):
-    logCategory = 'radiotime'
-
-    def __init__(self, outline):
-        BackendItem.__init__(self)
-        self.preset_id = outline.get('preset_id')
-        self.name = outline.get('text')
-        self.mimetype = DEFAULT_MIMETYPE
-        self.stream_url = outline.get('URL')
-        self.image = outline.get('image')
-        # self.location = PlaylistStreamProxy(self.stream_url)
-        # self.url = self.stream_url
-
-        self.item = None
-        self.parent = None
-
-    def replace_by(self, item):
-        # do nothing: we suppose the replacement item is the same
-        return
-
-    def get_item(self):
-        if self.item is None:
-            upnp_id = self.get_id()
-            upnp_parent_id = self.parent.get_id()
-            self.item = DIDLLite.AudioBroadcast(
-                upnp_id, upnp_parent_id, self.name
-            )
-            self.item.albumArtURI = self.image
-            protocols = ';'.join(
-                (
-                    'DLNA.ORG_PN=MP3',
-                    'DLNA.ORG_CI=0',
-                    'DLNA.ORG_OP=01',
-                    'DLNA.ORG_FLAGS=01700000000000000000000000000000',
-                )
-            )
-            res = Resource(
-                self.stream_url, f'http-get:*:{self.mimetype}:{protocols}'
-            )
-            res.size = 0  # None
-            self.item.res.append(res)
-        return self.item
-
-    def get_path(self):
-        return self.stream_url
-
-    def get_id(self):
-        return self.storage_id
-
 
 class RadiotimeStore(AbstractBackendStore):
     logCategory = 'radiotime'
@@ -119,7 +68,7 @@ class RadiotimeStore(AbstractBackendStore):
         )
         self.set_root_item(root_item)
 
-        self.init_completed()
+        self.init_completed=True
 
     def upnp_init(self):
         self.current_connection_id = None
@@ -178,8 +127,24 @@ class RadiotimeStore(AbstractBackendStore):
                 parent.add_child(item, external_id=external_id)
 
             elif type == 'audio':
-                item = RadiotimeAudioItem(outline)
-                parent.add_child(item, external_id=item.preset_id)
+                # the corresponding item will a self-populating Container
+                text = outline.get('text')
+                key = outline.get('key')
+                guide_id = outline.get('guide_id')
+                external_id = guide_id
+                if external_id is None and key is not None:
+                    external_id = f'{parent.external_id}_{key}'
+                if external_id is None:
+                    external_id = outline_url
+                item = LazyContainer(
+                    parent,
+                    text,
+                    external_id,
+                    self.refresh,
+                    self.retrievePlaylistItems,
+                    url=outline_url,
+                )
+                parent.add_child(item, external_id=external_id)
 
         def got_page(result):
             self.info(
@@ -198,7 +163,7 @@ class RadiotimeStore(AbstractBackendStore):
             )
             self.debug('%r', error.getTraceback())
             parent.childrenRetrievingNeeded = True  # we retry
-            return Failure(f'Unable to retrieve items for url {url}')
+            return Failure(error)
 
         def got_xml_error(error):
             self.warning(
@@ -209,9 +174,45 @@ class RadiotimeStore(AbstractBackendStore):
             parent.childrenRetrievingNeeded = True  # we retry
             return Failure(f'Unable to retrieve items for url {url}')
 
+        def parse_page(page):
+            return etree.fromstring(page[0])
+
         d = utils.getPage(url)
-        d.addCallback(etree.fromstring)
+        d.addCallback(parse_page)
         d.addErrback(got_error)
         d.addCallback(got_page)
         d.addErrback(got_xml_error)
+        return d
+
+    def retrievePlaylistItems(self, parent, url):
+        def gotPlaylist(playlist):
+            self.info('got playlist')
+            items = []
+            if playlist:
+                content, header = playlist
+                if isinstance(content, bytes):
+                    content = content.decode('utf-8')
+                lines = content.splitlines().__iter__()
+                line = next(lines)
+                mimetype="audio/mpeg"
+                i=0
+                while line is not None:
+                    i+=1 
+                    item = PlaylistItem(f'Stream{i}', line, mimetype)
+                    parent.add_child(item,external_id=f'{parent.external_id}_{i}')
+                    items.append(item)
+                    try:
+                        line = next(lines)
+                    except StopIteration:
+                        line = None
+            return items
+
+        def gotError(error):
+            self.warning(f'Unable to retrieve playlist: {url}')
+            print(f'Error: {error}')
+            return None
+
+        d = utils.getPage(url)
+        d.addCallback(gotPlaylist)
+        d.addErrback(gotError)
         return d
