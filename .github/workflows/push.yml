@@ -35,7 +35,7 @@ jobs:
     - name: Install python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install .[dev,mediadb]
+        python -m pip install .[dev,mediadb]
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -64,6 +64,6 @@ jobs:
         travis-sphinx build -n --source=docs
     # We only deploy docs when we merging to master branch
     - name: Deploy sphinx docs
-      if: matrix.python-version == '3.8' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+      if: matrix.python-version == '3.7' && github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: |
         travis-sphinx deploy
