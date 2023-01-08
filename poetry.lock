@@ -887,18 +887,11 @@ test = ["pytest"]
 
 [[package]]
 name = "tagpy"
-version = "2018.1.1"
+version = "2022.1"
 description = "Python Bindings for TagLib"
 category = "main"
-optional = true
+optional = false
 python-versions = "*"
-develop = false
-
-[package.source]
-type = "git"
-url = "https://github.com/palfrey/tagpy.git"
-reference = "fb452e4d46c6521de7a0f7b1ed7db4006b7d4a7c"
-resolved_reference = "fb452e4d46c6521de7a0f7b1ed7db4006b7d4a7c"
 
 [[package]]
 name = "twisted"
@@ -1041,7 +1034,7 @@ youtube = []
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "3b9c349b299e571f899bc79b7e753d6ff7884ef5b9509846aa572832a4d121a3"
+content-hash = "0cf9a282581b36fa2a6cedc2bc8ac3f255555565cf0f60727907ff0b9e2ad722"
 
 [metadata.files]
 alabaster = [

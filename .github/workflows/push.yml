@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       DISPLAY: ':99.0'
     strategy:
@@ -28,22 +28,14 @@ jobs:
         sudo apt-get install libdiscid0
         sudo apt-get install --yes gstreamer1.0-alsa gstreamer1.0-plugins-bad gstreamer1.0-plugins-base gstreamer1.0-plugins-base-apps gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly gstreamer1.0-libav
         sudo apt-get install -y libgirepository1.0-dev libcairo2-dev gir1.2-gtk-3.0 gobject-introspection python3-gi python3-gi-cairo gir1.2-gtk-3.0 python3-gst-1.0
-        sudo apt-get install -y libtag1-dev libboost-python-dev
         sudo apt-get install -y xvfb
         sudo apt-get install dbus-x11
         /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16
         export $(dbus-launch)
     - name: Install python dependencies
-      env:
-        PYTHON_VERSION: ${{ matrix.python-version }}
       run: |
         python -m pip install --upgrade pip
-        # Because libboost-python-dev only includes libraries for 3.8 (see https://packages.ubuntu.com/focal/amd64/libboost-python1.71-dev/filelist)
-        if [ "$PYTHON_VERSION" == "3.8" ]; then
-          pip install .[dev,mediadb]
-        else
-          pip install .[dev]
-        fi
+        pip install .[dev,mediadb]
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -56,16 +48,16 @@ jobs:
     - name: Unit tests with nose
       run: |
         nosetests --config=.noserc
-    # The following steps will only be run for python 3.8 (because that gets the mediadb testing)
+    # The following steps will only be run for python 3.7
     - name: Upload coverage to Codecov
-      if: matrix.python-version == '3.8'
+      if: matrix.python-version == '3.7'
       uses: codecov/codecov-action@v1.0.3
       with:
         token: ${{secrets.CODECOV_TOKEN}}
         flags: unittest
         name: Cohen3
     - name: Build sphinx docs
-      if: matrix.python-version == '3.8'
+      if: matrix.python-version == '3.7'
       run: |
         pip install travis-sphinx
         pip install sphinx-rtd-theme
