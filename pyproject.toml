@@ -52,7 +52,7 @@ twisted = ">=20.3.0, <22.1.0" # 22.1.0 removed HTTPPageGetter as it's now deprec
 "zope.interface" = "*"
 
 # dev-dependencies
-flake8 = {optional = true, version = "*"}
+flake8 = {optional = true, version = "<4"} # Because of https://github.com/PyCQA/flake8/issues/1564
 nose = {optional = true, version = "*"}
 nose-cov = {optional = true, version = "*"}
 pylint = {version = "==2.1.1", optional = true}
