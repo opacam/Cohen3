@@ -4,8 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04 # 22.04 doesn't have Python 3.6
     env:
       DISPLAY: ':99.0'
     strategy:
