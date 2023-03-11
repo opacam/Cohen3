@@ -135,7 +135,7 @@ AUDIO_ALBUM_CONTAINER_ID = 103
 
 def sanitize(filename):
     badchars = ''.join(set(string.punctuation) - set('-_+.~'))
-    f = str(filename.lower())
+    f = filename.lower()
     for old, new in (('ä', 'ae'), ('ö', 'oe'), ('ü', 'ue'), ('ß', 'ss')):
         f = f.replace(str(old), str(new))
     f = f.replace(badchars, '_')
@@ -583,12 +583,12 @@ class MediaStore(BackendStore):
                     return ''
 
         def got_tags(tags, file):
-            # print 'got_tags', tags
+            self.debug('got_tags', tags)
 
-            album = tags.get('album', '')
-            artist = tags.get('artist', '')
-            title = tags.get('title', '')
-            track = tags.get('track', 0)
+            album: bytes = tags.get('album', b'')
+            artist: bytes = tags.get('artist', b'')
+            title: bytes = tags.get('title', b'')
+            track: int = tags.get('track', 0)
 
             if len(artist) == 0:
                 return
@@ -601,12 +601,12 @@ class MediaStore(BackendStore):
                 title = 'UNKNOWN_TITLE'
             # print 'Tags:', file, album, artist, title, track
 
-            artist_ds = self.db.findOrCreate(Artist, name=str(artist, 'utf8'))
+            artist_ds = self.db.findOrCreate(Artist, name=artist.decode('utf-8'))
             album_ds = self.db.findOrCreate(
-                Album, title=str(album, 'utf8'), artist=artist_ds
+                Album, title=album.decode('utf-8'), artist=artist_ds
             )
             if len(album_ds.cover) == 0:
-                dirname = str(os.path.dirname(file), 'utf-8')
+                dirname = os.path.dirname(file)
                 album_ds.cover = check_for_cover_art(dirname)
                 if len(album_ds.cover) > 0:
                     filename = f'{album_ds.artist.name} - {album_ds.title}'
@@ -619,12 +619,12 @@ class MediaStore(BackendStore):
                     )
                     album_ds.cover = filename
             # print album_ds.cover
-            track_ds = self.db.findOrCreate(
+            self.db.findOrCreate(
                 Track,
-                title=str(title, 'utf8'),
-                track_nr=int(track),
+                title=title.decode('utf-8'),
+                track_nr=track,
                 album=album_ds,
-                location=str(file, 'utf8'),
+                location=file,
             )
 
         for file in self.filelist:

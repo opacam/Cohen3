@@ -6,8 +6,8 @@ from setuptools import setup, find_packages
 
 from coherence import __version__
 
-if sys.version_info[:3] < (3, 6, 0):
-    raise NotImplemented('Python 3.6+ required, bye-bye')
+if sys.version_info[:3] < (3, 7, 0):
+    raise NotImplemented('Python 3.7+ required, bye-bye')
 
 packages = find_packages()
 
@@ -145,7 +145,6 @@ setup(name='Cohen3',
                    'Environment :: Web Environment',
                    'License :: OSI Approved :: MIT License',
                    'Operating System :: OS Independent',
-                   'Programming Language :: Python :: 3.6',
                    'Programming Language :: Python :: 3.7',
                    'Topic :: Internet :: WWW/HTTP',
                    'Topic :: Multimedia :: Sound/Audio',

@@ -1,0 +1,1 @@
+test.mp3: Based off of https://github.com/mathiasbynens/small/blob/master/mp3.mp3 plus some use of id3 to add tags
