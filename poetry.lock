@@ -1631,7 +1631,7 @@ name = "tagpy"
 version = "2022.1"
 description = "Python Bindings for TagLib"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "tagpy-2022.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0535daa11972cef51a061f0142e1aee1f96bf41db84d0ccdeb7e4e4ffe344ac1"},
@@ -1975,4 +1975,4 @@ youtube = []
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "573844eccc461f3ad08c1d5c4ab9ccabe91372240786928fa234f32320cf5f68"
+content-hash = "3c53b18394d1d7a693fcac1ebf580c26faa3202e97de3dac638324f770d48307"
