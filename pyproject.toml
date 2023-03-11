@@ -16,7 +16,6 @@ classifiers = [
     "Environment :: Web Environment",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Topic :: Internet :: WWW/HTTP", "Topic :: Multimedia :: Sound/Audio",
@@ -35,7 +34,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 
 # Need https://github.com/twisted/axiom/pull/119 for Python 3 support
 axiom = {optional=true, git = "https://github.com/twisted/axiom.git", rev="f0fce994f894b0aa767daa392ac0a4ce9dbf9717"}
