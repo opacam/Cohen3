@@ -49,13 +49,15 @@ jobs:
       run: |
         nosetests --config=.noserc
     # The following steps will only be run for python 3.7
-    - name: Upload coverage to Codecov
+    - name: Upload coverage report to Codecov
       if: matrix.python-version == '3.7'
-      uses: codecov/codecov-action@v1.0.3
+      uses: codecov/codecov-action@v3
       with:
         token: ${{secrets.CODECOV_TOKEN}}
+        files: ./coverage.xml
         flags: unittest
         name: Cohen3
+        fail_ci_if_error: true
     - name: Build sphinx docs
       if: matrix.python-version == '3.7'
       run: |
