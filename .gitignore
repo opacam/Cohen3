@@ -35,8 +35,9 @@ _templates/
 /.project
 /.pydevproject
 
-# PyCharm
+# IDE
 /.idea
+/.vscode
 
 # OS generated files
 *.DS_[sS]Store*
@@ -45,3 +46,13 @@ Icon?
 Thumbs.db
 *.pid
 ._.**~
+
+# coverage reports
+/cover/
+
+# temp files from tests
+temp
+
+# dist files
+*tar.gz
+*.whl
