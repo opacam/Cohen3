@@ -103,102 +103,102 @@ and some of the backends has become obsolete. You can see the backends status
 in the below table.
 
 .. list-table::
-   :widths: 10 25 65
+   :widths: 5 25 65
    :header-rows: 1
 
-   * - Status
+   * - 
      - Backend Name
      - Description/Notes
-   * - |question|
+   * - `:question:`
      - AmpacheStore
      -
-   * - |success|
+   * - `:heavy_check_mark:`
      - AppleTrailersStore
      -
-   * - |question|
+   * - `:question:`
      - AudioCDStore
      -
-   * - |question|
+   * - `:question:`
      - AxisCamStore
      -
-   * - |question|
+   * - `:question:`
      - BansheeStore
      -
-   * - |question|
+   * - `:question:`
      - BuzztardStore
      -
-   * - |question|
+   * - `:question:`
      - DVBDStore
      -
-   * - |question|
+   * - `:question:`
      - ElisaPlayer
      -
-   * - |question|
+   * - `:question:`
      - ElisaMediaStore
      -
-   * - |question|
+   * - `:question:`
      - FeedStore
      -
-   * - |question|
+   * - `:question:`
      - FlickrStore
      -
-   * - |success|
+   * - `:heavy_check_mark:`
      - FSStore
      -
-   * - |question|
+   * - `:question:`
      - Gallery2Store
      -
-   * - |question|
+   * - `:question:`
      - GStreamerPlayer
      -
-   * - |success|
+   * - `:heavy_check_mark:`
      - IRadioStore (ShoutCast)
      -
-   * - |question|
+   * - `:question:`
      - ITVStore
      -
-   * - |fails|
+   * - `:heavy_multiplication_x:`
      - LastFMStore
      - *service moved to new api...needs update*
-   * - |success|
+   * - `:heavy_check_mark:`
      - LolcatsStore
      -
-   * - |question|
+   * - `:question:`
      - MediaStore
      -
-   * - |question|
+   * - `:question:`
      - PicasaStore
      - *Partially tested, may work until starting year 2019, where google will
        begin to shutdown this service, the source code should be rewrite using
        the api for the new service `Google Photos`*
-   * - |success|
+   * - `:heavy_check_mark:`
      - PlayListStore
      -
-   * - |question|
+   * - `:question:`
      - RadiotimeStore
      -
-   * - |question|
+   * - `:question:`
      - SWR3Store
      -
-   * - |success|
+   * - `:heavy_check_mark:`
      - TEDStore
      -
-   * - |question|
+   * - `:question:`
      - TestStore
      -
-   * - |question|
+   * - `:question:`
      - TrackerStore
      -
-   * - |question|
+   * - `:question:`
      - TestStore
      -
-   * - |fails|
+   * - `:heavy_multiplication_x:`
      - TwitchStore
      - *Partially working, video play is not working*
-   * - |question|
+   * - `:question:`
      - YamjStore
      -
-   * - |fails|
+   * - `:heavy_multiplication_x:`
      - YouTubeStore
      - *Google moved to new api...backend should be rewrite with new api in
        mind*
@@ -212,21 +212,6 @@ Notes:
       files into a dlna/upnp network, all the backends are extra features which
       may be handy for some end-users and also may be useful as a reference of
       how to make your own backend using the Cohen3's modules.
-
-.. |success| image:: misc/other-icons/checked.png
-   :align: middle
-   :height: 5
-   :width: 5
-
-.. |fails| image:: misc/other-icons/cross.png
-   :align: middle
-   :height: 5
-   :width: 5
-
-.. |question| image:: misc/other-icons/question.png
-   :align: middle
-   :height: 5
-   :width: 5
 
 Installation with pip
 ---------------------
