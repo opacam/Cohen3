@@ -202,13 +202,15 @@ in the below table.
 
 Notes:
 
-    - Some of the listed backends it may be removed in a future releases...
-      depending on if the target service is still available, dependencies of
-      the backend, maintainability...keep in mind that the main goal of this
-      project is to have a working media server/client capable of serve local
-      files into a dlna/upnp network, all the backends are extra features which
-      may be handy for some end-users and also may be useful as a reference of
-      how to make your own backend using the Cohen3's modules.
+      Please note that some of the listed backends may be removed in future
+      releases. This will depend on factors such as the availability of the
+      target service, the dependencies of the backend, and the maintainability
+      of the code. It is important to keep in mind that the main goal of this
+      project is to create a functional media server/client capable of serving
+      local files on a DLNA/UPnP network. All of the backends included are
+      additional features that may be useful for some end-users, and can also
+      serve as a reference for creating your own backend using Cohen3's
+      modules.
 
 Installation with pip
 ---------------------
