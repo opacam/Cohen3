@@ -1,8 +1,9 @@
 Cohen3
 ======
 
-.. image:: https://travis-ci.com/opacam/Cohen3.svg?branch=master
-        :target: https://travis-ci.com/opacam/Cohen3
+.. image:: https://github.com/opacam/Cohen3/actions/workflows/push.yml/badge.svg
+        :target: https://github.com/opacam/Cohen3/actions/workflows/push.yml
+        :alt: Unit tests
 
 .. image:: https://img.shields.io/pypi/status/Cohen3.svg
         :target: https://pypi.python.org/pypi/Cohen3/
