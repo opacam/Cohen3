@@ -23,9 +23,6 @@ Cohen3
         :target: https://github.com/opacam/Cohen3/releases
         :alt: GitHub release
 
-.. image:: http://hits.dwyl.io/opacam/Cohen3.svg
-        :target: http://hits.dwyl.io/opacam/Cohen3
-
 .. image:: https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat
         :target: https://github.com/opacam/Cohen3/issues
 
