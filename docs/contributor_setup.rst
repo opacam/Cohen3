@@ -42,9 +42,9 @@ Now you can make your changes locally.
     changes you made.
 
     :Note: You also can check the coverage once you submitted the pull requests
-           and travis tests are done (but this, probably, it will be  slower
-           than do it manually from your os, because you can skip some steps
-           that travis cannot skip).
+           and github-actions unit tests are done (but this, probably, it will be
+           slower than do it manually from your os, because you can skip some steps
+           that github-actions cannot skip).
 
 7. Commit your changes and push your branch to GitHub::
 
