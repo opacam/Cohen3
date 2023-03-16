@@ -23,8 +23,8 @@ Install with extra dependencies
 Some of the plugins will depend of system libraries that you must install
 in order to make it work the plugin.
 
-Note: the apt commands showed in this document are the ones used in our travis
-builds. The tests are made using a GNU Linux Os: ubuntu xenial.
+Note: the apt commands showed in this document are the ones used in our
+github-actions builds. The tests are made using a GNU Linux Os: ubuntu.
 
 You must have an updated cython package::
 
@@ -95,7 +95,7 @@ Also there are some special setup commands that can be useful for developers:
 
 
 *Note: If you have any doubt about how to install some dependencies, you can check the
-.travis.yml file, it can be useful in some cases.*
+`.github/workflows/push.yml` file, it can be useful in some cases.*
 
 Python dependencies
 -------------------
