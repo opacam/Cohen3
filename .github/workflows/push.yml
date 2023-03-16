@@ -33,9 +33,17 @@ jobs:
         /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16
         export $(dbus-launch)
     - name: Install python dependencies
+      # mediadb backend requires tagpy and it does not provide binaries for Python
+      # versions greater than 3.9, which can cause build failures. So we only install
+      # mediadb dependencies for the python version that we use for our codecov reports.
+      # Note that the mediadb tests will also be skipped if the dependencies are not installed.
       run: |
         python -m pip install --upgrade pip
-        python -m pip install .[dev,mediadb]
+        if [[ ${{ matrix.python-version }} == "3.7" ]]; then
+          python -m pip install .[dev,mediadb]
+        else
+          python -m pip install .[dev]
+        fi
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
