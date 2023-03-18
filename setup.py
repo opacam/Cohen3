@@ -46,10 +46,6 @@ twitch_store_require = [
     'livestreamer'
 ]
 
-youtube_store_require = [
-    'gdata'
-]
-
 web_ui_require = [
     'autobahn'
 ]
@@ -79,7 +75,6 @@ test_require = (
         'nose-cov',
     ]
     + audio_store_require
-    + youtube_store_require
 )
 
 dev_require = test_require + gstreamer_player_require
@@ -111,8 +106,7 @@ entry_points = """
     TrackerStore = coherence.backends.tracker_storage:TrackerStore
     TwitchStore = coherence.backends.twitch_storage:TwitchStore
     YamjStore = coherence.backends.yamj_storage:YamjStore
-    YouTubeStore = coherence.backends.youtube_storage:YouTubeStore
-    
+
     [coherence.plugins.backend.media_renderer]
     BuzztardPlayer = coherence.backends.buzztard_control:BuzztardPlayer
     ElisaPlayer = coherence.backends.elisa_renderer:ElisaPlayer
@@ -161,7 +155,6 @@ setup(name='Cohen3',
           'elisa': elisa_store_require,
           'feed': feed_store_require,
           'twitch': twitch_store_require,
-          'youtube': youtube_store_require,
           'web': web_ui_require,
       },
       dependency_links=[

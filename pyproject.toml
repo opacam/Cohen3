@@ -76,7 +76,6 @@ build-backend = "poetry.masonry.api"
 web = ["autobahn"]
 elisa = ["axiom", "epsilon"]
 dbus = ["dbus-python"]
-picasa = ["gdata"]
 youtube = ["gdata"]
 test = ["flake8", "nose", "nose-cov", "pylint", "python-coveralls"]
 audio = ["discid", "pycdb"]
@@ -122,7 +121,6 @@ TestStore = 'coherence.backends.test_storage:TestStore'
 TrackerStore = 'coherence.backends.tracker_storage:TrackerStore'
 TwitchStore = 'coherence.backends.twitch_storage:TwitchStore'
 YamjStore = 'coherence.backends.yamj_storage:YamjStore'
-YouTubeStore = 'coherence.backends.youtube_storage:YouTubeStore'
 
 
 [tool.poetry.plugins."coherence.plugins.backend.media_renderer"]
