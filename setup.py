@@ -159,7 +159,6 @@ setup(name='Cohen3',
       },
       dependency_links=[
           'git+git://github.com/lobocv/eventdispatcher@releases/tag/1.9.4#egg=eventdispatcher',
-          'git+git://github.com/dvska/gdata-python3@master#egg=gdata',
           'git+git://github.com/fishstiqz/pycdb@master#egg=pycdb',
           'git+git://github.com/JonnyJD/python-discid@master#egg=discid',
           'git+git://github.com/opacam/epsilon@python3#egg=Epsilon',

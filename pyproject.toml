@@ -76,7 +76,6 @@ build-backend = "poetry.masonry.api"
 web = ["autobahn"]
 elisa = ["axiom", "epsilon"]
 dbus = ["dbus-python"]
-youtube = ["gdata"]
 test = ["flake8", "nose", "nose-cov", "pylint", "python-coveralls"]
 audio = ["discid", "pycdb"]
 feed = ["feedparser"]
@@ -86,7 +85,7 @@ mediadb = ["axiom", "epsilon", "tagpy"]
 docs = ["recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
 dev = [
     "autobahn", "dbus-python",
-    "discid", "gdata", "pycdb",
+    "discid", "pycdb",
     "pycairo", "pygobject",
     "flake8", "nose", "nose-cov", "pylint", "python-coveralls",
     "recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon",
