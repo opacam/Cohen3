@@ -104,7 +104,7 @@ in the below table.
    :widths: 5 25 65
    :header-rows: 1
 
-   * - 
+   * -
      - Backend Name
      - Description/Notes
    * - `:question:`
@@ -164,11 +164,10 @@ in the below table.
    * - `:question:`
      - MediaStore
      -
-   * - `:question:`
+   * - `:fire:`
      - PicasaStore
-     - *Partially tested, may work until starting year 2019, where google will
-       begin to shutdown this service, the source code should be rewrite using
-       the api for the new service `Google Photos`*
+     - *Moved to `misc/deprecated/backends` because google stopped to offer this service, but could be
+       rewrite using the api for the new service `Google Photos`*
    * - `:heavy_check_mark:`
      - PlayListStore
      -
@@ -196,9 +195,10 @@ in the below table.
    * - `:question:`
      - YamjStore
      -
-   * - `:heavy_multiplication_x:`
+   * - `:fire:`
      - YouTubeStore
-     - *Google moved to new api...backend should be rewrite with new api in
+     - *Moved to `misc/deprecated/backends` because Google moved to new api...
+       backend should be rewrite with new api in
        mind*
 
 Notes:
