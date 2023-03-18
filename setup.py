@@ -42,10 +42,6 @@ feed_store_require = [
     'feedparser'
 ]
 
-picasa_store_require = [
-    'gdata'
-]
-
 twitch_store_require = [
     'livestreamer'
 ]
@@ -107,7 +103,6 @@ entry_points = """
     LastFMStore = coherence.backends.lastfm_storage:LastFMStore
     LolcatsStore = coherence.backends.lolcats_storage:LolcatsStore
     MediaStore = coherence.backends.mediadb_storage:MediaStore
-    PicasaStore = coherence.backends.picasa_storage:PicasaStore
     PlaylistStore = coherence.backends.playlist_storage:PlaylistStore
     RadiotimeStore = coherence.backends.radiotime_storage:RadiotimeStore
     SWR3Store = coherence.backends.swr3_storage:SWR3Store
@@ -165,7 +160,6 @@ setup(name='Cohen3',
           'gstreamer': gstreamer_player_require,
           'elisa': elisa_store_require,
           'feed': feed_store_require,
-          'picasa': picasa_store_require,
           'twitch': twitch_store_require,
           'youtube': youtube_store_require,
           'web': web_ui_require,
