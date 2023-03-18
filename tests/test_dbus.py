@@ -12,6 +12,7 @@ Test cases for L{dbus_service}
 import os
 import sys
 
+from pathlib import Path
 from twisted.internet.defer import Deferred
 from twisted.trial import unittest
 
@@ -127,11 +128,17 @@ class TestDBUS(unittest.TestCase):
         @wrapped(d)
         def add_it(uuid):
             self.coherence_service.add_plugin(
-                'YouTubeStore',
-                {'name': 'dbus-test-youtube-%d' % os.getpid(), 'uuid': uuid},
+                "FSStore",
+                {
+                    "name": f"MediaServer-{os.getpid()}",
+                    "content": f"{Path(__file__).parent}/content",
+                    "uuid": uuid,
+                    "enable_inotify": "False",
+                },
                 dbus_interface=BUS_NAME,
                 reply_handler=handle_add_plugin_reply,
-                error_handler=d.errback)
+                error_handler=d.errback,
+            )
 
         @wrapped(d)
         def handle_add_plugin_reply(uuid):
