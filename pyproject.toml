@@ -76,8 +76,6 @@ build-backend = "poetry.masonry.api"
 web = ["autobahn"]
 elisa = ["axiom", "epsilon"]
 dbus = ["dbus-python"]
-picasa = ["gdata"]
-youtube = ["gdata"]
 test = ["flake8", "nose", "nose-cov", "pylint", "python-coveralls"]
 audio = ["discid", "pycdb"]
 feed = ["feedparser"]
@@ -87,7 +85,7 @@ mediadb = ["axiom", "epsilon", "tagpy"]
 docs = ["recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon"]
 dev = [
     "autobahn", "dbus-python",
-    "discid", "gdata", "pycdb",
+    "discid", "pycdb",
     "pycairo", "pygobject",
     "flake8", "nose", "nose-cov", "pylint", "python-coveralls",
     "recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon",
@@ -114,7 +112,6 @@ ITVStore = 'coherence.backends.itv_storage:ITVStore'
 LastFMStore = 'coherence.backends.lastfm_storage:LastFMStore'
 LolcatsStore = 'coherence.backends.lolcats_storage:LolcatsStore'
 MediaStore = 'coherence.backends.mediadb_storage:MediaStore'
-PicasaStore = 'coherence.backends.picasa_storage:PicasaStore'
 PlaylistStore = 'coherence.backends.playlist_storage:PlaylistStore'
 RadiotimeStore = 'coherence.backends.radiotime_storage:RadiotimeStore'
 SWR3Store = 'coherence.backends.swr3_storage:SWR3Store'
@@ -123,7 +120,6 @@ TestStore = 'coherence.backends.test_storage:TestStore'
 TrackerStore = 'coherence.backends.tracker_storage:TrackerStore'
 TwitchStore = 'coherence.backends.twitch_storage:TwitchStore'
 YamjStore = 'coherence.backends.yamj_storage:YamjStore'
-YouTubeStore = 'coherence.backends.youtube_storage:YouTubeStore'
 
 
 [tool.poetry.plugins."coherence.plugins.backend.media_renderer"]

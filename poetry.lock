@@ -1966,13 +1966,11 @@ elisa = ["axiom", "epsilon"]
 feed = ["feedparser"]
 gstreamer = ["pycairo", "pygobject"]
 mediadb = ["axiom", "epsilon", "tagpy"]
-picasa = []
 test = ["flake8", "nose", "nose-cov", "pylint", "python-coveralls"]
 twitch = ["livestreamer"]
 web = ["autobahn"]
-youtube = []
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.7"
-content-hash = "3c53b18394d1d7a693fcac1ebf580c26faa3202e97de3dac638324f770d48307"
+content-hash = "1d9e6e150b3afb5c038a0cf7f21f06a04302bc8c8727c05dd6f85282987e6ed5"

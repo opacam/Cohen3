@@ -57,7 +57,7 @@ BetterLight, AmpacheStore, FlickrStore, ElisaPlayer,
 ElisaMediaStore, Gallery2Store, DVBDStore, FSStore, BuzztardPlayer,
 BuzztardStore, GStreamerPlayer, ITVStore, SWR3Store, TrackerStore,
 LolcatsStore, MediaStore, AppleTrailerStore, LastFMStore,
-AxisCamStore, YouTubeStore, TEDStore, IRadioStore, TwitchStore
+AxisCamStore, TEDStore, IRadioStore, TwitchStore
 
 Files
 -----

@@ -42,16 +42,8 @@ feed_store_require = [
     'feedparser'
 ]
 
-picasa_store_require = [
-    'gdata'
-]
-
 twitch_store_require = [
     'livestreamer'
-]
-
-youtube_store_require = [
-    'gdata'
 ]
 
 web_ui_require = [
@@ -83,7 +75,6 @@ test_require = (
         'nose-cov',
     ]
     + audio_store_require
-    + youtube_store_require
 )
 
 dev_require = test_require + gstreamer_player_require
@@ -107,7 +98,6 @@ entry_points = """
     LastFMStore = coherence.backends.lastfm_storage:LastFMStore
     LolcatsStore = coherence.backends.lolcats_storage:LolcatsStore
     MediaStore = coherence.backends.mediadb_storage:MediaStore
-    PicasaStore = coherence.backends.picasa_storage:PicasaStore
     PlaylistStore = coherence.backends.playlist_storage:PlaylistStore
     RadiotimeStore = coherence.backends.radiotime_storage:RadiotimeStore
     SWR3Store = coherence.backends.swr3_storage:SWR3Store
@@ -116,8 +106,7 @@ entry_points = """
     TrackerStore = coherence.backends.tracker_storage:TrackerStore
     TwitchStore = coherence.backends.twitch_storage:TwitchStore
     YamjStore = coherence.backends.yamj_storage:YamjStore
-    YouTubeStore = coherence.backends.youtube_storage:YouTubeStore
-    
+
     [coherence.plugins.backend.media_renderer]
     BuzztardPlayer = coherence.backends.buzztard_control:BuzztardPlayer
     ElisaPlayer = coherence.backends.elisa_renderer:ElisaPlayer
@@ -165,14 +154,11 @@ setup(name='Cohen3',
           'gstreamer': gstreamer_player_require,
           'elisa': elisa_store_require,
           'feed': feed_store_require,
-          'picasa': picasa_store_require,
           'twitch': twitch_store_require,
-          'youtube': youtube_store_require,
           'web': web_ui_require,
       },
       dependency_links=[
           'git+git://github.com/lobocv/eventdispatcher@releases/tag/1.9.4#egg=eventdispatcher',
-          'git+git://github.com/dvska/gdata-python3@master#egg=gdata',
           'git+git://github.com/fishstiqz/pycdb@master#egg=pycdb',
           'git+git://github.com/JonnyJD/python-discid@master#egg=discid',
           'git+git://github.com/opacam/epsilon@python3#egg=Epsilon',
