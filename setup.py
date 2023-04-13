@@ -71,6 +71,8 @@ test_require = (
         'flake8>=4',  # Because of https://github.com/PyCQA/flake8/issues/1564
         'pylint==2.1.1',
         'python-coveralls',
+        'pytest',
+        'pytest-cov',
     ]
     + audio_store_require
 )
