@@ -31,11 +31,11 @@ Now you can make your changes locally.
 
     $ pycodestyle coherence --statistics --ignore=E402
     $ pylint -E coherence --rcfile=.pylintrc
-    $ nosetests --with-coverage --cover-erase --cover-package=coherence --cover-html
+    $ py.test -v --cov=coherence --cov-report=term-missing tests
 
 6. Check that the test coverage hasn't dropped:
 
-    The last command of the above point (nosetests), will print a report at the
+    The last command of the above point (py.test), will print a report at the
     end of the tests (or you can check the results via your web browser: check
     the created folder "cover" and visualize the index.htm file for a nice
     report). Check that coverage percent against the coverage before the
