@@ -45,9 +45,9 @@ jobs:
     - name: Lint with pylint
       run: |
         pylint -E coherence --rcfile=.pylintrc
-    - name: Unit tests with nose
+    - name: Unit tests with pytest
       run: |
-        nosetests --config=.noserc
+        py.test -v --cov=coherence --cov-report=xml --cov-report=term-missing tests
     # The following steps will only be run for python 3.7
     - name: Upload coverage report to Codecov
       if: matrix.python-version == '3.7'
