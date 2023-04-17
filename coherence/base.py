@@ -883,7 +883,9 @@ class Coherence(EventDispatcher, log.LogAble):
                 if self.web_server.endpoint_listen is not None:
                     self.web_server.endpoint_listen.cancel()
                     self.web_server.endpoint_listen = None
-                if self.web_server.endpoint_port is not None:
+                if hasattr(
+                    self.web_server, 'endpoint_port'
+                ) and self.web_server.endpoint_port is not None:
                     self.web_server.endpoint_port.stopListening()
             if hasattr(self.web_server, 'ws_endpoint_listen'):
                 if self.web_server.ws_endpoint_listen is not None:
