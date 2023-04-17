@@ -73,6 +73,7 @@ test_require = (
         'python-coveralls',
         'pytest',
         'pytest-cov',
+        'pytest-twisted',
     ]
     + audio_store_require
 )

@@ -60,6 +60,7 @@ twisted = ">=20.3.0, <22.1.0" # 22.1.0 removed HTTPPageGetter as it's now deprec
 flake8 = {optional = true, version = ">=4"} # Because of https://github.com/PyCQA/flake8/issues/1564
 pytest = {optional = true, version = "*"}
 pytest-cov = {optional = true, version = "*"}
+pytest-twisted = {optional = true, version = "*"}
 pylint = {version = "==2.1.1", optional = true}
 python-coveralls = "*"
 recommonmark = {version = ">=0.4.0", optional = true}
@@ -76,7 +77,7 @@ build-backend = "poetry.masonry.api"
 web = ["autobahn"]
 elisa = ["axiom", "epsilon"]
 dbus = ["dbus-python"]
-test = ["flake8", "pytest", "pytest-cov", "pylint", "python-coveralls"]
+test = ["flake8", "pytest", "pytest-cov", "pytest-twisted", "pylint", "python-coveralls"]
 audio = ["discid", "pycdb"]
 feed = ["feedparser"]
 twitch = ["livestreamer"]
@@ -87,7 +88,7 @@ dev = [
     "autobahn", "dbus-python",
     "discid", "pycdb",
     "pycairo", "pygobject",
-    "flake8", "pytest", "pytest-cov", "pylint", "python-coveralls",
+    "flake8", "pytest", "pytest-cov", "pytest-twisted", "pylint", "python-coveralls",
     "recommonmark", "sphinx", "sphinx-rtd-theme", "sphinxcontrib-napoleon",
 ]
 
