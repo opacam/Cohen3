@@ -12,7 +12,7 @@ import pytest_twisted as pt
 import shutil
 
 from pathlib import Path
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Callable, Dict, Tuple, Union
 from twisted.internet import reactor
 from twisted.internet.defer import Deferred
 
@@ -27,6 +27,25 @@ COHERENCE_BASE_CONFIG = {
     "controlpoint": "yes",
     "web-ui": "no",
 }
+
+
+def wait_until(condition: Callable[[], bool]) -> Deferred:
+    """Returns a deferred that will fire when the given condition is True."""
+    d = Deferred()
+
+    def check_condition() -> None:
+        """
+        Checks the condition and either fires the deferred or schedules another
+        check.
+        """
+        if condition():
+            d.callback(None)
+        else:
+            reactor.callLater(0.1, check_condition)
+
+    check_condition()
+
+    return d
 
 
 @pt.async_yield_fixture(scope="function")
@@ -53,27 +72,20 @@ async def coherence_with_config(
     plugin_uuid = coherence_config.get("plugin", [{"uuid": None}])[0]["uuid"]
 
     # we need to wait coherence to be initialized before yielding
-    d = Deferred()
-
-    def wait_for_initialization():
+    def server_or_backend_is_ready():
         if (
             config_has_plugin
             and coherence.active_backends
             and coherence.active_backends[plugin_uuid].backend
-        ):
-            d.callback(coherence.active_backends[plugin_uuid].backend)
-        elif (
+        ) or (
             not config_has_plugin
             and coherence.web_server is not None
             and coherence.web_server_port is not None
         ):
-            d.callback(coherence)
-        else:
-            reactor.callLater(0.1, wait_for_initialization)
+            return True
+        return False
 
-    wait_for_initialization()
-    server_or_backend = await d
-    print(f"* server_or_backend is ready: {server_or_backend}")
+    await wait_until(server_or_backend_is_ready)
 
     # yield the server/backend and expected data (if any)
     # Note: for now, we yield the coherence server, but we could yeld the
@@ -183,23 +195,17 @@ async def media_server(
     }
     coherence_server = Coherence(coherence_config)
 
-    # we need to wait coherence to be initialized
-    backend_deferred = Deferred()
-
-    def wait_for_backend():
+    # we need to wait coherence backend to to be initialized
+    def store_is_ready():
         if (
             coherence_server.ctrl
             and coherence_server.active_backends
             and coherence_server.active_backends[store_uuid].backend
         ):
-            backend_deferred.callback(
-                coherence_server.active_backends[store_uuid].backend
-            )
-        else:
-            reactor.callLater(0.1, wait_for_backend)
+            return True
+        return False
 
-    wait_for_backend()
-    await backend_deferred
+    await wait_until(store_is_ready)
 
     # Add a device query and yield the MediaServer instance.
     result_deferred = Deferred()
