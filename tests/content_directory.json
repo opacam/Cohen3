@@ -1,0 +1,197 @@
+{
+  "id": 1001,
+  "parentID": 1000,
+  "name": "content",
+  "type": "folder",
+  "upnp_class": "object.container",
+  "children": [
+    {
+      "id": 1004,
+      "name": "audio",
+      "type": "folder",
+      "upnp_class": "object.container",
+      "parentID": 1001,
+      "children": [
+        {
+          "id": 1006,
+          "name": "album-1",
+          "type": "folder",
+          "upnp_class": "object.container",
+          "parentID": 1004,
+          "children": [
+            {
+              "id": "1008.mp3",
+              "name": "track-1.mp3",
+              "type": "file",
+              "upnp_class": "object.item.audioItem",
+              "parentID": 1006
+            },
+            {
+              "id": "1007.mp3",
+              "name": "track-2.mp3",
+              "type": "file",
+              "upnp_class": "object.item.audioItem",
+              "parentID": 1006
+            }
+          ]
+        },
+        {
+          "id": 1005,
+          "name": "album-2",
+          "type": "folder",
+          "upnp_class": "object.container",
+          "parentID": 1004,
+          "children": [
+            {
+              "id": "1010.ogg",
+              "name": "track-1.ogg",
+              "type": "file",
+              "upnp_class": "object.item.audioItem",
+              "parentID": 1005
+            },
+            {
+              "id": "1009.ogg",
+              "name": "track-2.ogg",
+              "type": "file",
+              "upnp_class": "object.item.audioItem",
+              "parentID": 1005
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 1002,
+      "name": "images",
+      "type": "folder",
+      "upnp_class": "object.container",
+      "parentID": 1001,
+      "children": [
+        {
+          "id": 1020,
+          "name": "trip-1",
+          "type": "folder",
+          "upnp_class": "object.container",
+          "parentID": 1002,
+          "children": [
+            {
+              "id": "1025.jpg",
+              "name": "photo-1.jpg",
+              "type": "file",
+              "upnp_class": "object.item.imageItem",
+              "parentID": 1020
+            },
+            {
+              "id": "1024.jpg",
+              "name": "photo-2.jpg",
+              "type": "file",
+              "upnp_class": "object.item.imageItem",
+              "parentID": 1020
+            }
+          ]
+        },
+        {
+          "id": 1021,
+          "name": "logos",
+          "type": "folder",
+          "upnp_class": "object.container",
+          "parentID": 1002,
+          "children": [
+            {
+              "id": "1022.jpeg",
+              "name": "logo-1.jpeg",
+              "type": "file",
+              "upnp_class": "object.item.imageItem",
+              "parentID": 1021
+            },
+            {
+              "id": "1023.png",
+              "name": "logo-2.png",
+              "type": "file",
+              "upnp_class": "object.item.imageItem",
+              "parentID": 1021
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 1003,
+      "name": "video",
+      "type": "folder",
+      "upnp_class": "object.container",
+      "parentID": 1001,
+      "children": [
+        {
+          "id": 1012,
+          "name": "tvshow-1",
+          "type": "folder",
+          "upnp_class": "object.container",
+          "parentID": 1003,
+          "children": [
+            {
+              "id": "1017.mp4",
+              "name": "the last of us 1x01.mp4",
+              "type": "file",
+              "upnp_class": "object.item.videoItem",
+              "parentID": 1012
+            },
+            {
+              "id": "1016.mp4",
+              "name": "the last of us 1x02.mp4",
+              "type": "file",
+              "upnp_class": "object.item.videoItem",
+              "parentID": 1012
+            }
+          ]
+        },
+        {
+          "id": 1011,
+          "name": "tvshow-2",
+          "type": "folder",
+          "upnp_class": "object.container",
+          "parentID": 1003,
+          "children": [
+            {
+              "id": "1018.avi",
+              "name": "game_of_thrones_s01e01.avi",
+              "type": "file",
+              "upnp_class": "object.item.videoItem",
+              "parentID": 1011
+            },
+            {
+              "id": "1019.avi",
+              "name": "game_of_thrones_s01e02.avi",
+              "type": "file",
+              "upnp_class": "object.item.videoItem",
+              "parentID": 1011
+            }
+          ]
+        },
+        {
+          "id": 1013,
+          "name": "movies",
+          "type": "folder",
+          "upnp_class": "object.container",
+          "parentID": 1003,
+          "children": [
+            {
+              "id": "1014.mkv",
+              "name": "John.Wick.2014.720p.BluRay.x264.mkv",
+              "type": "file",
+              "upnp_class": "object.item.videoItem",
+              "parentID": 1013
+            },
+            {
+              "id": "1015.mkv",
+              "name": "Pulp Fiction 1994 720P BRRip.mkv",
+              "type": "file",
+              "upnp_class": "object.item.videoItem",
+              "parentID": 1013
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
