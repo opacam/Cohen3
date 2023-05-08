@@ -4,16 +4,18 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2014, Hartmut Goebel <h.goebel@goebel-consult.de>
+# Copyright 2023 Pol Canelles <canellestudi@gmail.com>
 
 """
 Test cases for L{backends.ampache_storage}
 """
+import pytest
+
 from lxml import etree
-from twisted.trial import unittest
 
 from coherence.backends import ampache_storage
 
-SONG = '''
+SONG = """
 <!-- taken from https://github.com/ampache/ampache/wiki/XML-API
 but the original was not valid XML, so we can not trust it
 -->
@@ -34,9 +36,9 @@ but the original was not valid XML, so we can not trust it
     <rating>2.9</rating>
   </song>
 </root>
-'''
+"""
 
-SONG_370 = '''
+SONG_370 = """
 <!-- real-world example from Ampache 3.7.0 -->
 <root>
 <song id="3440">
@@ -62,73 +64,55 @@ SONG_370 = '''
   <averagerating></averagerating>
 </song>
 </root>
-'''  # noqa: E501
+"""  # noqa: E501
+
+
+def expected_duration(total_seconds: str) -> str:
+    """Convert the time element into a more human-readable format."""
+
+    hours, remainder = divmod(int(total_seconds), 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    return f"{hours:02}:{minutes:02}:{seconds:02}"
 
 
 class DummyStore:
     def __init__(self):
         pass
 
-    proxy = False
+    @property
+    def proxy(self):
+        return False
 
 
-class TestAmpache(unittest.TestCase):
+@pytest.fixture
+def dummy_store():
+    return DummyStore()
 
-    def setUp(self):
-        pass
 
-    def test_song(self):
-        """Test songs with XML from Ampache 3.7.0"""
-        doc = etree.fromstring(SONG)
-        song = doc.find('song')
-        store = DummyStore()
-        track = ampache_storage.Track(store, song)
-        self.assertEqual(track.get_id(), 'song.3180')
-        self.assertEqual(track.parent_id, 'album.2910')
-        self.assertEqual(track.duration, '00:03:54')
-        self.assertEqual(track.get_url(),
-                         'http://localhost/play/index.php?oid=123908...')
-        self.assertEqual(track.get_name(), 'Hells Bells')
-        self.assertEqual(track.title, 'Hells Bells')
-        self.assertEqual(track.artist, 'AC/DC')
-        self.assertEqual(track.album, 'Back in Black')
-        self.assertEqual(track.genre, None)
-        self.assertEqual(track.track_nr, '4')
-        self.assertEqual(track.cover, 'http://localhost/image.php?id=129348')
-        self.assertEqual(track.mimetype, 'audio/mpeg')  # guessed
-        self.assertEqual(track.size, 654321)
-        self.assertIs(track.get_path(), None)
-        self.assertEqual(track.get_children(), [])
-        self.assertEqual(track.get_child_count(), 0)
+@pytest.fixture(params=[SONG, SONG_370])
+def song_xml(request):
+    return etree.fromstring(request.param).find("song")
 
-    def test_song_370(self):
-        """Test songs with XML from Ampache 3.7.0"""
-        doc = etree.fromstring(SONG_370)
-        song = doc.find('song')
-        store = DummyStore()
-        track = ampache_storage.Track(store, song)
-        self.assertEqual(track.get_id(), 'song.3440')
-        self.assertEqual(track.parent_id, 'album.359')
-        self.assertEqual(track.duration, '00:10:25')
-        self.assertEqual(
-            track.get_url(),
-            'http://songserver/ampache/play/index.php?'
-            'ssid=1e11a4&type=song&oid=3440&uid=4&'
-            'name=Led%20Zeppelin%20-%20Achilles%20Last%20Stand.mp3'
-        )
-        self.assertEqual(track.get_name(), 'Achilles Last Stand')
-        self.assertEqual(track.title, 'Achilles Last Stand')
-        self.assertEqual(track.artist, 'Led Zeppelin')
-        self.assertEqual(track.album, 'Presence')
-        self.assertEqual(track.genre, None)
-        self.assertEqual(track.track_nr, '1')
-        self.assertEqual(
-            track.cover,
-            'http://songserver/ampache/image.php?'
-            'id=359&object_type=album&auth=1e11a40&name=art.'
-        )
-        self.assertEqual(track.mimetype, 'audio/mpeg')
-        self.assertEqual(track.size, 19485595)
-        self.assertIs(track.get_path(), None)
-        self.assertEqual(track.get_children(), [])
-        self.assertEqual(track.get_child_count(), 0)
+
+def test_track(dummy_store, song_xml):
+    """Test tracks with XML from Ampache"""
+    track = ampache_storage.Track(dummy_store, song_xml)
+    assert track.get_id() == "song." + song_xml.get("id")
+    assert track.parent_id == "album." + song_xml.find("album").get("id")
+    assert track.duration == expected_duration(song_xml.find("time").text)
+    assert track.get_url() == song_xml.find("url").text
+    assert track.get_name() == song_xml.find("title").text
+    assert track.title == song_xml.find("title").text
+    assert track.artist == song_xml.find("artist").text
+    assert track.album == song_xml.find("album").text
+    assert track.genre is None
+    assert track.track_nr == song_xml.find("track").text
+    assert track.cover == song_xml.find("art").text
+    assert track.mimetype == (
+        song_xml.find("mime").text if song_xml.find("mime") else "audio/mpeg"
+    )
+    assert track.size == int(song_xml.find("size").text)
+    assert track.get_path() is None
+    assert track.get_children() == []
+    assert track.get_child_count() == 0
