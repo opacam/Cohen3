@@ -4,19 +4,21 @@
 # http://opensource.org/licenses/mit-license.php
 
 # Copyright 2008, Frank Scholz <coherence@beebits.net>
+# Copyright 2023 Pol Canelles <canellestudi@gmail.com>
 
 """
 Test cases for L{upnp.core.utils}
 """
 
-import os
+import pytest
+import shutil
 
+from typing import Callable
 from twisted.internet import reactor
 from twisted.protocols import policies
-from twisted.python.filepath import FilePath
-from twisted.trial import unittest
-from twisted.web import static, server
 
+# from twisted.python.filepath import FilePath
+from twisted.web import static, server
 from coherence.upnp.core import utils
 
 # This data is joined using CRLF pairs.
@@ -123,52 +125,75 @@ testChunkedDataResult = [
 ]
 
 
-class TestUpnpUtils(unittest.TestCase):
-    def test_chunked_data(self):
-        """ tests proper reassembling of a chunked http-response
-            based on a test and data provided by Lawrence
-        """
-        testData = '\r\n'.join(testChunkedData)
-        newData = utils.de_chunk_payload(testData)
-        # see whether we can parse the result
-        self.assertEqual(newData, '\r\n'.join(testChunkedDataResult))
+@pytest.fixture
+def site(tmp_path: str) -> server.Site:
+    """
+    Pytest fixture that creates a test directory, a file within the test
+    directory, and returns a twisted.web.server.Site object for the directory.
+    """
+    name = tmp_path / "site"
+    name.mkdir()
+    (name / "file").write_bytes(b"0123456789")
+    r = static.File(name)
+    yield server.Site(r, timeout=None)
+    shutil.rmtree(name)
 
 
-class TestClient(unittest.TestCase):
-    def _listen(self, site):
-        return reactor.listenTCP(0, site, interface="127.0.0.1")
+@pytest.fixture
+def port(site: server.Site) -> int:
+    """
+    Pytest fixture that returns a TCP port that is being listened by a reactor
+    wrapping the server.Site object.
+    """
+    wrapper = policies.WrappingFactory(site)
+    port = reactor.listenTCP(0, wrapper, interface="127.0.0.1")
+    yield port.getHost().port
+    port.stopListening()
 
-    def setUp(self):
-        name = self.mktemp()
-        os.mkdir(name)
-        FilePath(name).child("file").setContent(b"0123456789")
-        r = static.File(name)
-        self.site = server.Site(r, timeout=None)
-        self.wrapper = policies.WrappingFactory(self.site)
-        self.port = self._listen(self.wrapper)
-        self.portno = self.port.getHost().port
 
-    def tearDown(self):
-        return self.port.stopListening()
+@pytest.fixture
+def get_url(port: int) -> Callable[[str], str]:
+    """
+    Pytest fixture that returns a function that accepts a string path, and
+    returns a full url that can be used to access the specified path.
+    """
 
-    def getURL(self, path):
-        return "http://127.0.0.1:%d/%s" % (self.portno, path)
+    def _get_url(path):
+        return f"http://127.0.0.1:{port}/{path}"
 
-    def assertResponse(self, original, content, headers):
-        self.assertIsInstance(original, tuple)
-        self.assertEqual(original[0], content)
-        originalHeaders = original[1]
+    return _get_url
+
+
+def test_chunked_data() -> None:
+    """Tests proper reassembling of a chunked http-response
+    based on a test and data provided by Lawrence
+    """
+    test_data = "\r\n".join(testChunkedData)
+    new_data = utils.de_chunk_payload(test_data)
+    assert new_data == "\r\n".join(testChunkedDataResult)
+
+
+def test_get_page(site: server.Site, get_url: Callable[[str], str]) -> None:
+    """
+    Tests proper retrieval of the page specified by the get_url function, and
+    the verification of the response content and headers.
+    """
+    content = b"0123456789"
+    headers = {
+        b"accept-ranges": [b"bytes"],
+        b"content-length": [b"10"],
+        b"content-type": [b"text/html"],
+    }
+
+    # Define a generator function that calls the coroutine
+    def _get_page() -> None:
+        response = yield utils.getPage(get_url("file"))
+        assert isinstance(response, tuple)
+        assert response[0] == content
+        original_headers = response[1]
         for header in headers:
-            self.assertIn(header, originalHeaders)
-            self.assertEqual(originalHeaders[header], headers[header])
+            assert header in original_headers
+            assert original_headers[header] == headers[header]
 
-    def test_getPage(self):
-        content = b'0123456789'
-        headers = {
-            b'accept-ranges': [b'bytes'],
-            b'content-length': [b'10'],
-            b'content-type': [b'text/html'],
-        }
-        d = utils.getPage(self.getURL("file"))
-        d.addCallback(self.assertResponse, content, headers)
-        return d
+    # Call the generator function to start the test
+    _get_page()

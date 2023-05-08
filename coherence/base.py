@@ -60,6 +60,7 @@ from twisted.web import resource, static
 from twisted.python.util import sibpath
 
 from eventdispatcher import (
+    BindError,
     EventDispatcher,
     ListProperty,
     DictProperty,
@@ -883,7 +884,9 @@ class Coherence(EventDispatcher, log.LogAble):
                 if self.web_server.endpoint_listen is not None:
                     self.web_server.endpoint_listen.cancel()
                     self.web_server.endpoint_listen = None
-                if self.web_server.endpoint_port is not None:
+                if hasattr(
+                    self.web_server, 'endpoint_port'
+                ) and self.web_server.endpoint_port is not None:
                     self.web_server.endpoint_port.stopListening()
             if hasattr(self.web_server, 'ws_endpoint_listen'):
                 if self.web_server.ws_endpoint_listen is not None:
@@ -920,8 +923,14 @@ class Coherence(EventDispatcher, log.LogAble):
 
         def homecleanup(result):
             # cleans up anything left over
-            self.ssdp_server.unbind(new_device=self.create_device)
-            self.ssdp_server.unbind(removed_device=self.remove_device)
+            try:
+                self.ssdp_server.unbind(new_device=self.create_device)
+            except BindError:
+                pass
+            try:
+                self.ssdp_server.unbind(removed_device=self.remove_device)
+            except BindError:
+                pass
             self.ssdp_server.shutdown()
             if self.ctrl:
                 self.ctrl.shutdown()

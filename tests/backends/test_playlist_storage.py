@@ -8,56 +8,81 @@
 """
 Test cases for L{upnp.backends.playlist_storage}
 """
-from twisted.trial import unittest
+import re
+import pytest
+import pytest_twisted as pt
 
 from coherence.backend import Container
 from coherence.backends.playlist_storage import PlaylistStore, PlaylistItem
+from coherence.upnp.core import uuid
 
-URL_M3U = 'https://gist.githubusercontent.com/random-robbie/' \
-          'e56919b5603ecc87af885391e7331657/raw/' \
-          '65661a4e6fa8c706cc8fe1cf7c553927e5cf62a7/BBC.m3u'
+URL_M3U = (
+    "https://gist.githubusercontent.com/random-robbie/"
+    "e56919b5603ecc87af885391e7331657/raw/"
+    "65661a4e6fa8c706cc8fe1cf7c553927e5cf62a7/BBC.m3u"
+)
+STORE_UUID = str(uuid.UUID())
 
 
-class TestPlaylistStorage(unittest.TestCase):
-
-    def setUp(self):
-        self.playlist = PlaylistStore(
+@pytest.mark.parametrize(
+    "coherence_with_config",
+    [
+        (
+            {
+                "logmode": "info",
+                "unittest": "yes",
+                "plugin": [
+                    {
+                        "backend": "PlaylistStore",
+                        "name": "PlayListServer-test",
+                        "playlist_url": URL_M3U,
+                        "uuid": STORE_UUID,
+                    },
+                ],
+            },
             None,
-            playlist_url=URL_M3U
-            )
+        ),
+    ],
+    indirect=True,
+)
+@pt.ensureDeferred
+async def test_playlist_storage(coherence_with_config):
+    """Test the PlaylistStore backend."""
+    coherence_server, _ = coherence_with_config
+    playlist = coherence_server.active_backends[STORE_UUID].backend
 
-    def test_Content(self):
-        def got_result(r):
-            # print('got result: %r results found' % len(r))
+    assert isinstance(playlist, PlaylistStore)
 
-            # Test content length
-            self.assertEqual(len(r), 30)
-            self.assertEqual(len(self.playlist.store), 31)
-            self.assertEqual(self.playlist.len(), 31)
+    def got_result(r):
+        """Callback function for when the playlist backend is initialized."""
+        assert len(r) == 30
+        assert len(playlist.store) == 61
+        assert playlist.len() == 61
 
-            # Test items
-            self.assertIsInstance(self.playlist.store[0], Container)
-            self.assertIsInstance(self.playlist.store[1000], PlaylistItem)
+        assert isinstance(playlist.store[0], Container)
+        assert isinstance(playlist.store[1000], PlaylistItem)
 
-            # Test playlist item
-            playlist_item = self.playlist.store[1000]
-            print(playlist_item.__dict__)
-            self.assertEqual(playlist_item.stream_url[0:4], 'http')
-            self.assertEqual(playlist_item.get_url(), '/1000')
-            self.assertEqual(playlist_item.get_id(), 1000)
+        playlist_item = playlist.store[1000]
+        assert playlist_item.stream_url[0:4] == "http"
+        url_pattern = url_pattern = (
+            r"http:\/\/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:8080"
+            r"\/[a-zA-Z0-9-]+\/1000"
+        )
+        assert re.match(url_pattern, playlist_item.get_url()) is not None
+        assert playlist_item.get_id() == 1000
 
-            # Test audio/video/image item
-            media_item = playlist_item.get_item()
-            self.assertEqual(media_item.parentID, 0)
-            self.assertEqual(media_item.id, 1000)
-            self.assertIsInstance(media_item.title, str)
-            self.assertGreater(len(media_item.title), 0)
+        media_item = playlist_item.get_item()
+        assert media_item.parentID == 0
+        assert media_item.id == 1000
+        assert isinstance(media_item.title, str)
+        assert len(media_item.title) > 0
 
-        def got_error(r):
-            print('got_error: %r' % r)
-            self.assertEqual(len(r), 30)
+    def got_error(r):
+        """Error callback function."""
+        r.printTraceback()
+        raise r
 
-        d = self.playlist.upnp_init()
-        d.addCallback(got_result)
-        d.addErrback(got_error)
-        return d
+    d = playlist.upnp_init()
+    d.addCallback(got_result)
+    d.addErrback(got_error)
+    await d

@@ -68,11 +68,12 @@ docs_require = [
 
 test_require = (
     [
-        'flake8>=4', # Because of https://github.com/PyCQA/flake8/issues/1564
+        'flake8>=4',  # Because of https://github.com/PyCQA/flake8/issues/1564
         'pylint==2.1.1',
         'python-coveralls',
-        'nose',
-        'nose-cov',
+        'pytest',
+        'pytest-cov',
+        'pytest-twisted',
     ]
     + audio_store_require
 )
